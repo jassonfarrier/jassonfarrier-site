@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Housing Market Updates | Jasson Farrier</title>
+<meta name="description" content="Real housing market data for Central Ohio and national trends. No spin, no headlines — just numbers.">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root { --navy: #0D1E42; --navy-deep: #0B1524; --gray: #9DA6AB; --dark: #0a0a0a; --light: #f6f6f6; --border: #e0e0e0; --white: #ffffff; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Montserrat', sans-serif; background: var(--white); color: var(--dark); line-height: 1.7; }
+nav { background: var(--navy); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+.nav-logo { font-weight: 900; font-size: 15px; letter-spacing: 2px; text-transform: uppercase; color: var(--white); text-decoration: none; }
+.nav-logo span { color: var(--gray); }
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a { font-weight: 600; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; }
+.nav-links a:hover { color: var(--white); }
+.nav-cta { background: var(--white) !important; color: var(--navy) !important; padding: 8px 18px; border-radius: 2px; }
+.agent-bar { background: var(--navy-deep); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 9px 40px; text-align: center; font-size: 12px; font-weight: 400; letter-spacing: 1px; color: rgba(255,255,255,0.55); }
+.agent-bar span { color: var(--white); font-size: 13px; font-weight: 600; letter-spacing: 1px; }
+.hero { background: var(--navy); padding: 80px 40px; text-align: center; }
+.hero-inner { max-width: 760px; margin: 0 auto; }
+.hero-tag { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--gray); margin-bottom: 20px; display: block; }
+.hero h1 { font-weight: 900; font-size: clamp(32px, 4vw, 52px); line-height: 1.1; color: var(--white); margin-bottom: 20px; }
+.hero-body { font-size: 18px; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 40px; }
+.signup-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-top: 3px solid var(--gray); padding: 40px; border-radius: 4px; max-width: 520px; margin: 0 auto; text-align: left; }
+.signup-box h2 { font-weight: 900; font-size: 18px; color: var(--white); margin-bottom: 8px; }
+.signup-box p { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 24px; }
+.field { margin-bottom: 16px; }
+.field label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.5); display: block; margin-bottom: 8px; }
+.field input { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 2px; color: var(--white); font-family: 'Montserrat', sans-serif; font-size: 14px; }
+.field input::placeholder { color: rgba(255,255,255,0.3); }
+.submit-btn { width: 100%; background: var(--white); color: var(--navy); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 16px; border: none; border-radius: 2px; cursor: pointer; margin-top: 8px; }
+.submit-btn:hover { background: #eaeaea; }
+.fine-print { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 12px; }
+.thanks { display: none; text-align: center; padding: 24px 0; }
+.thanks p { font-weight: 700; font-size: 16px; color: var(--white); }
+.thanks span { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 400; display: block; margin-top: 8px; }
+.what-section { padding: 80px 40px; background: var(--light); }
+.what-inner { max-width: 760px; margin: 0 auto; }
+.section-label { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--navy); margin-bottom: 16px; display: block; }
+.section-title { font-weight: 900; font-size: clamp(24px, 3vw, 36px); color: var(--dark); margin-bottom: 40px; }
+.what-list { display: flex; flex-direction: column; gap: 24px; }
+.what-item { display: flex; gap: 20px; align-items: flex-start; background: var(--white); padding: 24px; border-radius: 4px; border-left: 3px solid var(--navy); }
+.what-num { font-weight: 900; font-size: 28px; color: var(--navy); flex-shrink: 0; line-height: 1; }
+.what-item h3 { font-weight: 700; font-size: 15px; color: var(--dark); margin-bottom: 4px; }
+.what-item p { font-size: 14px; color: #555; line-height: 1.6; }
+footer { background: var(--dark); padding: 48px 40px 32px; border-top: 3px solid var(--navy); }
+.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
+.footer-logo { font-weight: 900; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--white); }
+.footer-logo span { color: var(--gray); }
+.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.footer-links a { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); text-decoration: none; }
+.footer-links a:hover { color: var(--white); }
+.footer-compliance { max-width: 1100px; margin: 24px auto 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.07); }
+.footer-compliance p { font-size: 10px; color: rgba(255,255,255,0.25); line-height: 1.8; }
+@media (max-width: 768px) {
+  nav { padding: 0 20px; } .nav-links { display: none; }
+  .hero { padding: 60px 20px; }
+  .what-section { padding: 60px 20px; }
+  footer { padding: 40px 20px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="agent-bar"><span style="font-size:18px;font-weight:700;color:#9DA6AB;">Kiger Realty</span> &nbsp;·&nbsp; <span>Jasson Farrier</span> &nbsp;·&nbsp; Realtor &nbsp;·&nbsp; License #2018004483 &nbsp;·&nbsp; 614-699-3007</div>
+
+<nav>
+  <a href="/" class="nav-logo">Jasson <span>Farrier</span></a>
+  <div class="nav-links">
+    <a href="/housing-market-updates">Market Updates</a>
+    <a href="/bio">Bio</a>
+    <a href="/contact">Work With Me</a>
+    <a href="/free" class="nav-cta">Free Guide</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-tag">Housing Market Updates</span>
+    <h1>Real numbers. No spin.</h1>
+    <p class="hero-body">Inventory, days on market, price reductions, permit data. When something shifts, I send an update. Not a daily email — only when it matters.</p>
+    <div class="signup-box">
+      <h2>Get Market Updates</h2>
+      <p>I'll send you data when the market actually moves. No fluff.</p>
+      <form id="mu-form" onsubmit="handleMU(event)">
+        <div class="field">
+          <label for="mu-email">Email Address</label>
+          <input type="email" id="mu-email" placeholder="your@email.com" required />
+        </div>
+        <input type="text" id="mu-hp" name="website" style="position:absolute;left:-9999px;opacity:0;" tabindex="-1" autocomplete="off" />
+        <button type="submit" class="submit-btn" id="mu-btn">Send Me Updates →</button>
+      </form>
+      <div class="thanks" id="mu-thanks">
+        <p>You're in.</p>
+        <span>Watch your inbox when the market shifts.</span>
+      </div>
+      <p class="fine-print">No spam. Unsubscribe anytime.</p>
+    </div>
+  </div>
+</div>
+
+<div class="what-section">
+  <div class="what-inner">
+    <span class="section-label">What You Get</span>
+    <h2 class="section-title">Data-first. When it matters.</h2>
+    <div class="what-list">
+      <div class="what-item">
+        <div class="what-num">01</div>
+        <div>
+          <h3>Inventory & Days on Market</h3>
+          <p>When supply shifts, you need to know before it hits the headlines. I track active listings, new listings, and absorption rate across Central Ohio.</p>
+        </div>
+      </div>
+      <div class="what-item">
+        <div class="what-num">02</div>
+        <div>
+          <h3>Price Reduction Signals</h3>
+          <p>Price reductions are a leading indicator. I watch them county by county and flag when the trend changes direction.</p>
+        </div>
+      </div>
+      <div class="what-item">
+        <div class="what-num">03</div>
+        <div>
+          <h3>National Context</h3>
+          <p>What's happening in 300 markets across the country — and what it means for Central Ohio buyers and sellers.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Jasson <span>Farrier</span></div>
+    <div class="footer-links">
+      <a href="/housing-market-updates">Market Updates</a>
+      <a href="/bio">Bio</a>
+      <a href="/contact">Contact</a>
+      <a href="/free">Free Guide</a>
+      <a href="/privacy">Privacy</a>
+    </div>
+  </div>
+  <div class="footer-compliance">
+    <p>Jasson Farrier · Kiger Realty · License #2018004483 · 614-699-3007 · jassonfarrier@gmail.com<br>
+    Equal Housing Opportunity. Information deemed reliable but not guaranteed.</p>
+  </div>
+</footer>
+
+<script>
+var _muLoadTime = Date.now();
+async function handleMU(e) {
+  e.preventDefault();
+  var btn = document.getElementById('mu-btn');
+  btn.textContent = 'Subscribing...';
+  btn.disabled = true;
+  if (document.getElementById('mu-hp').value || Date.now() - _muLoadTime < 2000) {
+    btn.textContent = 'Send Me Updates →';
+    btn.disabled = false;
+    return;
+  }
+  var email = document.getElementById('mu-email').value.trim();
+  try {
+    var kitForm = document.createElement('form');
+    kitForm.action = 'https://app.kit.com/forms/9195650/subscriptions';
+    kitForm.method = 'post';
+    kitForm.target = 'kit-mu-frame';
+    kitForm.style.display = 'none';
+    var ef = document.createElement('input');
+    ef.name = 'email_address';
+    ef.value = email;
+    kitForm.appendChild(ef);
+    document.body.appendChild(kitForm);
+    var iframe = document.createElement('iframe');
+    iframe.name = 'kit-mu-frame';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    kitForm.submit();
+    await fetch('https://farrier-crm.vercel.app/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email,
+        first_name: '', last_name: '', phone: '',
+        lead_source: 'Jasson Farrier — Market Updates',
+        source_site: 'jassonfarrier.com',
+        contact_type: 'Subscriber',
+        notes: 'Market updates signup',
+        newsletter: true
+      })
+    });
+  } catch(err) { console.error(err); }
+  document.getElementById('mu-form').style.display = 'none';
+  document.getElementById('mu-thanks').style.display = 'block';
+}
+</script>
+</body>
+</html>
