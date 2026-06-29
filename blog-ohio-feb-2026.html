@@ -61,7 +61,7 @@ footer { background: var(--dark); padding: 48px 40px 32px; border-top: 3px solid
 .footer-nav a{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;margin:0 12px;}
 .footer-nav a:hover{color:var(--white);}
 .footer-eho{background:var(--dark);padding:16px 40px 24px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);}
-.footer-eho img{height:28px;vertical-align:middle;margin-right:10px;opacity:0.6;}
+.footer-eho img{height:28px;vertical-align:middle;margin-right:10px;opacity:0.7;filter:invert(1);}
 .footer-eho span{font-size:10px;color:rgba(255,255,255,0.25);vertical-align:middle;line-height:1.8;}
 </style>
 </head>
@@ -124,6 +124,13 @@ footer { background: var(--dark); padding: 48px 40px 32px; border-top: 3px solid
   <script>
   var _nlLoadTime=Date.now();async function handleNL(e){e.preventDefault();var b=document.getElementById('nl-btn');b.textContent='Subscribing...';b.disabled=true;if(document.getElementById('nl-hp').value||Date.now()-_nlLoadTime<2000){b.textContent='Subscribe →';b.disabled=false;return;}try{await fetch('https://farrier-crm.vercel.app/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('nl-email').value.trim(),first_name:'',last_name:'',phone:'',lead_source:'Jasson Farrier — Blog',source_site:'jassonfarrier.com',contact_type:'Subscriber',notes:'Newsletter signup from blog',newsletter:true})})}catch(err){console.error(err)}document.getElementById('nl-form').style.display='none';document.getElementById('nl-thanks').style.display='block'}
   </script>
+</div>
+
+<div style="background:var(--navy);padding:48px 40px;margin-top:60px;border-top:3px solid var(--gray);text-align:center;">
+  <span style="font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:12px;">Watch on YouTube</span>
+  <p style="font-weight:900;font-size:22px;color:var(--white);margin-bottom:8px;">Ohio Housing Nerd</p>
+  <p style="font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:24px;">Weekly breakdowns of the Ohio housing market — inventory, prices, days on market, and what it actually means.</p>
+  <a href="https://youtube.com/@ohiohousingnerd" target="_blank" rel="noopener" style="display:inline-block;background:var(--white);color:var(--navy);font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:14px 28px;text-decoration:none;border-radius:2px;">Watch the Channel →</a>
 </div>
 
 <footer>

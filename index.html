@@ -51,6 +51,15 @@ nav { background: var(--navy); padding: 0 40px; display: flex; align-items: cent
 .stat { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-top: 3px solid var(--gray); padding: 20px; border-radius: 2px; }
 .stat-num { font-weight: 900; font-size: 28px; color: var(--white); margin-bottom: 4px; }
 .stat-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+.yt-section{background:var(--navy);padding:60px 40px;}
+.yt-inner{max-width:900px;margin:0 auto;}
+.yt-cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px;}
+.yt-card{display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-top:3px solid var(--gray);padding:32px;text-decoration:none;border-radius:2px;transition:background 0.2s;}
+.yt-card:hover{background:rgba(255,255,255,0.09);}
+.yt-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);}
+.yt-name{font-size:22px;font-weight:900;color:var(--white);}
+.yt-cta{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray);margin-top:8px;}
+@media(max-width:600px){.yt-cards{grid-template-columns:1fr;}}
 .cta-bar { background: var(--navy-deep); padding: 60px 40px; text-align: center; border-top: 3px solid var(--gray); }
 .cta-bar h2 { font-weight: 900; font-size: clamp(24px, 3vw, 36px); color: var(--white); margin-bottom: 12px; }
 .cta-bar p { font-size: 18px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
@@ -79,7 +88,7 @@ footer { background: var(--dark); padding: 48px 40px 32px; border-top: 3px solid
 .footer-nav a{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;margin:0 12px;}
 .footer-nav a:hover{color:var(--white);}
 .footer-eho{background:var(--dark);padding:16px 40px 24px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);}
-.footer-eho img{height:28px;vertical-align:middle;margin-right:10px;opacity:0.6;}
+.footer-eho img{height:28px;vertical-align:middle;margin-right:10px;opacity:0.7;filter:invert(1);}
 .footer-eho span{font-size:10px;color:rgba(255,255,255,0.25);vertical-align:middle;line-height:1.8;}
 </style>
 </head>
@@ -186,6 +195,24 @@ footer { background: var(--dark); padding: 48px 40px 32px; border-top: 3px solid
         <div class="stat-num">23/50</div>
         <div class="stat-label">Metros with both fewer sellers AND less inventory</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="yt-section">
+  <div class="yt-inner">
+    <span class="section-label" style="color:var(--gray);display:block;margin-bottom:12px;">Watch on YouTube</span>
+    <div class="yt-cards">
+      <a href="https://youtube.com/@housingnerd" target="_blank" rel="noopener" class="yt-card">
+        <span class="yt-label">National</span>
+        <span class="yt-name">Housing Nerd</span>
+        <span class="yt-cta">Watch →</span>
+      </a>
+      <a href="https://youtube.com/@ohiohousingnerd" target="_blank" rel="noopener" class="yt-card">
+        <span class="yt-label">Central Ohio</span>
+        <span class="yt-name">Ohio Housing Nerd</span>
+        <span class="yt-cta">Watch →</span>
+      </a>
     </div>
   </div>
 </div>
