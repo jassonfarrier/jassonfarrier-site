@@ -3,429 +3,213 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Jasson Farrier | Ohio Housing Market</title>
-<meta name="description" content="Jasson Farrier is a Central Ohio Realtor helping buyers and sellers with data-driven guidance. Serving Columbus, Newark, Granville and surrounding counties.">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<title>Jasson Farrier | Central Ohio Realtor & Real Estate Investor</title>
+<meta name="description" content="Jasson Farrier is a Central Ohio Realtor and real estate investor helping buyers and sellers with data-driven guidance. Serving Columbus, Newark, Granville and surrounding counties.">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-
-/* =====================
-   PALETTE: 3 colors only
-   #0D1E42  navy
-   #9DA6AB  gray
-   #ffffff  white
-   #f5f5f5  near-white (section bg only)
-   ===================== */
-
+:root { --navy: #0D1E42; --navy-deep: #0B1524; --gray: #9DA6AB; --dark: #0a0a0a; --light: #f6f6f6; --white: #ffffff; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: 'Montserrat', sans-serif;
-  background: #fff;
-  color: #0D1E42;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ---- NAV ---- */
-
-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 60px;
-  height: 64px;
-}
-
-.nav-logo {
-  font-size: 14px;
-  font-weight: 600;
-  color: #0D1E42;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.nav-logo em {
-  font-style: normal;
-  font-weight: 400;
-  color: #9DA6AB;
-  margin-left: 6px;
-}
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 28px;
-}
-
-.nav-links a {
-  font-size: 12px;
-  font-weight: 500;
-  color: #9DA6AB;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.nav-links a:hover { color: #0D1E42; }
-
-.nav-cta {
-  background: #0D1E42;
-  color: #fff !important;
-  font-size: 12px;
-  font-weight: 600;
-  padding: 10px 22px;
-  border-radius: 100px;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.nav-yt {
-  display: flex;
-  align-items: center;
-  color: #9DA6AB;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.nav-yt:hover { color: #0D1E42; }
-
-/* ---- HERO ---- */
-
-.hero-section {
-  padding: 120px 60px 100px;
-  display: flex;
-  align-items: center;
-  gap: 80px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.hero-text { flex: 1; }
-
-.hero-text h1 {
-  font-size: clamp(36px, 4.5vw, 56px);
-  font-weight: 600;
-  line-height: 1.15;
-  color: #0D1E42;
-  margin-bottom: 36px;
-}
-
-.btn-pill {
-  display: inline-block;
-  background: #0D1E42;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 14px 30px;
-  border-radius: 100px;
-  text-decoration: none;
-}
-
-.hero-photo {
-  flex-shrink: 0;
-  width: 380px;
-}
-
-.hero-photo img {
-  width: 100%;
-  border-radius: 16px;
-  display: block;
-}
-
-/* ---- REVIEWS ---- */
-
-.reviews-section {
-  background: #f5f5f5;
-  padding: 80px 60px;
-}
-
-.reviews-inner { max-width: 1080px; margin: 0 auto; }
-
-.section-label {
-  display: block;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: #9DA6AB;
-  margin-bottom: 12px;
-}
-
-.reviews-section h2 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #0D1E42;
-  margin-bottom: 36px;
-}
-
-.cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 28px;
-}
-
-.card p {
-  font-size: 14px;
-  color: #9DA6AB;
-  line-height: 1.75;
-  margin-bottom: 12px;
-}
-
-.card cite {
-  font-size: 11px;
-  color: #9DA6AB;
-  font-style: normal;
-  opacity: 0.6;
-}
-
-/* ---- MARKET UPDATE ---- */
-
-.update-section {
-  background: #0D1E42;
-  padding: 100px 60px;
-  text-align: center;
-}
-
-.update-inner {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.update-section .section-label { color: #9DA6AB; margin-bottom: 20px; }
-
-.update-section h2 {
-  font-size: clamp(24px, 3vw, 36px);
-  font-weight: 600;
-  color: #fff;
-  line-height: 1.25;
-  margin-bottom: 20px;
-}
-
-.update-section p {
-  font-size: 15px;
-  color: #9DA6AB;
-  line-height: 1.8;
-  margin-bottom: 40px;
-}
-
-.btn-pill-white {
-  display: inline-block;
-  background: #fff;
-  color: #0D1E42;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 14px 30px;
-  border-radius: 100px;
-  text-decoration: none;
-}
-
-/* ---- FOOTER ---- */
-
-footer {
-  background: #0D1E42;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  padding: 40px 60px 32px;
-}
-
-.footer-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.footer-name {
-  font-size: 12px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.3);
-}
-
-.footer-nav {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.footer-nav a {
-  font-size: 11px;
-  font-weight: 500;
-  color: rgba(255,255,255,0.25);
-  text-decoration: none;
-}
-
-.footer-nav a:hover { color: rgba(255,255,255,0.6); }
-
-.footer-legal {
-  border-top: 1px solid rgba(255,255,255,0.07);
-  padding-top: 20px;
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.footer-legal img {
-  height: 30px;
-  opacity: 0.25;
-  filter: invert(1);
-  flex-shrink: 0;
-}
-
-.footer-legal p {
-  font-size: 10px;
-  color: rgba(255,255,255,0.2);
-  line-height: 1.9;
-}
-
-/* ---- MOBILE MENU ---- */
-
-.nav-hamburger {
-  display: none;
-  flex-direction: column;
-  gap: 5px;
-  cursor: pointer;
-  padding: 4px;
-  background: none;
-  border: none;
-}
-
-.nav-hamburger span {
-  width: 22px;
-  height: 2px;
-  background: #0D1E42;
-  display: block;
-}
-
-.mobile-menu {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: #0D1E42;
-  z-index: 999;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 32px;
-}
-
+body { font-family: 'Montserrat', sans-serif; background: var(--white); color: var(--dark); line-height: 1.7; }
+nav { background: var(--navy); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+.nav-logo { font-weight: 900; font-size: 15px; letter-spacing: 2px; text-transform: uppercase; color: var(--white); text-decoration: none; }
+.nav-logo span { color: var(--gray); }
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a { font-weight: 600; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; }
+.nav-links a:hover { color: var(--white); }
+.nav-cta { background: var(--white) !important; color: var(--navy) !important; padding: 8px 18px; border-radius: 2px; }
+.agent-bar { background: var(--navy-deep); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 9px 40px; text-align: center; font-size: 12px; font-weight: 400; letter-spacing: 1px; color: rgba(255,255,255,0.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.agent-bar span { color: var(--white); font-size: 13px; font-weight: 600; letter-spacing: 1px; }
+.hero { background: var(--navy); padding: 60px 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; max-width: 1100px; margin: 0 auto; align-items: center; }
+.hero-tag { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--gray); margin-bottom: 20px; display: block; }
+.hero h1 { font-weight: 900; font-size: clamp(32px, 4vw, 52px); line-height: 1.1; color: var(--white); margin-bottom: 28px; }
+.hero-btns { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 32px; }
+.btn-primary { display: inline-block; background: var(--white); color: var(--navy); font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; padding: 16px 28px; text-decoration: none; border-radius: 2px; }
+.btn-secondary { display: inline-block; background: transparent; color: rgba(255,255,255,0.7); font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; padding: 16px 28px; text-decoration: none; border-radius: 2px; border: 1px solid rgba(255,255,255,0.2); }
+.creds-block { display: flex; flex-direction: column; gap: 8px; }
+.cred { font-size: 11px; font-weight: 600; letter-spacing: 1px; color: rgba(255,255,255,0.35); text-transform: uppercase; display: flex; align-items: center; gap: 10px; }
+.cred::before { content: ''; width: 20px; height: 2px; background: var(--gray); flex-shrink: 0; }
+.hero-img { width: 100%; display: block; border-top: 4px solid var(--gray); }
+.yt-section { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); padding: 48px 40px; }
+.yt-inner { max-width: 1100px; margin: 0 auto; }
+.yt-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+.yt-card { display: flex; flex-direction: column; gap: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-top: 3px solid var(--gray); padding: 28px; text-decoration: none; border-radius: 2px; transition: background 0.2s; }
+.yt-card:hover { background: rgba(255,255,255,0.09); }
+.yt-label { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); }
+.yt-name { font-size: 20px; font-weight: 900; color: var(--white); }
+.yt-cta { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); margin-top: 4px; }
+.yt-card--ohio { border-top-color: #BB0000; }
+.yt-card--ohio .yt-label { color: #BB0000; }
+.yt-card--ohio .yt-cta { color: #BB0000; }
+.testimonials { padding: 60px 40px; background: var(--light); }
+.testimonials-inner { max-width: 1100px; margin: 0 auto; }
+.section-label { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--navy); margin-bottom: 16px; display: block; }
+.section-title { font-weight: 900; font-size: clamp(22px, 3vw, 32px); color: var(--dark); margin-bottom: 40px; }
+.market-update { padding: 60px 40px; background: var(--navy); }
+.market-update-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+.market-update h2 { font-weight: 900; font-size: clamp(24px, 3vw, 36px); color: var(--white); margin-bottom: 16px; line-height: 1.15; }
+.market-update p { font-size: 16px; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 28px; }
+.market-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.stat { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-top: 3px solid var(--gray); padding: 20px; border-radius: 2px; }
+.stat-num { font-weight: 900; font-size: 26px; color: var(--white); margin-bottom: 4px; }
+.stat-label { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); }
+.cta-bar { background: var(--navy-deep); padding: 60px 40px; text-align: center; border-top: 3px solid var(--gray); }
+.cta-bar h2 { font-weight: 900; font-size: clamp(22px, 3vw, 32px); color: var(--white); margin-bottom: 12px; }
+.cta-bar p { font-size: 17px; color: rgba(255,255,255,0.7); margin-bottom: 28px; }
+.cta-bar a { display: inline-block; background: var(--white); color: var(--navy); font-weight: 700; font-size: 13px; letter-spacing: 1.5px; text-transform: uppercase; padding: 16px 32px; text-decoration: none; border-radius: 2px; }
+.footer-bar { background: var(--navy-deep); border-top: 1px solid rgba(255,255,255,0.08); padding: 10px 40px; text-align: center; font-size: 12px; font-weight: 400; letter-spacing: 1px; color: rgba(255,255,255,0.55); }
+.footer-bar span { color: var(--white); font-size: 13px; font-weight: 600; }
+.footer-nav { background: var(--dark); padding: 20px 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.07); }
+.footer-nav a { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); text-decoration: none; margin: 0 12px; }
+.footer-nav a:hover { color: var(--white); }
+.footer-eho { background: var(--dark); padding: 16px 40px 24px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
+.footer-eho img { height: 28px; vertical-align: middle; margin-right: 10px; opacity: 0.7; filter: invert(1); }
+.footer-eho span { font-size: 10px; color: rgba(255,255,255,0.25); vertical-align: middle; line-height: 1.8; }
+.nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
+.nav-hamburger span { width: 22px; height: 2px; background: var(--white); display: block; }
+.mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--navy-deep); z-index: 999; flex-direction: column; align-items: center; justify-content: center; gap: 32px; }
 .mobile-menu.open { display: flex; }
-
-.mobile-menu a {
-  font-size: 18px;
-  font-weight: 600;
-  color: rgba(255,255,255,0.75);
-  text-decoration: none;
-}
-
-.mobile-menu-close {
-  position: absolute;
-  top: 24px; right: 24px;
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 32px;
-  cursor: pointer;
-  line-height: 1;
-}
-
+.mobile-menu a { font-weight: 700; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.7); text-decoration: none; }
+.mobile-menu a:hover { color: var(--white); }
+.mobile-menu-close { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--white); font-size: 28px; cursor: pointer; line-height: 1; }
 @media (max-width: 768px) {
-  nav { padding: 0 24px; }
+  nav { padding: 0 20px; }
   .nav-links { display: none; }
   .nav-hamburger { display: flex; }
-  .hero-section { flex-direction: column; padding: 60px 24px; gap: 40px; }
-  .hero-photo { width: 100%; }
-  .reviews-section { padding: 60px 24px; }
-  .cards { grid-template-columns: 1fr; }
-  .update-section { padding: 60px 24px; }
-  footer { padding: 32px 24px; }
+  .agent-bar { padding: 7px 20px; font-size: 11px; }
+  .hero { grid-template-columns: 1fr; padding: 48px 20px; gap: 32px; }
+  .yt-section { padding: 40px 20px; }
+  .yt-cards { grid-template-columns: 1fr; }
+  .testimonials { padding: 48px 20px; }
+  .market-update { padding: 48px 20px; }
+  .market-update-inner { grid-template-columns: 1fr; gap: 32px; }
+  .market-stats { grid-template-columns: 1fr 1fr; }
+  .cta-bar { padding: 48px 20px; }
+  .footer-nav { flex-wrap: wrap; padding: 16px 20px; }
+  .footer-nav a { margin: 4px 8px; }
 }
-
+@media (max-width: 480px) {
+  .market-stats { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 <body>
 
+<div class="agent-bar"><span style="font-size:13px;font-weight:700;color:#9DA6AB;">Kiger Realty</span> &nbsp;·&nbsp; <span>Jasson Farrier</span> &nbsp;·&nbsp; Realtor &nbsp;·&nbsp; License #2018004483 &nbsp;·&nbsp; 614-699-3007</div>
+
 <nav>
-  <a href="/" class="nav-logo">Jasson Farrier <em>— Kiger Realty</em></a>
+  <a href="/" class="nav-logo">Jasson <span>Farrier</span></a>
   <div class="nav-links">
     <a href="/housing-market-updates">Market Updates</a>
     <a href="/bio">Bio</a>
     <a href="/contact">Contact</a>
-    <a href="/free">Free Guide</a>
-    <a href="https://youtube.com/@ohiohousingnerd" target="_blank" rel="noopener" class="nav-yt" title="Ohio Housing Nerd on YouTube">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="currentColor"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/></svg>
-    </a>
-    <a href="/contact" class="nav-cta">Let's Talk →</a>
+    <a href="/free" class="nav-cta">Free Guide</a>
   </div>
   <button class="nav-hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')" aria-label="Menu">
     <span></span><span></span><span></span>
   </button>
 </nav>
-
 <div class="mobile-menu" id="mobileMenu">
   <button class="mobile-menu-close" onclick="document.getElementById('mobileMenu').classList.remove('open')">&times;</button>
   <a href="/housing-market-updates" onclick="document.getElementById('mobileMenu').classList.remove('open')">Market Updates</a>
   <a href="/bio" onclick="document.getElementById('mobileMenu').classList.remove('open')">Bio</a>
   <a href="/contact" onclick="document.getElementById('mobileMenu').classList.remove('open')">Contact</a>
   <a href="/free" onclick="document.getElementById('mobileMenu').classList.remove('open')">Free Guide</a>
-  <a href="https://youtube.com/@ohiohousingnerd" target="_blank" rel="noopener">YouTube</a>
-  <a href="/contact" onclick="document.getElementById('mobileMenu').classList.remove('open')">Let's Talk →</a>
 </div>
 
-<!-- HERO -->
-<div class="hero-section">
-  <div class="hero-text">
-    <h1>The truth about the Ohio housing market.</h1>
-    <a href="/contact" class="btn-pill">Let's Talk →</a>
-  </div>
-  <div class="hero-photo">
-    <img src="https://images.squarespace-cdn.com/content/v1/5b96b43a75f9ee5fa8fbbadb/1629466533420-8AF62KY7ETA2APRXP2EX/0C2A5519_DONE.JPG" alt="Jasson Farrier" />
+<div style="background:var(--navy);">
+  <div class="hero">
+    <div>
+      <span class="hero-tag">Central Ohio Realtor &amp; Investor</span>
+      <h1>The truth about the housing market.</h1>
+      <div class="hero-btns">
+        <a href="/contact" class="btn-primary">Let's Talk →</a>
+        <a href="/free" class="btn-secondary">Free Guide</a>
+      </div>
+      <div class="creds-block">
+        <span class="cred">Kiger Realty · License #2018004483</span>
+        <span class="cred">Ohio Housing Nerd &amp; Housing Nerd on YouTube</span>
+      </div>
+    </div>
+    <div>
+      <img src="https://images.squarespace-cdn.com/content/v1/5b96b43a75f9ee5fa8fbbadb/1629466533420-8AF62KY7ETA2APRXP2EX/0C2A5519_DONE.JPG" alt="Jasson Farrier" class="hero-img" />
+    </div>
   </div>
 </div>
 
-<!-- REVIEWS -->
-<div class="reviews-section">
-  <div class="reviews-inner">
+<div class="yt-section">
+  <div class="yt-inner">
+    <span class="section-label" style="color:var(--gray);">Watch on YouTube</span>
+    <div class="yt-cards">
+      <a href="https://youtube.com/@housingnerd" target="_blank" rel="noopener" class="yt-card">
+        <span class="yt-label">National</span>
+        <span class="yt-name">Housing Nerd</span>
+        <span class="yt-cta">Watch →</span>
+      </a>
+      <a href="https://youtube.com/@ohiohousingnerd" target="_blank" rel="noopener" class="yt-card yt-card--ohio">
+        <span class="yt-label">Central Ohio</span>
+        <span class="yt-name">Ohio Housing Nerd</span>
+        <span class="yt-cta">Watch →</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="testimonials">
+  <div class="testimonials-inner">
     <span class="section-label">Client Reviews</span>
-    <h2>What my clients say</h2>
+    <h2 class="section-title">What my clients say</h2>
     <script src="https://elfsightcdn.com/platform.js" async></script>
     <div class="elfsight-app-825cdf7b-93af-4e3d-b6f6-86355d0197ad" data-elfsight-app-lazy></div>
   </div>
 </div>
 
-<!-- MARKET UPDATE -->
-<div class="update-section">
-  <div class="update-inner">
-    <span class="section-label">Latest Update · April 2026</span>
-    <h2>The housing market is splitting in two.</h2>
-    <p>99 of 300 markets have falling prices. 201 have rising prices. Same country. Same rates. The national average is lying to you.</p>
-    <a href="/blog-housing-market-splitting-in-two" class="btn-pill-white">Read the Update →</a>
+<div class="market-update">
+  <div class="market-update-inner">
+    <div>
+      <span class="section-label" style="color:var(--gray)">Latest Analysis · April 2026</span>
+      <h2>The housing market is splitting in two. Denver and Syracuse are the proof.</h2>
+      <p>26 years of county-level data reveals why the national average is lying to you. 99 of 300 markets have falling prices — but 201 have rising prices. Same country. Same mortgage rates.</p>
+      <a href="/blog-housing-market-splitting-in-two" class="btn-primary">Read the Full Analysis →</a>
+    </div>
+    <div class="market-stats">
+      <div class="stat">
+        <div class="stat-num">99/300</div>
+        <div class="stat-label">Markets with falling prices</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">201/300</div>
+        <div class="stat-label">Markets with rising prices</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">−11%</div>
+        <div class="stat-label">Denver County from peak</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">23/50</div>
+        <div class="stat-label">Metros with fewer sellers AND less inventory</div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- FOOTER -->
+<div class="cta-bar">
+  <h2>Ready to talk about your situation?</h2>
+  <p>Buying, selling, investing, or just trying to understand the market — reach out.</p>
+  <a href="/contact">Let's Have a Conversation →</a>
+</div>
+
 <footer>
-  <div class="footer-top">
-    <span class="footer-name">Jasson Farrier · Kiger Realty</span>
-    <nav class="footer-nav">
-      <a href="/housing-market-updates">Market Updates</a>
-      <a href="/bio">Bio</a>
-      <a href="/contact">Contact</a>
-      <a href="/free">Free Guide</a>
-      <a href="/privacy">Privacy</a>
-    </nav>
+  <div class="footer-bar"><span style="font-size:13px;font-weight:700;color:#9DA6AB;">Kiger Realty</span> &nbsp;·&nbsp; <span>Jasson Farrier</span> &nbsp;·&nbsp; Realtor &nbsp;·&nbsp; License #2018004483 &nbsp;·&nbsp; 614-699-3007</div>
+  <div class="footer-nav">
+    <a href="/housing-market-updates">Market Updates</a>
+    <a href="/bio">Bio</a>
+    <a href="/contact">Contact</a>
+    <a href="/free">Free Guide</a>
+    <a href="/privacy">Privacy</a>
   </div>
-  <div class="footer-legal">
+  <div class="footer-eho">
     <img src="/fair-housing.webp" alt="Equal Housing Opportunity">
-    <p>Jasson Farrier · Kiger Realty · Realtor · License #2018004483 · 614-699-3007<br>Equal Housing Opportunity · Information deemed reliable but not guaranteed.</p>
+    <span>Equal Housing Opportunity &nbsp;·&nbsp; Information deemed reliable but not guaranteed.</span>
   </div>
 </footer>
 
