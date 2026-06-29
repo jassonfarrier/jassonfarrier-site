@@ -33,15 +33,15 @@ nav{background:var(--navy);padding:0 40px;display:flex;align-items:center;justif
 .post p{font-size:16px;color:#555;line-height:1.7;margin-bottom:16px;}
 .read-more{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);text-decoration:none;}
 .read-more:hover{text-decoration:underline;}
-footer{background:var(--dark);padding:48px 40px 32px;border-top:3px solid var(--navy);}
-.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;}
-.footer-logo{font-weight:900;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--white);}
-.footer-logo span{color:var(--gray);}
-.footer-links{display:flex;gap:24px;flex-wrap:wrap;}
-.footer-links a{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;}
-.footer-compliance{max-width:1100px;margin:24px auto 0;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07);}
-.footer-compliance p{font-size:10px;color:rgba(255,255,255,0.25);line-height:1.8;}
 @media(max-width:768px){nav{padding:0 20px;}.nav-links{display:none;}.hero{padding:40px 20px;}.blog-list{padding:40px 20px;}}
+.footer-bar{background:var(--navy-deep);border-top:1px solid rgba(255,255,255,0.08);padding:10px 40px;text-align:center;font-size:12px;font-weight:400;letter-spacing:1px;color:rgba(255,255,255,0.55);}
+.footer-bar span{color:var(--white);font-size:13px;font-weight:600;}
+.footer-nav{background:var(--dark);padding:20px 40px;text-align:center;border-top:1px solid rgba(255,255,255,0.07);}
+.footer-nav a{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;margin:0 12px;}
+.footer-nav a:hover{color:var(--white);}
+.footer-eho{background:var(--dark);padding:16px 40px 24px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);}
+.footer-eho img{height:28px;vertical-align:middle;margin-right:10px;opacity:0.6;}
+.footer-eho span{font-size:10px;color:rgba(255,255,255,0.25);vertical-align:middle;line-height:1.8;}
 </style>
 </head>
 <body>
@@ -58,10 +58,10 @@ footer{background:var(--dark);padding:48px 40px 32px;border-top:3px solid var(--
   </div>
 </nav>
 
-<div class="hero">
-  <div class="hero-inner">
-    <span class="hero-tag">Market Analysis</span>
-    <h1>Real numbers. No spin.</h1>
+
+<div style="background:var(--navy);padding:32px 40px 28px;">
+  <div style="max-width:900px;margin:0 auto;">
+    <span style="font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);">Housing Market Updates</span>
   </div>
 </div>
 
@@ -112,19 +112,17 @@ footer{background:var(--dark);padding:48px 40px 32px;border-top:3px solid var(--
 </div>
 
 <footer>
-  <div class="footer-inner">
-    <div class="footer-logo">Jasson <span>Farrier</span></div>
-    <div class="footer-links">
-      <a href="/housing-market-updates">Market Updates</a>
-      <a href="/bio">Bio</a>
-      <a href="/contact">Contact</a>
-      <a href="/free">Free Guide</a>
-      <a href="/privacy">Privacy</a>
-    </div>
+  <div class="footer-bar"><span style="font-size:13px;font-weight:700;color:#9DA6AB;">Kiger Realty</span> &nbsp;·&nbsp; <span>Jasson Farrier</span> &nbsp;·&nbsp; Realtor &nbsp;·&nbsp; License #2018004483 &nbsp;·&nbsp; 614-699-3007</div>
+  <div class="footer-nav">
+    <a href="/housing-market-updates">Market Updates</a>
+    <a href="/bio">Bio</a>
+    <a href="/contact">Contact</a>
+    <a href="/free">Free Guide</a>
+    <a href="/privacy">Privacy</a>
   </div>
-  <div class="footer-compliance">
-    <p>Jasson Farrier · Kiger Realty · License #2018004483 · 614-699-3007 · jassonfarrier@gmail.com<br>
-    Equal Housing Opportunity. Information deemed reliable but not guaranteed.</p>
+  <div class="footer-eho">
+    <img src="/fair-housing.webp" alt="Equal Housing Opportunity">
+    <span>Equal Housing Opportunity &nbsp;·&nbsp; Information deemed reliable but not guaranteed.</span>
   </div>
 </footer>
 </body>
