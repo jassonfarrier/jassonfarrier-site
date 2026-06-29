@@ -46,7 +46,10 @@ footer { background: var(--dark); padding: 48px 40px 32px; border-top: 3px solid
 .footer-compliance { max-width: 1000px; margin: 24px auto 0; display: flex; align-items: flex-start; gap: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.07); }
 .footer-compliance img { width: 48px; flex-shrink: 0; filter: invert(1) opacity(0.4); }
 .footer-compliance p { font-size: 10px; color: rgba(255,255,255,0.25); line-height: 1.8; }
-@media (max-width: 768px) { nav { padding: 0 20px; } .nav-links { display: none; } .page-header { padding: 60px 20px; } .section { padding: 60px 20px; } .form-row { grid-template-columns: 1fr; } .footer-inner { flex-direction: column; align-items: flex-start; } .agent-bar { padding: 7px 20px; font-size: 11px; } }
+@media (max-width: 768px) {
+.footer-nav{flex-wrap:wrap;padding:16px 20px;}
+.footer-nav a{margin:4px 8px;}
+  .nav-hamburger{display:flex;} nav { padding: 0 20px; } .nav-links { display: none; } .page-header { padding: 60px 20px; } .section { padding: 60px 20px; } .form-row { grid-template-columns: 1fr; } .footer-inner { flex-direction: column; align-items: flex-start; } .agent-bar { padding: 7px 20px; font-size: 11px; } }
 .footer-bar{background:var(--navy-deep);border-top:1px solid rgba(255,255,255,0.08);padding:10px 40px;text-align:center;font-size:12px;font-weight:400;letter-spacing:1px;color:rgba(255,255,255,0.55);}
 .footer-bar span{color:var(--white);font-size:13px;font-weight:600;}
 .footer-nav{background:var(--dark);padding:20px 40px;text-align:center;border-top:1px solid rgba(255,255,255,0.07);}
@@ -55,6 +58,14 @@ footer { background: var(--dark); padding: 48px 40px 32px; border-top: 3px solid
 .footer-eho{background:var(--dark);padding:16px 40px 24px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);}
 .footer-eho img{height:28px;vertical-align:middle;margin-right:10px;opacity:0.7;filter:invert(1);}
 .footer-eho span{font-size:10px;color:rgba(255,255,255,0.25);vertical-align:middle;line-height:1.8;}
+
+.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none;}
+.nav-hamburger span{width:22px;height:2px;background:var(--white);display:block;transition:0.2s;}
+.mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--navy-deep);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:32px;}
+.mobile-menu.open{display:flex;}
+.mobile-menu a{font-weight:700;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.7);text-decoration:none;}
+.mobile-menu a:hover{color:var(--white);}
+.mobile-menu-close{position:absolute;top:24px;right:24px;background:none;border:none;color:var(--white);font-size:28px;cursor:pointer;line-height:1;}
 </style>
 </head>
 <body>
@@ -69,7 +80,17 @@ footer { background: var(--dark); padding: 48px 40px 32px; border-top: 3px solid
     <a href="/contact">Work With Me</a>
     <a href="/free" class="nav-cta">Free Guide</a>
   </div>
+  <button class="nav-hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="document.getElementById('mobileMenu').classList.remove('open')">&times;</button>
+  <a href="/housing-market-updates" onclick="document.getElementById('mobileMenu').classList.remove('open')">Market Updates</a>
+  <a href="/bio" onclick="document.getElementById('mobileMenu').classList.remove('open')">Bio</a>
+  <a href="/contact" onclick="document.getElementById('mobileMenu').classList.remove('open')">Work With Me</a>
+  <a href="/free" onclick="document.getElementById('mobileMenu').classList.remove('open')">Free Guide</a>
+</div>
 
 <div class="page-header">
   <div class="page-header-inner">
