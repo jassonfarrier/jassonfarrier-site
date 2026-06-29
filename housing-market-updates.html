@@ -7,60 +7,41 @@
 <meta name="description" content="Real housing market data for Central Ohio and national trends. No spin, no headlines — just numbers.">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-:root { --navy: #0D1E42; --navy-deep: #0B1524; --gray: #9DA6AB; --dark: #0a0a0a; --light: #f6f6f6; --border: #e0e0e0; --white: #ffffff; }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Montserrat', sans-serif; background: var(--white); color: var(--dark); line-height: 1.7; }
-nav { background: var(--navy); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
-.nav-logo { font-weight: 900; font-size: 15px; letter-spacing: 2px; text-transform: uppercase; color: var(--white); text-decoration: none; }
-.nav-logo span { color: var(--gray); }
-.nav-links { display: flex; gap: 32px; align-items: center; }
-.nav-links a { font-weight: 600; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; }
-.nav-links a:hover { color: var(--white); }
-.nav-cta { background: var(--white) !important; color: var(--navy) !important; padding: 8px 18px; border-radius: 2px; }
-.agent-bar { background: var(--navy-deep); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 9px 40px; text-align: center; font-size: 12px; font-weight: 400; letter-spacing: 1px; color: rgba(255,255,255,0.55); }
-.agent-bar span { color: var(--white); font-size: 13px; font-weight: 600; letter-spacing: 1px; }
-.hero { background: var(--navy); padding: 80px 40px; text-align: center; }
-.hero-inner { max-width: 760px; margin: 0 auto; }
-.hero-tag { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--gray); margin-bottom: 20px; display: block; }
-.hero h1 { font-weight: 900; font-size: clamp(32px, 4vw, 52px); line-height: 1.1; color: var(--white); margin-bottom: 20px; }
-.hero-body { font-size: 18px; color: rgba(255,255,255,0.6); line-height: 1.7; margin-bottom: 40px; }
-.signup-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-top: 3px solid var(--gray); padding: 40px; border-radius: 4px; max-width: 520px; margin: 0 auto; text-align: left; }
-.signup-box h2 { font-weight: 900; font-size: 18px; color: var(--white); margin-bottom: 8px; }
-.signup-box p { font-size: 14px; color: rgba(255,255,255,0.5); margin-bottom: 24px; }
-.field { margin-bottom: 16px; }
-.field label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.5); display: block; margin-bottom: 8px; }
-.field input { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 2px; color: var(--white); font-family: 'Montserrat', sans-serif; font-size: 14px; }
-.field input::placeholder { color: rgba(255,255,255,0.3); }
-.submit-btn { width: 100%; background: var(--white); color: var(--navy); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 16px; border: none; border-radius: 2px; cursor: pointer; margin-top: 8px; }
-.submit-btn:hover { background: #eaeaea; }
-.fine-print { font-size: 11px; color: rgba(255,255,255,0.3); margin-top: 12px; }
-.thanks { display: none; text-align: center; padding: 24px 0; }
-.thanks p { font-weight: 700; font-size: 16px; color: var(--white); }
-.thanks span { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 400; display: block; margin-top: 8px; }
-.what-section { padding: 80px 40px; background: var(--light); }
-.what-inner { max-width: 760px; margin: 0 auto; }
-.section-label { font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--navy); margin-bottom: 16px; display: block; }
-.section-title { font-weight: 900; font-size: clamp(24px, 3vw, 36px); color: var(--dark); margin-bottom: 40px; }
-.what-list { display: flex; flex-direction: column; gap: 24px; }
-.what-item { display: flex; gap: 20px; align-items: flex-start; background: var(--white); padding: 24px; border-radius: 4px; border-left: 3px solid var(--navy); }
-.what-num { font-weight: 900; font-size: 28px; color: var(--navy); flex-shrink: 0; line-height: 1; }
-.what-item h3 { font-weight: 700; font-size: 15px; color: var(--dark); margin-bottom: 4px; }
-.what-item p { font-size: 14px; color: #555; line-height: 1.6; }
-footer { background: var(--dark); padding: 48px 40px 32px; border-top: 3px solid var(--navy); }
-.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
-.footer-logo { font-weight: 900; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--white); }
-.footer-logo span { color: var(--gray); }
-.footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
-.footer-links a { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); text-decoration: none; }
-.footer-links a:hover { color: var(--white); }
-.footer-compliance { max-width: 1100px; margin: 24px auto 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.07); }
-.footer-compliance p { font-size: 10px; color: rgba(255,255,255,0.25); line-height: 1.8; }
-@media (max-width: 768px) {
-  nav { padding: 0 20px; } .nav-links { display: none; }
-  .hero { padding: 60px 20px; }
-  .what-section { padding: 60px 20px; }
-  footer { padding: 40px 20px 24px; }
-}
+:root{--navy:#0D1E42;--navy-deep:#0B1524;--gray:#9DA6AB;--dark:#0a0a0a;--light:#f6f6f6;--white:#ffffff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--dark);line-height:1.7;}
+nav{background:var(--navy);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;}
+.nav-logo{font-weight:900;font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--white);text-decoration:none;}
+.nav-logo span{color:var(--gray);}
+.nav-links{display:flex;gap:32px;align-items:center;}
+.nav-links a{font-weight:600;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.6);text-decoration:none;}
+.nav-links a:hover{color:var(--white);}
+.nav-cta{background:var(--white)!important;color:var(--navy)!important;padding:8px 18px;border-radius:2px;}
+.agent-bar{background:var(--navy-deep);border-bottom:1px solid rgba(255,255,255,0.08);padding:9px 40px;text-align:center;font-size:12px;font-weight:400;letter-spacing:1px;color:rgba(255,255,255,0.55);}
+.agent-bar span{color:var(--white);font-size:13px;font-weight:600;}
+.hero{background:var(--navy);padding:60px 40px;}
+.hero-inner{max-width:900px;margin:0 auto;}
+.hero-tag{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;display:block;}
+.hero h1{font-weight:900;font-size:clamp(32px,4vw,48px);line-height:1.1;color:var(--white);}
+.blog-list{padding:60px 40px;max-width:900px;margin:0 auto;}
+.post{border-bottom:1px solid #e8e8e8;padding:36px 0;}
+.post:last-child{border-bottom:none;}
+.post-date{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;}
+.post h2{font-weight:900;font-size:clamp(20px,2.5vw,28px);color:var(--dark);margin-bottom:12px;line-height:1.2;}
+.post h2 a{text-decoration:none;color:var(--dark);}
+.post h2 a:hover{color:var(--navy);}
+.post p{font-size:16px;color:#555;line-height:1.7;margin-bottom:16px;}
+.read-more{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);text-decoration:none;}
+.read-more:hover{text-decoration:underline;}
+footer{background:var(--dark);padding:48px 40px 32px;border-top:3px solid var(--navy);}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;}
+.footer-logo{font-weight:900;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--white);}
+.footer-logo span{color:var(--gray);}
+.footer-links{display:flex;gap:24px;flex-wrap:wrap;}
+.footer-links a{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;}
+.footer-compliance{max-width:1100px;margin:24px auto 0;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07);}
+.footer-compliance p{font-size:10px;color:rgba(255,255,255,0.25);line-height:1.8;}
+@media(max-width:768px){nav{padding:0 20px;}.nav-links{display:none;}.hero{padding:40px 20px;}.blog-list{padding:40px 20px;}}
 </style>
 </head>
 <body>
@@ -81,49 +62,53 @@ footer { background: var(--dark); padding: 48px 40px 32px; border-top: 3px solid
   <div class="hero-inner">
     <span class="hero-tag">Housing Market Updates</span>
     <h1>Real numbers. No spin.</h1>
-    <p class="hero-body">Inventory, days on market, price reductions, permit data — when the market moves, I write about it.</p>
   </div>
 </div>
 
-<div style="padding:60px 40px;max-width:900px;margin:0 auto;">
-  <span style="font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:#0D1E42;margin-bottom:16px;display:block;">Latest Analysis</span>
-  <h2 style="font-weight:900;font-size:clamp(24px,3vw,36px);color:#0a0a0a;margin-bottom:40px;">Recent Market Reports</h2>
+<div class="blog-list">
 
-  <div style="border-bottom:1px solid #e8e8e8;padding-bottom:32px;margin-bottom:32px;">
-    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9DA6AB;margin-bottom:10px;">Spring 2026</div>
-    <h3 style="font-weight:900;font-size:22px;margin-bottom:12px;"><a href="/blog-ohio-spring-2026" style="text-decoration:none;color:#0a0a0a;">Ohio Housing Market Spring 2026: Low Inventory, Record Prices, and the Problem No One Is Talking About</a></h3>
-    <a href="/blog-ohio-spring-2026" style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#0D1E42;text-decoration:none;">Read the Analysis →</a>
+  <div class="post">
+    <div class="post-date">Spring 2026</div>
+    <h2><a href="/blog-ohio-spring-2026">Ohio Housing Market Spring 2026: Low Inventory, Record Prices, and the Problem No One Is Talking About</a></h2>
+    <p>Inventory is still near historic lows. Prices are at record highs. And the one thing that could change everything? Nobody's talking about it.</p>
+    <a href="/blog-ohio-spring-2026" class="read-more">Read the Analysis →</a>
   </div>
 
-  <div style="border-bottom:1px solid #e8e8e8;padding-bottom:32px;margin-bottom:32px;">
-    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9DA6AB;margin-bottom:10px;">2026</div>
-    <h3 style="font-weight:900;font-size:22px;margin-bottom:12px;"><a href="/blog-housing-market-splitting-in-two" style="text-decoration:none;color:#0a0a0a;">WARNING: Housing Market 2026 — Denver Down 11%, Syracuse Surging</a></h3>
-    <a href="/blog-housing-market-splitting-in-two" style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#0D1E42;text-decoration:none;">Read the Analysis →</a>
+  <div class="post">
+    <div class="post-date">2026</div>
+    <h2><a href="/blog-housing-market-splitting-in-two">WARNING: Housing Market 2026 — Denver Down 11%, Syracuse Surging</a></h2>
+    <p>The national housing market is splitting in two. Some metros are crashing. Others are surging. Here's the data on where things stand — and why it matters for Ohio.</p>
+    <a href="/blog-housing-market-splitting-in-two" class="read-more">Read the Analysis →</a>
   </div>
 
-  <div style="border-bottom:1px solid #e8e8e8;padding-bottom:32px;margin-bottom:32px;">
-    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9DA6AB;margin-bottom:10px;">February 2026</div>
-    <h3 style="font-weight:900;font-size:22px;margin-bottom:12px;"><a href="/blog-ohio-feb-2026" style="text-decoration:none;color:#0a0a0a;">Ohio's Housing Market Is Under Strain — But It's Not Crashing</a></h3>
-    <a href="/blog-ohio-feb-2026" style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#0D1E42;text-decoration:none;">Read the Analysis →</a>
+  <div class="post">
+    <div class="post-date">February 2026</div>
+    <h2><a href="/blog-ohio-feb-2026">Ohio's Housing Market Is Under Strain — But It's Not Crashing</a></h2>
+    <p>Days on market are up. Price reductions are climbing. But calling it a crash would be wrong. Here's what the February 2026 data actually shows.</p>
+    <a href="/blog-ohio-feb-2026" class="read-more">Read the Analysis →</a>
   </div>
 
-  <div style="border-bottom:1px solid #e8e8e8;padding-bottom:32px;margin-bottom:32px;">
-    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9DA6AB;margin-bottom:10px;">2026</div>
-    <h3 style="font-weight:900;font-size:22px;margin-bottom:12px;"><a href="/blog-housing-slowdown-2026" style="text-decoration:none;color:#0a0a0a;">The Housing Market Slowdown Is Getting Much Worse — But Not How You Think</a></h3>
-    <a href="/blog-housing-slowdown-2026" style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#0D1E42;text-decoration:none;">Read the Analysis →</a>
+  <div class="post">
+    <div class="post-date">2026</div>
+    <h2><a href="/blog-housing-slowdown-2026">The Housing Market Slowdown Is Getting Much Worse — But Not How You Think</a></h2>
+    <p>The slowdown is real. But the narrative you're hearing is wrong. The data tells a more complicated — and more important — story.</p>
+    <a href="/blog-housing-slowdown-2026" class="read-more">Read the Analysis →</a>
   </div>
 
-  <div style="border-bottom:1px solid #e8e8e8;padding-bottom:32px;margin-bottom:32px;">
-    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9DA6AB;margin-bottom:10px;">December 2025</div>
-    <h3 style="font-weight:900;font-size:22px;margin-bottom:12px;"><a href="/blog-ohio-dec-2025" style="text-decoration:none;color:#0a0a0a;">What's Really Happening with The Ohio Housing Market</a></h3>
-    <a href="/blog-ohio-dec-2025" style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#0D1E42;text-decoration:none;">Read the Analysis →</a>
+  <div class="post">
+    <div class="post-date">December 2025</div>
+    <h2><a href="/blog-ohio-dec-2025">What's Really Happening with The Ohio Housing Market</a></h2>
+    <p>The headlines don't match the data. Here's a ground-level look at what's actually happening in Ohio's housing market as of December 2025.</p>
+    <a href="/blog-ohio-dec-2025" class="read-more">Read the Analysis →</a>
   </div>
 
-  <div style="padding-bottom:32px;">
-    <div style="font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#9DA6AB;margin-bottom:10px;">September 2025</div>
-    <h3 style="font-weight:900;font-size:22px;margin-bottom:12px;"><a href="/blog-property-tax-sep-2025" style="text-decoration:none;color:#0a0a0a;">Property Tax Showdown: Ohio Mom Takes On Politicians</a></h3>
-    <a href="/blog-property-tax-sep-2025" style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#0D1E42;text-decoration:none;">Read the Analysis →</a>
+  <div class="post">
+    <div class="post-date">September 2025</div>
+    <h2><a href="/blog-property-tax-sep-2025">Property Tax Showdown: Ohio Mom Takes On Politicians</a></h2>
+    <p>One Ohio homeowner's property tax bill exploded — and she fought back. What happened next reveals everything wrong with how Ohio taxes homeowners.</p>
+    <a href="/blog-property-tax-sep-2025" class="read-more">Read the Analysis →</a>
   </div>
+
 </div>
 
 <footer>
@@ -142,53 +127,5 @@ footer { background: var(--dark); padding: 48px 40px 32px; border-top: 3px solid
     Equal Housing Opportunity. Information deemed reliable but not guaranteed.</p>
   </div>
 </footer>
-
-<script>
-var _muLoadTime = Date.now();
-async function handleMU(e) {
-  e.preventDefault();
-  var btn = document.getElementById('mu-btn');
-  btn.textContent = 'Subscribing...';
-  btn.disabled = true;
-  if (document.getElementById('mu-hp').value || Date.now() - _muLoadTime < 2000) {
-    btn.textContent = 'Send Me Updates →';
-    btn.disabled = false;
-    return;
-  }
-  var email = document.getElementById('mu-email').value.trim();
-  try {
-    var kitForm = document.createElement('form');
-    kitForm.action = 'https://app.kit.com/forms/9195650/subscriptions';
-    kitForm.method = 'post';
-    kitForm.target = 'kit-mu-frame';
-    kitForm.style.display = 'none';
-    var ef = document.createElement('input');
-    ef.name = 'email_address';
-    ef.value = email;
-    kitForm.appendChild(ef);
-    document.body.appendChild(kitForm);
-    var iframe = document.createElement('iframe');
-    iframe.name = 'kit-mu-frame';
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-    kitForm.submit();
-    await fetch('https://farrier-crm.vercel.app/api/leads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: email,
-        first_name: '', last_name: '', phone: '',
-        lead_source: 'Jasson Farrier — Market Updates',
-        source_site: 'jassonfarrier.com',
-        contact_type: 'Subscriber',
-        notes: 'Market updates signup',
-        newsletter: true
-      })
-    });
-  } catch(err) { console.error(err); }
-  document.getElementById('mu-form').style.display = 'none';
-  document.getElementById('mu-thanks').style.display = 'block';
-}
-</script>
 </body>
 </html>

@@ -10,7 +10,13 @@
 :root { --navy: #0D1E42; --navy-deep: #0B1524; --gray: #9DA6AB; --dark: #0a0a0a; --white: #ffffff; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Montserrat', sans-serif; background: var(--navy); color: var(--white); min-height: 100vh; }
-nav { background: var(--navy-deep); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.agent-bar { background: var(--navy-deep); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 9px 40px; text-align: center; font-size: 12px; font-weight: 400; letter-spacing: 1px; color: rgba(255,255,255,0.55); }
+.agent-bar span { color: var(--white); font-size: 13px; font-weight: 600; letter-spacing: 1px; }
+nav { background: var(--navy); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a { font-weight: 600; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; }
+.nav-links a:hover { color: var(--white); }
+.nav-cta { background: var(--white) !important; color: var(--navy) !important; padding: 8px 18px; border-radius: 2px; }
 .nav-logo { font-weight: 900; font-size: 15px; letter-spacing: 2px; text-transform: uppercase; color: var(--white); text-decoration: none; }
 .nav-logo span { color: var(--gray); }
 .page { max-width: 560px; margin: 0 auto; padding: 80px 24px; text-align: center; }
@@ -35,12 +41,22 @@ h1 em { font-style: normal; color: var(--gray); }
 .item-num { font-weight: 900; font-size: 20px; color: var(--gray); flex-shrink: 0; width: 32px; }
 .item-text { font-size: 16px; color: rgba(255,255,255,0.7); line-height: 1.6; }
 .item-text strong { color: var(--white); font-weight: 700; font-size: 14px; display: block; margin-bottom: 4px; }
+
+@media(max-width:768px){nav{padding:0 20px;}.nav-links{display:none;}.page{padding:60px 16px;}}
 </style>
 </head>
 <body>
 
+<div class="agent-bar"><span style="font-size:13px;font-weight:700;color:#9DA6AB;">Kiger Realty</span> &nbsp;·&nbsp; <span>Jasson Farrier</span> &nbsp;·&nbsp; Realtor &nbsp;·&nbsp; License #2018004483 &nbsp;·&nbsp; 614-699-3007</div>
+
 <nav>
   <a href="/" class="nav-logo">Jasson <span>Farrier</span></a>
+  <div class="nav-links">
+    <a href="/housing-market-updates">Market Updates</a>
+    <a href="/bio">Bio</a>
+    <a href="/contact">Work With Me</a>
+    <a href="/free" class="nav-cta">Free Guide</a>
+  </div>
 </nav>
 
 <div class="page">
@@ -129,15 +145,23 @@ h1 em { font-style: normal; color: var(--gray); }
   }
   </script>
 
-  <div class="what-you-get">
-    <h3>What's Inside</h3>
-    <div class="item"><span class="item-num">1</span><div class="item-text"><strong>Is it your reason — or someone else's?</strong>The one question most buyers never honestly answer before signing a 30-year commitment.</div></div>
-    <div class="item"><span class="item-num">2</span><div class="item-text"><strong>Can you actually afford it?</strong>Not what the lender says. What the real number looks like with taxes, insurance, and repairs factored in.</div></div>
-    <div class="item"><span class="item-num">3</span><div class="item-text"><strong>Do you have all the money?</strong>Closing costs, reserves, moving costs, setup. Most buyers get blindsided by this.</div></div>
-    <div class="item"><span class="item-num">4</span><div class="item-text"><strong>Are you staying?</strong>If there's a real chance you're moving in 1-3 years, buying may not make financial sense.</div></div>
-    <div class="item"><span class="item-num">5</span><div class="item-text"><strong>Do you know your local market?</strong>What's happening nationally is almost never what's happening in your neighborhood.</div></div>
-  </div>
 </div>
 
+<footer style="background:var(--dark,#0a0a0a);padding:32px 40px;border-top:3px solid var(--navy);">
+  <div style="max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;">
+    <div style="font-weight:900;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:#fff;">Jasson <span style="color:var(--gray);">Farrier</span></div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+      <a href="/housing-market-updates" style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;">Market Updates</a>
+      <a href="/bio" style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;">Bio</a>
+      <a href="/contact" style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;">Contact</a>
+      <a href="/free" style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;">Free Guide</a>
+      <a href="/privacy" style="font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;">Privacy</a>
+    </div>
+  </div>
+  <div class="footer-compliance" style="max-width:1100px;margin:20px auto 0;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07);">
+    <p style="font-size:10px;color:rgba(255,255,255,0.25);line-height:1.8;">Jasson Farrier · Kiger Realty · License #2018004483 · 614-699-3007 · jassonfarrier@gmail.com<br>
+    Equal Housing Opportunity. Information deemed reliable but not guaranteed.</p>
+  </div>
+</footer>
 </body>
 </html>
