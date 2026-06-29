@@ -1,124 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Page not found</title>
-    <style>
-      :root {
-        --colorRgbFacetsTeal600: 2 128 125;
-        --colorTealAction: var(--colorRgbFacetsTeal600);
-        --colorRgbFacetsNeutralLight200: 233 235 237;
-        --colorHr: var(--colorRgbFacetsNeutralLight200);
-        --colorRgbFacetsNeutralLight700: 53 58 62;
-        --colorGrayDarkest: var(--colorRgbFacetsNeutralLight700);
-        --colorGrayLighter: var(--colorRgbFacetsNeutralLight200);
-        --colorText: var(--colorGrayDarkest);
-        --effectShadowLightShallow: 0 1px 10px 0 rgb(53 58 62 / 6%),
-          0 2px 4px 0 rgb(53 58 62 / 8%);
-        --colorRgbFacetsNeutralDark900: 6 11 16;
-      }
-      body {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-          Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
-          "Segoe UI Emoji", "Segoe UI Symbol";
-        background: white;
-        overflow: hidden;
-        margin: 0;
-        padding: 0;
-        line-height: 1.5;
-        color: rgb(var(--colorText));
-      }
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Market Analysis | Jasson Farrier</title>
+<meta name="description" content="Housing market analysis from Jasson Farrier — Central Ohio and national data, no spin.">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0D1E42;--navy-deep:#0B1524;--gray:#9DA6AB;--dark:#0a0a0a;--light:#f6f6f6;--white:#ffffff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--dark);line-height:1.7;}
+nav{background:var(--navy);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;}
+.nav-logo{font-weight:900;font-size:15px;letter-spacing:2px;text-transform:uppercase;color:var(--white);text-decoration:none;}
+.nav-logo span{color:var(--gray);}
+.nav-links{display:flex;gap:32px;align-items:center;}
+.nav-links a{font-weight:600;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.6);text-decoration:none;}
+.nav-links a:hover{color:var(--white);}
+.nav-cta{background:var(--white)!important;color:var(--navy)!important;padding:8px 18px;border-radius:2px;}
+.agent-bar{background:var(--navy-deep);border-bottom:1px solid rgba(255,255,255,0.08);padding:9px 40px;text-align:center;font-size:12px;font-weight:400;letter-spacing:1px;color:rgba(255,255,255,0.55);}
+.agent-bar span{color:var(--white);font-size:13px;font-weight:600;}
+.hero{background:var(--navy);padding:60px 40px;}
+.hero-inner{max-width:900px;margin:0 auto;}
+.hero-tag{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;display:block;}
+.hero h1{font-weight:900;font-size:clamp(32px,4vw,48px);line-height:1.1;color:var(--white);}
+.blog-list{padding:60px 40px;max-width:900px;margin:0 auto;}
+.post{border-bottom:1px solid #e8e8e8;padding:36px 0;}
+.post:last-child{border-bottom:none;}
+.post-date{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;}
+.post h2{font-weight:900;font-size:clamp(20px,2.5vw,28px);color:var(--dark);margin-bottom:12px;line-height:1.2;}
+.post h2 a{text-decoration:none;color:var(--dark);}
+.post h2 a:hover{color:var(--navy);}
+.post p{font-size:16px;color:#555;line-height:1.7;margin-bottom:16px;}
+.read-more{font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);text-decoration:none;}
+.read-more:hover{text-decoration:underline;}
+footer{background:var(--dark);padding:48px 40px 32px;border-top:3px solid var(--navy);}
+.footer-inner{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;}
+.footer-logo{font-weight:900;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:var(--white);}
+.footer-logo span{color:var(--gray);}
+.footer-links{display:flex;gap:24px;flex-wrap:wrap;}
+.footer-links a{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;}
+.footer-compliance{max-width:1100px;margin:24px auto 0;padding-top:24px;border-top:1px solid rgba(255,255,255,0.07);}
+.footer-compliance p{font-size:10px;color:rgba(255,255,255,0.25);line-height:1.8;}
+@media(max-width:768px){nav{padding:0 20px;}.nav-links{display:none;}.hero{padding:40px 20px;}.blog-list{padding:40px 20px;}}
+</style>
+</head>
+<body>
 
-      @media (prefers-color-scheme: dark) {
-        body {
-          background: rgb(var(--colorRgbFacetsNeutralDark900));
-        }
-      }
+<div class="agent-bar"><span style="font-size:18px;font-weight:700;color:#9DA6AB;">Kiger Realty</span> &nbsp;·&nbsp; <span>Jasson Farrier</span> &nbsp;·&nbsp; Realtor &nbsp;·&nbsp; License #2018004483 &nbsp;·&nbsp; 614-699-3007</div>
 
-      h1 {
-        margin: 0;
-        font-size: 1.375rem;
-        line-height: 1;
-      }
+<nav>
+  <a href="/" class="nav-logo">Jasson <span>Farrier</span></a>
+  <div class="nav-links">
+    <a href="/housing-market-updates">Market Updates</a>
+    <a href="/bio">Bio</a>
+    <a href="/contact">Work With Me</a>
+    <a href="/free" class="nav-cta">Free Guide</a>
+  </div>
+</nav>
 
-      h1 + p {
-        margin-top: 8px;
-      }
+<div class="hero">
+  <div class="hero-inner">
+    <span class="hero-tag">Market Analysis</span>
+    <h1>Real numbers. No spin.</h1>
+  </div>
+</div>
 
-      .main {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        width: 100vw;
-      }
+<div class="blog-list">
 
-      .card {
-        position: relative;
-        width: 75%;
-        max-width: 364px;
-        padding: 24px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: var(--effectShadowLightShallow);
-        border: 1px solid rgb(var(--colorGrayLighter));
-      }
+  <div class="post">
+    <div class="post-date">July 11, 2025</div>
+    <h2><a href="/blog-ohio-home-prices-skyrocketing">Ohio Home Prices are SKYROCKETING: Here's Why</a></h2>
+    <p>You've heard it all before: "Just wait a few more months." "Summer is when the housing crash hits." Well… it's summer. And across Ohio? Home prices just hit all-time highs. Again.</p>
+    <a href="/blog-ohio-home-prices-skyrocketing" class="read-more">Read the Analysis →</a>
+  </div>
 
-      a {
-        margin: 0;
-        font-weight: 600;
-        color: rgb(var(--colorTealAction));
-        text-decoration-skip-ink: all;
-        text-decoration-thickness: 1px;
-        text-underline-offset: 2px;
-        text-decoration-color: rgb(var(--colorTealAction) / 0.5);
-        transition: text-decoration-color 0.15s ease-in-out;
-      }
+  <div class="post">
+    <div class="post-date">April 24, 2025</div>
+    <h2><a href="/blog-central-ohio-home-prices-all-time-high">Central Ohio Home Prices Hit All-Time High</a></h2>
+    <p>Homes are taking longer to sell than any time in the last 5 years — yet prices just hit an all-time high. The median sale price reached $321,000 in March 2025, the highest March median on record.</p>
+    <a href="/blog-central-ohio-home-prices-all-time-high" class="read-more">Read the Analysis →</a>
+  </div>
 
-      a:hover,
-      a:focus-visible {
-        text-decoration-color: rgb(var(--colorTealAction));
-      }
+  <div class="post">
+    <div class="post-date">March 19, 2025</div>
+    <h2><a href="/blog-shocking-reality-central-ohio-homebuyers">Shocking Reality For Central Ohio Homebuyers</a></h2>
+    <p>Only two districts qualify as buyer's markets in Central Ohio. The rest? Strong seller's markets — despite high interest rates and elevated prices. Here's the data.</p>
+    <a href="/blog-shocking-reality-central-ohio-homebuyers" class="read-more">Read the Analysis →</a>
+  </div>
 
-      p:last-of-type {
-        margin-bottom: 0;
-      }
+  <div class="post">
+    <div class="post-date">February 28, 2025</div>
+    <h2><a href="/blog-686-home-listings-vanish">686 Home Listings VANISH: Why It's Actually Good News</a></h2>
+    <p>December 2024 saw 109 homes delisted in a single month — the highest ever recorded. Delistings have more than doubled since tracking began. Here's why that might actually be good news.</p>
+    <a href="/blog-686-home-listings-vanish" class="read-more">Read the Analysis →</a>
+  </div>
 
-      hr {
-        border: 0;
-        height: 1px;
-        background: rgb(var(--colorHr));
-        margin-top: 16px;
-        margin-bottom: 16px;
-      }
+</div>
 
-      .your-site {
-        font-size: 0.875rem;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="main">
-      <div class="card">
-        <h1>Page not found</h1>
-        <p>
-          Looks like you’ve followed a broken link or entered a URL that doesn’t
-          exist on this site.
-        </p>
-        <hr />
-        <p class="your-site">
-          If this is your site, and you weren’t expecting a 404 for this path,
-          please visit Netlify’s
-          <a
-            href="https://answers.netlify.com/t/support-guide-i-ve-deployed-my-site-but-i-still-see-page-not-found/125?utm_source=404page&utm_campaign=community_tracking"
-            >“page not found” support guide</a
-          >
-          for troubleshooting tips.
-        </p>
-      </div>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">Jasson <span>Farrier</span></div>
+    <div class="footer-links">
+      <a href="/housing-market-updates">Market Updates</a>
+      <a href="/bio">Bio</a>
+      <a href="/contact">Contact</a>
+      <a href="/free">Free Guide</a>
+      <a href="/privacy">Privacy</a>
     </div>
-  </body>
+  </div>
+  <div class="footer-compliance">
+    <p>Jasson Farrier · Kiger Realty · License #2018004483 · 614-699-3007 · jassonfarrier@gmail.com<br>
+    Equal Housing Opportunity. Information deemed reliable but not guaranteed.</p>
+  </div>
+</footer>
+</body>
 </html>
