@@ -24,19 +24,130 @@
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-:root { --navy: #0D1E42; --navy-deep: #0D1E42; --gray: #9DA6AB; --dark: #0D1E42; --white: #ffffff; }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Montserrat', sans-serif; background: var(--navy); color: var(--white); min-height: 100vh; }
-.agent-bar { background: var(--navy-deep); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 9px 40px; text-align: center; font-size: 12px; font-weight: 400; letter-spacing: 1px; color: rgba(255,255,255,0.55); }
-.agent-bar span { color: var(--white); font-size: 13px; font-weight: 600; letter-spacing: 1px; }
-nav { background: var(--navy); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.08); }
-.nav-links { display: flex; gap: 32px; align-items: center; }
-.nav-links a { font-weight: 600; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.6); text-decoration: none; }
-.nav-links a:hover { color: var(--white); }
-.nav-cta { background: var(--white) !important; color: var(--navy) !important; padding: 8px 18px; border-radius: 100px; font-weight: 700 !important; }
-.nav-logo { font-weight: 900; font-size: 15px; letter-spacing: 2px; text-transform: uppercase; color: var(--white); text-decoration: none; }
-.nav-logo span { color: var(--gray); }
-.page { max-width: 560px; margin: 0 auto; padding: 80px 24px; text-align: center; }
+/* ---- NAV ---- */
+
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 64px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.nav-brand {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0D1E42;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-brand span {
+  font-weight: 700;
+  color: #0D1E42;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-right a {
+  font-size: 12px;
+  font-weight: 500;
+  color: #9DA6AB;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-right a:hover { color: #0D1E42; }
+
+.nav-yt {
+  display: flex;
+  align-items: center;
+}
+
+.nav-pill {
+  background: #0D1E42 !important;
+  color: #fff !important;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 100px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+/* ---- FOOTER ---- */
+
+footer {
+  background: #0D1E42;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding: 48px 64px 36px;
+}
+
+.footer-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-brand {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+}
+
+.footer-links {
+  display: flex;
+  gap: 24px;
+}
+
+.footer-links a {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.25);
+  text-decoration: none;
+}
+
+.footer-links a:hover { color: rgba(255,255,255,0.6); }
+
+.footer-divider {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  margin-bottom: 24px;
+}
+
+.footer-legal {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.footer-legal p {
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  line-height: 2;
+}
+
+@media (max-width: 768px) {
+  nav { padding: 0 24px; }
+  .nav-right a:not(.nav-pill) { display: none; }
+  .nav-yt { display: none; }
+  footer { padding: 40px 24px 28px; }
+  .footer-top { flex-direction: column; align-items: flex-start; }
+}
+
+:root { --body { font-family: 'Montserrat', sans-serif; background: var(--.......page { max-width: 560px; margin: 0 auto; padding: 80px 24px; text-align: center; }
 .tag { font-weight: 700; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--gray); margin-bottom: 20px; display: block; }
 h1 { font-weight: 900; font-size: clamp(28px, 4vw, 44px); line-height: 1.1; color: var(--white); margin-bottom: 20px; }
 h1 em { font-style: normal; color: var(--gray); }
@@ -49,9 +160,7 @@ h1 em { font-style: normal; color: var(--gray); }
 .field input { width: 100%; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 2px; padding: 14px 16px; font-size: 16px; color: var(--white); font-family: 'Montserrat', sans-serif; }
 .field input:focus { outline: none; border-color: var(--gray); }
 .field input::placeholder { color: rgba(255,255,255,0.25); }
-.submit-btn { width: 100%; background: var(--white); color: var(--navy); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; padding: 16px; border: none; border-radius: 2px; cursor: pointer; margin-top: 8px; }
-.submit-btn:hover { background: #eaeaea; }
-.fine-print { font-size: 11px; color: rgba(255,255,255,0.25); text-align: center; margin-top: 16px; line-height: 1.6; }
+.submit-btn { width: 100%; background: var(--white); color: var(--.fine-print { font-size: 11px; color: rgba(255,255,255,0.25); text-align: center; margin-top: 16px; line-height: 1.6; }
 .what-you-get { margin-top: 60px; text-align: left; }
 .what-you-get h3 { font-weight: 900; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); margin-bottom: 20px; }
 .item { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; }
@@ -60,53 +169,28 @@ h1 em { font-style: normal; color: var(--gray); }
 .item-text strong { color: var(--white); font-weight: 700; font-size: 14px; display: block; margin-bottom: 4px; }
 
 @media(max-width:768px){
-.footer-nav{flex-wrap:wrap;padding:16px 20px;}
-.footer-nav a{margin:4px 8px;}
-  .nav-hamburger{display:flex;}nav{padding:0 20px;}.nav-links{display:none;}.page{padding:60px 16px;}}
-.footer-bar{background:var(--navy-deep);border-top:1px solid rgba(255,255,255,0.08);padding:10px 40px;text-align:center;font-size:12px;font-weight:400;letter-spacing:1px;color:rgba(255,255,255,0.55);}
-.footer-bar span{color:var(--white);font-size:13px;font-weight:600;}
-.footer-nav{background:var(--dark);padding:20px 40px;text-align:center;border-top:1px solid rgba(255,255,255,0.07);}
-.footer-nav a{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;margin:0 12px;}
-.footer-nav a:hover{color:var(--white);}
-.footer-eho{background:var(--dark);padding:16px 40px 24px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);}
-.footer-eho img{height:28px;vertical-align:middle;margin-right:10px;opacity:0.7;filter:invert(1);}
-.footer-eho span{font-size:10px;color:rgba(255,255,255,0.25);vertical-align:middle;line-height:1.8;}
-
-.nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none;}
-.nav-hamburger span{width:22px;height:2px;background:var(--white);display:block;transition:0.2s;}
-.mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--navy-deep);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:32px;}
-.mobile-menu.open{display:flex;}
-.mobile-menu a{font-weight:700;font-size:16px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.7);text-decoration:none;}
-.mobile-menu a:hover{color:var(--white);}
-.mobile-menu-close{position:absolute;top:24px;right:24px;background:none;border:none;color:var(--white);font-size:28px;cursor:pointer;line-height:1;}
+.}
+.footer-bar{background:var(--......mobile-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:var(--
 </style>
 </head>
 <body>
 
-<div class="agent-bar"><span style="font-size:13px;font-weight:700;color:#9DA6AB;">Kiger Realty</span> &nbsp;·&nbsp; <span>Jasson Farrier</span> &nbsp;·&nbsp; Realtor &nbsp;·&nbsp; License #2018004483 &nbsp;·&nbsp; 614-699-3007</div>
-
 <nav>
-  <a href="/" class="nav-logo">Jasson <span>Farrier</span></a>
-  <div class="nav-links">
+  <a href="/" class="nav-brand">Jasson Farrier <span>— Kiger Realty</span></a>
+  <div class="nav-right">
     <a href="/housing-market-updates">Market Updates</a>
     <a href="/ohio-housing-data">Data</a>
     <a href="/bio">About</a>
     <a href="/contact">Contact</a>
-    <a href="/free" class="nav-cta">Free Guide</a>
+    <a href="https://www.youtube.com/@OhioHousingNerd" class="nav-yt" aria-label="YouTube">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#9DA6AB"/>
+        <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/>
+      </svg>
+    </a>
+    <a href="/#hero-email" class="nav-pill">Get the Data &#8594;</a>
   </div>
-  <button class="nav-hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
 </nav>
-<div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-menu-close" onclick="document.getElementById('mobileMenu').classList.remove('open')">&times;</button>
-  <a href="/housing-market-updates" onclick="document.getElementById('mobileMenu').classList.remove('open')">Market Updates</a>
-  <a href="/ohio-housing-data" onclick="document.getElementById('mobileMenu').classList.remove('open')">Data</a>
-  <a href="/bio" onclick="document.getElementById('mobileMenu').classList.remove('open')">About</a>
-  <a href="/contact" onclick="document.getElementById('mobileMenu').classList.remove('open')">Contact</a>
-  <a href="/free" onclick="document.getElementById('mobileMenu').classList.remove('open')">Free Guide</a>
-</div>
-
 <div class="page">
   <span class="tag">Free Guide · 2026</span>
   <h1>Should I Buy in <em>2026</em> — or Wait?</h1>
@@ -196,18 +280,22 @@ h1 em { font-style: normal; color: var(--gray); }
 </div>
 
 <footer>
-  <div class="footer-bar"><span style="font-size:13px;font-weight:700;color:#9DA6AB;">Kiger Realty</span> &nbsp;·&nbsp; <span>Jasson Farrier</span> &nbsp;·&nbsp; Realtor &nbsp;·&nbsp; License #2018004483 &nbsp;·&nbsp; 614-699-3007</div>
-  <div class="footer-nav">
-    <a href="/housing-market-updates">Market Updates</a>
-    <a href="/ohio-housing-data">Data</a>
-    <a href="/bio">About</a>
-    <a href="/contact">Contact</a>
-    <a href="/free">Free Guide</a>
-    <a href="/privacy">Privacy</a>
+  <div class="footer-top">
+    <span class="footer-brand">Jasson Farrier &#183; Kiger Realty</span>
+    <div class="footer-links">
+      <a href="/housing-market-updates">Market Updates</a>
+      <a href="/ohio-housing-data">Data</a>
+      <a href="/bio">About</a>
+      <a href="/contact">Contact</a>
+    </div>
   </div>
-  <div class="footer-eho">
-    <img src="/fair-housing.webp" alt="Equal Housing Opportunity">
-    <span>Equal Housing Opportunity &nbsp;·&nbsp; Information deemed reliable but not guaranteed.</span>
+  <hr class="footer-divider">
+  <div class="footer-legal">
+    <img src="/fair-housing.webp" alt="Equal Housing Opportunity" style="flex-shrink:0;width:32px;height:auto;opacity:0.6;filter:invert(1);margin-top:2px;">
+    <p>
+      Jasson Farrier &#183; Kiger Realty &#183; Realtor &#183; License #2018004483 &#183; 614-699-3007<br>
+      Equal Housing Opportunity &#183; Information deemed reliable but not guaranteed.
+    </p>
   </div>
 </footer>
 </body>
