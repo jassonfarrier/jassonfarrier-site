@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ohio Housing Market Data — June 2026 | Jasson Farrier</title>
+<meta name="description" content="Ohio housing market data updated June 2026. County-by-county home price changes, inventory trends, and distress rates — straight from Zillow and PropStream. Analysis by Jasson Farrier.">
+<link rel="canonical" href="https://jassonfarrier.com/ohio-housing-data">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Ohio Housing Market Data — June 2026",
+  "description": "County-by-county Ohio home price changes, inventory trends, and distress data updated June 2026.",
+  "author": {
+    "@type": "Person",
+    "name": "Jasson Farrier",
+    "url": "https://jassonfarrier.com",
+    "jobTitle": "Realtor & Housing Market Analyst",
+    "worksFor": { "@type": "Organization", "name": "Kiger Realty" }
+  },
+  "datePublished": "2026-06-01",
+  "dateModified": "2026-06-30",
+  "publisher": { "@type": "Organization", "name": "Jasson Farrier", "url": "https://jassonfarrier.com" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Is the Ohio housing market cooling down in 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ohio home prices are still positive year-over-year across most major counties as of April 2026, but the pace has slowed sharply from pandemic highs. Columbus (Franklin County) is up just 0.19% year-over-year. Inventory is rising fast — Warren County is up 55.9% in active listings year-over-year — which is putting pressure on sellers but not yet crashing prices."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which Ohio county has the highest home price growth?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Mahoning County (Youngstown area) leads major Ohio counties with +6.58% year-over-year home price growth as of April 2026, according to Zillow ZHVI data. Montgomery County (Dayton) is second at +4.26%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where is housing distress highest in Ohio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Guernsey and Trumbull counties have the highest distress rates in Ohio at approximately 27% of properties in some form of financial distress as of June 2026, according to PropStream data. Lucas County (Toledo) leads among the state's larger markets at 12.9%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Ohio compare to the national housing market?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ohio is outperforming the national market on price growth in most counties. Ohio's major metros are averaging 1–5% year-over-year price growth versus the US national average of +0.73% as of April 2026. However, Ohio inventory is rising much faster than the national average, which could compress prices in 2026."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Columbus Ohio a good real estate market in 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Columbus (Franklin County) has essentially flatlined on year-over-year price growth at +0.19% as of April 2026, but remains up 49.5% since March 2020. Inventory is up 10.2% year-over-year — more supply, slower price growth. It's a transitioning market, not a crashing one."
+      }
+    }
+  ]
+}
+</script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --navy: #0D1E42; --gray: #9DA6AB; --white: #ffffff; --light: #f5f5f5; }
+body { font-family: 'Montserrat', sans-serif; background: var(--white); color: var(--navy); }
+
+/* NAV */
+.agent-bar { background: var(--navy); border-bottom: 1px solid rgba(255,255,255,0.1); padding: 9px 40px; text-align: center; font-size: 11px; font-weight: 500; letter-spacing: 1px; color: rgba(255,255,255,0.55); }
+.agent-bar span { color: #9DA6AB; font-weight: 700; }
+nav { background: var(--white); border-bottom: 1px solid var(--light); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 64px; position: sticky; top: 0; z-index: 100; }
+.nav-logo { font-weight: 700; font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--navy); text-decoration: none; }
+.nav-logo span { color: var(--gray); }
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a { font-weight: 600; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); text-decoration: none; transition: color 0.15s; }
+.nav-links a:hover, .nav-links a.active { color: var(--navy); }
+.nav-cta { background: var(--navy); color: var(--white) !important; padding: 9px 20px; border-radius: 100px; font-size: 11px !important; font-weight: 700 !important; letter-spacing: 1.5px; text-transform: uppercase; text-decoration: none; }
+.nav-cta:hover { opacity: 0.85; }
+.nav-hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; background: none; border: none; }
+.nav-hamburger span { width: 22px; height: 2px; background: var(--navy); display: block; }
+.mobile-menu { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--white); z-index: 999; flex-direction: column; align-items: center; justify-content: center; gap: 32px; }
+.mobile-menu.open { display: flex; }
+.mobile-menu a { font-weight: 700; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; color: var(--navy); text-decoration: none; }
+.mobile-menu-close { position: absolute; top: 24px; right: 24px; background: none; border: none; color: var(--navy); font-size: 28px; cursor: pointer; line-height: 1; }
+
+/* PAGE LAYOUT */
+.page-header { background: var(--navy); padding: 64px 40px 56px; text-align: center; }
+.eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); display: block; margin-bottom: 16px; }
+.page-header h1 { font-size: clamp(28px, 4vw, 44px); font-weight: 700; color: var(--white); line-height: 1.15; margin-bottom: 16px; }
+.page-header .sub { font-size: 15px; color: rgba(255,255,255,0.6); line-height: 1.7; max-width: 560px; margin: 0 auto; }
+.meta { font-size: 11px; color: rgba(255,255,255,0.4); letter-spacing: 1px; text-transform: uppercase; margin-top: 24px; }
+.meta a { color: rgba(255,255,255,0.5); text-decoration: none; }
+.meta a:hover { color: var(--gray); }
+
+.container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+
+/* TL;DR BOX */
+.tldr { background: var(--light); border-left: 3px solid var(--navy); padding: 28px 32px; margin: 48px 0; }
+.tldr .label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); margin-bottom: 12px; display: block; }
+.tldr h2 { font-size: 17px; font-weight: 700; color: var(--navy); line-height: 1.5; margin: 0; }
+.tldr ul { margin-top: 14px; padding-left: 0; list-style: none; }
+.tldr ul li { font-size: 14px; color: var(--navy); line-height: 1.7; padding-left: 16px; position: relative; margin-bottom: 6px; }
+.tldr ul li::before { content: '—'; position: absolute; left: 0; color: var(--gray); }
+
+/* SECTION STYLES */
+.section { padding: 56px 0; border-top: 1px solid var(--light); }
+.section:first-of-type { border-top: none; padding-top: 48px; }
+.section-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); display: block; margin-bottom: 12px; }
+.section h2 { font-size: clamp(20px, 2.5vw, 26px); font-weight: 700; color: var(--navy); line-height: 1.3; margin-bottom: 20px; }
+.section p { font-size: 15px; color: #444; line-height: 1.8; margin-bottom: 16px; }
+.section p strong { color: var(--navy); font-weight: 600; }
+
+/* DATA TABLE */
+.data-table-wrap { overflow-x: auto; margin: 28px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th { background: var(--navy); color: var(--white); font-weight: 700; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 14px; text-align: left; white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--light); }
+tbody tr:hover { background: var(--light); }
+tbody td { padding: 12px 14px; color: var(--navy); font-weight: 500; vertical-align: middle; }
+tbody td:first-child { font-weight: 700; }
+.up { color: #2a7a4a; font-weight: 700; }
+.down { color: #a33; font-weight: 700; }
+.neutral { color: var(--gray); font-weight: 600; }
+.badge { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 100px; background: var(--light); color: var(--gray); margin-left: 6px; vertical-align: middle; }
+.badge-hot { background: #0D1E42; color: #fff; }
+.badge-watch { background: #f5f5f5; color: #9DA6AB; }
+
+/* HIGHLIGHT STAT BOXES */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 28px 0; }
+.stat-box { background: var(--light); padding: 24px 20px; border-radius: 4px; }
+.stat-box .num { font-size: 28px; font-weight: 700; color: var(--navy); line-height: 1; margin-bottom: 6px; }
+.stat-box .stat-label { font-size: 11px; font-weight: 600; color: var(--gray); letter-spacing: 0.5px; line-height: 1.4; }
+
+/* SOURCE NOTE */
+.source-note { font-size: 12px; color: var(--gray); line-height: 1.7; margin-top: 16px; }
+.source-note a { color: var(--gray); }
+
+/* Q&A SECTION */
+.qa-section { background: var(--light); padding: 56px 0; }
+.qa-inner { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+.qa-item { padding: 24px 0; border-bottom: 1px solid #e5e5e5; }
+.qa-item:last-child { border-bottom: none; }
+.qa-item h3 { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 10px; line-height: 1.4; }
+.qa-item p { font-size: 14px; color: #555; line-height: 1.8; }
+
+/* EMAIL CTA */
+.email-cta { background: var(--navy); padding: 64px 40px; text-align: center; }
+.email-cta .eyebrow { color: var(--gray); margin-bottom: 12px; }
+.email-cta h2 { font-size: clamp(22px, 3vw, 32px); font-weight: 700; color: var(--white); margin-bottom: 12px; }
+.email-cta p { font-size: 15px; color: rgba(255,255,255,0.6); margin-bottom: 32px; max-width: 460px; margin-left: auto; margin-right: auto; }
+.email-form { display: flex; gap: 10px; max-width: 440px; margin: 0 auto; }
+.email-form input { flex: 1; padding: 14px 18px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); border-radius: 100px; font-family: 'Montserrat', sans-serif; font-size: 14px; color: var(--white); outline: none; }
+.email-form input::placeholder { color: rgba(255,255,255,0.4); }
+.email-form input:focus { border-color: var(--gray); }
+.btn-pill { background: var(--white); color: var(--navy); border: none; padding: 14px 24px; border-radius: 100px; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.btn-pill:hover { opacity: 0.9; }
+.email-sub { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 14px; }
+#data-thankyou { display: none; font-size: 14px; font-weight: 600; color: var(--white); margin-top: 16px; }
+
+/* FOOTER */
+.footer-bar { background: var(--navy); border-top: 1px solid rgba(255,255,255,0.08); padding: 10px 40px; text-align: center; font-size: 12px; color: rgba(255,255,255,0.5); letter-spacing: 1px; }
+.footer-bar span { color: var(--gray); font-weight: 700; }
+.footer-nav { background: var(--navy); padding: 20px 40px; text-align: center; border-top: 1px solid rgba(255,255,255,0.07); }
+.footer-nav a { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4); text-decoration: none; margin: 0 12px; }
+.footer-nav a:hover { color: var(--white); }
+.footer-eho { background: var(--navy); padding: 16px 40px 24px; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); }
+.footer-eho img { height: 28px; vertical-align: middle; margin-right: 10px; opacity: 0.7; filter: invert(1); }
+.footer-eho span { font-size: 10px; color: rgba(255,255,255,0.25); vertical-align: middle; line-height: 1.8; }
+
+@media(max-width:768px) {
+  .nav-links { display: none; }
+  .nav-hamburger { display: flex; }
+  nav { padding: 0 20px; }
+  .agent-bar { padding: 9px 20px; }
+  .page-header { padding: 48px 20px 40px; }
+  .container { padding: 0 20px; }
+  .tldr { padding: 24px 20px; }
+  .email-cta { padding: 48px 20px; }
+  .email-form { flex-direction: column; }
+  .email-form input, .btn-pill { width: 100%; }
+  thead th { font-size: 9px; padding: 10px 8px; }
+  tbody td { padding: 10px 8px; font-size: 12px; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .footer-bar { padding: 10px 20px; }
+  .footer-nav { padding: 16px 20px; }
+  .footer-nav a { margin: 4px 8px; }
+  .footer-eho { padding: 16px 20px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="agent-bar"><span>Kiger Realty</span> &nbsp;·&nbsp; Jasson Farrier &nbsp;·&nbsp; Realtor &nbsp;·&nbsp; License #2018004483 &nbsp;·&nbsp; 614-699-3007</div>
+
+<nav>
+  <a href="/" class="nav-logo">Jasson <span>Farrier</span></a>
+  <div class="nav-links">
+    <a href="/housing-market-updates">Market Updates</a>
+    <a href="/ohio-housing-data" class="active">Data</a>
+    <a href="/#bio">About</a>
+    <a href="/#contact">Contact</a>
+    <a href="/#hero-email" class="nav-cta">Get the Data &rarr;</a>
+  </div>
+  <button class="nav-hamburger" onclick="document.getElementById('mobileMenu').classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-menu-close" onclick="document.getElementById('mobileMenu').classList.remove('open')">&times;</button>
+  <a href="/housing-market-updates" onclick="document.getElementById('mobileMenu').classList.remove('open')">Market Updates</a>
+  <a href="/ohio-housing-data" onclick="document.getElementById('mobileMenu').classList.remove('open')">Data</a>
+  <a href="/#bio" onclick="document.getElementById('mobileMenu').classList.remove('open')">About</a>
+  <a href="/#contact" onclick="document.getElementById('mobileMenu').classList.remove('open')">Contact</a>
+  <a href="/#hero-email" onclick="document.getElementById('mobileMenu').classList.remove('open')">Get the Data</a>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <span class="eyebrow">Ohio Housing Market Data</span>
+  <h1>What the Numbers Actually Show<br>About Ohio Real Estate in 2026</h1>
+  <p class="sub">County-level home prices, inventory trends, and distress data — not headlines, not spin. Updated monthly.</p>
+  <p class="meta">Last updated: <strong style="color:rgba(255,255,255,0.7)">June 30, 2026</strong> &nbsp;·&nbsp; Data: Zillow ZHVI (Apr 2026), Realtor.com (May 2026), PropStream (Jun 2026) &nbsp;·&nbsp; Analysis by <a href="/#bio">Jasson Farrier</a></p>
+</div>
+
+<div class="container">
+
+  <!-- TL;DR -->
+  <div class="tldr">
+    <span class="label">TL;DR — What You Need to Know</span>
+    <h2>Ohio is outperforming the national market on price growth, but inventory is surging — and distress is concentrated in specific counties.</h2>
+    <ul>
+      <li>Ohio's major metros averaged +1–6% home price growth year-over-year through April 2026. The US national average: +0.73%.</li>
+      <li>Columbus (Franklin County) has essentially flatlined — up just 0.19% year-over-year. Still up 49.5% since March 2020.</li>
+      <li>Inventory is rising sharply in Columbus (+10%), Cincinnati (+23%), Dayton (+24%), and especially Warren County (+56%). More supply = more negotiating power for buyers.</li>
+      <li>Distress is not an Ohio-wide story. It's concentrated in specific counties — Guernsey (27%), Trumbull (27%), Scioto (26%). Lucas County (Toledo) leads the major markets at 12.9%.</li>
+      <li>Delaware County remains Ohio's healthiest market — lowest distress (2.4%), consistent price growth, and suburban demand holding firm.</li>
+    </ul>
+  </div>
+
+  <!-- SECTION 1: PRICE DATA -->
+  <div class="section">
+    <span class="section-label">Zillow ZHVI · April 2026</span>
+    <h2>Ohio Home Price Changes by County</h2>
+    <p>These numbers are from Zillow's Home Value Index — the most consistent county-level dataset available. They measure the median home value change, not median sale price, so they're less susceptible to mix shifts. All data is through April 2026.</p>
+    <p>The big takeaway: Ohio is still appreciating where the national market has stalled. But the gap between winners and laggards inside Ohio is widening.</p>
+
+    <div class="data-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>County / Market</th>
+            <th>1-Year Change</th>
+            <th>3-Year Change</th>
+            <th>Since Mar 2020</th>
+            <th>Size Rank</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🇺🇸 US National</td>
+            <td class="neutral">+0.73%</td>
+            <td class="up">+5.87%</td>
+            <td class="up">+44.91%</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Franklin County <span class="badge">Columbus</span></td>
+            <td class="neutral">+0.19%</td>
+            <td class="up">+9.48%</td>
+            <td class="up">+49.5%</td>
+            <td>#30</td>
+          </tr>
+          <tr>
+            <td>Cuyahoga County <span class="badge">Cleveland</span></td>
+            <td class="up">+4.53%</td>
+            <td class="up">+19.88%</td>
+            <td class="up">+56.51%</td>
+            <td>#34</td>
+          </tr>
+          <tr>
+            <td>Hamilton County <span class="badge">Cincinnati</span></td>
+            <td class="up">+1.96%</td>
+            <td class="up">+13.39%</td>
+            <td class="up">+52.33%</td>
+            <td>#75</td>
+          </tr>
+          <tr>
+            <td>Montgomery County <span class="badge">Dayton</span></td>
+            <td class="up">+4.26%</td>
+            <td class="up">+19.40%</td>
+            <td class="up">+59.32%</td>
+            <td>#130</td>
+          </tr>
+          <tr>
+            <td>Summit County <span class="badge">Akron</span></td>
+            <td class="up">+3.1%</td>
+            <td class="up">+17.2%</td>
+            <td class="up">+54.1%</td>
+            <td>#82</td>
+          </tr>
+          <tr>
+            <td>Mahoning County <span class="badge badge-hot">Youngstown</span></td>
+            <td class="up">+6.58%</td>
+            <td class="up">+25.19%</td>
+            <td class="up">+58.7%</td>
+            <td>#152</td>
+          </tr>
+          <tr>
+            <td>Lucas County <span class="badge">Toledo</span></td>
+            <td class="up">+3.8%</td>
+            <td class="up">+18.1%</td>
+            <td class="up">+55.4%</td>
+            <td>#95</td>
+          </tr>
+          <tr>
+            <td>Delaware County <span class="badge badge-hot">Columbus Suburb</span></td>
+            <td class="up">+2.1%</td>
+            <td class="up">+11.3%</td>
+            <td class="up">+52.8%</td>
+            <td>#190</td>
+          </tr>
+          <tr>
+            <td>Butler County <span class="badge">Cincinnati Suburb</span></td>
+            <td class="up">+2.3%</td>
+            <td class="up">+14.6%</td>
+            <td class="up">+53.9%</td>
+            <td>#140</td>
+          </tr>
+          <tr>
+            <td>Licking County <span class="badge">Columbus Suburb</span></td>
+            <td class="up">+2.8%</td>
+            <td class="up">+13.2%</td>
+            <td class="up">+55.1%</td>
+            <td>#210</td>
+          </tr>
+          <tr>
+            <td>Warren County <span class="badge">Cincinnati Suburb</span></td>
+            <td class="up">+1.7%</td>
+            <td class="up">+10.8%</td>
+            <td class="up">+51.2%</td>
+            <td>#220</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="source-note">Source: Zillow Home Value Index (ZHVI), ResiClub PRO analysis by Lance Lambert. Data through April 2026. Size rank = national county size ranking by housing stock. Estimates for counties without exact data are based on surrounding ZHVI regional data.</p>
+
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="num">+6.58%</div>
+        <div class="stat-label">Mahoning County<br>1-year price growth — leads Ohio</div>
+      </div>
+      <div class="stat-box">
+        <div class="num">+0.19%</div>
+        <div class="stat-label">Franklin County<br>Columbus essentially flat YoY</div>
+      </div>
+      <div class="stat-box">
+        <div class="num">+49.5%</div>
+        <div class="stat-label">Columbus total appreciation<br>since March 2020</div>
+      </div>
+      <div class="stat-box">
+        <div class="num">+0.73%</div>
+        <div class="stat-label">US national average<br>1-year price growth</div>
+      </div>
+    </div>
+
+    <p><strong>My take:</strong> Columbus catching national attention for "cooling" is accurate on the year-over-year number — but misleading in context. Up 49.5% since 2020, nearly flat year-over-year isn't collapse, it's consolidation. Dayton and Cleveland are quietly outperforming Columbus right now, and Youngstown's growth rate is the kind of number that gets investor attention fast.</p>
+  </div>
+
+  <!-- SECTION 2: INVENTORY -->
+  <div class="section">
+    <span class="section-label">Realtor.com Active Listings · May 2026</span>
+    <h2>Ohio Inventory Is Rising — But Not Evenly</h2>
+    <p>Active listings track how many homes are for sale at a given point in time. Rising inventory gives buyers more options and negotiating leverage. It also puts downward pressure on prices when it rises faster than demand.</p>
+    <p>Ohio inventory is up across the board — most counties are significantly above one year ago. The national average is up just 2.2% year-over-year. Ohio is running well ahead of that.</p>
+
+    <div class="data-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>County / Market</th>
+            <th>1-Year Inventory Change</th>
+            <th>2-Year Change</th>
+            <th>3-Year Change</th>
+            <th>Buyer Climate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>🇺🇸 US National</td>
+            <td class="up">+2.2%</td>
+            <td class="up">+34.4%</td>
+            <td class="up">+81.8%</td>
+            <td>—</td>
+          </tr>
+          <tr>
+            <td>Warren County <span class="badge badge-hot">Most Supply</span></td>
+            <td class="up">+55.9%</td>
+            <td class="up">—</td>
+            <td class="up">+143.1%</td>
+            <td>Buyer favorable</td>
+          </tr>
+          <tr>
+            <td>Montgomery County <span class="badge">Dayton</span></td>
+            <td class="up">+24.0%</td>
+            <td class="up">—</td>
+            <td class="up">+120.5%</td>
+            <td>Shifting to buyers</td>
+          </tr>
+          <tr>
+            <td>Hamilton County <span class="badge">Cincinnati</span></td>
+            <td class="up">+23.2%</td>
+            <td class="up">—</td>
+            <td class="up">+115.1%</td>
+            <td>Shifting to buyers</td>
+          </tr>
+          <tr>
+            <td>Lucas County <span class="badge">Toledo</span></td>
+            <td class="up">+18.9%</td>
+            <td class="up">—</td>
+            <td class="up">+49.1%</td>
+            <td>Shifting to buyers</td>
+          </tr>
+          <tr>
+            <td>Delaware County <span class="badge">Columbus Suburb</span></td>
+            <td class="up">+14.8%</td>
+            <td class="up">—</td>
+            <td class="up">+81.2%</td>
+            <td>Balanced</td>
+          </tr>
+          <tr>
+            <td>Mahoning County <span class="badge">Youngstown</span></td>
+            <td class="up">+11.9%</td>
+            <td class="up">—</td>
+            <td class="up">+92.5%</td>
+            <td>Balanced</td>
+          </tr>
+          <tr>
+            <td>Franklin County <span class="badge">Columbus</span></td>
+            <td class="up">+10.2%</td>
+            <td class="up">+71.9%</td>
+            <td class="up">+110.8%</td>
+            <td>Balanced</td>
+          </tr>
+          <tr>
+            <td>Butler County <span class="badge">Cincinnati Suburb</span></td>
+            <td class="up">+7.8%</td>
+            <td class="up">—</td>
+            <td class="up">+81.2%</td>
+            <td>Balanced</td>
+          </tr>
+          <tr>
+            <td>Stark County <span class="badge">Canton</span></td>
+            <td class="up">+6.9%</td>
+            <td class="up">—</td>
+            <td class="up">+62.2%</td>
+            <td>Balanced</td>
+          </tr>
+          <tr>
+            <td>Summit County <span class="badge">Akron</span></td>
+            <td class="up">+7.2%</td>
+            <td class="up">—</td>
+            <td class="up">+51.0%</td>
+            <td>Balanced</td>
+          </tr>
+          <tr>
+            <td>Cuyahoga County <span class="badge">Cleveland</span></td>
+            <td class="up">+5.6%</td>
+            <td class="up">+35.2%</td>
+            <td class="up">+35.2%</td>
+            <td>Seller-leaning</td>
+          </tr>
+          <tr>
+            <td>Licking County <span class="badge">Columbus Suburb</span></td>
+            <td class="down">-11.8%</td>
+            <td class="up">—</td>
+            <td class="up">+62.5%</td>
+            <td>Seller favorable</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="source-note">Source: ResiClub PRO analysis of Realtor.com active listing data. Data through May 2026.</p>
+
+    <p><strong>My take:</strong> Warren County's 56% inventory surge is the most interesting data point here. That's a market where buyers went from competing over almost nothing to having real choices. Sellers in Warren County priced for 2022 conditions are about to get a reality check. Licking County going the other direction — down 11.8% year-over-year — is the quiet story. Less supply plus continued demand equals continued price pressure in Newark and Heath.</p>
+  </div>
+
+  <!-- SECTION 3: DISTRESS -->
+  <div class="section">
+    <span class="section-label">PropStream Data · June 2026</span>
+    <h2>Where Housing Distress Is Concentrated in Ohio</h2>
+    <p>Distress data covers properties in pre-foreclosure, bank-owned, bankruptcy, tax delinquency, negative equity, or auction. It's a leading indicator — concentrated distress today means foreclosure activity and discounted inventory in the months ahead.</p>
+    <p>The critical context: Ohio's distress isn't uniform. There's a tale of two states here — and the line runs roughly along the I-71 corridor.</p>
+
+    <div class="data-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>County</th>
+            <th>Distress Rate</th>
+            <th>Tax Delinquency</th>
+            <th>Upside-Down Properties</th>
+            <th>Risk Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Guernsey County</td>
+            <td class="down">26.9%</td>
+            <td class="down">24.9%</td>
+            <td>—</td>
+            <td><span class="badge" style="background:#0D1E42;color:#fff">High</span></td>
+          </tr>
+          <tr>
+            <td>Trumbull County</td>
+            <td class="down">26.8%</td>
+            <td class="down">24.8%</td>
+            <td>1,994</td>
+            <td><span class="badge" style="background:#0D1E42;color:#fff">High</span></td>
+          </tr>
+          <tr>
+            <td>Scioto County</td>
+            <td class="down">25.6%</td>
+            <td class="down">23.7%</td>
+            <td>993</td>
+            <td><span class="badge" style="background:#0D1E42;color:#fff">High</span></td>
+          </tr>
+          <tr>
+            <td>Perry County</td>
+            <td class="down">25.4%</td>
+            <td class="down">23.4%</td>
+            <td>570</td>
+            <td><span class="badge" style="background:#0D1E42;color:#fff">High</span></td>
+          </tr>
+          <tr>
+            <td>Columbiana County</td>
+            <td class="down">24.3%</td>
+            <td class="down">21.8%</td>
+            <td>1,568</td>
+            <td><span class="badge" style="background:#0D1E42;color:#fff">High</span></td>
+          </tr>
+          <tr>
+            <td>Mahoning County <span class="badge">Youngstown</span></td>
+            <td class="down">18.7%</td>
+            <td class="down">16.3%</td>
+            <td>2,055</td>
+            <td><span class="badge" style="background:#9DA6AB;color:#fff">Elevated</span></td>
+          </tr>
+          <tr>
+            <td>Lucas County <span class="badge">Toledo</span></td>
+            <td class="down">12.9%</td>
+            <td class="down">10.4%</td>
+            <td>3,568</td>
+            <td><span class="badge" style="background:#9DA6AB;color:#fff">Elevated</span></td>
+          </tr>
+          <tr>
+            <td>Montgomery County <span class="badge">Dayton</span></td>
+            <td class="neutral">8.4%</td>
+            <td class="neutral">5.7%</td>
+            <td>5,013</td>
+            <td><span class="badge">Watch</span></td>
+          </tr>
+          <tr>
+            <td>Licking County</td>
+            <td class="neutral">8.0%</td>
+            <td class="neutral">4.5%</td>
+            <td>2,771</td>
+            <td><span class="badge">Watch</span></td>
+          </tr>
+          <tr>
+            <td>Butler County <span class="badge">Cincinnati Suburb</span></td>
+            <td class="neutral">7.8%</td>
+            <td class="neutral">5.7%</td>
+            <td>2,836</td>
+            <td><span class="badge">Watch</span></td>
+          </tr>
+          <tr>
+            <td>Stark County <span class="badge">Canton</span></td>
+            <td class="neutral">7.4%</td>
+            <td class="neutral">4.7%</td>
+            <td>4,500</td>
+            <td><span class="badge">Watch</span></td>
+          </tr>
+          <tr>
+            <td>Franklin County <span class="badge">Columbus</span></td>
+            <td class="neutral">5.0%</td>
+            <td class="neutral">2.3%</td>
+            <td>10,458</td>
+            <td><span class="badge">Moderate</span></td>
+          </tr>
+          <tr>
+            <td>Summit County <span class="badge">Akron</span></td>
+            <td class="neutral">3.8%</td>
+            <td class="neutral">1.7%</td>
+            <td>3,937</td>
+            <td><span class="badge">Moderate</span></td>
+          </tr>
+          <tr>
+            <td>Cuyahoga County <span class="badge">Cleveland</span></td>
+            <td class="neutral">3.9%</td>
+            <td class="neutral">0.7%</td>
+            <td>11,212</td>
+            <td><span class="badge">Moderate</span></td>
+          </tr>
+          <tr>
+            <td>Warren County <span class="badge">Cincinnati Suburb</span></td>
+            <td class="up">3.9%</td>
+            <td class="up">2.1%</td>
+            <td>1,475</td>
+            <td><span class="badge">Low</span></td>
+          </tr>
+          <tr>
+            <td>Hamilton County <span class="badge">Cincinnati</span></td>
+            <td class="up">3.1%</td>
+            <td class="up">0.1%</td>
+            <td>8,434</td>
+            <td><span class="badge">Low</span></td>
+          </tr>
+          <tr>
+            <td>Delaware County <span class="badge">Columbus Suburb</span></td>
+            <td class="up">2.4%</td>
+            <td class="up">0.2%</td>
+            <td>1,920</td>
+            <td><span class="badge">Low</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="source-note">Source: PropStream data, June 2026. Distress % = total distressed properties as a share of total property count. Includes pre-foreclosure, bank-owned, bankruptcy, tax delinquent, negative equity, and auction properties. Harrison County excluded (data anomaly).</p>
+
+    <p><strong>My take:</strong> Franklin County's 10,458 upside-down properties gets attention — that's a big number. But as a share of total properties, it's 5% distress rate, which is moderate. The more important story is the absolute numbers in Cuyahoga and Hamilton, which have 11,000+ and 8,000+ underwater properties respectively. If rates stay elevated and those owners need to sell, those markets absorb significant inventory that isn't in the current "for sale" count. Delaware County at 2.4% distress remains the cleanest market in Ohio by this metric.</p>
+  </div>
+
+  <!-- SECTION 4: OHIO VS NATIONAL -->
+  <div class="section">
+    <span class="section-label">Jasson Farrier Analysis</span>
+    <h2>Ohio vs. the National Market: What the Data Actually Shows</h2>
+    <p>The national housing narrative in 2026 is: prices are stalling, inventory is recovering, and the market is "normalizing." That's broadly true at the national level. Ohio tells a more nuanced version of that story.</p>
+    <p><strong>Where Ohio wins:</strong> Every major Ohio metro is outperforming the national +0.73% year-over-year price average. Cleveland (+4.53%), Dayton (+4.26%), and Youngstown (+6.58%) are not stalling markets. They're outperforming most of the country at a fraction of the price.</p>
+    <p><strong>Where Ohio is under pressure:</strong> Inventory recovery in Ohio is running 5–10x faster than the national average in several markets. Warren County (+56% YoY) and Montgomery County (+24%) are adding supply much faster than buyers are absorbing it. That's a setup for price compression, not collapse.</p>
+    <p><strong>The affordability advantage:</strong> Ohio remains one of the most affordable states in the country by price-to-income ratio. That's a structural advantage that doesn't disappear in a high-rate environment — it moderates it. Ohio buyers aren't stretched the same way coastal buyers are.</p>
+    <p><strong>The risk:</strong> Distress concentration in specific counties — particularly Trumbull, Mahoning, Scioto, and Lucas — is elevated by any measure. These aren't 2008 numbers, but they're not healthy either. Watch those markets for increased foreclosure activity in Q3–Q4 2026.</p>
+  </div>
+
+</div><!-- end container -->
+
+<!-- Q&A SECTION -->
+<div class="qa-section">
+  <div class="qa-inner">
+    <span class="section-label" style="display:block;margin-bottom:20px;">Common Questions</span>
+    <h2 style="font-size:22px;font-weight:700;color:var(--navy);margin-bottom:32px;">Ohio Housing Market — Frequently Asked Questions</h2>
+
+    <div class="qa-item">
+      <h3>Is the Ohio housing market cooling down in 2026?</h3>
+      <p>Yes and no. Columbus (Franklin County) is essentially flat year-over-year at +0.19% through April 2026 — that's a meaningful cooldown from the 5–10% growth years. But Cleveland, Dayton, and Youngstown are still posting 4–7% annual gains, well above the national average. The Ohio market is segmenting, not uniformly cooling.</p>
+    </div>
+
+    <div class="qa-item">
+      <h3>Which Ohio county has the highest home price growth in 2026?</h3>
+      <p>Mahoning County (Youngstown area) leads major Ohio counties at +6.58% year-over-year as of April 2026, according to Zillow ZHVI data. Montgomery County (Dayton) is second at +4.26%, followed by Cuyahoga County (Cleveland) at +4.53%.</p>
+    </div>
+
+    <div class="qa-item">
+      <h3>Is Columbus a buyer's or seller's market right now?</h3>
+      <p>Balanced, trending toward buyers. Active listings in Franklin County are up 10.2% year-over-year — more options, less competition. Prices are still positive but barely. Sellers who bought pre-2020 still have significant equity cushion. Sellers who bought at peak 2022 prices need to be realistic.</p>
+    </div>
+
+    <div class="qa-item">
+      <h3>Where is housing distress highest in Ohio?</h3>
+      <p>Rural and Rust Belt counties carry the highest distress rates. Guernsey and Trumbull counties sit at approximately 27% of properties in some form of financial distress as of June 2026. Among Ohio's larger markets, Lucas County (Toledo) at 12.9% distress is the most elevated. Delaware County at 2.4% is the cleanest.</p>
+    </div>
+
+    <div class="qa-item">
+      <h3>How does Ohio compare to the national housing market?</h3>
+      <p>Most Ohio counties are outperforming the national +0.73% year-over-year average on price growth. However, Ohio inventory is recovering faster than the national average in several markets. The tradeoff: more price support than the coast, but more supply coming online than the headline numbers suggest.</p>
+    </div>
+
+    <div class="qa-item">
+      <h3>Should I buy a home in Ohio in 2026 or wait?</h3>
+      <p>That depends entirely on your situation — timeline, financial stability, the specific market, and whether you're buying to live there or as an investment. The data doesn't give a universal answer. If you want a framework for your specific situation, <a href="/free" style="color:var(--navy);font-weight:700;">get my free Wait or Buy guide here</a>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- EMAIL CTA -->
+<div class="email-cta" id="data-email">
+  <span class="eyebrow">Stay Current</span>
+  <h2>Get Ohio Housing Data<br>When It Updates</h2>
+  <p>I update this page monthly. Drop your email and I'll send you the data plus my honest read on what it means.</p>
+  <form id="data-form" onsubmit="handleDataEmail(event)">
+    <div class="email-form">
+      <input type="email" id="data-email-input" placeholder="Your email address" required>
+      <button type="submit" class="btn-pill" id="data-email-btn">Get Updates &rarr;</button>
+    </div>
+  </form>
+  <p class="email-sub">No spam. Monthly data updates only. Unsubscribe anytime.</p>
+  <p id="data-thankyou">You're in — I'll send the next update when the data drops.</p>
+</div>
+
+<footer>
+  <div class="footer-bar"><span>Kiger Realty</span> &nbsp;·&nbsp; Jasson Farrier &nbsp;·&nbsp; Realtor &nbsp;·&nbsp; License #2018004483 &nbsp;·&nbsp; 614-699-3007</div>
+  <div class="footer-nav">
+    <a href="/housing-market-updates">Market Updates</a>
+    <a href="/ohio-housing-data">Data</a>
+    <a href="/#bio">About</a>
+    <a href="/#contact">Contact</a>
+    <a href="/free">Free Guide</a>
+    <a href="/privacy">Privacy</a>
+  </div>
+  <div class="footer-eho">
+    <img src="/fair-housing.webp" alt="Equal Housing Opportunity">
+    <span>Equal Housing Opportunity &nbsp;·&nbsp; Information deemed reliable but not guaranteed. Data sources: Zillow, Realtor.com, PropStream.</span>
+  </div>
+</footer>
+
+<script>
+var _dataLoadTime = Date.now();
+async function handleDataEmail(e) {
+  e.preventDefault();
+  if (Date.now() - _dataLoadTime < 2000) return;
+  const email = document.getElementById('data-email-input').value.trim();
+  const btn = document.getElementById('data-email-btn');
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  // Send to Kit
+  const kitForm = document.createElement('form');
+  kitForm.action = 'https://app.kit.com/forms/9195650/subscriptions';
+  kitForm.method = 'post';
+  kitForm.target = 'kit-data-frame';
+  kitForm.style.display = 'none';
+  const emailField = document.createElement('input');
+  emailField.name = 'email_address'; emailField.value = email;
+  kitForm.appendChild(emailField);
+  document.body.appendChild(kitForm);
+  const iframe = document.createElement('iframe');
+  iframe.name = 'kit-data-frame';
+  iframe.style.display = 'none';
+  document.body.appendChild(iframe);
+  kitForm.submit();
+
+  // Send to CRM
+  try {
+    await fetch('https://farrier-crm.vercel.app/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email,
+        first_name: '', last_name: '', phone: '',
+        lead_source: 'Jasson Farrier — Ohio Housing Data Page',
+        source_site: 'jassonfarrier.com',
+        contact_type: 'Email Subscriber',
+        notes: 'Subscribed via /ohio-housing-data page',
+        newsletter: true
+      })
+    });
+  } catch(err) { console.error('CRM error:', err); }
+
+  document.getElementById('data-form').style.display = 'none';
+  document.querySelector('.email-sub').style.display = 'none';
+  document.getElementById('data-thankyou').style.display = 'block';
+}
+</script>
+</body>
+</html>
