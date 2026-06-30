@@ -592,11 +592,65 @@ footer {
   <div class="hero-text">
     <span class="hero-eyebrow">Ohio Realtor &amp; Housing Market Analyst</span>
     <h1>The truth about the Ohio housing market.</h1>
-    <form id="hero-email" class="hero-email" action="https://app.kit.com/forms/9195650/subscriptions" method="POST">
-      <input type="email" name="email_address" placeholder="Your email address" required>
-      <button type="submit" class="btn-pill-dark">Get the Data &#8594;</button>
+    <form id="hero-email" class="hero-email" onsubmit="handleHeroEmail(event)">
+      <input type="email" id="hero-email-input" placeholder="Your email address" required>
+      <button type="submit" class="btn-pill-dark" id="hero-email-btn">Get the Data &#8594;</button>
     </form>
-    <p class="hero-sub">Free: Get my Wait or Buy Guide + monthly Ohio market updates.</p>
+    <p class="hero-sub" id="hero-sub-text">Free: Get my Wait or Buy Guide + monthly Ohio market updates.</p>
+    <p id="hero-thankyou" style="display:none;font-size:13px;font-weight:600;color:#0D1E42;margin-top:12px;">You're in — check your inbox for the guide.</p>
+
+    <script>
+    var _heroLoadTime = Date.now();
+    async function handleHeroEmail(e) {
+      e.preventDefault();
+      if (Date.now() - _heroLoadTime < 2000) return;
+      const email = document.getElementById('hero-email-input').value.trim();
+      const btn = document.getElementById('hero-email-btn');
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+
+      // Send to Kit
+      const kitForm = document.createElement('form');
+      kitForm.action = 'https://app.kit.com/forms/9195650/subscriptions';
+      kitForm.method = 'post';
+      kitForm.target = 'kit-hero-frame';
+      kitForm.style.display = 'none';
+      const emailField = document.createElement('input');
+      emailField.name = 'email_address'; emailField.value = email;
+      kitForm.appendChild(emailField);
+      document.body.appendChild(kitForm);
+      const iframe = document.createElement('iframe');
+      iframe.name = 'kit-hero-frame';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+      kitForm.submit();
+
+      // Send to CRM
+      try {
+        await fetch('https://farrier-crm.vercel.app/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            first_name: '',
+            last_name: '',
+            phone: '',
+            lead_source: 'Jasson Farrier — Homepage',
+            source_site: 'jassonfarrier.com',
+            contact_type: 'Email Subscriber',
+            notes: 'Subscribed via homepage hero form',
+            newsletter: true
+          })
+        });
+      } catch(err) {
+        console.error('CRM error:', err);
+      }
+
+      document.getElementById('hero-email').style.display = 'none';
+      document.getElementById('hero-sub-text').style.display = 'none';
+      document.getElementById('hero-thankyou').style.display = 'block';
+    }
+    </script>
   </div>
   <div class="hero-photo">
     <img
