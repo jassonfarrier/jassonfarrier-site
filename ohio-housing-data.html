@@ -188,6 +188,30 @@
 
   /* COUNTY LABEL */
   .county-label { pointer-events: none; font-family: 'Montserrat', sans-serif; }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    html, body { overflow: auto; }
+    .main { flex-direction: column; height: auto; }
+    .sidebar {
+      width: 100%; flex-direction: row; flex-wrap: wrap;
+      gap: 8px; padding: 12px;
+      border-right: none; border-bottom: 1px solid rgba(0,210,255,0.1);
+      overflow-x: auto;
+    }
+    .sidebar-label { width: 100%; margin-bottom: 0; }
+    .metric-btn { flex: 1; min-width: 130px; padding: 10px 12px; }
+    .metric-btn .metric-desc { display: none; }
+    .source-note { display: none; }
+    .map-area { height: 60vw; min-height: 280px; flex: none; }
+    #chart-panel {
+      position: fixed; left: 0; right: 0; bottom: 0; top: auto;
+      width: 100%; border-radius: 16px 16px 0 0;
+      max-height: 70vh; overflow-y: auto;
+    }
+    #legend { left: 12px; bottom: 12px; }
+  }
+
 </style>
 </head>
 <body>
