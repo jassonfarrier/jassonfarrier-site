@@ -63,6 +63,7 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
+  overflow-x: hidden;
   font-family: 'Montserrat', sans-serif;
   background: #fff;
   color: #0D1E42;
@@ -414,6 +415,13 @@ nav {
 
 @media (max-width: 768px) {
   .guide { padding: 60px 24px; }
+
+  nav { padding: 0 20px; }
+  .nav-right a:not(.nav-pill):not(.nav-yt) { display: none; }
+  .stat-row, .stat-grid { flex-wrap: wrap; }
+  .footer-cols, .footer-columns { flex-direction: column; }
+  .hero, .page-header, .article-hero { padding: 48px 24px; }
+  section, .section { padding: 40px 20px; }
 }
 
 /* ---- MARKET UPDATE ---- */
