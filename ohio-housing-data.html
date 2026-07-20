@@ -28,6 +28,8 @@ nav{position:relative;z-index:100;background:rgba(6,13,31,0.97);height:56px;flex
 .metric-btn{background:rgba(0,210,255,0.03);border:1px solid rgba(0,210,255,0.08);border-radius:6px;padding:11px 13px;cursor:pointer;transition:all .2s;text-align:left;width:100%}
 .metric-btn:hover{background:rgba(0,210,255,0.09);border-color:rgba(0,210,255,0.25)}
 .metric-btn.active{background:rgba(0,210,255,0.11);border-color:#00d4ff;box-shadow:0 0 14px rgba(0,210,255,0.13)}
+.metric-btn.just-clicked{animation:pulse-btn 0.4s ease}
+@keyframes pulse-btn{0%{box-shadow:0 0 0 rgba(0,210,255,0.5)}50%{box-shadow:0 0 20px rgba(0,210,255,0.6)}100%{box-shadow:0 0 14px rgba(0,210,255,0.13)}}
 .metric-btn .mn{font-size:12px;font-weight:700;color:#e0eaff;display:block;margin-bottom:2px}
 .metric-btn .md{font-size:10px;color:rgba(255,255,255,0.3);line-height:1.4}
 .metric-btn.active .mn{color:#00d4ff}
@@ -37,7 +39,7 @@ nav{position:relative;z-index:100;background:rgba(6,13,31,0.97);height:56px;flex
 /* MAP */
 .map-area{flex:1;position:relative;overflow:hidden;background:#060d1f}
 #map-svg{width:100%;height:100%}
-.county-path{stroke:rgba(0,210,255,0.2);stroke-width:0.5;cursor:pointer;transition:stroke-width .15s}
+.county-path{stroke:rgba(0,210,255,0.2);stroke-width:0.5;cursor:pointer;transition:fill .4s ease, stroke-width .15s}
 .county-path:hover{stroke:#00d4ff;stroke-width:1.8}
 .county-path.selected{stroke:#fff;stroke-width:2}
 
@@ -237,7 +239,8 @@ function render() {
   const vals = DATA.map(d => d[metric]).filter(v => v != null);
   const mn = d3.min(vals), mx = d3.max(vals);
 
-  svg.append('g').selectAll('.county-path')
+  const g = svg.append('g');
+  g.selectAll('.county-path')
     .data(geoData.features).enter()
     .append('path')
     .attr('class', d => 'county-path' + (FIPS[String(d.id).padStart(5,'0')] === selected ? ' selected' : ''))
@@ -344,6 +347,21 @@ document.querySelectorAll('.metric-btn').forEach(btn => {
     document.querySelectorAll('.metric-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     metric = btn.dataset.metric;
+    btn.classList.add('just-clicked');
+    setTimeout(()=>btn.classList.remove('just-clicked'), 400);
+    if (selected) showPanel(selected);
+    // Animate fills on existing paths instead of full redraw
+    const vals2 = DATA.map(d=>d[metric]).filter(v=>v!=null);
+    const mn2=d3.min(vals2), mx2=d3.max(vals2);
+    d3.selectAll('.county-path')
+      .transition().duration(450).ease(d3.easeCubicInOut)
+      .attr('fill', d => {
+        const name = FIPS[String(d.id).padStart(5,'0')];
+        const cd = name && dataMap[name];
+        const v = cd && cd[metric];
+        return v != null ? getColor(v, mn2, mx2, metric) : '#111827';
+      });
+    drawLegend(mn2, mx2);out(()=>btn.classList.remove('just-clicked'), 400);
     if (selected) showPanel(selected);
     render();
   });
