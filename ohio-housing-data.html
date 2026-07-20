@@ -212,7 +212,7 @@ function render(){
   if(!geoData||!DATA.length) return;
   const w=mapArea.clientWidth, h=mapArea.clientHeight;
   svg.selectAll('*').remove();
-  const proj=d3.geoMercator().fitSize([w*.9,h*.88],geoData).translate([w*.45,h*.46]);
+  const proj=d3.geoMercator().fitSize([w*.92,h*.9],geoData);
   const pathGen=d3.geoPath().projection(proj);
   const vals=DATA.map(d=>d.latest&&d.latest[mapMetric]).filter(v=>v!=null);
   const mn=d3.min(vals),mx=d3.max(vals);
