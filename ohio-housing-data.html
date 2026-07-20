@@ -4,14 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ohio Housing Data by County | Jasson Farrier</title>
-<meta name="description" content="Interactive Ohio county housing map — 10 years of home values, listings, days on market, and price trends across all 88 counties.">
+<meta name="description" content="Interactive Ohio county housing map — 10 years of home values, listings, days on market across all 88 counties.">
+<script src='https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css' rel='stylesheet'>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{width:100%;height:100%;overflow:hidden;background:#060d1f}
-body{font-family:'Montserrat',sans-serif;color:#e0eaff;display:flex;flex-direction:column;overflow-x:hidden}
+body{font-family:'Montserrat',sans-serif;color:#e0eaff;display:flex;flex-direction:column}
 
 nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid rgba(0,210,255,0.12)}
 .nav-brand{font-size:13px;font-weight:700;color:#e0eaff;text-decoration:none}
@@ -20,9 +21,9 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
 .nav-right a{font-size:12px;font-weight:500;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s}
 .nav-right a:hover,.nav-right a.active{color:#00d4ff}
 
-.main{display:flex;flex:1;overflow:hidden}
+.main{display:flex;flex:1;overflow:hidden;position:relative}
 
-.sidebar{width:210px;flex-shrink:0;background:rgba(6,13,31,0.98);border-right:1px solid rgba(0,210,255,0.1);padding:18px 12px;display:flex;flex-direction:column;gap:5px;overflow-y:auto}
+.sidebar{width:210px;flex-shrink:0;background:rgba(6,13,31,0.98);border-right:1px solid rgba(0,210,255,0.1);padding:18px 12px;display:flex;flex-direction:column;gap:5px;overflow-y:auto;z-index:10}
 .sidebar-label{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(0,210,255,0.45);margin-bottom:5px;padding-left:3px}
 .metric-btn{background:rgba(0,210,255,0.03);border:1px solid rgba(0,210,255,0.08);border-radius:6px;padding:10px 12px;cursor:pointer;transition:all .2s;text-align:left;width:100%}
 .metric-btn:hover{background:rgba(0,210,255,0.09);border-color:rgba(0,210,255,0.3)}
@@ -32,48 +33,53 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
 .metric-btn.active .mn{color:#00d4ff}
 .sidebar hr{border:none;border-top:1px solid rgba(0,210,255,0.06);margin:5px 0}
 .src{font-size:8px;color:rgba(255,255,255,0.18);line-height:1.7;padding:0 3px;margin-top:auto;padding-top:12px}
-.hint{font-size:9px;color:rgba(0,210,255,0.35);padding:8px;background:rgba(0,210,255,0.04);border-radius:5px;line-height:1.5;margin-top:4px}
+.hint{font-size:9px;color:rgba(0,210,255,0.4);padding:8px 10px;background:rgba(0,210,255,0.05);border-radius:5px;line-height:1.5;margin-top:4px}
 
-.map-area{flex:1;position:relative;overflow:hidden}
-#map-svg{width:100%;height:100%}
-.county-path{stroke:rgba(0,210,255,0.18);stroke-width:0.5;cursor:pointer;transition:fill .45s ease,stroke-width .15s}
-.county-path:hover{stroke:#00d4ff;stroke-width:1.8;filter:brightness(1.3)}
-.county-path.selected{stroke:#fff;stroke-width:2}
+#map{flex:1;height:100%}
 
-#tooltip{position:absolute;pointer-events:none;background:rgba(6,13,31,0.96);border:1px solid rgba(0,210,255,0.35);border-radius:8px;padding:10px 14px;box-shadow:0 0 20px rgba(0,210,255,0.18);opacity:0;transition:opacity .15s;z-index:50;min-width:150px}
-#tooltip .tc{font-size:13px;font-weight:700;color:#00d4ff;margin-bottom:3px}
-#tooltip .tv{font-size:19px;font-weight:900;color:#fff;line-height:1}
-#tooltip .tl{font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px}
+/* Mapbox tooltip */
+.mapboxgl-popup-content{
+  background:rgba(4,10,26,0.97)!important;
+  border:1px solid rgba(0,210,255,0.5)!important;
+  border-radius:10px!important;
+  padding:14px 20px!important;
+  box-shadow:0 0 30px rgba(0,210,255,0.2),0 4px 20px rgba(0,0,0,0.7)!important;
+  font-family:'Montserrat',sans-serif!important;
+  color:#fff!important;
+  min-width:180px!important;
+}
+.mapboxgl-popup-tip{border-top-color:rgba(0,210,255,0.5)!important;border-bottom-color:rgba(0,210,255,0.5)!important}
+.tt-county{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(0,210,255,0.7);margin-bottom:6px}
+.tt-val{font-size:30px;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.5px}
+.tt-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);margin-top:5px}
+.mapboxgl-popup-close-button{color:rgba(255,255,255,0.3)!important;font-size:16px!important;right:8px!important;top:6px!important}
+
+/* LEGEND */
+#legend{position:absolute;bottom:28px;left:226px;z-index:10;display:flex;align-items:center;gap:8px;font-size:9px;color:rgba(255,255,255,0.35);background:rgba(6,13,31,0.85);padding:8px 12px;border-radius:6px;border:1px solid rgba(0,210,255,0.1)}
+#leg-canvas{width:110px;height:7px;border-radius:4px}
 
 /* CENTER MODAL */
-#modal-overlay{position:fixed;inset:0;background:rgba(2,6,18,0.7);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
+#modal-overlay{position:fixed;inset:0;background:rgba(2,6,18,0.75);backdrop-filter:blur(5px);z-index:200;display:none;align-items:center;justify-content:center}
 #modal-overlay.visible{display:flex}
 #modal{background:#080f22;border:1px solid rgba(0,210,255,0.25);border-radius:14px;width:min(820px,96vw);max-height:90vh;overflow-y:auto;padding:28px 28px 24px;box-shadow:0 0 60px rgba(0,210,255,0.12),0 20px 60px rgba(0,0,0,0.8);position:relative}
 .modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
 .modal-county{font-size:26px;font-weight:900;color:#fff}
 .modal-sub{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(0,210,255,0.5);margin-top:3px}
-.close-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.25);font-size:20px;padding:4px;line-height:1;margin-left:16px;flex-shrink:0}
+.close-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.25);font-size:22px;padding:4px;line-height:1;margin-left:16px;flex-shrink:0;transition:color .2s}
 .close-btn:hover{color:#fff}
 
-/* SNAPSHOT GRID */
 .snap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:22px}
 .snap-card{background:rgba(0,210,255,0.04);border:1px solid rgba(0,210,255,0.09);border-radius:7px;padding:11px 13px}
 .snap-val{font-size:19px;font-weight:900;color:#fff;line-height:1}
 .snap-val.up{color:#4ade80}.snap-val.dn{color:#f87171}
 .snap-lbl{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.27);margin-top:4px}
 
-/* CHART METRIC TABS */
+.chart-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(0,210,255,0.4);margin-bottom:10px}
 .chart-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.chart-tab{background:rgba(0,210,255,0.04);border:1px solid rgba(0,210,255,0.1);border-radius:20px;padding:5px 12px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);cursor:pointer;transition:all .2s}
+.chart-tab{background:rgba(0,210,255,0.04);border:1px solid rgba(0,210,255,0.1);border-radius:20px;padding:5px 13px;font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif}
 .chart-tab:hover{border-color:rgba(0,210,255,0.35);color:#e0eaff}
 .chart-tab.active{background:rgba(0,210,255,0.15);border-color:#00d4ff;color:#00d4ff}
-.chart-wrap{position:relative}
 #line-chart{width:100%;height:220px}
-.chart-label{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(0,210,255,0.4);margin-bottom:8px}
-
-/* LEGEND */
-#legend{position:absolute;left:226px;bottom:14px;display:flex;align-items:center;gap:7px;font-size:8px;color:rgba(255,255,255,0.28)}
-#leg-canvas{width:100px;height:7px;border-radius:4px}
 
 /* LOADING */
 #loading{position:fixed;inset:0;background:#060d1f;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px}
@@ -84,22 +90,20 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
 @media(max-width:768px){
   html,body{overflow:auto}
   .main{flex-direction:column;height:auto}
-  .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;gap:5px;padding:10px;border-right:none;border-bottom:1px solid rgba(0,210,255,0.1)}
+  .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;gap:5px;padding:10px;border-right:none;border-bottom:1px solid rgba(0,210,255,0.1);overflow-x:auto}
   .sidebar-label,.src,.hint{width:100%}
-  .metric-btn{flex:1;min-width:110px;padding:8px 10px}
+  .metric-btn{flex:1;min-width:110px}
   .metric-btn .md{display:none}
-  .map-area{height:55vw;min-height:240px;flex:none}
-  #modal{padding:18px 14px}
+  #map{height:65vw;min-height:280px}
   .snap-grid{grid-template-columns:repeat(2,1fr)}
   #line-chart{height:180px}
-  #legend{left:10px;bottom:8px}
+  #legend{left:10px}
   nav{padding:0 16px}
   .nav-right a:not(.nav-yt){display:none}
 }
 </style>
 </head>
 <body>
-
 <div id="loading"><div class="spinner"></div><div class="ld">Loading Ohio Data</div></div>
 
 <nav>
@@ -127,23 +131,21 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
     <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Reductions</span><span class="md">% of listings with a cut</span></button>
     <hr>
     <div class="hint">Click any county to see 10 years of trend data</div>
-    <div class="src">Zillow ZHVI + Realtor.com<br>Data through Jun 2026</div>
+    <div class="src">Zillow ZHVI · Realtor.com<br>Data through Jun 2026</div>
   </div>
-  <div class="map-area">
-    <svg id="map-svg"></svg>
-    <div id="tooltip"><div class="tc"></div><div class="tv"></div><div class="tl"></div></div>
-    <div id="legend"><span id="leg-lo"></span><canvas id="leg-canvas" width="100" height="7"></canvas><span id="leg-hi"></span></div>
+  <div id="map"></div>
+  <div id="legend">
+    <span id="leg-lo"></span>
+    <canvas id="leg-canvas" width="110" height="7"></canvas>
+    <span id="leg-hi"></span>
   </div>
 </div>
 
-<!-- CENTER MODAL -->
+<!-- MODAL -->
 <div id="modal-overlay">
   <div id="modal">
     <div class="modal-header">
-      <div>
-        <div class="modal-county" id="modal-county"></div>
-        <div class="modal-sub">Ohio County · Jun 2026</div>
-      </div>
+      <div><div class="modal-county" id="modal-county"></div><div class="modal-sub">Ohio County · Jun 2026</div></div>
       <button class="close-btn" id="close-btn">✕</button>
     </div>
     <div class="snap-grid">
@@ -157,7 +159,7 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
       <div class="snap-card"><div class="snap-val" id="s-rank"></div><div class="snap-lbl">Value Rank in OH</div></div>
     </div>
     <div class="chart-label" id="chart-label">Historical Trend</div>
-    <div class="chart-tabs" id="chart-tabs">
+    <div class="chart-tabs">
       <button class="chart-tab active" data-cmetric="zhvi">Home Value</button>
       <button class="chart-tab" data-cmetric="median_list_price">List Price</button>
       <button class="chart-tab" data-cmetric="active_listings">Active</button>
@@ -166,247 +168,294 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
       <button class="chart-tab" data-cmetric="days_on_market">DOM</button>
       <button class="chart-tab" data-cmetric="price_reduced_pct">Price Cuts%</button>
     </div>
-    <div class="chart-wrap"><svg id="line-chart"></svg></div>
+    <svg id="line-chart"></svg>
   </div>
 </div>
 
 <script>
-const FIPS={"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
+mapboxgl.accessToken = 'pk.eyJ1IjoiamFzc29uZmFy'
+  + 'cmllciIsImEiOiJjbWx1eTF5bDYwMmUx'
+  + 'M2VuMGdhcWJ3b2ZjIn0.P30w3CmMyaDkBzumr5NyWg';
 
-const METRICS={
-  zhvi:{label:'Home Value',fmt:v=>'$'+Math.round(v).toLocaleString(),lo:'Lower',hi:'Higher'},
-  median_list_price:{label:'Listing Price',fmt:v=>'$'+v.toLocaleString(),lo:'Lower',hi:'Higher'},
-  active_listings:{label:'Active Listings',fmt:v=>v.toLocaleString(),lo:'Few',hi:'Many'},
-  new_listings:{label:'New Listings',fmt:v=>v.toLocaleString(),lo:'Few',hi:'Many'},
-  pending_listings:{label:'Pending Sales',fmt:v=>v.toLocaleString(),lo:'Few',hi:'Many'},
-  days_on_market:{label:'Days on Market',fmt:v=>v+' days',lo:'Fast',hi:'Slow'},
-  price_reduced_pct:{label:'Price Reductions',fmt:v=>v.toFixed(1)+'%',lo:'Few Cuts',hi:'Many Cuts'},
+const METRICS = {
+  zhvi:             {label:'Home Value',      fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower',    hi:'Higher'},
+  median_list_price:{label:'Listing Price',   fmt:v=>'$'+v.toLocaleString(),             lo:'Lower',    hi:'Higher'},
+  active_listings:  {label:'Active Listings', fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
+  new_listings:     {label:'New Listings',    fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
+  pending_listings: {label:'Pending Sales',   fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
+  days_on_market:   {label:'Days on Market',  fmt:v=>v+' days',                          lo:'Fast',     hi:'Slow'},
+  price_reduced_pct:{label:'Price Reductions',fmt:v=>v.toFixed(1)+'%',                  lo:'Few Cuts', hi:'Many Cuts'},
 };
 
-let mapMetric='zhvi', chartMetric='zhvi', selectedCounty=null;
-let DATA=[], dataMap={}, geoData=null;
+const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
 
-function getColor(val,min,max,m){
-  const t=max===min?0.5:(val-min)/(max-min);
-  if(m==='days_on_market'||m==='price_reduced_pct'){
-    return `rgb(${Math.round(t*248)},${Math.round(174-t*120)},${Math.round(30+t*10)})`;
+let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null;
+
+function getStops(metric) {
+  const vals = DATA.map(d => d.latest && d.latest[metric]).filter(v => v != null).sort((a,b)=>a-b);
+  if (!vals.length) return [[0,'#111827'],[1,'#00d4ff']];
+  const mn = vals[0], mx = vals[vals.length-1];
+  const isInverse = metric === 'days_on_market' || metric === 'price_reduced_pct';
+  if (isInverse) {
+    return [[mn,'#4ade80'],[mx,'#f87171']];
   }
-  // cyan→white scale
-  const r=Math.round(t*80),g=Math.round(130+t*125),b=Math.round(200+t*55);
-  return `rgb(${r},${g},${b})`;
+  return [[mn,'#0a2a4a'],[mx,'#00d4ff']];
 }
 
-function drawLegend(mn,mx){
-  const c=document.getElementById('leg-canvas'),ctx=c.getContext('2d');
-  const g=ctx.createLinearGradient(0,0,100,0);
-  for(let i=0;i<=10;i++) g.addColorStop(i/10,getColor(mn+(mx-mn)*(i/10),mn,mx,mapMetric));
-  ctx.fillStyle=g; ctx.fillRect(0,0,100,7);
-  document.getElementById('leg-lo').textContent=METRICS[mapMetric].lo;
-  document.getElementById('leg-hi').textContent=METRICS[mapMetric].hi;
+function drawLegend() {
+  const c = document.getElementById('leg-canvas'), ctx = c.getContext('2d');
+  const stops = getStops(mapMetric);
+  const g = ctx.createLinearGradient(0,0,110,0);
+  g.addColorStop(0, stops[0][1]); g.addColorStop(1, stops[1][1]);
+  ctx.fillStyle = g; ctx.fillRect(0,0,110,7);
+  document.getElementById('leg-lo').textContent = METRICS[mapMetric].lo;
+  document.getElementById('leg-hi').textContent = METRICS[mapMetric].hi;
 }
 
-const svg=d3.select('#map-svg');
-const mapArea=document.querySelector('.map-area');
-
-function render(){
-  if(!geoData||!DATA.length) return;
-  const w=mapArea.clientWidth, h=mapArea.clientHeight;
-  svg.selectAll('*').remove();
-  const proj=d3.geoMercator().fitSize([w*.92,h*.9],geoData);
-  const pathGen=d3.geoPath().projection(proj);
-  const vals=DATA.map(d=>d.latest&&d.latest[mapMetric]).filter(v=>v!=null);
-  const mn=d3.min(vals),mx=d3.max(vals);
-
-  svg.append('g').selectAll('.county-path')
-    .data(geoData.features).enter().append('path')
-    .attr('class',d=>'county-path'+(FIPS[String(d.id).padStart(5,'0')]===selectedCounty?' selected':''))
-    .attr('d',pathGen)
-    .attr('fill',d=>{
-      const name=FIPS[String(d.id).padStart(5,'0')];
-      const cd=name&&dataMap[name];
-      const v=cd&&cd.latest&&cd.latest[mapMetric];
-      return v!=null?getColor(v,mn,mx,mapMetric):'#111827';
-    })
-    .on('mousemove',function(event,d){
-      const name=FIPS[String(d.id).padStart(5,'0')];
-      const cd=name&&dataMap[name];
-      if(!name) return;
-      const v=cd&&cd.latest&&cd.latest[mapMetric];
-      const tt=document.getElementById('tooltip');
-      tt.querySelector('.tc').textContent=name+' County';
-      tt.querySelector('.tv').textContent=v!=null?METRICS[mapMetric].fmt(v):'N/A';
-      tt.querySelector('.tl').textContent=METRICS[mapMetric].label;
-      tt.style.opacity=1;
-      const rect=mapArea.getBoundingClientRect();
-      let x=event.clientX-rect.left+14, y=event.clientY-rect.top-12;
-      if(x+165>w) x-=175;
-      tt.style.left=x+'px'; tt.style.top=y+'px';
-    })
-    .on('mouseleave',()=>{ document.getElementById('tooltip').style.opacity=0; })
-    .on('click',(event,d)=>{
-      const name=FIPS[String(d.id).padStart(5,'0')];
-      if(!name||!dataMap[name]) return;
-      selectedCounty=name;
-      openModal(name);
-      render();
-    });
-  drawLegend(mn,mx);
-}
-
-function updateMapColors(){
-  const vals=DATA.map(d=>d.latest&&d.latest[mapMetric]).filter(v=>v!=null);
-  const mn=d3.min(vals),mx=d3.max(vals);
-  d3.selectAll('.county-path')
-    .transition().duration(500).ease(d3.easeCubicInOut)
-    .attr('fill',d=>{
-      const name=FIPS[String(d.id).padStart(5,'0')];
-      const cd=name&&dataMap[name];
-      const v=cd&&cd.latest&&cd.latest[mapMetric];
-      return v!=null?getColor(v,mn,mx,mapMetric):'#111827';
-    });
-  drawLegend(mn,mx);
+function updateMapColors() {
+  if (!map || !map.getLayer('counties-fill')) return;
+  const vals = DATA.map(d => d.latest && d.latest[mapMetric]).filter(v => v != null).sort((a,b)=>a-b);
+  if (!vals.length) return;
+  const mn = vals[0], mx = vals[vals.length-1];
+  const isInverse = mapMetric === 'days_on_market' || mapMetric === 'price_reduced_pct';
+  const colorLow = isInverse ? '#4ade80' : '#0a2a4a';
+  const colorHigh = isInverse ? '#f87171' : '#00d4ff';
+  map.setPaintProperty('counties-fill', 'fill-color', [
+    'interpolate', ['linear'],
+    ['coalesce', ['get', mapMetric], mn],
+    mn, colorLow,
+    mx, colorHigh
+  ]);
+  drawLegend();
 }
 
 function fmt$(v){return v?'$'+v.toLocaleString():'—';}
 function fmtN(v){return v!=null?v.toLocaleString():'—';}
 
-function openModal(name){
-  const d=dataMap[name];
-  if(!d) return;
-  const l=d.latest||{};
-  document.getElementById('modal-county').textContent=name+' County';
-  document.getElementById('s-zhvi').textContent=fmt$(l.zhvi);
-  document.getElementById('s-list').textContent=fmt$(l.median_list_price);
-  document.getElementById('s-active').textContent=fmtN(l.active_listings);
-  document.getElementById('s-new').textContent=fmtN(l.new_listings);
-  document.getElementById('s-pending').textContent=fmtN(l.pending_listings);
-  document.getElementById('s-dom').textContent=l.days_on_market!=null?l.days_on_market+' days':'—';
-  document.getElementById('s-pct').textContent=l.price_reduced_pct!=null?l.price_reduced_pct.toFixed(1)+'%':'—';
-  const sorted=[...DATA].filter(c=>c.latest&&c.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
-  const rank=sorted.findIndex(c=>c.county===name)+1;
-  document.getElementById('s-rank').textContent=rank>0?'#'+rank+' of '+sorted.length:'—';
-  drawLineChart(name, chartMetric);
+function openModal(county) {
+  const d = dataMap[county];
+  if (!d) return;
+  selectedCounty = county;
+  const l = d.latest || {};
+  document.getElementById('modal-county').textContent = county + ' County';
+  document.getElementById('s-zhvi').textContent = fmt$(l.zhvi);
+  document.getElementById('s-list').textContent = fmt$(l.median_list_price);
+  document.getElementById('s-active').textContent = fmtN(l.active_listings);
+  document.getElementById('s-new').textContent = fmtN(l.new_listings);
+  document.getElementById('s-pending').textContent = fmtN(l.pending_listings);
+  document.getElementById('s-dom').textContent = l.days_on_market != null ? l.days_on_market+' days' : '—';
+  document.getElementById('s-pct').textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
+  const sorted = [...DATA].filter(c=>c.latest&&c.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
+  const rank = sorted.findIndex(c=>c.county===county)+1;
+  document.getElementById('s-rank').textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
+  // Reset chart tab
+  document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.chart-tab[data-cmetric="zhvi"]').classList.add('active');
+  chartMetric = 'zhvi';
+  drawLineChart(county, 'zhvi');
   document.getElementById('modal-overlay').classList.add('visible');
 }
 
-function drawLineChart(name, cmetric){
-  const d=dataMap[name];
-  if(!d) return;
-  chartMetric=cmetric;
-  document.getElementById('chart-label').textContent=METRICS[cmetric].label+' — '+name+' County (2016–2026)';
-
-  const history=d.history.filter(r=>r[cmetric]!=null);
-  const lsvg=d3.select('#line-chart');
+function drawLineChart(county, cmetric) {
+  const d = dataMap[county];
+  if (!d) return;
+  chartMetric = cmetric;
+  document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + ' County (2016–2026)';
+  const history = d.history.filter(r => r[cmetric] != null);
+  const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
+  const W = lsvg.node().getBoundingClientRect().width || 760;
+  const H = 220;
+  const m = {top:12, right:16, bottom:32, left:62};
+  const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
+  const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
+  const parseDate = d3.timeParse('%Y-%m');
+  const x = d3.scaleTime().domain(d3.extent(history,r=>parseDate(r.date))).range([0,iw]);
+  const y = d3.scaleLinear().domain([d3.min(history,r=>r[cmetric])*0.92, d3.max(history,r=>r[cmetric])*1.05]).range([ih,0]);
 
-  const W=lsvg.node().getBoundingClientRect().width||760;
-  const H=220;
-  const m={top:12,right:16,bottom:32,left:60};
-  const iw=W-m.left-m.right, ih=H-m.top-m.bottom;
-  const g=lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
-
-  const parseDate=d3.timeParse('%Y-%m');
-  const x=d3.scaleTime().domain(d3.extent(history,r=>parseDate(r.date))).range([0,iw]);
-  const y=d3.scaleLinear().domain([d3.min(history,r=>r[cmetric])*0.92, d3.max(history,r=>r[cmetric])*1.05]).range([ih,0]);
-
-  // Grid
   y.ticks(5).forEach(t=>{
-    g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t))
-     .attr('stroke','rgba(0,210,255,0.07)').attr('stroke-width',1);
+    g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t)).attr('stroke','rgba(0,210,255,0.07)').attr('stroke-width',1);
   });
 
-  // Area fill
-  const area=d3.area().x(r=>x(parseDate(r.date))).y0(ih).y1(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
-  const grad=lsvg.append('defs').append('linearGradient').attr('id','area-grad').attr('x1','0').attr('y1','0').attr('x2','0').attr('y2','1');
-  grad.append('stop').attr('offset','0%').attr('stop-color','#00d4ff').attr('stop-opacity',0.25);
+  const defs = lsvg.append('defs');
+  const grad = defs.append('linearGradient').attr('id','ag').attr('x1','0').attr('y1','0').attr('x2','0').attr('y2','1');
+  grad.append('stop').attr('offset','0%').attr('stop-color','#00d4ff').attr('stop-opacity',0.28);
   grad.append('stop').attr('offset','100%').attr('stop-color','#00d4ff').attr('stop-opacity',0.02);
-  g.append('path').datum(history).attr('d',area).attr('fill','url(#area-grad)');
 
-  // Line
-  const line=d3.line().x(r=>x(parseDate(r.date))).y(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
-  g.append('path').datum(history).attr('d',line).attr('fill','none').attr('stroke','#00d4ff').attr('stroke-width',2).attr('opacity',0.9);
+  const area = d3.area().x(r=>x(parseDate(r.date))).y0(ih).y1(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
+  g.append('path').datum(history).attr('d',area).attr('fill','url(#ag)');
 
-  // Dots on hover
+  const line = d3.line().x(r=>x(parseDate(r.date))).y(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
+  g.append('path').datum(history).attr('d',line).attr('fill','none').attr('stroke','#00d4ff').attr('stroke-width',2);
+
+  // Hover interaction
+  const bisect = d3.bisector(r=>parseDate(r.date)).left;
+  const hoverLine = g.append('line').attr('y1',0).attr('y2',ih).attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('stroke-dasharray','3,3').style('opacity',0);
+  const hoverDot = g.append('circle').attr('r',5).attr('fill','#00d4ff').attr('stroke','#fff').attr('stroke-width',2).style('opacity',0);
+  const hoverCard = g.append('g').style('opacity',0);
+  const hoverRect = hoverCard.append('rect').attr('rx',8).attr('fill','rgba(4,10,26,0.97)').attr('stroke','rgba(0,210,255,0.5)').attr('stroke-width',1);
+  const hoverDate = hoverCard.append('text').attr('font-size','10px').attr('font-family','Montserrat').attr('font-weight','600').attr('fill','rgba(0,210,255,0.7)');
+  const hoverVal = hoverCard.append('text').attr('font-size','20px').attr('font-family','Montserrat').attr('font-weight','900').attr('fill','#fff');
+
   g.append('rect').attr('width',iw).attr('height',ih).attr('fill','transparent')
-   .on('mousemove',function(event){
-     const [mx2]=d3.pointer(event);
-     const bisect=d3.bisector(r=>parseDate(r.date)).left;
-     const date0=x.invert(mx2);
-     const i=Math.min(history.length-1,bisect(history,date0));
-     const r=history[i];
-     if(!r) return;
-     g.selectAll('.hover-dot').remove();
-     g.selectAll('.hover-line').remove();
-     g.append('line').attr('class','hover-line').attr('x1',x(parseDate(r.date))).attr('x2',x(parseDate(r.date))).attr('y1',0).attr('y2',ih).attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1).attr('stroke-dasharray','3,3');
-     g.append('circle').attr('class','hover-dot').attr('cx',x(parseDate(r.date))).attr('cy',y(r[cmetric])).attr('r',4).attr('fill','#00d4ff').attr('stroke','#fff').attr('stroke-width',1.5);
-     const val=METRICS[cmetric].fmt(r[cmetric]);
-     const tx=x(parseDate(r.date)), ty=y(r[cmetric]);
-     const lbl=g.append('g').attr('class','hover-dot').attr('transform',`translate(${tx<iw/2?tx+8:tx-8},${ty<ih/2?ty+8:ty-22})`);
-     lbl.append('rect').attr('x',-4).attr('y',-14).attr('width',Math.max(val.length*7,60)).attr('height',18).attr('fill','rgba(6,13,31,0.9)').attr('rx',3);
-     lbl.append('text').attr('font-size','10px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#fff').text(r.date+' · '+val);
-   })
-   .on('mouseleave',()=>{ g.selectAll('.hover-dot,.hover-line').remove(); });
+    .on('mousemove', function(event) {
+      const [mx2] = d3.pointer(event);
+      const date0 = x.invert(mx2);
+      const i = Math.min(history.length-1, bisect(history, date0));
+      const r = history[i];
+      if (!r) return;
+      const cx = x(parseDate(r.date)), cy = y(r[cmetric]);
+      const val = METRICS[cmetric].fmt(r[cmetric]);
+      const cardW = Math.max(val.length*10+24, 140), cardH = 58;
+      const cardX = cx < iw/2 ? cx+12 : cx-cardW-12;
+      const cardY = Math.max(4, Math.min(ih-cardH-4, cy-cardH/2));
+      hoverLine.attr('x1',cx).attr('x2',cx).style('opacity',1);
+      hoverDot.attr('cx',cx).attr('cy',cy).style('opacity',1);
+      hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',cardH);
+      hoverDate.attr('x',cardX+12).attr('y',cardY+18).text(r.date);
+      hoverVal.attr('x',cardX+12).attr('y',cardY+44).text(val);
+      hoverCard.style('opacity',1);
+    })
+    .on('mouseleave', () => { hoverLine.style('opacity',0); hoverDot.style('opacity',0); hoverCard.style('opacity',0); });
 
-  // Axes
-  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(d3.timeYear.every(2)).tickFormat(d3.timeFormat('%Y')).tickSize(0))
-   .call(ax=>ax.select('.domain').remove())
-   .selectAll('text').attr('fill','rgba(255,255,255,0.3)').attr('font-size','9px').attr('font-family','Montserrat');
-
-  const fmtY=cmetric==='zhvi'||cmetric==='median_list_price'
-    ? v=>'$'+d3.format('.2s')(v).replace('k','K')
-    : cmetric==='price_reduced_pct' ? v=>v+'%' : v=>d3.format('.2s')(v);
-  g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtY))
-   .call(ax=>ax.select('.domain').remove())
-   .selectAll('text').attr('fill','rgba(255,255,255,0.3)').attr('font-size','9px').attr('font-family','Montserrat');
+  const fmtY = cmetric==='zhvi'||cmetric==='median_list_price' ? v=>'$'+d3.format('.2s')(v).replace('k','K') : cmetric==='price_reduced_pct' ? v=>v+'%' : v=>d3.format('.2s')(v);
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(d3.timeYear.every(2)).tickFormat(d3.timeFormat('%Y')).tickSize(0)).call(ax=>ax.select('.domain').remove()).selectAll('text').attr('fill','rgba(255,255,255,0.35)').attr('font-size','9px').attr('font-family','Montserrat');
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtY)).call(ax=>ax.select('.domain').remove()).selectAll('text').attr('fill','rgba(255,255,255,0.3)').attr('font-size','9px').attr('font-family','Montserrat');
 }
 
+// Modal close
+document.getElementById('close-btn').addEventListener('click', () => { document.getElementById('modal-overlay').classList.remove('visible'); selectedCounty=null; });
+document.getElementById('modal-overlay').addEventListener('click', e => { if(e.target===document.getElementById('modal-overlay')){ document.getElementById('modal-overlay').classList.remove('visible'); selectedCounty=null; }});
+
 // Chart tabs
-document.querySelectorAll('.chart-tab').forEach(tab=>{
-  tab.addEventListener('click',()=>{
+document.querySelectorAll('.chart-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
     document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
-    chartMetric=tab.dataset.cmetric;
-    if(selectedCounty) drawLineChart(selectedCounty, chartMetric);
+    if (selectedCounty) drawLineChart(selectedCounty, tab.dataset.cmetric);
   });
 });
 
-// Map metric buttons
-document.querySelectorAll('.metric-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
+// Metric buttons
+document.querySelectorAll('.metric-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
     document.querySelectorAll('.metric-btn').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
-    mapMetric=btn.dataset.metric;
+    mapMetric = btn.dataset.metric;
     updateMapColors();
   });
 });
 
-// Close modal
-document.getElementById('close-btn').addEventListener('click',()=>{
-  document.getElementById('modal-overlay').classList.remove('visible');
-  selectedCounty=null; render();
-});
-document.getElementById('modal-overlay').addEventListener('click',e=>{
-  if(e.target===document.getElementById('modal-overlay')){
-    document.getElementById('modal-overlay').classList.remove('visible');
-    selectedCounty=null; render();
-  }
-});
+// Load data + init map
+fetch('/ohio-data.json').then(r=>r.json()).then(counties => {
+  DATA = counties;
+  DATA.forEach(d => { dataMap[d.county] = d; });
 
-// Load data + TopoJSON in parallel
-Promise.all([
-  fetch('/ohio-data.json').then(r=>r.json()),
-  fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json').then(r=>r.json())
-]).then(([counties, us])=>{
-  DATA=counties;
-  DATA.forEach(d=>{ dataMap[d.county]=d; });
-  const all=topojson.feature(us, us.objects.counties);
-  all.features=all.features.filter(f=>String(f.id).startsWith('39'));
-  geoData=all;
-  document.getElementById('loading').style.display='none';
-  render();
-  window.addEventListener('resize', render);
-}).catch(err=>{
-  document.getElementById('loading').innerHTML='<div class="ld" style="color:#f87171">Error loading data</div>';
+  // Inject metric values into GeoJSON properties via fetch
+  fetch('/ohio-counties.json').then(r=>r.json()).then(geojson => {
+    // Attach all metric values to each feature
+    geojson.features.forEach(f => {
+      const name = FIPS_NAME[f.id];
+      const d = name && dataMap[name];
+      if (d && d.latest) {
+        Object.assign(f.properties, d.latest, {county: name});
+      }
+    });
+
+    map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v11',
+      center: [-82.5, 40.15],
+      zoom: 6.2,
+      minZoom: 5,
+      maxZoom: 12,
+    });
+
+    map.addControl(new mapboxgl.NavigationControl({showCompass:false}), 'top-right');
+
+    map.on('load', () => {
+      map.addSource('ohio-counties', { type:'geojson', data: geojson });
+
+      const vals = DATA.map(d=>d.latest&&d.latest.zhvi).filter(v=>v!=null).sort((a,b)=>a-b);
+      const mn = vals[0], mx = vals[vals.length-1];
+
+      map.addLayer({
+        id: 'counties-fill',
+        type: 'fill',
+        source: 'ohio-counties',
+        paint: {
+          'fill-color': ['interpolate',['linear'],['coalesce',['get','zhvi'],mn], mn,'#0a2a4a', mx,'#00d4ff'],
+          'fill-opacity': ['case',['boolean',['feature-state','selected'],false], 1, 0.82],
+        }
+      });
+
+      map.addLayer({
+        id: 'counties-border',
+        type: 'line',
+        source: 'ohio-counties',
+        paint: {
+          'line-color': 'rgba(0,210,255,0.25)',
+          'line-width': ['case',['boolean',['feature-state','hover'],false],2,0.6],
+        }
+      });
+
+      map.addLayer({
+        id: 'counties-border-selected',
+        type: 'line',
+        source: 'ohio-counties',
+        paint: {
+          'line-color': '#fff',
+          'line-width': ['case',['boolean',['feature-state','selected'],false],2.5,0],
+        }
+      });
+
+      drawLegend();
+      document.getElementById('loading').style.display='none';
+
+      // Hover tooltip
+      popup = new mapboxgl.Popup({closeButton:false, closeOnClick:false, offset:12, maxWidth:'220px'});
+      let hoveredId = null;
+
+      map.on('mousemove','counties-fill', e => {
+        if (!e.features.length) return;
+        map.getCanvas().style.cursor='pointer';
+        const f = e.features[0];
+        if (hoveredId !== null) map.setFeatureState({source:'ohio-counties',id:hoveredId},{hover:false});
+        hoveredId = f.id;
+        map.setFeatureState({source:'ohio-counties',id:hoveredId},{hover:true});
+        const name = f.properties.county;
+        const val = f.properties[mapMetric];
+        const fmtVal = val != null ? METRICS[mapMetric].fmt(Number(val)) : 'N/A';
+        popup.setLngLat(e.lngLat).setHTML(`
+          <div class="tt-county">${name} County</div>
+          <div class="tt-val">${fmtVal}</div>
+          <div class="tt-label">${METRICS[mapMetric].label}</div>
+        `).addTo(map);
+      });
+
+      map.on('mouseleave','counties-fill', () => {
+        map.getCanvas().style.cursor='';
+        if (hoveredId !== null) map.setFeatureState({source:'ohio-counties',id:hoveredId},{hover:false});
+        hoveredId = null;
+        popup.remove();
+      });
+
+      // Click → modal
+      let selectedFips = null;
+      map.on('click','counties-fill', e => {
+        if (!e.features.length) return;
+        const f = e.features[0];
+        const name = f.properties.county;
+        if (!name) return;
+        if (selectedFips) map.setFeatureState({source:'ohio-counties',id:selectedFips},{selected:false});
+        selectedFips = f.id;
+        map.setFeatureState({source:'ohio-counties',id:selectedFips},{selected:true});
+        openModal(name);
+      });
+    });
+  });
+}).catch(err => {
+  document.getElementById('loading').innerHTML = '<div class="ld" style="color:#f87171">Error loading data</div>';
   console.error(err);
 });
 </script>
