@@ -3,185 +3,192 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ohio Housing Market Data — June 2026 | Jasson Farrier</title>
-<meta name="description" content="Ohio housing market data updated June 2026. County-by-county home price changes, inventory trends, and distress rates — straight from Zillow and PropStream. Analysis by Jasson Farrier.">
-<link rel="canonical" href="https://jassonfarrier.com/ohio-housing-data">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "Ohio Housing Market Data — June 2026",
-  "description": "County-by-county Ohio home price changes, inventory trends, and distress data updated June 2026.",
-  "author": {
-    "@type": "Person",
-    "name": "Jasson Farrier",
-    "url": "https://jassonfarrier.com",
-    "jobTitle": "Realtor & Housing Market Analyst",
-    "worksFor": { "@type": "Organization", "name": "Kiger Realty" }
-  },
-  "datePublished": "2026-06-01",
-  "dateModified": "2026-06-30",
-  "publisher": { "@type": "Organization", "name": "Jasson Farrier", "url": "https://jassonfarrier.com" }
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Is the Ohio housing market cooling down in 2026?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Ohio home prices are still positive year-over-year across most major counties as of April 2026, but the pace has slowed sharply from pandemic highs. Columbus (Franklin County) is up just 0.19% year-over-year. Inventory is rising fast — Warren County is up 55.9% in active listings year-over-year — which is putting pressure on sellers but not yet crashing prices."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Which Ohio county has the highest home price growth?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Mahoning County (Youngstown area) leads major Ohio counties with +6.58% year-over-year home price growth as of April 2026, according to Zillow ZHVI data. Montgomery County (Dayton) is second at +4.26%."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Where is housing distress highest in Ohio?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Guernsey and Trumbull counties have the highest distress rates in Ohio at approximately 27% of properties in some form of financial distress as of June 2026, according to PropStream data. Lucas County (Toledo) leads among the state's larger markets at 12.9%."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How does Ohio compare to the national housing market?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Ohio is outperforming the national market on price growth in most counties. Ohio's major metros are averaging 1–5% year-over-year price growth versus the US national average of +0.73% as of April 2026. However, Ohio inventory is rising much faster than the national average, which could compress prices in 2026."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Is Columbus Ohio a good real estate market in 2026?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Columbus (Franklin County) has essentially flatlined on year-over-year price growth at +0.19% as of April 2026, but remains up 49.5% since March 2020. Inventory is up 10.2% year-over-year — more supply, slower price growth. It's a transitioning market, not a crashing one."
-      }
-    }
-  ]
-}
-</script>
+<title>Ohio Housing Data by County | Jasson Farrier</title>
+<meta name="description" content="Interactive Ohio county-level housing distress map. Explore foreclosures, tax delinquency, bank-owned properties, and market health across all 88 Ohio counties.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Montserrat', sans-serif; background: #fff; color: #0D1E42; -webkit-font-smoothing: antialiased; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background: #060d1f;
+    color: #e0eaff;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* ---- NAV ---- */
-nav { position: sticky; top: 0; z-index: 100; background: #fff; height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 64px; border-bottom: 1px solid #f5f5f5; }
-.nav-brand { font-size: 13px; font-weight: 700; color: #0D1E42; text-decoration: none; white-space: nowrap; }
-.nav-brand span { font-weight: 700; color: #0D1E42; }
-.nav-right { display: flex; align-items: center; gap: 32px; }
-.nav-right a { font-size: 12px; font-weight: 500; color: #9DA6AB; text-decoration: none; transition: color 0.2s; }
-.nav-right a:hover { color: #0D1E42; }
-.nav-yt { display: flex; align-items: center; }
-.nav-pill { background: #0D1E42 !important; color: #fff !important; font-size: 12px; font-weight: 600; padding: 10px 22px; border-radius: 100px; text-decoration: none; white-space: nowrap; }
+  /* NAV */
+  nav {
+    position: relative; z-index: 100;
+    background: rgba(6,13,31,0.95);
+    height: 56px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px;
+    border-bottom: 1px solid rgba(0,210,255,0.12);
+  }
+  .nav-brand { font-size: 13px; font-weight: 700; color: #e0eaff; text-decoration: none; }
+  .nav-brand span { color: rgba(255,255,255,0.35); font-weight: 500; }
+  .nav-right { display: flex; gap: 28px; align-items: center; }
+  .nav-right a { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.4); text-decoration: none; transition: color 0.2s; }
+  .nav-right a:hover, .nav-right a.active { color: #00d4ff; }
 
-/* ---- FOOTER ---- */
-footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padding: 48px 64px 36px; }
-.footer-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
-.footer-brand { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7); }
-.footer-links { display: flex; gap: 24px; }
-.footer-links a { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.25); text-decoration: none; }
-.footer-links a:hover { color: rgba(255,255,255,0.6); }
-.footer-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin-bottom: 24px; }
-.footer-legal { display: flex; align-items: flex-start; gap: 16px; }
-.footer-legal p { font-size: 10px; color: rgba(255,255,255,0.2); line-height: 2; }
+  /* MAIN LAYOUT */
+  .main { display: flex; flex: 1; overflow: hidden; }
 
-/* ---- PAGE ---- */
-.section-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #9DA6AB; display: block; margin-bottom: 12px; }
-.eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #9DA6AB; display: block; margin-bottom: 12px; }
-.container { max-width: 860px; margin: 0 auto; padding: 0 24px; }
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px; flex-shrink: 0;
+    background: rgba(6,13,31,0.98);
+    border-right: 1px solid rgba(0,210,255,0.1);
+    padding: 24px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    overflow-y: auto;
+  }
+  .sidebar-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: rgba(0,210,255,0.5);
+    margin-bottom: 8px; padding-left: 4px;
+  }
+  .metric-btn {
+    background: rgba(0,210,255,0.04);
+    border: 1px solid rgba(0,210,255,0.1);
+    border-radius: 6px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+  }
+  .metric-btn:hover {
+    background: rgba(0,210,255,0.1);
+    border-color: rgba(0,210,255,0.3);
+  }
+  .metric-btn.active {
+    background: rgba(0,210,255,0.12);
+    border-color: #00d4ff;
+    box-shadow: 0 0 16px rgba(0,210,255,0.15);
+  }
+  .metric-btn .metric-name {
+    font-size: 12px; font-weight: 700; color: #e0eaff; display: block; margin-bottom: 3px;
+  }
+  .metric-btn .metric-desc {
+    font-size: 10px; color: rgba(255,255,255,0.35); line-height: 1.4;
+  }
+  .metric-btn.active .metric-name { color: #00d4ff; }
 
-/* TL;DR */
-.tldr { background: #f5f5f5; border-left: 3px solid #0D1E42; padding: 28px 32px; margin: 48px 0; }
-.tldr .label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #9DA6AB; margin-bottom: 12px; display: block; }
-.tldr h2 { font-size: 17px; font-weight: 700; color: #0D1E42; line-height: 1.5; margin: 0; }
-.tldr ul { margin-top: 14px; padding-left: 0; list-style: none; }
-.tldr ul li { font-size: 14px; color: #0D1E42; line-height: 1.7; padding-left: 16px; position: relative; margin-bottom: 6px; }
-.tldr ul li::before { content: '—'; position: absolute; left: 0; color: #9DA6AB; }
+  .sidebar-divider {
+    border: none; border-top: 1px solid rgba(0,210,255,0.07);
+    margin: 8px 0;
+  }
+  .source-note {
+    font-size: 9px; color: rgba(255,255,255,0.2); line-height: 1.6; padding: 0 4px;
+    margin-top: auto; padding-top: 16px;
+  }
 
-/* SECTIONS */
-.section { padding: 56px 0; border-top: 1px solid #f5f5f5; }
-.section:first-of-type { border-top: none; padding-top: 48px; }
-.section h2 { font-size: clamp(20px, 2.5vw, 26px); font-weight: 700; color: #0D1E42; line-height: 1.3; margin-bottom: 20px; }
-.section p { font-size: 15px; color: #444; line-height: 1.8; margin-bottom: 16px; }
-.section p strong { color: #0D1E42; font-weight: 600; }
+  /* MAP AREA */
+  .map-area {
+    flex: 1; position: relative; overflow: hidden;
+    background: #060d1f;
+  }
+  #map-svg { width: 100%; height: 100%; }
 
-/* TABLES */
-.data-table-wrap { overflow-x: auto; margin: 28px 0; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-thead th { background: #0D1E42; color: #fff; font-weight: 700; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 12px 14px; text-align: left; white-space: nowrap; }
-tbody tr { border-bottom: 1px solid #f5f5f5; }
-tbody tr:hover { background: #f5f5f5; }
-tbody td { padding: 12px 14px; color: #0D1E42; font-weight: 500; vertical-align: middle; }
-tbody td:first-child { font-weight: 700; }
-.up { color: #2a7a4a; font-weight: 700; }
-.down { color: #a33; font-weight: 700; }
-.neutral { color: #9DA6AB; font-weight: 600; }
-.badge { display: inline-block; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 2px 7px; border-radius: 100px; background: #f5f5f5; color: #9DA6AB; margin-left: 6px; vertical-align: middle; }
-.badge-hot { background: #0D1E42; color: #fff; }
+  /* Glow filter */
+  .county-path {
+    stroke: rgba(0,210,255,0.25);
+    stroke-width: 0.5;
+    cursor: pointer;
+    transition: stroke-width 0.15s;
+  }
+  .county-path:hover { stroke: #00d4ff; stroke-width: 1.5; }
+  .county-path.selected { stroke: #fff; stroke-width: 2; }
 
-/* STAT BOXES */
-.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin: 28px 0; }
-.stat-box { background: #f5f5f5; padding: 24px 20px; border-radius: 4px; }
-.stat-box .num { font-size: 28px; font-weight: 700; color: #0D1E42; line-height: 1; margin-bottom: 6px; }
-.stat-box .stat-label { font-size: 11px; font-weight: 600; color: #9DA6AB; letter-spacing: 0.5px; line-height: 1.4; }
+  /* TOOLTIP */
+  #tooltip {
+    position: absolute; pointer-events: none;
+    background: rgba(6,13,31,0.95);
+    border: 1px solid rgba(0,210,255,0.4);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 11px;
+    box-shadow: 0 0 24px rgba(0,210,255,0.2);
+    opacity: 0; transition: opacity 0.15s;
+    z-index: 50;
+    max-width: 180px;
+  }
+  #tooltip .tt-county { font-size: 13px; font-weight: 700; color: #00d4ff; margin-bottom: 4px; }
+  #tooltip .tt-val { font-size: 18px; font-weight: 900; color: #fff; }
+  #tooltip .tt-label { font-size: 10px; color: rgba(255,255,255,0.4); }
 
-/* SOURCE */
-.source-note { font-size: 12px; color: #9DA6AB; line-height: 1.7; margin-top: 16px; }
-.source-note a { color: #9DA6AB; }
+  /* CHART PANEL */
+  #chart-panel {
+    position: absolute; right: 24px; top: 24px;
+    width: 380px;
+    background: rgba(6,13,31,0.97);
+    border: 1px solid rgba(0,210,255,0.25);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 0 40px rgba(0,210,255,0.12), 0 8px 32px rgba(0,0,0,0.6);
+    display: none;
+    z-index: 60;
+  }
+  #chart-panel.visible { display: block; }
+  .panel-county {
+    font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 2px;
+  }
+  .panel-subtitle {
+    font-size: 10px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(0,210,255,0.6); margin-bottom: 20px;
+  }
+  .stat-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 10px; margin-bottom: 20px;
+  }
+  .stat-card {
+    background: rgba(0,210,255,0.05);
+    border: 1px solid rgba(0,210,255,0.1);
+    border-radius: 8px; padding: 12px 14px;
+  }
+  .stat-card .s-val {
+    font-size: 22px; font-weight: 900; color: #fff; line-height: 1;
+  }
+  .stat-card .s-val.warn { color: #ff6b6b; }
+  .stat-card .s-val.ok { color: #00d4ff; }
+  .stat-card .s-label {
+    font-size: 9px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: rgba(255,255,255,0.3); margin-top: 4px;
+  }
+  .chart-title {
+    font-size: 10px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(0,210,255,0.5); margin-bottom: 12px;
+  }
+  #bar-chart { width: 100%; height: 160px; }
+  .rank-line {
+    font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 14px;
+    padding-top: 14px; border-top: 1px solid rgba(0,210,255,0.08);
+  }
+  .rank-line strong { color: rgba(0,210,255,0.8); }
+  .close-btn {
+    position: absolute; top: 14px; right: 14px;
+    background: none; border: none; cursor: pointer;
+    color: rgba(255,255,255,0.3); font-size: 18px; line-height: 1;
+    padding: 4px;
+  }
+  .close-btn:hover { color: #fff; }
 
-/* Q&A */
-.qa-section { background: #f5f5f5; padding: 56px 0; }
-.qa-inner { max-width: 860px; margin: 0 auto; padding: 0 24px; }
-.qa-item { padding: 24px 0; border-bottom: 1px solid #e5e5e5; }
-.qa-item:last-child { border-bottom: none; }
-.qa-item h3 { font-size: 15px; font-weight: 700; color: #0D1E42; margin-bottom: 10px; line-height: 1.4; }
-.qa-item p { font-size: 14px; color: #555; line-height: 1.8; }
+  /* LEGEND */
+  #legend {
+    position: absolute; left: 256px; bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 10px; color: rgba(255,255,255,0.3);
+  }
+  #legend-gradient {
+    width: 120px; height: 8px; border-radius: 4px;
+  }
 
-/* EMAIL CTA */
-.email-cta { background: #0D1E42; padding: 64px 40px; text-align: center; }
-.email-cta .eyebrow { color: #9DA6AB; margin-bottom: 12px; }
-.email-cta h2 { font-size: clamp(22px, 3vw, 32px); font-weight: 700; color: #fff; margin-bottom: 12px; }
-.email-cta p { font-size: 15px; color: rgba(255,255,255,0.6); margin-bottom: 32px; max-width: 460px; margin-left: auto; margin-right: auto; }
-.email-form { display: flex; gap: 10px; max-width: 440px; margin: 0 auto; }
-.email-form input { flex: 1; padding: 14px 18px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08); border-radius: 100px; font-family: 'Montserrat', sans-serif; font-size: 14px; color: #fff; outline: none; }
-.email-form input::placeholder { color: rgba(255,255,255,0.4); }
-.email-form input:focus { border-color: #9DA6AB; }
-.btn-pill { background: #fff; color: #0D1E42; border: none; padding: 14px 24px; border-radius: 100px; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-.btn-pill:hover { opacity: 0.9; }
-.email-sub { font-size: 12px; color: rgba(255,255,255,0.35); margin-top: 14px; }
-#data-thankyou { display: none; font-size: 14px; font-weight: 600; color: #fff; margin-top: 16px; }
-
-/* MOBILE */
-@media(max-width: 768px) {
-  nav { padding: 0 24px; }
-  .nav-right a:not(.nav-pill) { display: none; }
-  .nav-yt { display: none; }
-  .container { padding: 0 20px; }
-  .tldr { padding: 24px 20px; }
-  .email-cta { padding: 48px 20px; }
-  .email-form { flex-direction: column; }
-  .email-form input, .btn-pill { width: 100%; }
-  .stat-grid { grid-template-columns: 1fr 1fr; }
-  thead th { font-size: 9px; padding: 10px 8px; }
-  tbody td { padding: 10px 8px; font-size: 12px; }
-  footer { padding: 40px 24px 28px; }
-  .footer-top { flex-direction: column; align-items: flex-start; }
-}
+  /* COUNTY LABEL */
+  .county-label { pointer-events: none; font-family: 'Montserrat', sans-serif; }
 </style>
-<meta property="og:type" content="website"><meta property="og:title" content="Ohio Housing Market Data — Jasson Farrier"><meta property="og:description" content="Current Ohio housing market data: inventory, prices, days on market, and trends updated regularly."><meta property="og:url" content="https://jassonfarrier.com/ohio-housing-data"><meta property="og:image" content="https://jassonfarrier.com/jasson-farrier.jpg">
 </head>
 <body>
 
@@ -189,568 +196,384 @@ tbody td:first-child { font-weight: 700; }
   <a href="/" class="nav-brand">Jasson Farrier <span>— Kiger Realty</span></a>
   <div class="nav-right">
     <a href="/housing-market-updates">Market Updates</a>
-    <a href="/ohio-housing-data">Data</a>
+    <a href="/ohio-housing-data" class="active">Data</a>
     <a href="/bio">About</a>
     <a href="/contact">Contact</a>
-    <a href="https://www.youtube.com/@OhioHousingNerd" class="nav-yt" aria-label="YouTube">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#9DA6AB"/>
+    <a href="https://www.youtube.com/@OhioHousingNerd" aria-label="YouTube" target="_blank" rel="noopener">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="rgba(255,255,255,0.3)"/>
         <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/>
       </svg>
     </a>
-    
   </div>
 </nav>
-<div class="container">
 
-  <!-- PAGE TITLE -->
-  <div style="padding: 56px 0 0;">
-    <span class="section-label">Ohio Housing Market Data</span>
-    <h1 style="font-size: clamp(26px, 3.5vw, 40px); font-weight: 700; color: var(--navy); line-height: 1.2; margin-bottom: 12px;">What the Numbers Actually Show<br>About Ohio Real Estate in 2026</h1>
-    <p style="font-size: 15px; color: #666; line-height: 1.7; margin-bottom: 8px;">County-level home prices, inventory trends, and distress data — not headlines, not spin. Updated monthly.</p>
-    <p style="font-size: 11px; color: var(--gray); letter-spacing: 0.5px;">Last updated: <strong style="color: var(--navy);">June 30, 2026</strong> &nbsp;·&nbsp; Data: Zillow ZHVI (Apr 2026), Realtor.com (May 2026), PropStream (Jun 2026) &nbsp;·&nbsp; Analysis by <a href="/#bio" style="color: var(--navy); font-weight: 600;">Jasson Farrier</a></p>
+<div class="main">
+  <div class="sidebar">
+    <div class="sidebar-label">Select Metric</div>
+
+    <button class="metric-btn active" data-metric="distress_pct">
+      <span class="metric-name">Overall Distress</span>
+      <span class="metric-desc">% of properties showing any distress signal</span>
+    </button>
+
+    <button class="metric-btn" data-metric="tax_del_pct">
+      <span class="metric-name">Tax Delinquency</span>
+      <span class="metric-desc">% of properties behind on property taxes</span>
+    </button>
+
+    <button class="metric-btn" data-metric="bank_owned">
+      <span class="metric-name">Bank Owned (REO)</span>
+      <span class="metric-desc">Number of lender-owned properties</span>
+    </button>
+
+    <button class="metric-btn" data-metric="pre_foreclosure">
+      <span class="metric-name">Pre-Foreclosure</span>
+      <span class="metric-desc">Properties with active foreclosure filings</span>
+    </button>
+
+    <button class="metric-btn" data-metric="upside_down">
+      <span class="metric-name">Underwater Mortgages</span>
+      <span class="metric-desc">Owners who owe more than the home is worth</span>
+    </button>
+
+    <button class="metric-btn" data-metric="auctions">
+      <span class="metric-name">Auction Properties</span>
+      <span class="metric-desc">Homes scheduled for foreclosure auction</span>
+    </button>
+
+    <hr class="sidebar-divider">
+
+    <div class="source-note">
+      Data: PropStream Jun 2026 + Realtor.com May 2026 + Zillow ZHVI Apr 2026.<br><br>
+      Harrison County excluded (data anomaly).
+    </div>
   </div>
 
-  <!-- TL;DR -->
-  <div class="tldr">
-    <span class="label">TL;DR — What You Need to Know</span>
-    <h2>Ohio is outperforming the national market on price growth, but inventory is surging — and distress is concentrated in specific counties.</h2>
-    <ul>
-      <li>Ohio's major metros averaged +1–6% home price growth year-over-year through April 2026. The US national average: +0.73%.</li>
-      <li>Columbus (Franklin County) has essentially flatlined — up just 0.19% year-over-year. Still up 49.5% since March 2020.</li>
-      <li>Inventory is rising sharply in Columbus (+10%), Cincinnati (+23%), Dayton (+24%), and especially Warren County (+56%). More supply = more negotiating power for buyers.</li>
-      <li>Distress is not an Ohio-wide story. It's concentrated in specific counties — Guernsey (27%), Trumbull (27%), Scioto (26%). Lucas County (Toledo) leads the major markets at 12.9%.</li>
-      <li>Delaware County remains Ohio's healthiest market — lowest distress (2.4%), consistent price growth, and suburban demand holding firm.</li>
-    </ul>
-  </div>
-
-  <!-- SECTION 1: PRICE DATA -->
-  <div class="section">
-    <span class="section-label">Zillow ZHVI · April 2026</span>
-    <h2>Ohio Home Price Changes by County</h2>
-    <p>These numbers are from Zillow's Home Value Index — the most consistent county-level dataset available. They measure the median home value change, not median sale price, so they're less susceptible to mix shifts. All data is through April 2026.</p>
-    <p>The big takeaway: Ohio is still appreciating where the national market has stalled. But the gap between winners and laggards inside Ohio is widening.</p>
-
-    <div class="data-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>County / Market</th>
-            <th>1-Year Change</th>
-            <th>3-Year Change</th>
-            <th>Since Mar 2020</th>
-            <th>Size Rank</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>🇺🇸 US National</td>
-            <td class="neutral">+0.73%</td>
-            <td class="up">+5.87%</td>
-            <td class="up">+44.91%</td>
-            <td>—</td>
-          </tr>
-          <tr>
-            <td>Franklin County <span class="badge">Columbus</span></td>
-            <td class="neutral">+0.19%</td>
-            <td class="up">+9.48%</td>
-            <td class="up">+49.5%</td>
-            <td>#30</td>
-          </tr>
-          <tr>
-            <td>Cuyahoga County <span class="badge">Cleveland</span></td>
-            <td class="up">+4.53%</td>
-            <td class="up">+19.88%</td>
-            <td class="up">+56.51%</td>
-            <td>#34</td>
-          </tr>
-          <tr>
-            <td>Hamilton County <span class="badge">Cincinnati</span></td>
-            <td class="up">+1.96%</td>
-            <td class="up">+13.39%</td>
-            <td class="up">+52.33%</td>
-            <td>#75</td>
-          </tr>
-          <tr>
-            <td>Montgomery County <span class="badge">Dayton</span></td>
-            <td class="up">+4.26%</td>
-            <td class="up">+19.40%</td>
-            <td class="up">+59.32%</td>
-            <td>#130</td>
-          </tr>
-          <tr>
-            <td>Summit County <span class="badge">Akron</span></td>
-            <td class="up">+3.1%</td>
-            <td class="up">+17.2%</td>
-            <td class="up">+54.1%</td>
-            <td>#82</td>
-          </tr>
-          <tr>
-            <td>Mahoning County <span class="badge badge-hot">Youngstown</span></td>
-            <td class="up">+6.58%</td>
-            <td class="up">+25.19%</td>
-            <td class="up">+58.7%</td>
-            <td>#152</td>
-          </tr>
-          <tr>
-            <td>Lucas County <span class="badge">Toledo</span></td>
-            <td class="up">+3.8%</td>
-            <td class="up">+18.1%</td>
-            <td class="up">+55.4%</td>
-            <td>#95</td>
-          </tr>
-          <tr>
-            <td>Delaware County <span class="badge badge-hot">Columbus Suburb</span></td>
-            <td class="up">+2.1%</td>
-            <td class="up">+11.3%</td>
-            <td class="up">+52.8%</td>
-            <td>#190</td>
-          </tr>
-          <tr>
-            <td>Butler County <span class="badge">Cincinnati Suburb</span></td>
-            <td class="up">+2.3%</td>
-            <td class="up">+14.6%</td>
-            <td class="up">+53.9%</td>
-            <td>#140</td>
-          </tr>
-          <tr>
-            <td>Licking County <span class="badge">Columbus Suburb</span></td>
-            <td class="up">+2.8%</td>
-            <td class="up">+13.2%</td>
-            <td class="up">+55.1%</td>
-            <td>#210</td>
-          </tr>
-          <tr>
-            <td>Warren County <span class="badge">Cincinnati Suburb</span></td>
-            <td class="up">+1.7%</td>
-            <td class="up">+10.8%</td>
-            <td class="up">+51.2%</td>
-            <td>#220</td>
-          </tr>
-        </tbody>
-      </table>
+  <div class="map-area">
+    <svg id="map-svg">
+      <defs>
+        <filter id="glow">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="strong-glow">
+          <feGaussianBlur stdDeviation="5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+    </svg>
+    <div id="tooltip">
+      <div class="tt-county"></div>
+      <div class="tt-val"></div>
+      <div class="tt-label"></div>
     </div>
-    <p class="source-note">Source: Zillow Home Value Index (ZHVI), ResiClub PRO analysis by Lance Lambert. Data through April 2026. Size rank = national county size ranking by housing stock. Estimates for counties without exact data are based on surrounding ZHVI regional data.</p>
-
-    <div class="stat-grid">
-      <div class="stat-box">
-        <div class="num">+6.58%</div>
-        <div class="stat-label">Mahoning County<br>1-year price growth — leads Ohio</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">+0.19%</div>
-        <div class="stat-label">Franklin County<br>Columbus essentially flat YoY</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">+49.5%</div>
-        <div class="stat-label">Columbus total appreciation<br>since March 2020</div>
-      </div>
-      <div class="stat-box">
-        <div class="num">+0.73%</div>
-        <div class="stat-label">US national average<br>1-year price growth</div>
-      </div>
-    </div>
-
-    <p><strong>My take:</strong> Columbus catching national attention for "cooling" is accurate on the year-over-year number — but misleading in context. Up 49.5% since 2020, nearly flat year-over-year isn't collapse, it's consolidation. Dayton and Cleveland are quietly outperforming Columbus right now, and Youngstown's growth rate is the kind of number that gets investor attention fast.</p>
-  </div>
-
-  <!-- SECTION 2: INVENTORY -->
-  <div class="section">
-    <span class="section-label">Realtor.com Active Listings · May 2026</span>
-    <h2>Ohio Inventory Is Rising — But Not Evenly</h2>
-    <p>Active listings track how many homes are for sale at a given point in time. Rising inventory gives buyers more options and negotiating leverage. It also puts downward pressure on prices when it rises faster than demand.</p>
-    <p>Ohio inventory is up across the board — most counties are significantly above one year ago. The national average is up just 2.2% year-over-year. Ohio is running well ahead of that.</p>
-
-    <div class="data-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>County / Market</th>
-            <th>1-Year Inventory Change</th>
-            <th>2-Year Change</th>
-            <th>3-Year Change</th>
-            <th>Buyer Climate</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>🇺🇸 US National</td>
-            <td class="up">+2.2%</td>
-            <td class="up">+34.4%</td>
-            <td class="up">+81.8%</td>
-            <td>—</td>
-          </tr>
-          <tr>
-            <td>Warren County <span class="badge badge-hot">Most Supply</span></td>
-            <td class="up">+55.9%</td>
-            <td class="up">—</td>
-            <td class="up">+143.1%</td>
-            <td>Buyer favorable</td>
-          </tr>
-          <tr>
-            <td>Montgomery County <span class="badge">Dayton</span></td>
-            <td class="up">+24.0%</td>
-            <td class="up">—</td>
-            <td class="up">+120.5%</td>
-            <td>Shifting to buyers</td>
-          </tr>
-          <tr>
-            <td>Hamilton County <span class="badge">Cincinnati</span></td>
-            <td class="up">+23.2%</td>
-            <td class="up">—</td>
-            <td class="up">+115.1%</td>
-            <td>Shifting to buyers</td>
-          </tr>
-          <tr>
-            <td>Lucas County <span class="badge">Toledo</span></td>
-            <td class="up">+18.9%</td>
-            <td class="up">—</td>
-            <td class="up">+49.1%</td>
-            <td>Shifting to buyers</td>
-          </tr>
-          <tr>
-            <td>Delaware County <span class="badge">Columbus Suburb</span></td>
-            <td class="up">+14.8%</td>
-            <td class="up">—</td>
-            <td class="up">+81.2%</td>
-            <td>Balanced</td>
-          </tr>
-          <tr>
-            <td>Mahoning County <span class="badge">Youngstown</span></td>
-            <td class="up">+11.9%</td>
-            <td class="up">—</td>
-            <td class="up">+92.5%</td>
-            <td>Balanced</td>
-          </tr>
-          <tr>
-            <td>Franklin County <span class="badge">Columbus</span></td>
-            <td class="up">+10.2%</td>
-            <td class="up">+71.9%</td>
-            <td class="up">+110.8%</td>
-            <td>Balanced</td>
-          </tr>
-          <tr>
-            <td>Butler County <span class="badge">Cincinnati Suburb</span></td>
-            <td class="up">+7.8%</td>
-            <td class="up">—</td>
-            <td class="up">+81.2%</td>
-            <td>Balanced</td>
-          </tr>
-          <tr>
-            <td>Stark County <span class="badge">Canton</span></td>
-            <td class="up">+6.9%</td>
-            <td class="up">—</td>
-            <td class="up">+62.2%</td>
-            <td>Balanced</td>
-          </tr>
-          <tr>
-            <td>Summit County <span class="badge">Akron</span></td>
-            <td class="up">+7.2%</td>
-            <td class="up">—</td>
-            <td class="up">+51.0%</td>
-            <td>Balanced</td>
-          </tr>
-          <tr>
-            <td>Cuyahoga County <span class="badge">Cleveland</span></td>
-            <td class="up">+5.6%</td>
-            <td class="up">+35.2%</td>
-            <td class="up">+35.2%</td>
-            <td>Seller-leaning</td>
-          </tr>
-          <tr>
-            <td>Licking County <span class="badge">Columbus Suburb</span></td>
-            <td class="down">-11.8%</td>
-            <td class="up">—</td>
-            <td class="up">+62.5%</td>
-            <td>Seller favorable</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="source-note">Source: ResiClub PRO analysis of Realtor.com active listing data. Data through May 2026.</p>
-
-    <p><strong>My take:</strong> Warren County's 56% inventory surge is the most interesting data point here. That's a market where buyers went from competing over almost nothing to having real choices. Sellers in Warren County priced for 2022 conditions are about to get a reality check. Licking County going the other direction — down 11.8% year-over-year — is the quiet story. Less supply plus continued demand equals continued price pressure in Newark and Heath.</p>
-  </div>
-
-  <!-- SECTION 3: DISTRESS -->
-  <div class="section">
-    <span class="section-label">PropStream Data · June 2026</span>
-    <h2>Where Housing Distress Is Concentrated in Ohio</h2>
-    <p>Distress data covers properties in pre-foreclosure, bank-owned, bankruptcy, tax delinquency, negative equity, or auction. It's a leading indicator — concentrated distress today means foreclosure activity and discounted inventory in the months ahead.</p>
-    <p>The critical context: Ohio's distress isn't uniform. There's a tale of two states here — and the line runs roughly along the I-71 corridor.</p>
-
-    <div class="data-table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>County</th>
-            <th>Distress Rate</th>
-            <th>Tax Delinquency</th>
-            <th>Upside-Down Properties</th>
-            <th>Risk Level</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Guernsey County</td>
-            <td class="down">26.9%</td>
-            <td class="down">24.9%</td>
-            <td>—</td>
-            <td><span class="badge" style="background:#0D1E42;color:#fff">High</span></td>
-          </tr>
-          <tr>
-            <td>Trumbull County</td>
-            <td class="down">26.8%</td>
-            <td class="down">24.8%</td>
-            <td>1,994</td>
-            <td><span class="badge" style="background:#0D1E42;color:#fff">High</span></td>
-          </tr>
-          <tr>
-            <td>Scioto County</td>
-            <td class="down">25.6%</td>
-            <td class="down">23.7%</td>
-            <td>993</td>
-            <td><span class="badge" style="background:#0D1E42;color:#fff">High</span></td>
-          </tr>
-          <tr>
-            <td>Perry County</td>
-            <td class="down">25.4%</td>
-            <td class="down">23.4%</td>
-            <td>570</td>
-            <td><span class="badge" style="background:#0D1E42;color:#fff">High</span></td>
-          </tr>
-          <tr>
-            <td>Columbiana County</td>
-            <td class="down">24.3%</td>
-            <td class="down">21.8%</td>
-            <td>1,568</td>
-            <td><span class="badge" style="background:#0D1E42;color:#fff">High</span></td>
-          </tr>
-          <tr>
-            <td>Mahoning County <span class="badge">Youngstown</span></td>
-            <td class="down">18.7%</td>
-            <td class="down">16.3%</td>
-            <td>2,055</td>
-            <td><span class="badge" style="background:#9DA6AB;color:#fff">Elevated</span></td>
-          </tr>
-          <tr>
-            <td>Lucas County <span class="badge">Toledo</span></td>
-            <td class="down">12.9%</td>
-            <td class="down">10.4%</td>
-            <td>3,568</td>
-            <td><span class="badge" style="background:#9DA6AB;color:#fff">Elevated</span></td>
-          </tr>
-          <tr>
-            <td>Montgomery County <span class="badge">Dayton</span></td>
-            <td class="neutral">8.4%</td>
-            <td class="neutral">5.7%</td>
-            <td>5,013</td>
-            <td><span class="badge">Watch</span></td>
-          </tr>
-          <tr>
-            <td>Licking County</td>
-            <td class="neutral">8.0%</td>
-            <td class="neutral">4.5%</td>
-            <td>2,771</td>
-            <td><span class="badge">Watch</span></td>
-          </tr>
-          <tr>
-            <td>Butler County <span class="badge">Cincinnati Suburb</span></td>
-            <td class="neutral">7.8%</td>
-            <td class="neutral">5.7%</td>
-            <td>2,836</td>
-            <td><span class="badge">Watch</span></td>
-          </tr>
-          <tr>
-            <td>Stark County <span class="badge">Canton</span></td>
-            <td class="neutral">7.4%</td>
-            <td class="neutral">4.7%</td>
-            <td>4,500</td>
-            <td><span class="badge">Watch</span></td>
-          </tr>
-          <tr>
-            <td>Franklin County <span class="badge">Columbus</span></td>
-            <td class="neutral">5.0%</td>
-            <td class="neutral">2.3%</td>
-            <td>10,458</td>
-            <td><span class="badge">Moderate</span></td>
-          </tr>
-          <tr>
-            <td>Summit County <span class="badge">Akron</span></td>
-            <td class="neutral">3.8%</td>
-            <td class="neutral">1.7%</td>
-            <td>3,937</td>
-            <td><span class="badge">Moderate</span></td>
-          </tr>
-          <tr>
-            <td>Cuyahoga County <span class="badge">Cleveland</span></td>
-            <td class="neutral">3.9%</td>
-            <td class="neutral">0.7%</td>
-            <td>11,212</td>
-            <td><span class="badge">Moderate</span></td>
-          </tr>
-          <tr>
-            <td>Warren County <span class="badge">Cincinnati Suburb</span></td>
-            <td class="up">3.9%</td>
-            <td class="up">2.1%</td>
-            <td>1,475</td>
-            <td><span class="badge">Low</span></td>
-          </tr>
-          <tr>
-            <td>Hamilton County <span class="badge">Cincinnati</span></td>
-            <td class="up">3.1%</td>
-            <td class="up">0.1%</td>
-            <td>8,434</td>
-            <td><span class="badge">Low</span></td>
-          </tr>
-          <tr>
-            <td>Delaware County <span class="badge">Columbus Suburb</span></td>
-            <td class="up">2.4%</td>
-            <td class="up">0.2%</td>
-            <td>1,920</td>
-            <td><span class="badge">Low</span></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="source-note">Source: PropStream data, June 2026. Distress % = total distressed properties as a share of total property count. Includes pre-foreclosure, bank-owned, bankruptcy, tax delinquent, negative equity, and auction properties. Harrison County excluded (data anomaly).</p>
-
-    <p><strong>My take:</strong> Franklin County's 10,458 upside-down properties gets attention — that's a big number. But as a share of total properties, it's 5% distress rate, which is moderate. The more important story is the absolute numbers in Cuyahoga and Hamilton, which have 11,000+ and 8,000+ underwater properties respectively. If rates stay elevated and those owners need to sell, those markets absorb significant inventory that isn't in the current "for sale" count. Delaware County at 2.4% distress remains the cleanest market in Ohio by this metric.</p>
-  </div>
-
-  <!-- SECTION 4: OHIO VS NATIONAL -->
-  <div class="section">
-    <span class="section-label">Jasson Farrier Analysis</span>
-    <h2>Ohio vs. the National Market: What the Data Actually Shows</h2>
-    <p>The national housing narrative in 2026 is: prices are stalling, inventory is recovering, and the market is "normalizing." That's broadly true at the national level. Ohio tells a more nuanced version of that story.</p>
-    <p><strong>Where Ohio wins:</strong> Every major Ohio metro is outperforming the national +0.73% year-over-year price average. Cleveland (+4.53%), Dayton (+4.26%), and Youngstown (+6.58%) are not stalling markets. They're outperforming most of the country at a fraction of the price.</p>
-    <p><strong>Where Ohio is under pressure:</strong> Inventory recovery in Ohio is running 5–10x faster than the national average in several markets. Warren County (+56% YoY) and Montgomery County (+24%) are adding supply much faster than buyers are absorbing it. That's a setup for price compression, not collapse.</p>
-    <p><strong>The affordability advantage:</strong> Ohio remains one of the most affordable states in the country by price-to-income ratio. That's a structural advantage that doesn't disappear in a high-rate environment — it moderates it. Ohio buyers aren't stretched the same way coastal buyers are.</p>
-    <p><strong>The risk:</strong> Distress concentration in specific counties — particularly Trumbull, Mahoning, Scioto, and Lucas — is elevated by any measure. These aren't 2008 numbers, but they're not healthy either. Watch those markets for increased foreclosure activity in Q3–Q4 2026.</p>
-  </div>
-
-</div><!-- end container -->
-
-<!-- Q&A SECTION -->
-<div class="qa-section">
-  <div class="qa-inner">
-    <span class="section-label" style="display:block;margin-bottom:20px;">Common Questions</span>
-    <h2 style="font-size:22px;font-weight:700;color:var(--navy);margin-bottom:32px;">Ohio Housing Market — Frequently Asked Questions</h2>
-
-    <div class="qa-item">
-      <h3>Is the Ohio housing market cooling down in 2026?</h3>
-      <p>Yes and no. Columbus (Franklin County) is essentially flat year-over-year at +0.19% through April 2026 — that's a meaningful cooldown from the 5–10% growth years. But Cleveland, Dayton, and Youngstown are still posting 4–7% annual gains, well above the national average. The Ohio market is segmenting, not uniformly cooling.</p>
-    </div>
-
-    <div class="qa-item">
-      <h3>Which Ohio county has the highest home price growth in 2026?</h3>
-      <p>Mahoning County (Youngstown area) leads major Ohio counties at +6.58% year-over-year as of April 2026, according to Zillow ZHVI data. Montgomery County (Dayton) is second at +4.26%, followed by Cuyahoga County (Cleveland) at +4.53%.</p>
-    </div>
-
-    <div class="qa-item">
-      <h3>Is Columbus a buyer's or seller's market right now?</h3>
-      <p>Balanced, trending toward buyers. Active listings in Franklin County are up 10.2% year-over-year — more options, less competition. Prices are still positive but barely. Sellers who bought pre-2020 still have significant equity cushion. Sellers who bought at peak 2022 prices need to be realistic.</p>
-    </div>
-
-    <div class="qa-item">
-      <h3>Where is housing distress highest in Ohio?</h3>
-      <p>Rural and Rust Belt counties carry the highest distress rates. Guernsey and Trumbull counties sit at approximately 27% of properties in some form of financial distress as of June 2026. Among Ohio's larger markets, Lucas County (Toledo) at 12.9% distress is the most elevated. Delaware County at 2.4% is the cleanest.</p>
-    </div>
-
-    <div class="qa-item">
-      <h3>How does Ohio compare to the national housing market?</h3>
-      <p>Most Ohio counties are outperforming the national +0.73% year-over-year average on price growth. However, Ohio inventory is recovering faster than the national average in several markets. The tradeoff: more price support than the coast, but more supply coming online than the headline numbers suggest.</p>
-    </div>
-
-    <div class="qa-item">
-      <h3>Should I buy a home in Ohio in 2026 or wait?</h3>
-      <p>That depends entirely on your situation — timeline, financial stability, the specific market, and whether you're buying to live there or as an investment. The data doesn't give a universal answer. If you want a framework for your specific situation, <a href="/free" style="color:var(--navy);font-weight:700;">get my free Wait or Buy guide here</a>.</p>
+    <div id="legend">
+      <span id="legend-low">Low</span>
+      <canvas id="legend-gradient" width="120" height="8"></canvas>
+      <span id="legend-high">High</span>
     </div>
   </div>
 </div>
 
-<!-- EMAIL CTA -->
-<div class="email-cta" id="data-email">
-  <span class="eyebrow">Stay Current</span>
-  <h2>Get Ohio Housing Data<br>When It Updates</h2>
-  <p>I update this page monthly. Drop your email and I'll send you the data plus my honest read on what it means.</p>
-  <form id="data-form" onsubmit="handleDataEmail(event)">
-    <div class="email-form">
-      <input type="email" id="data-email-input" placeholder="Your email address" required>
-      <button type="submit" class="btn-pill" id="data-email-btn">Get Updates &rarr;</button>
+<!-- CHART PANEL -->
+<div id="chart-panel">
+  <button class="close-btn" id="close-panel">✕</button>
+  <div class="panel-county" id="panel-county-name"></div>
+  <div class="panel-subtitle">COUNTY HOUSING DISTRESS</div>
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="s-val warn" id="p-distress"></div>
+      <div class="s-label">Overall Distress</div>
     </div>
-  </form>
-  <p class="email-sub">No spam. Monthly data updates only. Unsubscribe anytime.</p>
-  <p id="data-thankyou">You're in — I'll send the next update when the data drops.</p>
+    <div class="stat-card">
+      <div class="s-val warn" id="p-taxdel"></div>
+      <div class="s-label">Tax Delinquent</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-val" id="p-bankowned"></div>
+      <div class="s-label">Bank Owned</div>
+    </div>
+    <div class="stat-card">
+      <div class="s-val" id="p-prefc"></div>
+      <div class="s-label">Pre-Foreclosure</div>
+    </div>
+  </div>
+  <div class="chart-title">Distress Breakdown</div>
+  <svg id="bar-chart"></svg>
+  <div class="rank-line" id="rank-line"></div>
 </div>
-
-<footer>
-  <div class="footer-top">
-    <span class="footer-brand">Jasson Farrier &#183; Kiger Realty</span>
-    <div class="footer-links">
-      <a href="/housing-market-updates">Market Updates</a>
-      <a href="/ohio-housing-data">Data</a>
-      <a href="/bio">About</a>
-      <a href="/contact">Contact</a>
-    </div>
-  </div>
-  <hr class="footer-divider">
-  <div class="footer-legal">
-    <img src="/fair-housing.webp" alt="Equal Housing Opportunity" style="flex-shrink:0;width:32px;height:auto;opacity:0.6;filter:invert(1);margin-top:2px;">
-    <p>
-      Jasson Farrier &#183; Kiger Realty &#183; Realtor &#183; License #2018004483 &#183; 614-699-3007<br>
-      Equal Housing Opportunity &#183; Information deemed reliable but not guaranteed.
-    </p>
-  </div>
-</footer>
 
 <script>
-var _dataLoadTime = Date.now();
-async function handleDataEmail(e) {
-  e.preventDefault();
-  if (Date.now() - _dataLoadTime < 2000) return;
-  const email = document.getElementById('data-email-input').value.trim();
-  const btn = document.getElementById('data-email-btn');
-  btn.textContent = 'Sending...';
-  btn.disabled = true;
+const COUNTY_DATA = [{"county": "Guernsey", "total_properties": 49756, "pre_foreclosure": 63, "bank_owned": 68, "bankruptcy": 1, "tax_delinquent": 12377, "upside_down": 856, "auctions": 6, "total_distress": 13371, "distress_pct": 26.87, "tax_del_pct": 24.88}, {"county": "Trumbull", "total_properties": 141074, "pre_foreclosure": 349, "bank_owned": 339, "bankruptcy": 142, "tax_delinquent": 35008, "upside_down": 1994, "auctions": 25, "total_distress": 37857, "distress_pct": 26.83, "tax_del_pct": 24.82}, {"county": "Scioto", "total_properties": 57415, "pre_foreclosure": 18, "bank_owned": 109, "bankruptcy": 2, "tax_delinquent": 13583, "upside_down": 993, "auctions": 8, "total_distress": 14713, "distress_pct": 25.63, "tax_del_pct": 23.66}, {"county": "Perry", "total_properties": 34400, "pre_foreclosure": 2, "bank_owned": 123, "bankruptcy": 0, "tax_delinquent": 8031, "upside_down": 570, "auctions": 2, "total_distress": 8728, "distress_pct": 25.37, "tax_del_pct": 23.35}, {"county": "Columbiana", "total_properties": 77611, "pre_foreclosure": 167, "bank_owned": 144, "bankruptcy": 70, "tax_delinquent": 16913, "upside_down": 1568, "auctions": 8, "total_distress": 18870, "distress_pct": 24.31, "tax_del_pct": 21.79}, {"county": "Adams", "total_properties": 22528, "pre_foreclosure": 7, "bank_owned": 49, "bankruptcy": 1, "tax_delinquent": 4509, "upside_down": 479, "auctions": 7, "total_distress": 5052, "distress_pct": 22.43, "tax_del_pct": 20.02}, {"county": "Monroe", "total_properties": 21381, "pre_foreclosure": 5, "bank_owned": 28, "bankruptcy": 0, "tax_delinquent": 3894, "upside_down": 235, "auctions": 1, "total_distress": 4163, "distress_pct": 19.47, "tax_del_pct": 18.21}, {"county": "Mahoning", "total_properties": 164763, "pre_foreclosure": 28, "bank_owned": 1651, "bankruptcy": 178, "tax_delinquent": 26885, "upside_down": 2055, "auctions": 15, "total_distress": 30812, "distress_pct": 18.7, "tax_del_pct": 16.32}, {"county": "Ashland", "total_properties": 35314, "pre_foreclosure": 74, "bank_owned": 46, "bankruptcy": 2, "tax_delinquent": 5733, "upside_down": 605, "auctions": 2, "total_distress": 6462, "distress_pct": 18.3, "tax_del_pct": 16.23}, {"county": "Williams", "total_properties": 26322, "pre_foreclosure": 7, "bank_owned": 59, "bankruptcy": 0, "tax_delinquent": 3921, "upside_down": 599, "auctions": 7, "total_distress": 4593, "distress_pct": 17.45, "tax_del_pct": 14.9}, {"county": "Pike", "total_properties": 26908, "pre_foreclosure": 5, "bank_owned": 43, "bankruptcy": 2, "tax_delinquent": 3650, "upside_down": 616, "auctions": 2, "total_distress": 4318, "distress_pct": 16.05, "tax_del_pct": 13.56}, {"county": "Morgan", "total_properties": 25486, "pre_foreclosure": 1, "bank_owned": 40, "bankruptcy": 0, "tax_delinquent": 3569, "upside_down": 415, "auctions": 0, "total_distress": 4025, "distress_pct": 15.79, "tax_del_pct": 14.0}, {"county": "Muskingum", "total_properties": 77018, "pre_foreclosure": 107, "bank_owned": 199, "bankruptcy": 1, "tax_delinquent": 10258, "upside_down": 1553, "auctions": 8, "total_distress": 12126, "distress_pct": 15.74, "tax_del_pct": 13.32}, {"county": "Clinton", "total_properties": 29059, "pre_foreclosure": 5, "bank_owned": 63, "bankruptcy": 3, "tax_delinquent": 3876, "upside_down": 427, "auctions": 5, "total_distress": 4379, "distress_pct": 15.07, "tax_del_pct": 13.34}, {"county": "Preble", "total_properties": 28430, "pre_foreclosure": 83, "bank_owned": 80, "bankruptcy": 0, "tax_delinquent": 3452, "upside_down": 540, "auctions": 3, "total_distress": 4158, "distress_pct": 14.63, "tax_del_pct": 12.14}, {"county": "Logan", "total_properties": 37774, "pre_foreclosure": 80, "bank_owned": 68, "bankruptcy": 1, "tax_delinquent": 4514, "upside_down": 777, "auctions": 15, "total_distress": 5455, "distress_pct": 14.44, "tax_del_pct": 11.95}, {"county": "Van Wert", "total_properties": 20452, "pre_foreclosure": 5, "bank_owned": 27, "bankruptcy": 0, "tax_delinquent": 2391, "upside_down": 526, "auctions": 5, "total_distress": 2954, "distress_pct": 14.44, "tax_del_pct": 11.69}, {"county": "Allen", "total_properties": 56245, "pre_foreclosure": 109, "bank_owned": 156, "bankruptcy": 3, "tax_delinquent": 6849, "upside_down": 974, "auctions": 14, "total_distress": 8105, "distress_pct": 14.41, "tax_del_pct": 12.18}, {"county": "Seneca", "total_properties": 35764, "pre_foreclosure": 39, "bank_owned": 96, "bankruptcy": 1, "tax_delinquent": 4170, "upside_down": 768, "auctions": 12, "total_distress": 5086, "distress_pct": 14.22, "tax_del_pct": 11.66}, {"county": "Meigs", "total_properties": 31364, "pre_foreclosure": 1, "bank_owned": 69, "bankruptcy": 0, "tax_delinquent": 4023, "upside_down": 327, "auctions": 1, "total_distress": 4421, "distress_pct": 14.1, "tax_del_pct": 12.83}, {"county": "Lorain", "total_properties": 177327, "pre_foreclosure": 545, "bank_owned": 320, "bankruptcy": 22, "tax_delinquent": 21009, "upside_down": 2280, "auctions": 55, "total_distress": 24231, "distress_pct": 13.66, "tax_del_pct": 11.85}, {"county": "Madison", "total_properties": 25228, "pre_foreclosure": 7, "bank_owned": 28, "bankruptcy": 2, "tax_delinquent": 2452, "upside_down": 766, "auctions": 6, "total_distress": 3261, "distress_pct": 12.93, "tax_del_pct": 9.72}, {"county": "Lucas", "total_properties": 205785, "pre_foreclosure": 708, "bank_owned": 693, "bankruptcy": 12, "tax_delinquent": 21468, "upside_down": 3568, "auctions": 44, "total_distress": 26493, "distress_pct": 12.87, "tax_del_pct": 10.43}, {"county": "Pickaway", "total_properties": 31614, "pre_foreclosure": 77, "bank_owned": 61, "bankruptcy": 2, "tax_delinquent": 2926, "upside_down": 884, "auctions": 6, "total_distress": 3956, "distress_pct": 12.51, "tax_del_pct": 9.26}, {"county": "Fulton", "total_properties": 25110, "pre_foreclosure": 20, "bank_owned": 52, "bankruptcy": 0, "tax_delinquent": 2399, "upside_down": 540, "auctions": 0, "total_distress": 3011, "distress_pct": 11.99, "tax_del_pct": 9.55}, {"county": "Miami", "total_properties": 55155, "pre_foreclosure": 21, "bank_owned": 98, "bankruptcy": 2, "tax_delinquent": 4573, "upside_down": 1891, "auctions": 16, "total_distress": 6601, "distress_pct": 11.97, "tax_del_pct": 8.29}, {"county": "Clark", "total_properties": 67410, "pre_foreclosure": 11, "bank_owned": 151, "bankruptcy": 6, "tax_delinquent": 6261, "upside_down": 1593, "auctions": 4, "total_distress": 8026, "distress_pct": 11.91, "tax_del_pct": 9.29}, {"county": "Washington", "total_properties": 78938, "pre_foreclosure": 7, "bank_owned": 244, "bankruptcy": 0, "tax_delinquent": 7743, "upside_down": 1101, "auctions": 1, "total_distress": 9096, "distress_pct": 11.52, "tax_del_pct": 9.81}, {"county": "Greene", "total_properties": 77885, "pre_foreclosure": 195, "bank_owned": 107, "bankruptcy": 1, "tax_delinquent": 7025, "upside_down": 1495, "auctions": 13, "total_distress": 8836, "distress_pct": 11.34, "tax_del_pct": 9.02}, {"county": "Paulding", "total_properties": 18810, "pre_foreclosure": 4, "bank_owned": 36, "bankruptcy": 1, "tax_delinquent": 1701, "upside_down": 341, "auctions": 4, "total_distress": 2087, "distress_pct": 11.1, "tax_del_pct": 9.04}, {"county": "Ross", "total_properties": 49392, "pre_foreclosure": 99, "bank_owned": 94, "bankruptcy": 2, "tax_delinquent": 4301, "upside_down": 785, "auctions": 0, "total_distress": 5281, "distress_pct": 10.69, "tax_del_pct": 8.71}, {"county": "Wyandot", "total_properties": 20965, "pre_foreclosure": 3, "bank_owned": 52, "bankruptcy": 0, "tax_delinquent": 1735, "upside_down": 360, "auctions": 3, "total_distress": 2153, "distress_pct": 10.27, "tax_del_pct": 8.28}, {"county": "Defiance", "total_properties": 27818, "pre_foreclosure": 45, "bank_owned": 82, "bankruptcy": 1, "tax_delinquent": 1976, "upside_down": 623, "auctions": 0, "total_distress": 2727, "distress_pct": 9.8, "tax_del_pct": 7.1}, {"county": "Mercer", "total_properties": 29015, "pre_foreclosure": 39, "bank_owned": 56, "bankruptcy": 0, "tax_delinquent": 2260, "upside_down": 368, "auctions": 5, "total_distress": 2728, "distress_pct": 9.4, "tax_del_pct": 7.79}, {"county": "Montgomery", "total_properties": 261236, "pre_foreclosure": 869, "bank_owned": 1220, "bankruptcy": 22, "tax_delinquent": 14782, "upside_down": 5013, "auctions": 75, "total_distress": 21981, "distress_pct": 8.41, "tax_del_pct": 5.66}, {"county": "Licking", "total_properties": 87630, "pre_foreclosure": 116, "bank_owned": 157, "bankruptcy": 10, "tax_delinquent": 3967, "upside_down": 2771, "auctions": 22, "total_distress": 7043, "distress_pct": 8.04, "tax_del_pct": 4.53}, {"county": "Putnam", "total_properties": 30245, "pre_foreclosure": 34, "bank_owned": 70, "bankruptcy": 0, "tax_delinquent": 1700, "upside_down": 624, "auctions": 3, "total_distress": 2431, "distress_pct": 8.04, "tax_del_pct": 5.62}, {"county": "Butler", "total_properties": 177342, "pre_foreclosure": 568, "bank_owned": 372, "bankruptcy": 14, "tax_delinquent": 10041, "upside_down": 2836, "auctions": 50, "total_distress": 13881, "distress_pct": 7.83, "tax_del_pct": 5.66}, {"county": "Stark", "total_properties": 210418, "pre_foreclosure": 544, "bank_owned": 463, "bankruptcy": 22, "tax_delinquent": 9897, "upside_down": 4500, "auctions": 56, "total_distress": 15482, "distress_pct": 7.36, "tax_del_pct": 4.7}, {"county": "Knox", "total_properties": 45363, "pre_foreclosure": 67, "bank_owned": 107, "bankruptcy": 0, "tax_delinquent": 2012, "upside_down": 1105, "auctions": 3, "total_distress": 3294, "distress_pct": 7.26, "tax_del_pct": 4.44}, {"county": "Portage", "total_properties": 82968, "pre_foreclosure": 216, "bank_owned": 128, "bankruptcy": 8, "tax_delinquent": 4057, "upside_down": 1097, "auctions": 13, "total_distress": 5519, "distress_pct": 6.65, "tax_del_pct": 4.89}, {"county": "Champaign", "total_properties": 27085, "pre_foreclosure": 7, "bank_owned": 72, "bankruptcy": 1, "tax_delinquent": 856, "upside_down": 603, "auctions": 7, "total_distress": 1546, "distress_pct": 5.71, "tax_del_pct": 3.16}, {"county": "Darke", "total_properties": 32334, "pre_foreclosure": 70, "bank_owned": 54, "bankruptcy": 1, "tax_delinquent": 913, "upside_down": 803, "auctions": 1, "total_distress": 1842, "distress_pct": 5.7, "tax_del_pct": 2.82}, {"county": "Carroll", "total_properties": 31479, "pre_foreclosure": 5, "bank_owned": 32, "bankruptcy": 4, "tax_delinquent": 0, "upside_down": 1637, "auctions": 0, "total_distress": 1678, "distress_pct": 5.33, "tax_del_pct": 0}, {"county": "Holmes", "total_properties": 30210, "pre_foreclosure": 13, "bank_owned": 67, "bankruptcy": 1, "tax_delinquent": 741, "upside_down": 689, "auctions": 0, "total_distress": 1511, "distress_pct": 5.0, "tax_del_pct": 2.45}, {"county": "Franklin", "total_properties": 499603, "pre_foreclosure": 1891, "bank_owned": 616, "bankruptcy": 38, "tax_delinquent": 11715, "upside_down": 10458, "auctions": 112, "total_distress": 24830, "distress_pct": 4.97, "tax_del_pct": 2.34}, {"county": "Erie", "total_properties": 49154, "pre_foreclosure": 101, "bank_owned": 53, "bankruptcy": 2, "tax_delinquent": 1255, "upside_down": 992, "auctions": 12, "total_distress": 2415, "distress_pct": 4.91, "tax_del_pct": 2.55}, {"county": "Coshocton", "total_properties": 31851, "pre_foreclosure": 6, "bank_owned": 61, "bankruptcy": 1, "tax_delinquent": 785, "upside_down": 695, "auctions": 4, "total_distress": 1552, "distress_pct": 4.87, "tax_del_pct": 2.46}, {"county": "Union", "total_properties": 41116, "pre_foreclosure": 1, "bank_owned": 47, "bankruptcy": 2, "tax_delinquent": 813, "upside_down": 1087, "auctions": 1, "total_distress": 1951, "distress_pct": 4.75, "tax_del_pct": 1.98}, {"county": "Wayne", "total_properties": 58321, "pre_foreclosure": 7, "bank_owned": 112, "bankruptcy": 4, "tax_delinquent": 948, "upside_down": 1481, "auctions": 7, "total_distress": 2559, "distress_pct": 4.39, "tax_del_pct": 1.63}, {"county": "Ottawa", "total_properties": 44634, "pre_foreclosure": 7, "bank_owned": 55, "bankruptcy": 0, "tax_delinquent": 996, "upside_down": 771, "auctions": 5, "total_distress": 1834, "distress_pct": 4.11, "tax_del_pct": 2.23}, {"county": "Fayette", "total_properties": 19164, "pre_foreclosure": 33, "bank_owned": 44, "bankruptcy": 2, "tax_delinquent": 0, "upside_down": 700, "auctions": 2, "total_distress": 781, "distress_pct": 4.08, "tax_del_pct": 0}, {"county": "Cuyahoga", "total_properties": 590938, "pre_foreclosure": 3498, "bank_owned": 3343, "bankruptcy": 127, "tax_delinquent": 4351, "upside_down": 11212, "auctions": 682, "total_distress": 23213, "distress_pct": 3.93, "tax_del_pct": 0.74}, {"county": "Warren", "total_properties": 110188, "pre_foreclosure": 305, "bank_owned": 180, "bankruptcy": 7, "tax_delinquent": 2256, "upside_down": 1475, "auctions": 23, "total_distress": 4246, "distress_pct": 3.85, "tax_del_pct": 2.05}, {"county": "Summit", "total_properties": 279459, "pre_foreclosure": 864, "bank_owned": 903, "bankruptcy": 30, "tax_delinquent": 4807, "upside_down": 3937, "auctions": 102, "total_distress": 10643, "distress_pct": 3.81, "tax_del_pct": 1.72}, {"county": "Lake", "total_properties": 114797, "pre_foreclosure": 423, "bank_owned": 202, "bankruptcy": 14, "tax_delinquent": 1847, "upside_down": 1517, "auctions": 33, "total_distress": 4036, "distress_pct": 3.52, "tax_del_pct": 1.61}, {"county": "Wood", "total_properties": 80438, "pre_foreclosure": 5, "bank_owned": 146, "bankruptcy": 0, "tax_delinquent": 1423, "upside_down": 1228, "auctions": 5, "total_distress": 2807, "distress_pct": 3.49, "tax_del_pct": 1.77}, {"county": "Sandusky", "total_properties": 35749, "pre_foreclosure": 93, "bank_owned": 83, "bankruptcy": 0, "tax_delinquent": 59, "upside_down": 985, "auctions": 12, "total_distress": 1232, "distress_pct": 3.45, "tax_del_pct": 0.17}, {"county": "Belmont", "total_properties": 73391, "pre_foreclosure": 8, "bank_owned": 158, "bankruptcy": 1, "tax_delinquent": 1143, "upside_down": 1201, "auctions": 5, "total_distress": 2516, "distress_pct": 3.43, "tax_del_pct": 1.56}, {"county": "Richland", "total_properties": 77761, "pre_foreclosure": 169, "bank_owned": 110, "bankruptcy": 7, "tax_delinquent": 162, "upside_down": 2177, "auctions": 0, "total_distress": 2625, "distress_pct": 3.38, "tax_del_pct": 0.21}, {"county": "Auglaize", "total_properties": 32100, "pre_foreclosure": 43, "bank_owned": 52, "bankruptcy": 1, "tax_delinquent": 444, "upside_down": 520, "auctions": 1, "total_distress": 1061, "distress_pct": 3.31, "tax_del_pct": 1.38}, {"county": "Hancock", "total_properties": 42813, "pre_foreclosure": 93, "bank_owned": 47, "bankruptcy": 1, "tax_delinquent": 0, "upside_down": 1259, "auctions": 1, "total_distress": 1401, "distress_pct": 3.27, "tax_del_pct": 0}, {"county": "Hamilton", "total_properties": 359969, "pre_foreclosure": 1413, "bank_owned": 784, "bankruptcy": 25, "tax_delinquent": 434, "upside_down": 8434, "auctions": 80, "total_distress": 11170, "distress_pct": 3.1, "tax_del_pct": 0.12}, {"county": "Highland", "total_properties": 34483, "pre_foreclosure": 80, "bank_owned": 71, "bankruptcy": 0, "tax_delinquent": 86, "upside_down": 796, "auctions": 2, "total_distress": 1035, "distress_pct": 3.0, "tax_del_pct": 0.25}, {"county": "Lawrence", "total_properties": 55912, "pre_foreclosure": 10, "bank_owned": 116, "bankruptcy": 1, "tax_delinquent": 791, "upside_down": 729, "auctions": 10, "total_distress": 1657, "distress_pct": 2.96, "tax_del_pct": 1.41}, {"county": "Geauga", "total_properties": 55146, "pre_foreclosure": 74, "bank_owned": 49, "bankruptcy": 5, "tax_delinquent": 524, "upside_down": 921, "auctions": 5, "total_distress": 1578, "distress_pct": 2.86, "tax_del_pct": 0.95}, {"county": "Shelby", "total_properties": 33636, "pre_foreclosure": 71, "bank_owned": 45, "bankruptcy": 0, "tax_delinquent": 32, "upside_down": 798, "auctions": 5, "total_distress": 951, "distress_pct": 2.83, "tax_del_pct": 0.1}, {"county": "Henry", "total_properties": 21462, "pre_foreclosure": 3, "bank_owned": 92, "bankruptcy": 1, "tax_delinquent": 37, "upside_down": 466, "auctions": 3, "total_distress": 602, "distress_pct": 2.8, "tax_del_pct": 0.17}, {"county": "Medina", "total_properties": 88451, "pre_foreclosure": 53, "bank_owned": 56, "bankruptcy": 5, "tax_delinquent": 518, "upside_down": 1782, "auctions": 33, "total_distress": 2447, "distress_pct": 2.77, "tax_del_pct": 0.59}, {"county": "Hardin", "total_properties": 21259, "pre_foreclosure": 2, "bank_owned": 35, "bankruptcy": 1, "tax_delinquent": 0, "upside_down": 536, "auctions": 2, "total_distress": 576, "distress_pct": 2.71, "tax_del_pct": 0}, {"county": "Marion", "total_properties": 36720, "pre_foreclosure": 124, "bank_owned": 75, "bankruptcy": 3, "tax_delinquent": 37, "upside_down": 719, "auctions": 5, "total_distress": 963, "distress_pct": 2.62, "tax_del_pct": 0.1}, {"county": "Brown", "total_properties": 35895, "pre_foreclosure": 11, "bank_owned": 97, "bankruptcy": 0, "tax_delinquent": 43, "upside_down": 777, "auctions": 9, "total_distress": 937, "distress_pct": 2.61, "tax_del_pct": 0.12}, {"county": "Clermont", "total_properties": 110406, "pre_foreclosure": 283, "bank_owned": 122, "bankruptcy": 6, "tax_delinquent": 112, "upside_down": 2247, "auctions": 13, "total_distress": 2783, "distress_pct": 2.52, "tax_del_pct": 0.1}, {"county": "Fairfield", "total_properties": 76190, "pre_foreclosure": 220, "bank_owned": 162, "bankruptcy": 8, "tax_delinquent": 29, "upside_down": 1469, "auctions": 12, "total_distress": 1900, "distress_pct": 2.49, "tax_del_pct": 0.04}, {"county": "Delaware", "total_properties": 100030, "pre_foreclosure": 213, "bank_owned": 81, "bankruptcy": 8, "tax_delinquent": 187, "upside_down": 1920, "auctions": 11, "total_distress": 2420, "distress_pct": 2.42, "tax_del_pct": 0.19}, {"county": "Tuscarawas", "total_properties": 68244, "pre_foreclosure": 135, "bank_owned": 194, "bankruptcy": 5, "tax_delinquent": 9, "upside_down": 1269, "auctions": 5, "total_distress": 1617, "distress_pct": 2.37, "tax_del_pct": 0.01}, {"county": "Hocking", "total_properties": 23329, "pre_foreclosure": 7, "bank_owned": 45, "bankruptcy": 1, "tax_delinquent": 7, "upside_down": 478, "auctions": 7, "total_distress": 545, "distress_pct": 2.34, "tax_del_pct": 0.03}, {"county": "Jefferson", "total_properties": 60350, "pre_foreclosure": 108, "bank_owned": 152, "bankruptcy": 1, "tax_delinquent": 60, "upside_down": 1074, "auctions": 13, "total_distress": 1408, "distress_pct": 2.33, "tax_del_pct": 0.1}, {"county": "Crawford", "total_properties": 34340, "pre_foreclosure": 58, "bank_owned": 56, "bankruptcy": 3, "tax_delinquent": 6, "upside_down": 673, "auctions": 0, "total_distress": 796, "distress_pct": 2.32, "tax_del_pct": 0.02}, {"county": "Athens", "total_properties": 42139, "pre_foreclosure": 44, "bank_owned": 129, "bankruptcy": 1, "tax_delinquent": 46, "upside_down": 748, "auctions": 4, "total_distress": 972, "distress_pct": 2.31, "tax_del_pct": 0.11}, {"county": "Huron", "total_properties": 42056, "pre_foreclosure": 48, "bank_owned": 62, "bankruptcy": 0, "tax_delinquent": 28, "upside_down": 780, "auctions": 5, "total_distress": 923, "distress_pct": 2.19, "tax_del_pct": 0.07}, {"county": "Ashtabula", "total_properties": 78427, "pre_foreclosure": 177, "bank_owned": 219, "bankruptcy": 48, "tax_delinquent": 90, "upside_down": 1066, "auctions": 11, "total_distress": 1611, "distress_pct": 2.05, "tax_del_pct": 0.11}, {"county": "Jackson", "total_properties": 31711, "pre_foreclosure": 11, "bank_owned": 72, "bankruptcy": 2, "tax_delinquent": 10, "upside_down": 514, "auctions": 9, "total_distress": 618, "distress_pct": 1.95, "tax_del_pct": 0.03}, {"county": "Vinton", "total_properties": 15642, "pre_foreclosure": 1, "bank_owned": 30, "bankruptcy": 0, "tax_delinquent": 0, "upside_down": 221, "auctions": 1, "total_distress": 253, "distress_pct": 1.62, "tax_del_pct": 0}, {"county": "Gallia", "total_properties": 29587, "pre_foreclosure": 24, "bank_owned": 83, "bankruptcy": 1, "tax_delinquent": 0, "upside_down": 346, "auctions": 0, "total_distress": 454, "distress_pct": 1.53, "tax_del_pct": 0}, {"county": "Morrow", "total_properties": 29409, "pre_foreclosure": 2, "bank_owned": 23, "bankruptcy": 1, "tax_delinquent": 163, "upside_down": 108, "auctions": 2, "total_distress": 299, "distress_pct": 1.02, "tax_del_pct": 0.55}, {"county": "Noble", "total_properties": 18197, "pre_foreclosure": 1, "bank_owned": 21, "bankruptcy": 1, "tax_delinquent": 17, "upside_down": 69, "auctions": 1, "total_distress": 110, "distress_pct": 0.6, "tax_del_pct": 0.09}];
 
-  // Send to Kit
-  const kitForm = document.createElement('form');
-  kitForm.action = 'https://app.kit.com/forms/9195650/subscriptions';
-  kitForm.method = 'post';
-  kitForm.target = 'kit-data-frame';
-  kitForm.style.display = 'none';
-  const emailField = document.createElement('input');
-  emailField.name = 'email_address'; emailField.value = email;
-  kitForm.appendChild(emailField);
-  document.body.appendChild(kitForm);
-  const iframe = document.createElement('iframe');
-  iframe.name = 'kit-data-frame';
-  iframe.style.display = 'none';
-  document.body.appendChild(iframe);
-  kitForm.submit();
+// FIPS → county name for Ohio counties
+const FIPS_TO_NAME = {
+  "39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula",
+  "39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown",
+  "39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark",
+  "39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton",
+  "39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance",
+  "39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette",
+  "39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga",
+  "39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock",
+  "39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland",
+  "39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson",
+  "39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence",
+  "39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas",
+  "39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina",
+  "39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe",
+  "39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum",
+  "39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry",
+  "39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble",
+  "39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky",
+  "39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark",
+  "39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union",
+  "39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington",
+  "39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"
+};
 
-  // Send to CRM
-  try {
-    await fetch('https://farrier-crm.vercel.app/api/leads', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: email,
-        first_name: '', last_name: '', phone: '',
-        lead_source: 'Jasson Farrier — Ohio Housing Data Page',
-        source_site: 'jassonfarrier.com',
-        contact_type: 'Email Subscriber',
-        notes: 'Subscribed via /ohio-housing-data page',
-        newsletter: true
-      })
-    });
-  } catch(err) { console.error('CRM error:', err); }
+const dataMap = {};
+COUNTY_DATA.forEach(d => { dataMap[d.county] = d; });
 
-  document.getElementById('data-form').style.display = 'none';
-  document.querySelector('.email-sub').style.display = 'none';
-  document.getElementById('data-thankyou').style.display = 'block';
+const METRICS = {
+  distress_pct:    { label: 'Overall Distress %', fmt: v => v.toFixed(1)+'%', isPercent: true },
+  tax_del_pct:     { label: 'Tax Delinquency %',  fmt: v => v.toFixed(1)+'%', isPercent: true },
+  bank_owned:      { label: 'Bank Owned (REO)',    fmt: v => v.toLocaleString(), isPercent: false },
+  pre_foreclosure: { label: 'Pre-Foreclosure',     fmt: v => v.toLocaleString(), isPercent: false },
+  upside_down:     { label: 'Underwater Mortgages',fmt: v => v.toLocaleString(), isPercent: false },
+  auctions:        { label: 'Auction Properties',  fmt: v => v.toLocaleString(), isPercent: false },
+};
+
+let currentMetric = 'distress_pct';
+let selectedCounty = null;
+
+// Color scale: dark navy → cyan glow
+const colorScale = d3.scaleSequential()
+  .interpolator(t => {
+    // low: dark blue-grey, high: hot cyan/red
+    const r = Math.round(6 + t * 249);
+    const g = Math.round(13 + t * (t > 0.7 ? -13*t : 107*t));
+    const b = Math.round(31 + t * (t > 0.6 ? -31*t+150 : 224*t));
+    return `rgb(${r},${g},${b})`;
+  });
+
+// Draw legend gradient
+function drawLegend() {
+  const canvas = document.getElementById('legend-gradient');
+  const ctx = canvas.getContext('2d');
+  const grad = ctx.createLinearGradient(0, 0, 120, 0);
+  for (let i = 0; i <= 10; i++) {
+    grad.addColorStop(i/10, colorScale(i/10));
+  }
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 120, 8);
 }
+
+// Load TopoJSON and render
+const svg = d3.select('#map-svg');
+const mapArea = document.querySelector('.map-area');
+
+function getSize() {
+  return { w: mapArea.clientWidth, h: mapArea.clientHeight };
+}
+
+let geoData = null;
+let projection, path;
+
+fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json')
+  .then(r => r.json())
+  .then(us => {
+    // Filter Ohio counties (FIPS starts with 39)
+    const ohioCounties = topojson.feature(us, us.objects.counties);
+    ohioCounties.features = ohioCounties.features.filter(f => f.id.toString().startsWith('39'));
+    geoData = ohioCounties;
+    render();
+    window.addEventListener('resize', render);
+  });
+
+function getVal(countyName, metric) {
+  const d = dataMap[countyName];
+  if (!d) return null;
+  return d[metric];
+}
+
+function render() {
+  const { w, h } = getSize();
+  svg.selectAll('*').remove();
+
+  // Re-add defs
+  const defs = svg.append('defs');
+  const glow = defs.append('filter').attr('id','glow');
+  glow.append('feGaussianBlur').attr('stdDeviation','3').attr('result','blur');
+  const merge = glow.append('feMerge');
+  merge.append('feMergeNode').attr('in','blur');
+  merge.append('feMergeNode').attr('in','SourceGraphic');
+
+  projection = d3.geoAlbersUsa()
+    .fitSize([w * 0.96, h * 0.94], geoData)
+    .translate([w * 0.48, h * 0.5]);
+
+  path = d3.geoPath().projection(projection);
+
+  // Compute color domain
+  const vals = geoData.features.map(f => {
+    const name = FIPS_TO_NAME[f.id.toString().padStart(5,'0')];
+    return name ? getVal(name, currentMetric) : null;
+  }).filter(v => v !== null);
+
+  colorScale.domain([d3.min(vals), d3.max(vals)]);
+
+  const g = svg.append('g');
+
+  g.selectAll('.county-path')
+    .data(geoData.features)
+    .enter()
+    .append('path')
+    .attr('class', d => {
+      const name = FIPS_TO_NAME[d.id.toString().padStart(5,'0')];
+      return 'county-path' + (name === selectedCounty ? ' selected' : '');
+    })
+    .attr('d', path)
+    .attr('fill', d => {
+      const name = FIPS_TO_NAME[d.id.toString().padStart(5,'0')];
+      if (!name) return '#1a2340';
+      const val = getVal(name, currentMetric);
+      if (val === null) return '#1a2340';
+      return colorScale(val);
+    })
+    .on('mousemove', function(event, d) {
+      const name = FIPS_TO_NAME[d.id.toString().padStart(5,'0')];
+      if (!name) return;
+      const val = getVal(name, currentMetric);
+      const m = METRICS[currentMetric];
+      const tt = document.getElementById('tooltip');
+      tt.querySelector('.tt-county').textContent = name + ' County';
+      tt.querySelector('.tt-val').textContent = val !== null ? m.fmt(val) : 'N/A';
+      tt.querySelector('.tt-label').textContent = m.label;
+      tt.style.opacity = 1;
+      const rect = mapArea.getBoundingClientRect();
+      let x = event.clientX - rect.left + 12;
+      let y = event.clientY - rect.top - 10;
+      if (x + 190 > w) x -= 200;
+      tt.style.left = x + 'px';
+      tt.style.top = y + 'px';
+    })
+    .on('mouseleave', function() {
+      document.getElementById('tooltip').style.opacity = 0;
+    })
+    .on('click', function(event, d) {
+      const name = FIPS_TO_NAME[d.id.toString().padStart(5,'0')];
+      if (!name || !dataMap[name]) return;
+      selectedCounty = name;
+      showPanel(name);
+      render();
+    });
+
+  drawLegend();
+}
+
+function showPanel(countyName) {
+  const d = dataMap[countyName];
+  if (!d) return;
+
+  document.getElementById('panel-county-name').textContent = countyName + ' County';
+  document.getElementById('p-distress').textContent = d.distress_pct.toFixed(1) + '%';
+  document.getElementById('p-taxdel').textContent = d.tax_del_pct.toFixed(1) + '%';
+  document.getElementById('p-bankowned').textContent = d.bank_owned.toLocaleString();
+  document.getElementById('p-prefc').textContent = d.pre_foreclosure.toLocaleString();
+
+  // Rank
+  const sorted = [...COUNTY_DATA].sort((a,b) => b.distress_pct - a.distress_pct);
+  const rank = sorted.findIndex(c => c.county === countyName) + 1;
+  document.getElementById('rank-line').innerHTML =
+    `Ranked <strong>#${rank} of ${COUNTY_DATA.length}</strong> Ohio counties by overall distress`;
+
+  // Bar chart — breakdown of distress components
+  const bars = [
+    { label: 'Tax Del.', val: d.tax_del_pct, pct: true },
+    { label: 'Pre-FC', val: d.pre_foreclosure, pct: false },
+    { label: 'Bank Own', val: d.bank_owned, pct: false },
+    { label: 'Upside Dn', val: d.upside_down, pct: false },
+    { label: 'Auctions', val: d.auctions, pct: false },
+  ];
+
+  const bsvg = d3.select('#bar-chart');
+  bsvg.selectAll('*').remove();
+
+  const bw = 332, bh = 160;
+  const margin = { top: 10, right: 10, bottom: 28, left: 40 };
+  const iw = bw - margin.left - margin.right;
+  const ih = bh - margin.top - margin.bottom;
+
+  const bg = bsvg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const x = d3.scaleBand().domain(bars.map(b=>b.label)).range([0,iw]).padding(0.25);
+  const maxVal = d3.max(bars, b => b.val);
+  const y = d3.scaleLinear().domain([0, maxVal * 1.15]).range([ih, 0]);
+
+  // Grid lines
+  y.ticks(4).forEach(t => {
+    bg.append('line')
+      .attr('x1', 0).attr('x2', iw)
+      .attr('y1', y(t)).attr('y2', y(t))
+      .attr('stroke', 'rgba(0,210,255,0.07)').attr('stroke-width', 1);
+  });
+
+  // Bars
+  bg.selectAll('.bar')
+    .data(bars).enter()
+    .append('rect')
+    .attr('class','bar')
+    .attr('x', b => x(b.label))
+    .attr('width', x.bandwidth())
+    .attr('y', b => y(b.val))
+    .attr('height', b => ih - y(b.val))
+    .attr('fill', (b,i) => {
+      const colors = ['#ff6b6b','#ff9f43','#00d4ff','#a29bfe','#55efc4'];
+      return colors[i];
+    })
+    .attr('rx', 3)
+    .attr('opacity', 0.85);
+
+  // X axis
+  bg.append('g').attr('transform', `translate(0,${ih})`)
+    .call(d3.axisBottom(x).tickSize(0))
+    .call(g => g.select('.domain').remove())
+    .selectAll('text')
+    .attr('fill','rgba(255,255,255,0.4)')
+    .attr('font-size','9px')
+    .attr('font-family','Montserrat');
+
+  // Y axis
+  bg.append('g')
+    .call(d3.axisLeft(y).ticks(4).tickSize(0).tickFormat(v => v >= 1 ? Math.round(v) : v.toFixed(1)))
+    .call(g => g.select('.domain').remove())
+    .selectAll('text')
+    .attr('fill','rgba(255,255,255,0.3)')
+    .attr('font-size','9px')
+    .attr('font-family','Montserrat');
+
+  document.getElementById('chart-panel').classList.add('visible');
+}
+
+document.getElementById('close-panel').addEventListener('click', () => {
+  document.getElementById('chart-panel').classList.remove('visible');
+  selectedCounty = null;
+  render();
+});
+
+document.querySelectorAll('.metric-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.metric-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMetric = btn.dataset.metric;
+    if (selectedCounty) showPanel(selectedCounty);
+    render();
+  });
+});
+
+drawLegend();
 </script>
 </body>
 </html>
