@@ -67,17 +67,17 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
 .close-btn{background:none;border:none;cursor:pointer;color:rgba(0,0,0,0.25);font-size:22px;padding:4px;line-height:1;margin-left:16px;flex-shrink:0;transition:color .2s}
 .close-btn:hover{color:#1a1a2e}
 
-.snap-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;}
-.snap-card{background:#f7f8fa;border:1px solid rgba(0,0,0,0.08);border-radius:7px;padding:10px 12px}
+.snap-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-bottom:20px;}
+.snap-card{background:#f7f8fa;border:1px solid rgba(0,0,0,0.08);border-radius:7px;padding:9px 11px}
 .snap-val{font-size:18px;font-weight:600;color:#1a1a2e;line-height:1}
 .snap-val.up{color:#15803d}.snap-val.dn{color:#dc2626}
 .snap-lbl{font-size:8px;font-weight:400;letter-spacing:1px;text-transform:uppercase;color:rgba(0,0,0,0.38);margin-top:4px}
 
-.modal-body{display:flex;gap:24px;align-items:flex-start;}.modal-left{width:260px;flex-shrink:0;}.modal-right{flex:1;min-width:0;}.chart-label{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:10px}
-.chart-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
-.chart-tab{background:transparent;border:1px solid rgba(0,0,0,0.12);border-radius:20px;padding:5px 13px;font-size:10px;font-weight:400;color:rgba(0,0,0,0.45);cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif}
-.chart-tab:hover{border-color:rgba(26,82,150,0.4);color:#1a5296}
-.chart-tab.active{background:#dce8f7;border-color:#1a5296;color:#1a5296}
+.modal-body{display:flex;gap:0;align-items:stretch;}.modal-left{width:150px;flex-shrink:0;border-right:1px solid rgba(0,0,0,0.07);padding-right:14px;margin-right:18px;max-height:420px;overflow-y:auto;}.modal-right{flex:1;min-width:0;}.chart-label{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:10px}
+.chart-tabs{display:flex;flex-direction:column;gap:4px;}
+.chart-tab{background:transparent;border:none;border-radius:7px;padding:9px 12px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif;text-align:left;width:100%;}
+.chart-tab:hover{background:#edf2fb;color:#1a5296}
+.chart-tab.active{background:#dce8f7;color:#1a5296;font-weight:700;}
 #line-chart{width:100%;height:420px}
 
 /* LOADING */
@@ -94,7 +94,7 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
   .metric-btn{flex:1;min-width:110px}
   .metric-btn .md{display:none}
   #map{height:65vw;min-height:280px}
-  .snap-grid{grid-template-columns:repeat(1,1fr)}
+  .snap-grid{grid-template-columns:repeat(2,1fr)}
   #line-chart{height:286px}
   #legend{left:10px}
   nav{padding:0 16px}
@@ -164,21 +164,19 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
       <div><div class="modal-county" id="modal-county"></div><div class="modal-sub">Ohio County · Jun 2026</div></div>
       <button class="close-btn" id="close-btn">✕</button>
     </div>
+    <div class="snap-grid">
+      <div class="snap-card"><div class="snap-val" id="s-zhvi"></div><div class="snap-lbl">Home Value</div></div>
+      <div class="snap-card"><div class="snap-val" id="s-active"></div><div class="snap-lbl">Active Listings</div></div>
+      <div class="snap-card"><div class="snap-val" id="s-pending"></div><div class="snap-lbl">Pending Sales</div></div>
+      <div class="snap-card"><div class="snap-val" id="s-dom"></div><div class="snap-lbl">Days on Market</div></div>
+      <div class="snap-card"><div class="snap-val" id="s-pct"></div><div class="snap-lbl">Price Cut %</div></div>
+      <div class="snap-card"><div class="snap-val" id="s-ptax"></div><div class="snap-lbl">Property Tax</div></div>
+      <div class="snap-card"><div class="snap-val" id="s-ptaxrate"></div><div class="snap-lbl">Tax Rate</div></div>
+      <div class="snap-card"><div class="snap-val" id="s-rank"></div><div class="snap-lbl">Value Rank</div></div>
+    </div>
     <div class="modal-body">
       <div class="modal-left">
-        <div class="snap-grid">
-          <div class="snap-card"><div class="snap-val" id="s-zhvi"></div><div class="snap-lbl">Home Value</div></div>
-          <div class="snap-card"><div class="snap-val" id="s-active"></div><div class="snap-lbl">Active Listings</div></div>
-          <div class="snap-card"><div class="snap-val" id="s-pending"></div><div class="snap-lbl">Pending Sales</div></div>
-          <div class="snap-card"><div class="snap-val" id="s-dom"></div><div class="snap-lbl">Days on Market</div></div>
-          <div class="snap-card"><div class="snap-val" id="s-pct"></div><div class="snap-lbl">Price Cut %</div></div>
-          <div class="snap-card"><div class="snap-val" id="s-ptax"></div><div class="snap-lbl">Annual Property Tax</div></div>
-          <div class="snap-card"><div class="snap-val" id="s-ptaxrate"></div><div class="snap-lbl">Effective Tax Rate</div></div>
-          <div class="snap-card"><div class="snap-val" id="s-rank"></div><div class="snap-lbl">Value Rank in OH</div></div>
-        </div>
-      </div>
-      <div class="modal-right">
-        <div class="chart-label" id="chart-label">Historical Trend</div>
+        <div class="chart-label">Chart Type</div>
         <div class="chart-tabs">
           <button class="chart-tab active" data-cmetric="zhvi">Home Value</button>
           <button class="chart-tab" data-cmetric="active_listings">Active Listings</button>
@@ -187,6 +185,9 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
           <button class="chart-tab" data-cmetric="price_reduced_pct">Price Cut %</button>
           <button class="chart-tab" data-cmetric="median_property_tax">Property Tax</button>
         </div>
+      </div>
+      <div class="modal-right">
+        <div class="chart-label" id="chart-label">Historical Trend</div>
         <svg id="line-chart"></svg>
       </div>
     </div>
