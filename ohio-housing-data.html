@@ -261,6 +261,13 @@ function drawLineChart(county, cmetric) {
   const d = dataMap[county];
   if (!d) return;
   chartMetric = cmetric;
+
+  // Property tax metrics use bar chart with ACS annual data
+  if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
+    drawBarChart(county, cmetric);
+    return;
+  }
+
   document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + ' County (2016–2026)';
   const history = d.history.filter(r => r[cmetric] != null);
   const lsvg = d3.select('#line-chart');
@@ -459,6 +466,81 @@ fetch('/ohio-data.json').then(r=>r.json()).then(counties => {
   document.getElementById('loading').innerHTML = '<div class="ld" style="color:#f87171">Error loading data</div>';
   console.error(err);
 });
+function drawBarChart(county, cmetric) {
+  const d = dataMap[county];
+  if (!d || !d.prop_tax_history) return;
+  const rows = d.prop_tax_history.filter(r => r[cmetric] != null);
+  document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + ' County (Census ACS 2021–2024)';
+
+  const lsvg = d3.select('#line-chart');
+  lsvg.selectAll('*').remove();
+  const W = lsvg.node().getBoundingClientRect().width || 760;
+  const H = 220;
+  const m = {top:18, right:16, bottom:36, left:70};
+  const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
+  const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
+
+  const x = d3.scaleBand().domain(rows.map(r=>r.year)).range([0,iw]).padding(0.28);
+  const y = d3.scaleLinear().domain([0, d3.max(rows,r=>r[cmetric])*1.15]).range([ih,0]);
+  const fmt = cmetric==='median_property_tax' ? v=>'$'+Math.round(v).toLocaleString() : v=>v.toFixed(2)+'%';
+  const fmtAxis = cmetric==='median_property_tax' ? v=>'$'+d3.format('.2s')(v).replace('k','K') : v=>v.toFixed(1)+'%';
+
+  // Grid
+  y.ticks(5).forEach(t=>{
+    g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t))
+      .attr('stroke','rgba(0,210,255,0.07)').attr('stroke-width',1);
+  });
+
+  // Bars
+  g.selectAll('.bar').data(rows).join('rect').attr('class','bar')
+    .attr('x', r=>x(r.year)).attr('y', r=>y(r[cmetric]))
+    .attr('width', x.bandwidth())
+    .attr('height', r=>ih-y(r[cmetric]))
+    .attr('rx', 4)
+    .attr('fill', (r,i)=> i===rows.length-1 ? '#00d4ff' : 'rgba(0,210,255,0.35)')
+    .attr('stroke', (r,i)=> i===rows.length-1 ? '#00d4ff' : 'rgba(0,210,255,0.5)')
+    .attr('stroke-width', 1);
+
+  // Value labels on bars
+  g.selectAll('.bar-lbl').data(rows).join('text').attr('class','bar-lbl')
+    .attr('x', r=>x(r.year)+x.bandwidth()/2).attr('y', r=>y(r[cmetric])-7)
+    .attr('text-anchor','middle').attr('font-size','11px').attr('font-weight','700')
+    .attr('font-family','Montserrat').attr('fill','#fff')
+    .text(r=>fmt(r[cmetric]));
+
+  // YoY change arrow on latest bar
+  if (rows.length >= 2) {
+    const prev = rows[rows.length-2][cmetric];
+    const curr = rows[rows.length-1][cmetric];
+    const pct = ((curr-prev)/prev*100).toFixed(1);
+    const arrow = curr >= prev ? '▲' : '▼';
+    const clr = cmetric==='median_property_tax' ? (curr>prev?'#f87171':'#4ade80') : (curr>prev?'#f87171':'#4ade80');
+    g.append('text')
+      .attr('x', x(rows[rows.length-1].year)+x.bandwidth()/2)
+      .attr('y', y(curr)-22)
+      .attr('text-anchor','middle').attr('font-size','9px').attr('font-weight','700')
+      .attr('font-family','Montserrat').attr('fill',clr)
+      .text(`${arrow} ${pct}% YoY`);
+  }
+
+  // Source note
+  g.append('text').attr('x',iw).attr('y',ih+30).attr('text-anchor','end')
+    .attr('font-size','8px').attr('fill','rgba(255,255,255,0.2)').attr('font-family','Montserrat')
+    .text('Source: US Census Bureau ACS 5-Year Estimates');
+
+  // Axes
+  g.append('g').attr('transform',`translate(0,${ih})`)
+    .call(d3.axisBottom(x).tickSize(0))
+    .call(ax=>ax.select('.domain').remove())
+    .selectAll('text').attr('fill','rgba(255,255,255,0.4)').attr('font-size','11px')
+    .attr('font-family','Montserrat').attr('font-weight','600');
+
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtAxis))
+    .call(ax=>ax.select('.domain').remove())
+    .selectAll('text').attr('fill','rgba(255,255,255,0.3)').attr('font-size','9px')
+    .attr('font-family','Montserrat');
+}
+
 </script>
 </body>
 </html>
