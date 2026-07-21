@@ -316,14 +316,14 @@ function drawLineChart(county, cmetric) {
 
   const defs = lsvg.append('defs');
   const grad = defs.append('linearGradient').attr('id','ag').attr('x1','0').attr('y1','0').attr('x2','0').attr('y2','1');
-  grad.append('stop').attr('offset','0%').attr('stop-color','#00d4ff').attr('stop-opacity',0.28);
-  grad.append('stop').attr('offset','100%').attr('stop-color','#00d4ff').attr('stop-opacity',0.02);
+  grad.append('stop').attr('offset','0%').attr('stop-color','#1a3a5c').attr('stop-opacity',0.28);
+  grad.append('stop').attr('offset','100%').attr('stop-color','#1a3a5c').attr('stop-opacity',0.02);
 
   const area = d3.area().x(r=>x(parseDate(r.date))).y0(ih).y1(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
   g.append('path').datum(history).attr('d',area).attr('fill','url(#ag)');
 
   const line = d3.line().x(r=>x(parseDate(r.date))).y(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
-  g.append('path').datum(history).attr('d',line).attr('fill','none').attr('stroke','#00d4ff').attr('stroke-width',2.5);
+  g.append('path').datum(history).attr('d',line).attr('fill','none').attr('stroke','#1a3a5c').attr('stroke-width',2.5);
 
   // Compact label formatter (e.g. $301K, 37 days, 24.1%)
   function fmtCompact(val) {
@@ -354,7 +354,7 @@ function drawLineChart(county, cmetric) {
     .attr('cx', r=>x(parseDate(r.date)))
     .attr('cy', r=>y(r[cmetric]))
     .attr('r', 3)
-    .attr('fill','#00d4ff')
+    .attr('fill','#1a3a5c')
     .attr('stroke','#fff')
     .attr('stroke-width', 1.5);
 
@@ -373,7 +373,7 @@ function drawLineChart(county, cmetric) {
   // Hover interaction
   const bisect = d3.bisector(r=>parseDate(r.date)).left;
   const hoverLine = g.append('line').attr('y1',0).attr('y2',ih).attr('stroke','rgba(26,82,150,0.25)').attr('stroke-width',1).attr('stroke-dasharray','4,3').style('opacity',0);
-  const hoverDot = g.append('circle').attr('r',6).attr('fill','#00d4ff').attr('stroke','#fff').attr('stroke-width',2.5).style('opacity',0);
+  const hoverDot = g.append('circle').attr('r',6).attr('fill','#1a3a5c').attr('stroke','#fff').attr('stroke-width',2.5).style('opacity',0);
   const hoverCard = g.append('g').style('opacity',0);
   const hoverRect = hoverCard.append('rect').attr('rx',10).attr('fill','#fff').attr('stroke','rgba(26,82,150,0.18)').attr('stroke-width',1.5).style('filter','drop-shadow(0 4px 12px rgba(0,0,0,0.13))');
   const hoverDateTxt = hoverCard.append('text').attr('font-size','11px').attr('font-family','Montserrat').attr('font-weight','600').attr('fill','#888').attr('letter-spacing','0.06em');
