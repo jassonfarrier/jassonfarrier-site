@@ -68,7 +68,7 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
 .close-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.25);font-size:22px;padding:4px;line-height:1;margin-left:16px;flex-shrink:0;transition:color .2s}
 .close-btn:hover{color:#fff}
 
-.snap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:22px}
+.snap-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:22px}
 .snap-card{background:rgba(0,210,255,0.04);border:1px solid rgba(0,210,255,0.09);border-radius:7px;padding:11px 13px}
 .snap-val{font-size:19px;font-weight:900;color:#fff;line-height:1}
 .snap-val.up{color:#4ade80}.snap-val.dn{color:#f87171}
@@ -127,6 +127,8 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
     <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
     <button class="metric-btn" data-metric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span></button>
     <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Reductions</span><span class="md">% of listings with a cut</span></button>
+    <button class="metric-btn" data-metric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span></button>
+    <button class="metric-btn" data-metric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
     <hr>
     <div class="hint">Click any county to see 10 years of trend data</div>
     <div class="src">Zillow ZHVI · Realtor.com<br>Data through Jun 2026</div>
@@ -152,7 +154,9 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
       <div class="snap-card"><div class="snap-val" id="s-pending"></div><div class="snap-lbl">Pending Sales</div></div>
       <div class="snap-card"><div class="snap-val" id="s-dom"></div><div class="snap-lbl">Days on Market</div></div>
       <div class="snap-card"><div class="snap-val" id="s-pct"></div><div class="snap-lbl">Price Reductions</div></div>
-      <div class="snap-card"><div class="snap-val" id="s-rank"></div><div class="snap-lbl">Value Rank in OH</div></div>
+      <div class="snap-card"><div class="snap-val" id="s-ptax"></div><div class="snap-lbl">Annual Property Tax</div></div>
+      <div class="snap-card"><div class="snap-val" id="s-ptaxrate"></div><div class="snap-lbl">Effective Tax Rate</div></div>
+            <div class="snap-card"><div class="snap-val" id="s-rank"></div><div class="snap-lbl">Value Rank in OH</div></div>
     </div>
     <div class="chart-label" id="chart-label">Historical Trend</div>
     <div class="chart-tabs">
@@ -161,6 +165,7 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
       <button class="chart-tab" data-cmetric="pending_listings">Pending</button>
       <button class="chart-tab" data-cmetric="days_on_market">DOM</button>
       <button class="chart-tab" data-cmetric="price_reduced_pct">Price Cuts%</button>
+      <button class="chart-tab" data-cmetric="median_property_tax">Prop Tax</button>
     </div>
     <svg id="line-chart"></svg>
   </div>
@@ -179,6 +184,8 @@ const METRICS = {
   pending_listings: {label:'Pending Sales',   fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
   days_on_market:   {label:'Days on Market',  fmt:v=>v+' days',                          lo:'Fast',     hi:'Slow'},
   price_reduced_pct:{label:'Price Reductions',fmt:v=>v.toFixed(1)+'%',                  lo:'Few Cuts', hi:'Many Cuts'},
+  median_property_tax:{label:'Annual Property Tax', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
+  property_tax_rate:  {label:'Effective Tax Rate',  fmt:v=>v.toFixed(2)+'%',               lo:'Lower', hi:'Higher'},
 };
 
 const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
@@ -237,7 +244,9 @@ function openModal(county) {
   document.getElementById('s-pending').textContent = fmtN(l.pending_listings);
   document.getElementById('s-dom').textContent = l.days_on_market != null ? l.days_on_market+' days' : '—';
   document.getElementById('s-pct').textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
-  const sorted = [...DATA].filter(c=>c.latest&&c.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
+  document.getElementById('s-ptax').textContent = l.median_property_tax ? '$'+Math.round(l.median_property_tax).toLocaleString() : '—';
+  document.getElementById('s-ptaxrate').textContent = l.property_tax_rate != null ? l.property_tax_rate.toFixed(2)+'%' : '—';
+    const sorted = [...DATA].filter(c=>c.latest&&c.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
   const rank = sorted.findIndex(c=>c.county===county)+1;
   document.getElementById('s-rank').textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
   // Reset chart tab
@@ -310,7 +319,7 @@ function drawLineChart(county, cmetric) {
     })
     .on('mouseleave', () => { hoverLine.style('opacity',0); hoverDot.style('opacity',0); hoverCard.style('opacity',0); });
 
-  const fmtY = cmetric==='zhvi'||cmetric==='median_list_price' ? v=>'$'+d3.format('.2s')(v).replace('k','K') : cmetric==='price_reduced_pct' ? v=>v+'%' : v=>d3.format('.2s')(v);
+  const fmtY = (cmetric==='zhvi'||cmetric==='median_list_price'||cmetric==='median_property_tax') ? v=>'$'+d3.format('.2s')(v).replace('k','K') : (cmetric==='price_reduced_pct'||cmetric==='property_tax_rate') ? v=>v.toFixed(2)+'%' : v=>d3.format('.2s')(v);
   g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(d3.timeYear.every(2)).tickFormat(d3.timeFormat('%Y')).tickSize(0)).call(ax=>ax.select('.domain').remove()).selectAll('text').attr('fill','rgba(255,255,255,0.35)').attr('font-size','9px').attr('font-family','Montserrat');
   g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtY)).call(ax=>ax.select('.domain').remove()).selectAll('text').attr('fill','rgba(255,255,255,0.3)').attr('font-size','9px').attr('font-family','Montserrat');
 }
