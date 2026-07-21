@@ -100,6 +100,17 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
   nav{padding:0 16px}
   .nav-right a:not(.nav-yt){display:none}
 }
+
+#search-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:20;width:320px;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.13);box-shadow:0 4px 20px rgba(0,0,0,0.13);display:flex;align-items:center;padding:0 12px;gap:8px}
+#search-input{flex:1;border:none;outline:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:#1a1a2e;padding:12px 0;background:transparent}
+#search-input::placeholder{color:rgba(0,0,0,0.3)}
+#search-clear{background:none;border:none;cursor:pointer;color:rgba(0,0,0,0.3);font-size:14px;padding:4px;line-height:1}
+#search-clear:hover{color:#333}
+#search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.12);list-style:none;overflow:hidden;display:none;max-height:260px;overflow-y:auto}
+#search-results li{padding:11px 16px;font-size:13px;font-family:'Montserrat',sans-serif;font-weight:500;color:#1a1a2e;cursor:pointer;border-bottom:1px solid rgba(0,0,0,0.05)}
+#search-results li:last-child{border-bottom:none}
+#search-results li:hover{background:#f0f4fb;color:#1a5296}
+#search-results li .sr-sub{font-size:10px;font-weight:400;color:rgba(0,0,0,0.38);margin-top:1px}
 </style>
 </head>
 <body>
@@ -133,6 +144,12 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
     <div class="src">Zillow ZHVI · Realtor.com<br>Data through Jun 2026</div>
   </div>
   <div id="map"></div>
+<div id="search-bar">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+  <input id="search-input" type="text" placeholder="Search Ohio counties…" autocomplete="off">
+  <button id="search-clear" style="display:none">✕</button>
+  <ul id="search-results"></ul>
+</div>
   <div id="legend">
     <span id="leg-lo"></span>
     <canvas id="leg-canvas" width="110" height="7"></canvas>
@@ -548,6 +565,72 @@ function drawBarChart(county, cmetric) {
     .selectAll('text').attr('fill','rgba(0,0,0,0.38)').attr('font-size','9px')
     .attr('font-family','Montserrat');
 }
+
+// --- County Search ---
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+const searchClear = document.getElementById('search-clear');
+const COUNTY_NAMES = Object.values(FIPS_NAME).sort();
+
+function doSearch(q) {
+  q = q.trim().toLowerCase();
+  searchResults.innerHTML = '';
+  if (!q) { searchResults.style.display='none'; return; }
+  const matches = COUNTY_NAMES.filter(n => n.toLowerCase().startsWith(q))
+    .concat(COUNTY_NAMES.filter(n => !n.toLowerCase().startsWith(q) && n.toLowerCase().includes(q)))
+    .slice(0, 8);
+  if (!matches.length) { searchResults.style.display='none'; return; }
+  matches.forEach(name => {
+    const li = document.createElement('li');
+    const d = dataMap[name];
+    const val = d && d.latest && d.latest[mapMetric] != null ? METRICS[mapMetric].fmt(Number(d.latest[mapMetric])) : '';
+    li.innerHTML = `<div>${name} County</div><div class="sr-sub">${METRICS[mapMetric].label}${val?' — '+val:''}</div>`;
+    li.addEventListener('click', () => selectCounty(name));
+    searchResults.appendChild(li);
+  });
+  searchResults.style.display = 'block';
+}
+
+function selectCounty(name) {
+  searchInput.value = name + ' County';
+  searchResults.style.display = 'none';
+  searchClear.style.display = 'block';
+  // Fly to county bounds
+  if (map) {
+    const fips = Object.keys(FIPS_NAME).find(k => FIPS_NAME[k] === name);
+    const features = map.querySourceFeatures('ohio-counties', {filter:['==','$id',fips]});
+    if (features.length) {
+      const coords = [];
+      const collect = g => { if(!g) return; if(g.type==='Point') coords.push(g.coordinates); else if(g.type==='LineString'||g.type==='MultiPoint') g.coordinates.forEach(c=>coords.push(c)); else if(g.type==='Polygon'||g.type==='MultiLineString') g.coordinates.forEach(r=>r.forEach(c=>coords.push(c))); else if(g.type==='MultiPolygon') g.coordinates.forEach(p=>p.forEach(r=>r.forEach(c=>coords.push(c)))); };
+      collect(features[0].geometry);
+      if (coords.length) {
+        const lons = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
+        map.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]], {padding:80, duration:600});
+      }
+    } else {
+      map.flyTo({center:[-82.5,40.15], zoom:7, duration:600});
+    }
+  }
+  openModal(name);
+}
+
+searchInput.addEventListener('input', e => {
+  searchClear.style.display = e.target.value ? 'block' : 'none';
+  doSearch(e.target.value);
+});
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { searchResults.style.display='none'; searchInput.blur(); }
+  if (e.key === 'Enter') {
+    const first = searchResults.querySelector('li');
+    if (first) first.click();
+  }
+});
+searchClear.addEventListener('click', () => {
+  searchInput.value = ''; searchClear.style.display='none'; searchResults.style.display='none'; searchInput.focus();
+});
+document.addEventListener('click', e => {
+  if (!document.getElementById('search-bar').contains(e.target)) searchResults.style.display='none';
+});
 
 </script>
 </body>
