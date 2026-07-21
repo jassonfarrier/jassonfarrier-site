@@ -192,9 +192,10 @@ const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"As
 
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null;
 
-// Muted diverging red→blue palette (7 stops, ColorBrewer-inspired)
-const PALETTE_NORM  = ['#b2182b','#d6604d','#f4a582','#e8dcc8','#92c5de','#4393c3','#2166ac']; // low→high
-const PALETTE_INV   = ['#2166ac','#4393c3','#92c5de','#e8dcc8','#f4a582','#d6604d','#b2182b']; // high→low (DOM, cuts)
+// Viridis color scale — perceptually uniform, excellent on dark maps
+// Low = dark purple, High = bright yellow; every shade is visually distinct
+const PALETTE_NORM  = ['#440154','#443a83','#31688e','#21918c','#35b779','#90d743','#fde725'];
+const PALETTE_INV   = ['#fde725','#90d743','#35b779','#21918c','#31688e','#443a83','#440154'];
 
 function getStops(metric) {
   const vals = DATA.map(d => d.latest && d.latest[metric]).filter(v => v != null).sort((a,b)=>a-b);
@@ -504,8 +505,8 @@ function drawBarChart(county, cmetric) {
     .attr('width', x.bandwidth())
     .attr('height', r=>ih-y(r[cmetric]))
     .attr('rx', 4)
-    .attr('fill', (r,i)=> i===rows.length-1 ? '#4393c3' : 'rgba(67,147,195,0.45)')
-    .attr('stroke', (r,i)=> i===rows.length-1 ? '#92c5de' : 'rgba(146,197,222,0.5)')
+    .attr('fill', (r,i)=> i===rows.length-1 ? '#35b779' : 'rgba(53,183,121,0.35)')
+    .attr('stroke', (r,i)=> i===rows.length-1 ? '#90d743' : 'rgba(144,215,67,0.4)')
     .attr('stroke-width', 1);
 
   // Value labels on bars
