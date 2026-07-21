@@ -493,8 +493,8 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
         type: 'line',
         source: 'ohio-counties',
         paint: {
-          'line-color': 'rgba(0,0,0,0.2)',
-          'line-width': ['case',['boolean',['feature-state','hover'],false],2,0.6],
+          'line-color': '#111',
+          'line-width': ['interpolate',['linear'],['zoom'], 5,1.2, 8,2.0, 11,2.5],
         }
       });
 
