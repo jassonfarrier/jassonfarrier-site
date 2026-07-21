@@ -249,11 +249,14 @@ function openModal(county) {
     const sorted = [...DATA].filter(c=>c.latest&&c.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
   const rank = sorted.findIndex(c=>c.county===county)+1;
   document.getElementById('s-rank').textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
-  // Reset chart tab
+  // Default chart to current map metric
+  const defaultMetric = mapMetric;
   document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelector('.chart-tab[data-cmetric="zhvi"]').classList.add('active');
-  chartMetric = 'zhvi';
-  drawLineChart(county, 'zhvi');
+  const activeTab = document.querySelector(`.chart-tab[data-cmetric="${defaultMetric}"]`);
+  if (activeTab) activeTab.classList.add('active');
+  else document.querySelector('.chart-tab[data-cmetric="zhvi"]').classList.add('active');
+  chartMetric = defaultMetric;
+  drawLineChart(county, defaultMetric);
   document.getElementById('modal-overlay').classList.add('visible');
 }
 
@@ -503,25 +506,26 @@ function drawBarChart(county, cmetric) {
 
   // Value labels on bars
   g.selectAll('.bar-lbl').data(rows).join('text').attr('class','bar-lbl')
-    .attr('x', r=>x(r.year)+x.bandwidth()/2).attr('y', r=>y(r[cmetric])-7)
+    .attr('x', r=>x(r.year)+x.bandwidth()/2).attr('y', r=>y(r[cmetric])-35)
     .attr('text-anchor','middle').attr('font-size','11px').attr('font-weight','700')
     .attr('font-family','Montserrat').attr('fill','#fff')
     .text(r=>fmt(r[cmetric]));
 
-  // YoY change arrow on latest bar
-  if (rows.length >= 2) {
-    const prev = rows[rows.length-2][cmetric];
-    const curr = rows[rows.length-1][cmetric];
+  // YoY on every bar except first
+  rows.forEach((r, i) => {
+    if (i === 0) return;
+    const prev = rows[i-1][cmetric];
+    const curr = r[cmetric];
     const pct = ((curr-prev)/prev*100).toFixed(1);
     const arrow = curr >= prev ? '▲' : '▼';
-    const clr = cmetric==='median_property_tax' ? (curr>prev?'#f87171':'#4ade80') : (curr>prev?'#f87171':'#4ade80');
+    const clr = curr >= prev ? '#f87171' : '#4ade80';
     g.append('text')
-      .attr('x', x(rows[rows.length-1].year)+x.bandwidth()/2)
-      .attr('y', y(curr)-22)
+      .attr('x', x(r.year)+x.bandwidth()/2)
+      .attr('y', y(curr)-20)
       .attr('text-anchor','middle').attr('font-size','9px').attr('font-weight','700')
       .attr('font-family','Montserrat').attr('fill',clr)
-      .text(`${arrow} ${pct}% YoY`);
-  }
+      .text(`${arrow}${pct}%`);
+  });
 
   // Source note
   g.append('text').attr('x',iw).attr('y',ih+30).attr('text-anchor','end')
