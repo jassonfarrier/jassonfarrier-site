@@ -342,10 +342,11 @@ function drawLineChart(county, cmetric) {
     const [yr,mo] = r.date.split('-');
     return mo === '01';
   });
-  // Only show label every 2 years if too many points
+  // Fixed even years + latest point
+  const labelYears = new Set(['2016','2018','2020','2022','2024','2026']);
   const annualPts = allAnnual.filter((r,i) => {
-    if (i === allAnnual.length-1) return true; // always show latest
-    return i % 2 === 0;
+    if (i === allAnnual.length-1) return true;
+    return labelYears.has(r.date.split('-')[0]) && r.date.split('-')[1] === '01';
   });
 
   // Dots on ALL annual points (small, no label)
