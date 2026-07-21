@@ -316,11 +316,11 @@ function drawLineChart(county, cmetric) {
 
   const defs = lsvg.append('defs');
   const grad = defs.append('linearGradient').attr('id','ag').attr('x1','0').attr('y1','0').attr('x2','0').attr('y2','1');
-  grad.append('stop').attr('offset','0%').attr('stop-color','#1a3a5c').attr('stop-opacity',0.28);
-  grad.append('stop').attr('offset','100%').attr('stop-color','#1a3a5c').attr('stop-opacity',0.02);
+  grad.append('stop').attr('offset','0%').attr('stop-color','#4393c3').attr('stop-opacity',0.45);
+  grad.append('stop').attr('offset','100%').attr('stop-color','#d1e5f0').attr('stop-opacity',0.0);
 
   const area = d3.area().x(r=>x(parseDate(r.date))).y0(ih).y1(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
-  g.append('path').datum(history).attr('d',area).attr('fill','url(#ag)');
+  g.append('path').datum(history).attr('d',area).attr('fill','url(#ag)').attr('stroke','none');
 
   const line = d3.line().x(r=>x(parseDate(r.date))).y(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
   g.append('path').datum(history).attr('d',line).attr('fill','none').attr('stroke','#1a3a5c').attr('stroke-width',2.5);
