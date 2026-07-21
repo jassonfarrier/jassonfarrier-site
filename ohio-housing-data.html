@@ -40,19 +40,19 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
 /* Mapbox tooltip */
 .mapboxgl-popup-content{
   background:rgba(4,10,26,0.97)!important;
-  border:1px solid rgba(0,210,255,0.5)!important;
-  border-radius:10px!important;
-  padding:14px 20px!important;
-  box-shadow:0 0 30px rgba(0,210,255,0.2),0 4px 20px rgba(0,0,0,0.7)!important;
+  border:1px solid rgba(0,210,255,0.45)!important;
+  border-radius:14px!important;
+  padding:20px 26px 18px!important;
+  box-shadow:0 0 40px rgba(0,210,255,0.18),0 8px 32px rgba(0,0,0,0.8)!important;
   font-family:'Montserrat',sans-serif!important;
   color:#fff!important;
-  min-width:180px!important;
+  min-width:200px!important;
 }
-.mapboxgl-popup-tip{border-top-color:rgba(0,210,255,0.5)!important;border-bottom-color:rgba(0,210,255,0.5)!important}
-.tt-county{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(0,210,255,0.7);margin-bottom:6px}
-.tt-val{font-size:30px;font-weight:900;color:#fff;line-height:1;letter-spacing:-0.5px}
-.tt-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.4);margin-top:5px}
-.mapboxgl-popup-close-button{color:rgba(255,255,255,0.3)!important;font-size:16px!important;right:8px!important;top:6px!important}
+.mapboxgl-popup-tip{border-top-color:rgba(0,210,255,0.45)!important;border-bottom-color:rgba(0,210,255,0.45)!important}
+.tt-county{font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(0,210,255,0.65);margin-bottom:10px}
+.tt-val{font-size:38px;font-weight:900;color:#fff;line-height:1;letter-spacing:-1px}
+.tt-label{font-size:11px;font-weight:600;color:rgba(255,255,255,0.4);margin-top:8px;letter-spacing:0.5px}
+.mapboxgl-popup-close-button{display:none!important}
 
 /* LEGEND */
 #legend{position:absolute;bottom:28px;left:226px;z-index:10;display:flex;align-items:center;gap:8px;font-size:9px;color:rgba(255,255,255,0.35);background:rgba(6,13,31,0.85);padding:8px 12px;border-radius:6px;border:1px solid rgba(0,210,255,0.1)}
@@ -123,7 +123,6 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
   <div class="sidebar">
     <div class="sidebar-label">Map Metric</div>
     <button class="metric-btn active" data-metric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span></button>
-    <button class="metric-btn" data-metric="median_list_price"><span class="mn">Listing Price</span><span class="md">Median active listing price</span></button>
     <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
     <button class="metric-btn" data-metric="new_listings"><span class="mn">New Listings</span><span class="md">New to market this month</span></button>
     <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
@@ -150,7 +149,6 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
     </div>
     <div class="snap-grid">
       <div class="snap-card"><div class="snap-val" id="s-zhvi"></div><div class="snap-lbl">Home Value</div></div>
-      <div class="snap-card"><div class="snap-val" id="s-list"></div><div class="snap-lbl">Listing Price</div></div>
       <div class="snap-card"><div class="snap-val" id="s-active"></div><div class="snap-lbl">Active Listings</div></div>
       <div class="snap-card"><div class="snap-val" id="s-new"></div><div class="snap-lbl">New Listings</div></div>
       <div class="snap-card"><div class="snap-val" id="s-pending"></div><div class="snap-lbl">Pending Sales</div></div>
@@ -161,7 +159,6 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
     <div class="chart-label" id="chart-label">Historical Trend</div>
     <div class="chart-tabs">
       <button class="chart-tab active" data-cmetric="zhvi">Home Value</button>
-      <button class="chart-tab" data-cmetric="median_list_price">List Price</button>
       <button class="chart-tab" data-cmetric="active_listings">Active</button>
       <button class="chart-tab" data-cmetric="new_listings">New</button>
       <button class="chart-tab" data-cmetric="pending_listings">Pending</button>
@@ -239,7 +236,6 @@ function openModal(county) {
   const l = d.latest || {};
   document.getElementById('modal-county').textContent = county + ' County';
   document.getElementById('s-zhvi').textContent = fmt$(l.zhvi);
-  document.getElementById('s-list').textContent = fmt$(l.median_list_price);
   document.getElementById('s-active').textContent = fmtN(l.active_listings);
   document.getElementById('s-new').textContent = fmtN(l.new_listings);
   document.getElementById('s-pending').textContent = fmtN(l.pending_listings);
