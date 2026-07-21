@@ -325,32 +325,50 @@ function drawLineChart(county, cmetric) {
   const line = d3.line().x(r=>x(parseDate(r.date))).y(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
   g.append('path').datum(history).attr('d',line).attr('fill','none').attr('stroke','#00d4ff').attr('stroke-width',2.5);
 
+  // Compact label formatter (e.g. $301K, 37 days, 24.1%)
+  function fmtCompact(val) {
+    if (cmetric === 'zhvi' || cmetric === 'median_property_tax') {
+      if (val >= 1000000) return '$' + (val/1000000).toFixed(1) + 'M';
+      if (val >= 1000) return '$' + Math.round(val/1000) + 'K';
+      return '$' + Math.round(val);
+    }
+    return METRICS[cmetric].fmt(val);
+  }
+
   // Annual data point labels (Jan of each year + latest point)
-  const annualPts = history.filter((r,i) => {
+  // Skip every other year if chart is narrow to prevent overlap
+  const allAnnual = history.filter((r,i) => {
     if (i === history.length-1) return true;
     const [yr,mo] = r.date.split('-');
     return mo === '01';
   });
-  // Dots on annual points
-  g.selectAll('.apt').data(annualPts).enter().append('circle')
-    .attr('class','apt')
+  // Only show label every 2 years if too many points
+  const annualPts = allAnnual.filter((r,i) => {
+    if (i === allAnnual.length-1) return true; // always show latest
+    return i % 2 === 0;
+  });
+
+  // Dots on ALL annual points (small, no label)
+  g.selectAll('.apt-all').data(allAnnual).enter().append('circle')
+    .attr('class','apt-all')
     .attr('cx', r=>x(parseDate(r.date)))
     .attr('cy', r=>y(r[cmetric]))
-    .attr('r', 4)
+    .attr('r', 3)
     .attr('fill','#00d4ff')
     .attr('stroke','#fff')
-    .attr('stroke-width', 2);
-  // Value labels above each dot
+    .attr('stroke-width', 1.5);
+
+  // Labels only on every-other year
   g.selectAll('.albl').data(annualPts).enter().append('text')
     .attr('class','albl')
     .attr('x', r=>x(parseDate(r.date)))
-    .attr('y', r=>Math.max(18, y(r[cmetric])-10))
+    .attr('y', r=>Math.max(14, y(r[cmetric])-9))
     .attr('text-anchor','middle')
-    .attr('font-size','10px')
+    .attr('font-size','9px')
     .attr('font-family','Montserrat,sans-serif')
     .attr('font-weight','700')
-    .attr('fill','#1a1a2e')
-    .text(r => METRICS[cmetric].fmt(r[cmetric]));
+    .attr('fill','#333')
+    .text(r => fmtCompact(r[cmetric]));
 
   // Hover interaction
   const bisect = d3.bisector(r=>parseDate(r.date)).left;
