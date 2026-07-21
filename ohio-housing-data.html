@@ -192,9 +192,10 @@ const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"As
 
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null;
 
-// OrRd sequential — cream/peach → orange → deep red, no yellow, clean on light maps
-const PALETTE_NORM  = ['#fff5eb','#fdd9b5','#fdb97d','#fd8d3c','#e6550d','#c03402','#7f2704'];
-const PALETTE_INV   = ['#7f2704','#c03402','#e6550d','#fd8d3c','#fdb97d','#fdd9b5','#fff5eb'];
+// Diverging peach→sage→blue (matches reference map exactly)
+// Low = warm peach/salmon | Mid = muted sage green | High = steel blue
+const PALETTE_NORM  = ['#e8906a','#f5b88a','#f8d0a8','#f0e0c8','#c8d4b8','#a8c8dc','#78a8cc','#4a7fb8','#1a5296'];
+const PALETTE_INV   = ['#1a5296','#4a7fb8','#78a8cc','#a8c8dc','#c8d4b8','#f0e0c8','#f8d0a8','#f5b88a','#e8906a'];
 
 function getStops(metric) {
   const vals = DATA.map(d => d.latest && d.latest[metric]).filter(v => v != null).sort((a,b)=>a-b);
@@ -504,8 +505,8 @@ function drawBarChart(county, cmetric) {
     .attr('width', x.bandwidth())
     .attr('height', r=>ih-y(r[cmetric]))
     .attr('rx', 4)
-    .attr('fill', (r,i)=> i===rows.length-1 ? '#f03b20' : 'rgba(254,178,76,0.5)')
-    .attr('stroke', (r,i)=> i===rows.length-1 ? '#fd8d3c' : 'rgba(254,178,76,0.4)')
+    .attr('fill', (r,i)=> i===rows.length-1 ? '#4a7fb8' : 'rgba(74,127,184,0.4)')
+    .attr('stroke', (r,i)=> i===rows.length-1 ? '#78a8cc' : 'rgba(120,168,204,0.4)')
     .attr('stroke-width', 1);
 
   // Value labels on bars
