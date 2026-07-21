@@ -320,12 +320,19 @@ function drawLineChart(county, cmetric) {
 
   // Hover interaction
   const bisect = d3.bisector(r=>parseDate(r.date)).left;
-  const hoverLine = g.append('line').attr('y1',0).attr('y2',ih).attr('stroke','rgba(255,255,255,0.2)').attr('stroke-width',1).attr('stroke-dasharray','3,3').style('opacity',0);
-  const hoverDot = g.append('circle').attr('r',5).attr('fill','#00d4ff').attr('stroke','#fff').attr('stroke-width',2).style('opacity',0);
+  const hoverLine = g.append('line').attr('y1',0).attr('y2',ih).attr('stroke','rgba(26,82,150,0.25)').attr('stroke-width',1).attr('stroke-dasharray','4,3').style('opacity',0);
+  const hoverDot = g.append('circle').attr('r',6).attr('fill','#00d4ff').attr('stroke','#fff').attr('stroke-width',2.5).style('opacity',0);
   const hoverCard = g.append('g').style('opacity',0);
-  const hoverRect = hoverCard.append('rect').attr('rx',8).attr('fill','rgba(255,255,255,0.97)').attr('stroke','rgba(26,82,150,0.3)').attr('stroke-width',1);
-  const hoverDate = hoverCard.append('text').attr('font-size','10px').attr('font-family','Montserrat').attr('font-weight','400').attr('fill','rgba(26,82,150,0.6)');
-  const hoverVal = hoverCard.append('text').attr('font-size','18px').attr('font-family','Montserrat').attr('font-weight','500').attr('fill','#fff');
+  const hoverRect = hoverCard.append('rect').attr('rx',10).attr('fill','#fff').attr('stroke','rgba(26,82,150,0.18)').attr('stroke-width',1.5).style('filter','drop-shadow(0 4px 12px rgba(0,0,0,0.13))');
+  const hoverDateTxt = hoverCard.append('text').attr('font-size','11px').attr('font-family','Montserrat').attr('font-weight','600').attr('fill','#888').attr('letter-spacing','0.06em');
+  const hoverValTxt = hoverCard.append('text').attr('font-size','22px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#111');
+  const hoverLabelTxt = hoverCard.append('text').attr('font-size','10px').attr('font-family','Montserrat').attr('font-weight','500').attr('fill','#aaa');
+
+  function fmtDate(d) {
+    const [y,m] = d.split('-');
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    return months[parseInt(m,10)-1] + ' ' + y;
+  }
 
   g.append('rect').attr('width',iw).attr('height',ih).attr('fill','transparent')
     .on('mousemove', function(event) {
@@ -336,14 +343,16 @@ function drawLineChart(county, cmetric) {
       if (!r) return;
       const cx = x(parseDate(r.date)), cy = y(r[cmetric]);
       const val = METRICS[cmetric].fmt(r[cmetric]);
-      const cardW = Math.max(val.length*10+24, 140), cardH = 58;
-      const cardX = cx < iw/2 ? cx+12 : cx-cardW-12;
+      const label = METRICS[cmetric].label;
+      const cardW = Math.max(val.length*13+32, 160), cardH = 76;
+      const cardX = cx < iw/2 ? cx+14 : cx-cardW-14;
       const cardY = Math.max(4, Math.min(ih-cardH-4, cy-cardH/2));
       hoverLine.attr('x1',cx).attr('x2',cx).style('opacity',1);
       hoverDot.attr('cx',cx).attr('cy',cy).style('opacity',1);
       hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',cardH);
-      hoverDate.attr('x',cardX+12).attr('y',cardY+18).text(r.date);
-      hoverVal.attr('x',cardX+12).attr('y',cardY+44).text(val);
+      hoverDateTxt.attr('x',cardX+14).attr('y',cardY+20).text(fmtDate(r.date).toUpperCase());
+      hoverValTxt.attr('x',cardX+14).attr('y',cardY+48).text(val);
+      hoverLabelTxt.attr('x',cardX+14).attr('y',cardY+66).text(label.toUpperCase());
       hoverCard.style('opacity',1);
     })
     .on('mouseleave', () => { hoverLine.style('opacity',0); hoverDot.style('opacity',0); hoverCard.style('opacity',0); });
