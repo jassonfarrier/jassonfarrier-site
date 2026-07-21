@@ -212,7 +212,7 @@ const METRICS = {
 
 const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
 
-let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null;
+let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null, selectedFips = null;
 
 // Diverging peach→sage→blue (matches reference map exactly)
 // Low = warm peach/salmon | Mid = muted sage green | High = steel blue
@@ -493,7 +493,6 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
       });
 
       // Click → modal
-      let selectedFips = null;
       map.on('click','counties-fill', e => {
         if (!e.features.length) return;
         const f = e.features[0];
@@ -615,9 +614,44 @@ function selectCounty(name) {
   searchInput.value = name + ' County';
   searchResults.style.display = 'none';
   searchClear.style.display = 'block';
-  // Fly to county bounds
-  if (map) {
-    const fips = Object.keys(FIPS_NAME).find(k => FIPS_NAME[k] === name);
+  if (!map) return;
+
+  const fips = Object.keys(FIPS_NAME).find(k => FIPS_NAME[k] === name);
+  if (!fips) return;
+
+  // Apply highlight via feature-state (same as click highlight)
+  if (selectedFips) map.setFeatureState({source:'ohio-counties', id:selectedFips}, {selected:false});
+  selectedFips = fips;
+  map.setFeatureState({source:'ohio-counties', id:fips}, {selected:true});
+
+  // Get bounds from the source GeoJSON directly (works at any zoom)
+  const src = map.getSource('ohio-counties');
+  const geojsonData = src && src._data;
+  let boundsFound = false;
+  if (geojsonData && geojsonData.features) {
+    const feature = geojsonData.features.find(f => String(f.id) === String(fips));
+    if (feature) {
+      const coords = [];
+      const collect = g => {
+        if (!g) return;
+        if (g.type==='Point') coords.push(g.coordinates);
+        else if (g.type==='LineString'||g.type==='MultiPoint') g.coordinates.forEach(c=>coords.push(c));
+        else if (g.type==='Polygon'||g.type==='MultiLineString') g.coordinates.forEach(r=>r.forEach(c=>coords.push(c)));
+        else if (g.type==='MultiPolygon') g.coordinates.forEach(p=>p.forEach(r=>r.forEach(c=>coords.push(c))));
+      };
+      collect(feature.geometry);
+      if (coords.length) {
+        const lons = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
+        map.fitBounds(
+          [[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]],
+          {padding: 120, maxZoom: 11, duration: 700}
+        );
+        boundsFound = true;
+      }
+    }
+  }
+  if (!boundsFound) {
+    // Fallback: query rendered features
     const features = map.querySourceFeatures('ohio-counties', {filter:['==','$id',fips]});
     if (features.length) {
       const coords = [];
@@ -625,10 +659,8 @@ function selectCounty(name) {
       collect(features[0].geometry);
       if (coords.length) {
         const lons = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
-        map.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]], {padding:80, duration:600});
+        map.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]], {padding:120, maxZoom:11, duration:700});
       }
-    } else {
-      map.flyTo({center:[-82.5,40.15], zoom:7, duration:600});
     }
   }
 }
