@@ -136,7 +136,7 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
     <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
     <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
     <button class="metric-btn" data-metric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span></button>
-    <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Reductions</span><span class="md">% of listings with a cut</span></button>
+    <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
     <button class="metric-btn" data-metric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span></button>
     <button class="metric-btn" data-metric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
     <hr>
@@ -171,7 +171,7 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
           <div class="snap-card"><div class="snap-val" id="s-active"></div><div class="snap-lbl">Active Listings</div></div>
           <div class="snap-card"><div class="snap-val" id="s-pending"></div><div class="snap-lbl">Pending Sales</div></div>
           <div class="snap-card"><div class="snap-val" id="s-dom"></div><div class="snap-lbl">Days on Market</div></div>
-          <div class="snap-card"><div class="snap-val" id="s-pct"></div><div class="snap-lbl">Price Reductions</div></div>
+          <div class="snap-card"><div class="snap-val" id="s-pct"></div><div class="snap-lbl">Price Cut %</div></div>
           <div class="snap-card"><div class="snap-val" id="s-ptax"></div><div class="snap-lbl">Annual Property Tax</div></div>
           <div class="snap-card"><div class="snap-val" id="s-ptaxrate"></div><div class="snap-lbl">Effective Tax Rate</div></div>
           <div class="snap-card"><div class="snap-val" id="s-rank"></div><div class="snap-lbl">Value Rank in OH</div></div>
@@ -181,11 +181,11 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
         <div class="chart-label" id="chart-label">Historical Trend</div>
         <div class="chart-tabs">
           <button class="chart-tab active" data-cmetric="zhvi">Home Value</button>
-          <button class="chart-tab" data-cmetric="active_listings">Active</button>
-          <button class="chart-tab" data-cmetric="pending_listings">Pending</button>
-          <button class="chart-tab" data-cmetric="days_on_market">DOM</button>
-          <button class="chart-tab" data-cmetric="price_reduced_pct">Price Cuts%</button>
-          <button class="chart-tab" data-cmetric="median_property_tax">Prop Tax</button>
+          <button class="chart-tab" data-cmetric="active_listings">Active Listings</button>
+          <button class="chart-tab" data-cmetric="pending_listings">Pending Sales</button>
+          <button class="chart-tab" data-cmetric="days_on_market">Days on Market</button>
+          <button class="chart-tab" data-cmetric="price_reduced_pct">Price Cut %</button>
+          <button class="chart-tab" data-cmetric="median_property_tax">Property Tax</button>
         </div>
         <svg id="line-chart"></svg>
       </div>
@@ -205,7 +205,7 @@ const METRICS = {
   new_listings:     {label:'New Listings',    fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
   pending_listings: {label:'Pending Sales',   fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
   days_on_market:   {label:'Days on Market',  fmt:v=>v+' days',                          lo:'Fast',     hi:'Slow'},
-  price_reduced_pct:{label:'Price Reductions',fmt:v=>v.toFixed(1)+'%',                  lo:'Few Cuts', hi:'Many Cuts'},
+  price_reduced_pct:{label:'Price Cut %',fmt:v=>v.toFixed(1)+'%',                  lo:'Few Cuts', hi:'Many Cuts'},
   median_property_tax:{label:'Annual Property Tax', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
   property_tax_rate:  {label:'Effective Tax Rate',  fmt:v=>v.toFixed(2)+'%',               lo:'Lower', hi:'Higher'},
 };
