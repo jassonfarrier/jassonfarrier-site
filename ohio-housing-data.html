@@ -192,22 +192,25 @@ const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"As
 
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null;
 
+// Muted diverging red→blue palette (7 stops, ColorBrewer-inspired)
+const PALETTE_NORM  = ['#b2182b','#d6604d','#f4a582','#e8dcc8','#92c5de','#4393c3','#2166ac']; // low→high
+const PALETTE_INV   = ['#2166ac','#4393c3','#92c5de','#e8dcc8','#f4a582','#d6604d','#b2182b']; // high→low (DOM, cuts)
+
 function getStops(metric) {
   const vals = DATA.map(d => d.latest && d.latest[metric]).filter(v => v != null).sort((a,b)=>a-b);
-  if (!vals.length) return [[0,'#111827'],[1,'#00d4ff']];
+  if (!vals.length) return [[0,'#b2182b'],[1,'#2166ac']];
   const mn = vals[0], mx = vals[vals.length-1];
-  const isInverse = metric === 'days_on_market' || metric === 'price_reduced_pct';
-  if (isInverse) {
-    return [[mn,'#4ade80'],[mx,'#f87171']];
-  }
-  return [[mn,'#0a2a4a'],[mx,'#00d4ff']];
+  const isInverse = metric === 'days_on_market' || metric === 'price_reduced_pct' || metric === 'median_property_tax' || metric === 'property_tax_rate';
+  const pal = isInverse ? PALETTE_INV : PALETTE_NORM;
+  return pal.map((c,i) => [mn + (mx-mn)*(i/(pal.length-1)), c]);
 }
 
 function drawLegend() {
   const c = document.getElementById('leg-canvas'), ctx = c.getContext('2d');
-  const stops = getStops(mapMetric);
+  const isInverse = mapMetric==='days_on_market'||mapMetric==='price_reduced_pct'||mapMetric==='median_property_tax'||mapMetric==='property_tax_rate';
+  const pal = isInverse ? PALETTE_INV : PALETTE_NORM;
   const g = ctx.createLinearGradient(0,0,110,0);
-  g.addColorStop(0, stops[0][1]); g.addColorStop(1, stops[1][1]);
+  pal.forEach((clr,i) => g.addColorStop(i/(pal.length-1), clr));
   ctx.fillStyle = g; ctx.fillRect(0,0,110,7);
   document.getElementById('leg-lo').textContent = METRICS[mapMetric].lo;
   document.getElementById('leg-hi').textContent = METRICS[mapMetric].hi;
@@ -218,14 +221,13 @@ function updateMapColors() {
   const vals = DATA.map(d => d.latest && d.latest[mapMetric]).filter(v => v != null).sort((a,b)=>a-b);
   if (!vals.length) return;
   const mn = vals[0], mx = vals[vals.length-1];
-  const isInverse = mapMetric === 'days_on_market' || mapMetric === 'price_reduced_pct';
-  const colorLow = isInverse ? '#4ade80' : '#0a2a4a';
-  const colorHigh = isInverse ? '#f87171' : '#00d4ff';
+  const isInverse = mapMetric === 'days_on_market' || mapMetric === 'price_reduced_pct' || mapMetric === 'median_property_tax' || mapMetric === 'property_tax_rate';
+  const pal = isInverse ? PALETTE_INV : PALETTE_NORM;
+  const stops = pal.flatMap((c,i) => [mn + (mx-mn)*(i/(pal.length-1)), c]);
   map.setPaintProperty('counties-fill', 'fill-color', [
     'interpolate', ['linear'],
     ['coalesce', ['get', mapMetric], mn],
-    mn, colorLow,
-    mx, colorHigh
+    ...stops
   ]);
   drawLegend();
 }
@@ -390,12 +392,14 @@ fetch('/ohio-data.json').then(r=>r.json()).then(counties => {
       const vals = DATA.map(d=>d.latest&&d.latest.zhvi).filter(v=>v!=null).sort((a,b)=>a-b);
       const mn = vals[0], mx = vals[vals.length-1];
 
+      const initPal = PALETTE_NORM;
+      const initStops = initPal.flatMap((c,i)=>[mn+(mx-mn)*(i/(initPal.length-1)),c]);
       map.addLayer({
         id: 'counties-fill',
         type: 'fill',
         source: 'ohio-counties',
         paint: {
-          'fill-color': ['interpolate',['linear'],['coalesce',['get','zhvi'],mn], mn,'#0a2a4a', mx,'#00d4ff'],
+          'fill-color': ['interpolate',['linear'],['coalesce',['get','zhvi'],mn], ...initStops],
           'fill-opacity': ['case',['boolean',['feature-state','selected'],false], 1, 0.82],
         }
       });
@@ -500,8 +504,8 @@ function drawBarChart(county, cmetric) {
     .attr('width', x.bandwidth())
     .attr('height', r=>ih-y(r[cmetric]))
     .attr('rx', 4)
-    .attr('fill', (r,i)=> i===rows.length-1 ? '#00d4ff' : 'rgba(0,210,255,0.35)')
-    .attr('stroke', (r,i)=> i===rows.length-1 ? '#00d4ff' : 'rgba(0,210,255,0.5)')
+    .attr('fill', (r,i)=> i===rows.length-1 ? '#4393c3' : 'rgba(67,147,195,0.45)')
+    .attr('stroke', (r,i)=> i===rows.length-1 ? '#92c5de' : 'rgba(146,197,222,0.5)')
     .attr('stroke-width', 1);
 
   // Value labels on bars
