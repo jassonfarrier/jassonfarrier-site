@@ -217,8 +217,8 @@ let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popu
 
 // Diverging peach→sage→blue (matches reference map exactly)
 // Low = warm peach/salmon | Mid = muted sage green | High = steel blue
-const PALETTE_NORM  = ['#e8906a','#f5b88a','#f8d0a8','#f0e0c8','#c8d4b8','#a8c8dc','#78a8cc','#4a7fb8','#1a5296'];
-const PALETTE_INV   = ['#1a5296','#4a7fb8','#78a8cc','#a8c8dc','#c8d4b8','#f0e0c8','#f8d0a8','#f5b88a','#e8906a'];
+const PALETTE_NORM  = ['#2166ac','#4393c3','#92c5de','#d1e5f0','#f7f7f7','#fddbc7','#f4a582','#d6604d','#b2182b'];
+const PALETTE_INV   = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d1e5f0','#92c5de','#4393c3','#2166ac'];
 
 function getStops(metric) {
   const vals = DATA.map(d => d.latest && d.latest[metric]).filter(v => v != null).sort((a,b)=>a-b);
@@ -323,7 +323,34 @@ function drawLineChart(county, cmetric) {
   g.append('path').datum(history).attr('d',area).attr('fill','url(#ag)');
 
   const line = d3.line().x(r=>x(parseDate(r.date))).y(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
-  g.append('path').datum(history).attr('d',line).attr('fill','none').attr('stroke','#00d4ff').attr('stroke-width',2);
+  g.append('path').datum(history).attr('d',line).attr('fill','none').attr('stroke','#00d4ff').attr('stroke-width',2.5);
+
+  // Annual data point labels (Jan of each year + latest point)
+  const annualPts = history.filter((r,i) => {
+    if (i === history.length-1) return true;
+    const [yr,mo] = r.date.split('-');
+    return mo === '01';
+  });
+  // Dots on annual points
+  g.selectAll('.apt').data(annualPts).enter().append('circle')
+    .attr('class','apt')
+    .attr('cx', r=>x(parseDate(r.date)))
+    .attr('cy', r=>y(r[cmetric]))
+    .attr('r', 4)
+    .attr('fill','#00d4ff')
+    .attr('stroke','#fff')
+    .attr('stroke-width', 2);
+  // Value labels above each dot
+  g.selectAll('.albl').data(annualPts).enter().append('text')
+    .attr('class','albl')
+    .attr('x', r=>x(parseDate(r.date)))
+    .attr('y', r=>Math.max(18, y(r[cmetric])-10))
+    .attr('text-anchor','middle')
+    .attr('font-size','10px')
+    .attr('font-family','Montserrat,sans-serif')
+    .attr('font-weight','700')
+    .attr('fill','#1a1a2e')
+    .text(r => METRICS[cmetric].fmt(r[cmetric]));
 
   // Hover interaction
   const bisect = d3.bisector(r=>parseDate(r.date)).left;
@@ -457,11 +484,32 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
         type: 'line',
         source: 'ohio-counties',
         paint: {
-          'line-color': '#1a5296',
-          'line-width': ['case',['boolean',['feature-state','selected'],false],2.5,0],
+          'line-color': '#000',
+          'line-width': ['case',['boolean',['feature-state','selected'],false],3.5,0],
         }
       });
 
+
+      // County label layer — county name + value shown on map when zoomed in
+      map.addLayer({
+        id: 'counties-labels',
+        type: 'symbol',
+        source: 'ohio-counties',
+        minzoom: 7.5,
+        layout: {
+          'text-field': ['concat', ['get','county'], '\n', ['coalesce',['get','__label'],'']],
+          'text-size': ['interpolate',['linear'],['zoom'], 7.5,10, 10,14],
+          'text-font': ['DIN Pro Bold','Arial Unicode MS Bold'],
+          'text-anchor': 'center',
+          'text-max-width': 10,
+          'text-line-height': 1.4,
+        },
+        paint: {
+          'text-color': '#111',
+          'text-halo-color': 'rgba(255,255,255,0.85)',
+          'text-halo-width': 2,
+        }
+      });
       drawLegend();
       document.getElementById('loading').style.display='none';
 
