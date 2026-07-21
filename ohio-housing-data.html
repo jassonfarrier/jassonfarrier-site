@@ -368,17 +368,18 @@ function drawLineChart(county, cmetric) {
     return labelYears.has(yr) && mo === latestMonth;
   });
 
-  // Dots on ALL annual points (small, no label)
-  g.selectAll('.apt-all').data(allAnnual).enter().append('circle')
+  // Dots on EVERY year (June of each year)
+  const everyYearPts = history.filter(r => r.date.split('-')[1] === latestMonth);
+  g.selectAll('.apt-all').data(everyYearPts).enter().append('circle')
     .attr('class','apt-all')
     .attr('cx', r=>x(parseDate(r.date)))
     .attr('cy', r=>y(r[cmetric]))
-    .attr('r', 3)
+    .attr('r', 3.5)
     .attr('fill','#1a3a5c')
     .attr('stroke','#fff')
     .attr('stroke-width', 1.5);
 
-  // Labels only on every-other year
+  // Labels only on every OTHER year (2016, 2018, 2020, 2022, 2024, 2026)
   g.selectAll('.albl').data(annualPts).enter().append('text')
     .attr('class','albl')
     .attr('x', r=>x(parseDate(r.date)))
