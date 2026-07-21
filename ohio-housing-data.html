@@ -124,7 +124,6 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
     <div class="sidebar-label">Map Metric</div>
     <button class="metric-btn active" data-metric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span></button>
     <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
-    <button class="metric-btn" data-metric="new_listings"><span class="mn">New Listings</span><span class="md">New to market this month</span></button>
     <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
     <button class="metric-btn" data-metric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span></button>
     <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Reductions</span><span class="md">% of listings with a cut</span></button>
@@ -150,7 +149,6 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
     <div class="snap-grid">
       <div class="snap-card"><div class="snap-val" id="s-zhvi"></div><div class="snap-lbl">Home Value</div></div>
       <div class="snap-card"><div class="snap-val" id="s-active"></div><div class="snap-lbl">Active Listings</div></div>
-      <div class="snap-card"><div class="snap-val" id="s-new"></div><div class="snap-lbl">New Listings</div></div>
       <div class="snap-card"><div class="snap-val" id="s-pending"></div><div class="snap-lbl">Pending Sales</div></div>
       <div class="snap-card"><div class="snap-val" id="s-dom"></div><div class="snap-lbl">Days on Market</div></div>
       <div class="snap-card"><div class="snap-val" id="s-pct"></div><div class="snap-lbl">Price Reductions</div></div>
@@ -160,7 +158,6 @@ nav{z-index:100;background:rgba(6,13,31,0.97);height:56px;flex-shrink:0;display:
     <div class="chart-tabs">
       <button class="chart-tab active" data-cmetric="zhvi">Home Value</button>
       <button class="chart-tab" data-cmetric="active_listings">Active</button>
-      <button class="chart-tab" data-cmetric="new_listings">New</button>
       <button class="chart-tab" data-cmetric="pending_listings">Pending</button>
       <button class="chart-tab" data-cmetric="days_on_market">DOM</button>
       <button class="chart-tab" data-cmetric="price_reduced_pct">Price Cuts%</button>
@@ -237,7 +234,6 @@ function openModal(county) {
   document.getElementById('modal-county').textContent = county + ' County';
   document.getElementById('s-zhvi').textContent = fmt$(l.zhvi);
   document.getElementById('s-active').textContent = fmtN(l.active_listings);
-  document.getElementById('s-new').textContent = fmtN(l.new_listings);
   document.getElementById('s-pending').textContent = fmtN(l.pending_listings);
   document.getElementById('s-dom').textContent = l.days_on_market != null ? l.days_on_market+' days' : '—';
   document.getElementById('s-pct').textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
