@@ -254,6 +254,23 @@ function updateMapColors() {
     ...stops
   ]);
   drawLegend();
+  // Update on-map labels with compact values for current metric
+  const src = map.getSource('ohio-counties');
+  if (src && src._data && src._data.features) {
+    src._data.features.forEach(f => {
+      const v = f.properties[mapMetric];
+      if (v == null) { f.properties.__label = ''; return; }
+      const n = Number(v);
+      if (mapMetric === 'zhvi' || mapMetric === 'median_property_tax') {
+        f.properties.__label = n >= 1000000 ? '$'+(n/1000000).toFixed(1)+'M' : '$'+Math.round(n/1000)+'K';
+      } else if (mapMetric === 'property_tax_rate' || mapMetric === 'price_reduced_pct') {
+        f.properties.__label = n.toFixed(1)+'%';
+      } else {
+        f.properties.__label = METRICS[mapMetric].fmt(n);
+      }
+    });
+    src.setData(src._data);
+  }
 }
 
 function fmt$(v){return v?'$'+v.toLocaleString():'—';}
@@ -457,7 +474,9 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
       const name = FIPS_NAME[f.id];
       const d = name && dataMap[name];
       if (d && d.latest) {
-        Object.assign(f.properties, d.latest, {county: name});
+        const zhvi = d.latest.zhvi;
+        const lbl = zhvi >= 1000000 ? '$'+(zhvi/1000000).toFixed(1)+'M' : zhvi >= 1000 ? '$'+Math.round(zhvi/1000)+'K' : zhvi ? '$'+Math.round(zhvi) : '';
+        Object.assign(f.properties, d.latest, {county: name, __label: lbl});
       }
     });
 
@@ -516,10 +535,10 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
         id: 'counties-labels',
         type: 'symbol',
         source: 'ohio-counties',
-        minzoom: 7.5,
+        minzoom: 6.8,
         layout: {
           'text-field': ['concat', ['get','county'], '\n', ['coalesce',['get','__label'],'']],
-          'text-size': ['interpolate',['linear'],['zoom'], 7.5,10, 10,14],
+          'text-size': ['interpolate',['linear'],['zoom'], 6.8,10, 9,13, 11,15],
           'text-font': ['DIN Pro Bold','Arial Unicode MS Bold'],
           'text-anchor': 'center',
           'text-max-width': 10,
@@ -531,7 +550,7 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
           'text-halo-width': 2,
         }
       });
-      drawLegend();
+      updateMapColors();
       document.getElementById('loading').style.display='none';
 
       // Hover tooltip
