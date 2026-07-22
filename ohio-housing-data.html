@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ohio Housing Data by County | Jasson Farrier</title>
-<meta name="description" content="Interactive Ohio county housing map — 10 years of home values, listings, days on market across all 88 counties.">
+<title>Ohio Housing Market Data | Home Values, Inventory &amp; Trends by County, Metro &amp; ZIP</title>
+<meta name="description" content="Interactive Ohio housing map with 10+ years of data. Explore home values, active listings, days on market, price cuts, and year-over-year trends across all 88 counties, metros, and ZIP codes.">
 <script src='https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.js'></script>
 <link href='https://api.mapbox.com/mapbox-gl-js/v3.4.0/mapbox-gl.css' rel='stylesheet'>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
@@ -14,11 +14,11 @@
 html,body{width:100%;height:100%;overflow:hidden;background:#f7f8fa}
 body{font-family:'Montserrat',sans-serif;color:#e0eaff;display:flex;flex-direction:column}
 
-nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 32px;border-bottom:1px solid rgba(0,0,0,0.1)}
-.nav-brand{font-size:13px;font-weight:500;color:#1a1a2e;text-decoration:none}
-.nav-brand span{color:rgba(255,255,255,0.3);font-weight:500}
+nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 64px;border-bottom:1px solid #f5f5f5}
+.nav-brand{font-size:13px;font-weight:700;color:#0D1E42;text-decoration:none;white-space:nowrap}
+.nav-brand span{color:#0D1E42;font-weight:700}
 .nav-right{display:flex;gap:28px;align-items:center}
-.nav-right a{font-size:12px;font-weight:500;color:rgba(0,0,0,0.45);text-decoration:none;transition:color .2s}
+.nav-right a{font-size:12px;font-weight:500;color:#9DA6AB;text-decoration:none;transition:color .2s}.nav-right a:hover{color:#0D1E42}.nav-right a.active{color:#0D1E42;font-weight:700}
 .nav-right a:hover,.nav-right a.active{color:#1a5296}
 
 .main{display:flex;flex:1;overflow:hidden;position:relative}
@@ -31,6 +31,10 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
 .metric-btn .mn{font-size:11px;font-weight:500;color:#1a1a2e;display:block;margin-bottom:1px}
 .metric-btn .md{font-size:9px;color:rgba(0,0,0,0.38);line-height:1.4}
 .metric-btn.active .mn{color:#1a5296}
+.yoy-btn{background:#f8fafc;border-color:rgba(0,0,0,0.07);margin-top:2px}
+.yoy-btn .mn{font-size:10px;color:rgba(26,26,46,0.65)}
+.yoy-btn.active{background:#dce8f7;border-color:#1a5296}
+.yoy-btn.active .mn{color:#1a5296;font-weight:700}
 .sidebar hr{border:none;border-top:1px solid rgba(0,0,0,0.07);margin:5px 0}
 .src{font-size:8px;color:rgba(0,0,0,0.28);line-height:1.7;padding:0 3px;margin-top:auto;padding-top:12px}
 .hint{font-size:9px;color:rgba(26,82,150,0.6);padding:8px 10px;background:rgba(26,82,150,0.05);border-radius:5px;line-height:1.5;margin-top:4px}
@@ -42,14 +46,14 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
   background:#ffffff!important;
   border:2px solid rgba(0,0,0,0.15)!important;
   border-radius:12px!important;
-  padding:22px 30px 20px!important;
+  padding:18px 20px 16px!important;
   box-shadow:0 8px 32px rgba(0,0,0,0.22)!important;
   font-family:'Montserrat',sans-serif!important;
   min-width:240px!important;
 }
 .mapboxgl-popup-tip{border-top-color:rgba(0,0,0,0.15)!important;border-bottom-color:rgba(0,0,0,0.15)!important}
 .tt-county{font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#555;margin-bottom:8px}
-.tt-val{font-size:44px;font-weight:800;color:#111;line-height:1;letter-spacing:-1px}
+.tt-val{font-size:40px;font-weight:800;color:#111;line-height:1;letter-spacing:-1px;text-align:left;display:block}
 .tt-label{font-size:13px;font-weight:500;color:#777;margin-top:8px}
 .mapboxgl-popup-close-button{display:none!important}
 
@@ -58,13 +62,20 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
 #leg-canvas{width:110px;height:7px;border-radius:4px}
 
 /* CENTER MODAL */
-#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding-left:20%}
+#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
 #modal-overlay.visible{display:flex}
-#modal{background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:14px;width:min(1299px,96vw);max-height:90vh;overflow-y:auto;padding:28px 28px 24px;box-shadow:0 8px 40px rgba(0,0,0,0.18);position:relative}
-.modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px}
-.modal-county{font-size:24px;font-weight:600;color:#1a1a2e}
-.modal-sub{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-top:3px}
-.close-btn{background:none;border:none;cursor:pointer;color:rgba(0,0,0,0.25);font-size:22px;padding:4px;line-height:1;margin-left:16px;flex-shrink:0;transition:color .2s}
+#modal{background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:14px;width:min(1715px,96vw);max-height:90vh;overflow-y:auto;padding:37px 37px 32px;box-shadow:0 8px 40px rgba(0,0,0,0.18);position:relative}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:24px}
+.modal-header-left{flex:1;min-width:0}
+.modal-header-right{text-align:right;flex-shrink:0}
+.modal-county{font-size:36px;font-weight:800;color:#c0392b;line-height:1;letter-spacing:-1px}
+.modal-sub{font-size:13px;font-weight:500;color:#888;margin-top:4px}
+.attr-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.attr-chip{background:#fff;border:1px solid rgba(0,0,0,0.18);color:#222;font-size:12px;font-weight:500;padding:5px 12px;border-radius:6px;font-family:Montserrat,sans-serif;white-space:nowrap}
+.attr-source{font-size:12px;color:#888;font-family:Montserrat,sans-serif;font-weight:400}
+.attr-source-name{color:#c0392b;font-weight:500}
+.page-eyebrow{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#0D1E42;padding:18px 64px 0;font-family:Montserrat,sans-serif}
+.close-btn{background:none;border:none;cursor:pointer;color:rgba(0,0,0,0.25);font-size:22px;padding:4px;line-height:1;margin-left:8px;flex-shrink:0;transition:color .2s}
 .close-btn:hover{color:#1a1a2e}
 
 .snap-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-bottom:20px;}
@@ -73,12 +84,14 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
 .snap-val.up{color:#15803d}.snap-val.dn{color:#dc2626}
 .snap-lbl{font-size:8px;font-weight:400;letter-spacing:1px;text-transform:uppercase;color:rgba(0,0,0,0.38);margin-top:4px}
 
-.modal-body{display:flex;gap:0;align-items:stretch;}.modal-left{width:150px;flex-shrink:0;border-right:1px solid rgba(0,0,0,0.07);padding-right:14px;margin-right:18px;max-height:420px;overflow-y:auto;}.modal-right{flex:1;min-width:0;}.chart-label{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:10px}
+.modal-body{display:flex;gap:0;align-items:stretch;}.modal-left{width:200px;flex-shrink:0;border-right:1px solid rgba(0,0,0,0.07);padding-right:14px;margin-right:18px;max-height:554px;overflow-y:auto;}.modal-right{flex:1;min-width:0;}.chart-label{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:10px}
 .chart-tabs{display:flex;flex-direction:column;gap:4px;}
 .chart-tab{background:transparent;border:none;border-radius:7px;padding:9px 12px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif;text-align:left;width:100%;}
 .chart-tab:hover{background:#edf2fb;color:#1a5296}
 .chart-tab.active{background:#dce8f7;color:#1a5296;font-weight:700;}
-#line-chart{width:100%;height:420px}
+.yoy-tab{font-size:10px;padding:6px 12px;color:rgba(0,0,0,0.35);margin-top:-2px}
+.yoy-tab.active{background:#dce8f7;color:#1a5296}
+#line-chart{width:100%;height:554px}
 
 /* LOADING */
 #loading{position:fixed;inset:0;background:#060d1f;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px}
@@ -101,7 +114,7 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
   .nav-right a:not(.nav-yt){display:none}
 }
 
-#search-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:20;width:320px;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.13);box-shadow:0 4px 20px rgba(0,0,0,0.13);display:flex;align-items:center;padding:0 12px;gap:8px}
+#search-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:20;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.13);box-shadow:0 4px 20px rgba(0,0,0,0.13);display:flex;align-items:center;padding:0 12px;gap:8px;min-width:420px}.mode-pills{display:flex;gap:4px;margin-left:6px;flex-shrink:0}.mode-pill{background:transparent;border:1px solid rgba(0,0,0,0.15);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;font-family:Montserrat,sans-serif;color:rgba(0,0,0,0.4);cursor:pointer;transition:all .2s;white-space:nowrap}.mode-pill.active{background:#1a5296;color:#fff;border-color:#1a5296}.mode-pill:hover:not(.active){background:#edf2fb;color:#1a5296;border-color:rgba(26,82,150,0.3)}
 #search-input{flex:1;border:none;outline:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:#1a1a2e;padding:12px 0;background:transparent}
 #search-input::placeholder{color:rgba(0,0,0,0.3)}
 #search-clear{background:none;border:none;cursor:pointer;color:rgba(0,0,0,0.3);font-size:14px;padding:4px;line-height:1}
@@ -111,6 +124,7 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
 #search-results li:last-child{border-bottom:none}
 #search-results li:hover{background:#f0f4fb;color:#1a5296}
 #search-results li .sr-sub{font-size:10px;font-weight:400;color:rgba(0,0,0,0.38);margin-top:1px}
+
 </style>
 </head>
 <body>
@@ -124,30 +138,50 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
     <a href="/bio">About</a>
     <a href="/contact">Contact</a>
     <a href="https://www.youtube.com/@OhioHousingNerd" class="nav-yt" aria-label="YouTube" target="_blank" rel="noopener">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="rgba(255,255,255,0.3)"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/></svg>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#9DA6AB"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/></svg>
     </a>
   </div>
 </nav>
 
 <div class="main">
   <div class="sidebar">
+    <div class="page-eyebrow" style="padding:18px 0 10px;letter-spacing:3px;font-size:11px;font-weight:700;text-transform:uppercase;color:#0D1E42;font-family:Montserrat,sans-serif">Ohio Housing Data</div>
     <div class="sidebar-label">Map Metric</div>
     <button class="metric-btn active" data-metric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span></button>
+    <button class="metric-btn yoy-btn" data-metric="zhvi_yoy"><span class="mn">Home Value YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
+    <button class="metric-btn yoy-btn" data-metric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
+    <button class="metric-btn yoy-btn" data-metric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span></button>
+    <button class="metric-btn yoy-btn" data-metric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
+    <button class="metric-btn yoy-btn" data-metric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span></button>
+    <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
+    <button class="metric-btn yoy-btn" data-metric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span></button>
     <hr>
-    <div class="hint">Click any county to see 10 years of trend data</div>
-    <div class="src">Zillow ZHVI · Realtor.com<br>Data through Jun 2026</div>
+
+    <div class="src" style="margin-top:auto;font-size:9px;color:rgba(0,0,0,0.35);line-height:1.6;padding-top:12px;border-top:1px solid rgba(0,0,0,0.07)">
+      <img src="/fair-housing.webp" alt="Equal Housing Opportunity" style="width:24px;height:auto;opacity:0.5;filter:invert(0.4);display:block;margin-bottom:6px;">
+      Jasson Farrier · Kiger Realty · Realtor · License #2018004483 · 614-699-3007<br>
+      Equal Housing Opportunity · Information deemed reliable but not guaranteed.<br>
+      <a href="/ohio-housing-data-methodology/" style="color:rgba(26,82,150,0.6);font-size:9px;font-weight:500;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Methodology &amp; Data Sources →</a>
+    </div>
   </div>
-  <div id="map"></div>
+<div id="map"></div>
 <div id="search-bar">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-  <input id="search-input" type="text" placeholder="Search Ohio counties…" autocomplete="off">
+  <input id="search-input" type="text" placeholder="Search counties or ZIP codes…" autocomplete="off" style="flex:1;min-width:160px">
   <button id="search-clear" style="display:none">✕</button>
+  <div style="width:1px;height:18px;background:rgba(0,0,0,0.12);flex-shrink:0"></div>
+  <div class="mode-pills">
+    <button class="mode-pill" id="pill-state">State</button>
+    <button class="mode-pill" id="pill-metro">Metro</button>
+    <button class="mode-pill active" id="pill-county">County</button>
+    <button class="mode-pill" id="pill-zip">ZIP Code</button>
+  </div>
   <ul id="search-results"></ul>
 </div>
   <div id="legend">
@@ -161,7 +195,14 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
 <div id="modal-overlay">
   <div id="modal">
     <div class="modal-header">
-      <div><div class="modal-county" id="modal-county"></div><div class="modal-sub">Ohio County · Jun 2026</div></div>
+      <div class="modal-header-left">
+        <div class="attr-chips" id="attr-chips"></div>
+        <div class="attr-source">Source: <span class="attr-source-name"><a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Zillow</a></span></div>
+      </div>
+      <div class="modal-header-right">
+        <div class="modal-county" id="modal-county"></div>
+        <div class="modal-sub" id="modal-sub"></div>
+      </div>
       <button class="close-btn" id="close-btn">✕</button>
     </div>
     <div class="snap-grid">
@@ -178,12 +219,20 @@ nav{z-index:100;background:#fff;height:56px;flex-shrink:0;display:flex;align-ite
       <div class="modal-left">
         <div class="chart-label">Chart Type</div>
         <div class="chart-tabs">
-          <button class="chart-tab active" data-cmetric="zhvi">Home Value</button>
-          <button class="chart-tab" data-cmetric="active_listings">Active Listings</button>
-          <button class="chart-tab" data-cmetric="pending_listings">Pending Sales</button>
-          <button class="chart-tab" data-cmetric="days_on_market">Days on Market</button>
-          <button class="chart-tab" data-cmetric="price_reduced_pct">Price Cut %</button>
-          <button class="chart-tab" data-cmetric="median_property_tax">Property Tax</button>
+          <button class="metric-btn chart-tab active" data-cmetric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_yoy"><span class="mn">Home Value YOY %</span><span class="md">Year-over-year change</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span></button>
         </div>
       </div>
       <div class="modal-right">
@@ -201,80 +250,325 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiamFzc29uZmFy'
 
 const METRICS = {
   zhvi:             {label:'Home Value',      fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower',    hi:'Higher'},
+  zhvi_yoy:         {label:'Home Value YOY %',fmt:v=>v.toFixed(1)+'%',                   lo:'Declining',hi:'Growing'},
   median_list_price:{label:'Listing Price',   fmt:v=>'$'+v.toLocaleString(),             lo:'Lower',    hi:'Higher'},
   active_listings:  {label:'Active Listings', fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
+  active_listings_yoy:{label:'Active Listings YOY %',fmt:v=>v.toFixed(1)+'%',           lo:'Declining',hi:'Growing'},
   new_listings:     {label:'New Listings',    fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
   pending_listings: {label:'Pending Sales',   fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
+  pending_listings_yoy:{label:'Pending Sales YOY %',fmt:v=>v.toFixed(1)+'%',            lo:'Declining',hi:'Growing'},
   days_on_market:   {label:'Days on Market',  fmt:v=>v+' days',                          lo:'Fast',     hi:'Slow'},
+  days_on_market_yoy:{label:'Days on Market YOY %',fmt:v=>v.toFixed(1)+'%',             lo:'Declining',hi:'Growing'},
   price_reduced_pct:{label:'Price Cut %',fmt:v=>v.toFixed(1)+'%',                  lo:'Few Cuts', hi:'Many Cuts'},
+  price_reduced_pct_yoy:{label:'Price Cut % YOY',fmt:v=>v.toFixed(1)+'%',              lo:'Declining',hi:'Growing'},
   median_property_tax:{label:'Annual Property Tax', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
+  median_property_tax_yoy:{label:'Property Tax YOY %',fmt:v=>v.toFixed(1)+'%',         lo:'Declining',hi:'Growing'},
   property_tax_rate:  {label:'Effective Tax Rate',  fmt:v=>v.toFixed(2)+'%',               lo:'Lower', hi:'Higher'},
+  property_tax_rate_yoy:{label:'Tax Rate YOY %',fmt:v=>v.toFixed(1)+'%',               lo:'Declining',hi:'Growing'},
 };
+const YOY_METRICS = new Set(['zhvi_yoy','active_listings_yoy','pending_listings_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy']);
+const YOY_BASE = {zhvi_yoy:'zhvi', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate'};
+const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 
 const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
 
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null, selectedFips = null;
+let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, selectedZip = null, zipHoveredId = null;
+let METRO_DATA = [], metroDataMap = {}, metroDataLoaded = false, metroGeoJSON = null, selectedMetro = null, metroHoveredId = null;
+let STATE_DATA = null, stateDataLoaded = false, selectedState = null;
+let _dismissClickCard = null; // set by active chart to vanish pinned tooltip
 
 // Diverging peach→sage→blue (matches reference map exactly)
 // Low = warm peach/salmon | Mid = muted sage green | High = steel blue
-const PALETTE_NORM  = ['#2166ac','#4393c3','#92c5de','#d1e5f0','#f7f7f7','#fddbc7','#f4a582','#d6604d','#b2182b'];
-const PALETTE_INV   = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d1e5f0','#92c5de','#4393c3','#2166ac'];
 
-function getStops(metric) {
-  const vals = DATA.map(d => d.latest && d.latest[metric]).filter(v => v != null).sort((a,b)=>a-b);
-  if (!vals.length) return [[0,'#b2182b'],[1,'#2166ac']];
-  const mn = vals[0], mx = vals[vals.length-1];
-  const isInverse = metric === 'days_on_market' || metric === 'price_reduced_pct' || metric === 'median_property_tax' || metric === 'property_tax_rate';
-  const pal = isInverse ? PALETTE_INV : PALETTE_NORM;
-  return pal.map((c,i) => [mn + (mx-mn)*(i/(pal.length-1)), c]);
+// ── YOY computation ──────────────────────────────────────────────────────────
+function computeYOYHistory(history, baseMetric) {
+  // history: array of {date:'YYYY-MM', [metric]: value, ...}
+  // returns array of {date, value} for the YOY % metric
+  if (!history || !history.length) return [];
+  const byDate = {};
+  history.forEach(r => { byDate[r.date] = r; });
+  const result = [];
+  history.forEach(r => {
+    if (r[baseMetric] == null) return;
+    const [yr, mo] = r.date.split('-').map(Number);
+    const priorDate = `${yr-1}-${String(mo).padStart(2,'0')}`;
+    const prior = byDate[priorDate];
+    if (!prior || prior[baseMetric] == null || prior[baseMetric] === 0) return;
+    const pct = (r[baseMetric] - prior[baseMetric]) / Math.abs(prior[baseMetric]) * 100;
+    result.push({date: r.date, value: parseFloat(pct.toFixed(2))});
+  });
+  return result;
 }
 
-function drawLegend() {
-  const c = document.getElementById('leg-canvas'), ctx = c.getContext('2d');
-  const isInverse = mapMetric==='days_on_market'||mapMetric==='price_reduced_pct'||mapMetric==='median_property_tax'||mapMetric==='property_tax_rate';
-  const pal = isInverse ? PALETTE_INV : PALETTE_NORM;
-  const g = ctx.createLinearGradient(0,0,110,0);
-  pal.forEach((clr,i) => g.addColorStop(i/(pal.length-1), clr));
-  ctx.fillStyle = g; ctx.fillRect(0,0,110,7);
-  document.getElementById('leg-lo').textContent = METRICS[mapMetric].lo;
-  document.getElementById('leg-hi').textContent = METRICS[mapMetric].hi;
-}
-
-function updateMapColors() {
-  if (!map || !map.getLayer('counties-fill')) return;
-  const vals = DATA.map(d => d.latest && d.latest[mapMetric]).filter(v => v != null).sort((a,b)=>a-b);
-  if (!vals.length) return;
-  const mn = vals[0], mx = vals[vals.length-1];
-  const isInverse = mapMetric === 'days_on_market' || mapMetric === 'price_reduced_pct' || mapMetric === 'median_property_tax' || mapMetric === 'property_tax_rate';
-  const pal = isInverse ? PALETTE_INV : PALETTE_NORM;
-  const stops = pal.flatMap((c,i) => [mn + (mx-mn)*(i/(pal.length-1)), c]);
-  map.setPaintProperty('counties-fill', 'fill-color', [
-    'interpolate', ['linear'],
-    ['coalesce', ['get', mapMetric], mn],
-    ...stops
-  ]);
-  drawLegend();
-  // Update on-map labels with compact values for current metric
-  const src = map.getSource('ohio-counties');
-  if (src && src._data && src._data.features) {
-    src._data.features.forEach(f => {
-      const v = f.properties[mapMetric];
-      if (v == null) { f.properties.__label = ''; return; }
-      const n = Number(v);
-      if (mapMetric === 'zhvi' || mapMetric === 'median_property_tax') {
-        f.properties.__label = n >= 1000000 ? '$'+(n/1000000).toFixed(1)+'M' : '$'+Math.round(n/1000)+'K';
-      } else if (mapMetric === 'property_tax_rate' || mapMetric === 'price_reduced_pct') {
-        f.properties.__label = n.toFixed(1)+'%';
-      } else {
-        f.properties.__label = METRICS[mapMetric].fmt(n);
-      }
-    });
-    src.setData(src._data);
+function computeYOYHistoryAnnual(history, baseMetric) {
+  // For prop_tax_history: array of {year, [metric]: value}
+  if (!history || !history.length) return [];
+  const result = [];
+  for (let i = 1; i < history.length; i++) {
+    const curr = history[i], prev = history[i-1];
+    if (curr[baseMetric] == null || prev[baseMetric] == null || prev[baseMetric] === 0) continue;
+    const pct = (curr[baseMetric] - prev[baseMetric]) / Math.abs(prev[baseMetric]) * 100;
+    result.push({year: curr.year, value: parseFloat(pct.toFixed(2))});
   }
+  return result;
+}
+
+function attachYOY(d) {
+  // Attach .yoy_latest and .yoy_history to a data record
+  d.yoy_latest = {};
+  d.yoy_history = {};
+  for (const [yoyKey, base] of Object.entries(YOY_BASE)) {
+    if (TAX_YOY.has(yoyKey)) {
+      // Annual property tax — use prop_tax_history
+      const hist = computeYOYHistoryAnnual(d.prop_tax_history || [], base);
+      d.yoy_history[yoyKey] = hist;
+      d.yoy_latest[yoyKey] = hist.length ? hist[hist.length-1].value : null;
+    } else {
+      const hist = computeYOYHistory(d.history || [], base);
+      d.yoy_history[yoyKey] = hist;
+      d.yoy_latest[yoyKey] = hist.length ? hist[hist.length-1].value : null;
+    }
+  }
+}
+
+const PALETTE_NORM  = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d1e5f0','#92c5de','#4393c3','#2166ac'];
+const PALETTE_INV   = ['#2166ac','#4393c3','#92c5de','#d1e5f0','#f7f7f7','#fddbc7','#f4a582','#d6604d','#b2182b'];
+
+
+
+function quantileStops(vals, palette) {
+  return palette.map((c, i) => {
+    const idx = Math.min(Math.round(i / (palette.length - 1) * (vals.length - 1)), vals.length - 1);
+    return [vals[idx], c];
+  });
+}
+
+function divergingColor(vals, val) {
+  if (val == null) return '#ccc';
+  const absMax = Math.max(Math.abs(vals[0] != null ? vals[0] : 0), Math.abs(vals[vals.length-1] != null ? vals[vals.length-1] : 0)) || 1;
+  if (val < 0) {
+    const t = Math.min(Math.abs(val) / absMax, 1);
+    return d3.interpolateRgb('#f7f7f7', '#b2182b')(t);
+  } else {
+    const t = Math.min(val / absMax, 1);
+    return d3.interpolateRgb('#f7f7f7', '#2166ac')(t);
+  }
+}
+
+const YOY_NEG = [
+  '#7a0020','#97071f','#b5131e','#cc2420','#d9462e',
+  '#e56e3c','#f0904d','#f8b070','#facf8a','#fce0a4',
+  '#feebbe','#fff4d6',
+];
+const YOY_POS = [
+  '#fff4d6','#eef4c0','#d4ecab','#b2df96','#87cc82',
+  '#5ab56e','#34985a','#1a7f53','#136b5e','#145568',
+  '#153f72','#132b5e',
+];
+function yoyQuantileColor(vals, val) {
+  if (val == null) return '#ccc';
+  const negs = vals.filter(v => v < 0).sort((a,b) => a-b);
+  const pos  = vals.filter(v => v > 0).sort((a,b) => a-b);
+  if (val === 0) return '#fff4d6';
+  if (val > 0) {
+    if (!pos.length) return YOY_POS[YOY_POS.length-1];
+    const stops = quantileStops(pos, YOY_POS);
+    return colorFromStops(stops, val);
+  } else {
+    if (!negs.length) return YOY_NEG[0];
+    const stops = quantileStops(negs, YOY_NEG);
+    return colorFromStops(stops, val);
+  }
+}
+
+function drawLegend(vals, palette) {
+  // Draw gradient on canvas
+  const canvas = document.getElementById('leg-canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    palette.forEach((c, i) => grad.addColorStop(i / (palette.length - 1), c));
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+// ── Unified color renderer ────────────────────────────────────────────────────
+// Single source of truth for ALL layer × metric combinations.
+// Add a new layer: add one entry to LAYER_CONFIG. Nothing else changes.
+function getMetricVal(d, metric) {
+  if (YOY_METRICS.has(metric)) return d.yoy_latest && d.yoy_latest[metric] != null ? Number(d.yoy_latest[metric]) : null;
+  return d.latest && d.latest[metric] != null ? Number(d.latest[metric]) : null;
+}
+
+const LAYER_CONFIG = {
+  county: {
+    getData:  () => DATA,
+    layer:    'counties-fill',
+    getVal:   (d, metric) => getMetricVal(d, metric),
+    getKey:   (metric) => metric,
+    usePaint: false,
+  },
+  zip: {
+    getData:  () => ZIP_DATA,
+    layer:    'zips-fill',
+    getVal:   (d, metric) => getMetricVal(d, metric),
+    getKey:   (metric) => metric,
+    usePaint: true,
+  },
+  metro: {
+    getData:  () => METRO_DATA,
+    layer:    'metros-fill',
+    getVal:   (d, metric) => getMetricVal(d, metric),
+    getKey:   (metric) => metric,
+    usePaint: true,
+  },
+};
+
+// Assign a hex color from quantile stops to a single value
+function colorFromStops(stops, val) {
+  if (val == null) return '#ccc';
+  // stops = [[v0,c0],[v1,c1],...] sorted ascending
+  if (val <= stops[0][0]) return stops[0][1];
+  if (val >= stops[stops.length-1][0]) return stops[stops.length-1][1];
+  for (let i = 0; i < stops.length-1; i++) {
+    if (val >= stops[i][0] && val <= stops[i+1][0]) {
+      // Return nearest stop color (discrete quantile buckets)
+      return val - stops[i][0] < stops[i+1][0] - val ? stops[i][1] : stops[i+1][1];
+    }
+  }
+  return '#ccc';
+}
+
+function renderColors(mode) {
+  if (!map) return;
+  const metric = mapMetric;
+  // YOY: PALETTE_NORM (red=negative/down, blue=positive/up)
+  // Inverse metrics: higher value = worse = red
+  const isYOY = YOY_METRICS.has(metric);
+  const isInverse = !isYOY && (metric === 'days_on_market' || metric === 'price_reduced_pct' ||
+                    metric === 'median_property_tax' || metric === 'property_tax_rate');
+  const palette = isInverse ? PALETTE_INV : PALETTE_NORM;
+
+  // Always update legend labels when metric changes
+  document.getElementById('leg-lo').textContent = METRICS[metric].lo;
+  document.getElementById('leg-hi').textContent = METRICS[metric].hi;
+
+  if (mode === 'state') {
+    try { map.setPaintProperty('state-fill', 'fill-color', '#4393c3'); } catch(e) {}
+    drawLegend([], palette);
+    return;
+  }
+
+  const cfg = LAYER_CONFIG[mode];
+  if (!cfg) return;
+
+  const allData = cfg.getData();
+  if (!allData || !allData.length) return;
+
+  const vals = allData.map(d => cfg.getVal(d, metric)).filter(v => v != null).sort((a, b) => a - b);
+  if (!vals.length) return;
+
+  const stops = quantileStops(vals, palette);
+
+  if (mode === 'county') {
+    const src = map.getSource('ohio-counties');
+    if (isYOY) {
+      // YOY: set __color per feature (values not in GeoJSON properties)
+      if (src && src._data && src._data.features) {
+        src._data.features.forEach(f => {
+          const name = f.properties && f.properties.county;
+          const d = name ? dataMap[name] : null;
+          const val = d ? getMetricVal(d, metric) : null;
+          f.properties.__color = yoyQuantileColor(vals, val);
+          f.properties.__label = val != null ? val.toFixed(1)+'%' : '';
+        });
+        src.setData(src._data);
+      }
+      try { map.setPaintProperty('counties-fill', 'fill-color', ['coalesce', ['get', '__color'], '#ccc']); } catch(e) {}
+    } else {
+      // Non-YOY: use Mapbox interpolate expression on GeoJSON property
+      const flatStops = stops.flatMap(([v, c]) => [v, c]);
+      try {
+        map.setPaintProperty('counties-fill', 'fill-color', [
+          'interpolate', ['linear'],
+          ['coalesce', ['get', metric], vals[0]],
+          ...flatStops
+        ]);
+      } catch(e) {}
+      if (src && src._data && src._data.features) {
+        src._data.features.forEach(f => {
+          const v = f.properties[metric];
+          if (v == null) { f.properties.__label = ''; return; }
+          const n = Number(v);
+          if (metric === 'zhvi' || metric === 'median_property_tax') {
+            f.properties.__label = n >= 1000000 ? '$'+(n/1000000).toFixed(1)+'M' : '$'+Math.round(n/1000)+'K';
+          } else if (metric === 'property_tax_rate' || metric === 'price_reduced_pct') {
+            f.properties.__label = n.toFixed(1)+'%';
+          } else {
+            f.properties.__label = METRICS[metric].fmt(n);
+          }
+        });
+        src.setData(src._data);
+      }
+    }
+  } else if (mode === 'zip' && zipGeoJSON) {
+    zipGeoJSON.features.forEach(f => {
+      const zip = f.properties.__zip || f.properties.zip || String(f.id);
+      const d = zipDataMap[zip];
+      const val = isYOY
+        ? (d && d.yoy_latest && d.yoy_latest[metric] != null ? d.yoy_latest[metric] : null)
+        : (f.properties[metric] != null ? Number(f.properties[metric]) : null);
+      f.properties.__color = isYOY ? yoyQuantileColor(vals, val != null ? Number(val) : null) : colorFromStops(stops, val != null ? Number(val) : null);
+    });
+    map.getSource('ohio-zips').setData(zipGeoJSON);
+    map.setPaintProperty('zips-fill', 'fill-color', ['coalesce', ['get', '__color'], '#ccc']);
+  } else if (mode === 'metro' && metroGeoJSON) {
+    metroGeoJSON.features.forEach(f => {
+      const rid = f.properties && f.properties.__rid;
+      const d = rid ? metroDataMap[rid] : null;
+      const val = isYOY
+        ? (d && d.yoy_latest && d.yoy_latest[metric] != null ? d.yoy_latest[metric] : null)
+        : (f.properties[metric] != null ? Number(f.properties[metric]) : null);
+      f.properties.__color = isYOY ? yoyQuantileColor(vals, val != null ? Number(val) : null) : colorFromStops(stops, val != null ? Number(val) : null);
+    });
+    map.getSource('ohio-metros').setData(metroGeoJSON);
+    map.setPaintProperty('metros-fill', 'fill-color', ['coalesce', ['get', '__color'], '#ccc']);
+  }
+
+  drawLegend(vals, palette);
 }
 
 function fmt$(v){return v?'$'+v.toLocaleString():'—';}
 function fmtN(v){return v!=null?v.toLocaleString():'—';}
+function fmtAxisCompact(cmetric) {
+  return v => {
+    if (cmetric==='zhvi'||cmetric==='median_list_price'||cmetric==='median_property_tax') {
+      if (Math.abs(v)>=1000) return '$'+d3.format('.2s')(v).replace('k','K').replace('G','B');
+      return '$'+v;
+    }
+    if (cmetric==='price_reduced_pct'||cmetric==='property_tax_rate') return v.toFixed(1)+'%';
+    if (cmetric==='days_on_market') return v+'d';
+    if (Math.abs(v)>=1000) return d3.format('.2s')(v).replace('k','K');
+    return v;
+  };
+}
+
+
+
+function sourceForMetric(m) {
+  const base = YOY_BASE[m] || m;
+  if (base==='zhvi') return '<a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Zillow</a>';
+  if (base==='median_property_tax'||base==='property_tax_rate') return '<a href="https://data.census.gov/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census ACS</a>';
+  return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
+}
+function setAttrHeader(chips, metric) {
+  document.getElementById('attr-chips').innerHTML = chips.map(c=>`<span class="attr-chip">${c}</span>`).join('');
+  const src = document.querySelector('.attr-source');
+  if (src) src.innerHTML = `Source: <span class="attr-source-name">${sourceForMetric(metric)}</span>`;
+}
 
 function openModal(county) {
   const d = dataMap[county];
@@ -282,6 +576,8 @@ function openModal(county) {
   selectedCounty = county;
   const l = d.latest || {};
   document.getElementById('modal-county').textContent = county + ' County';
+  document.getElementById('modal-sub').textContent = '';
+  setAttrHeader(['County: ' + county, 'State: Ohio'], mapMetric);
   document.getElementById('s-zhvi').textContent = fmt$(l.zhvi);
   document.getElementById('s-active').textContent = fmtN(l.active_listings);
   document.getElementById('s-pending').textContent = fmtN(l.pending_listings);
@@ -294,12 +590,12 @@ function openModal(county) {
   document.getElementById('s-rank').textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
   // Default chart to current map metric
   const defaultMetric = mapMetric;
-  document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
   const activeTab = document.querySelector(`.chart-tab[data-cmetric="${defaultMetric}"]`);
   if (activeTab) activeTab.classList.add('active');
   else document.querySelector('.chart-tab[data-cmetric="zhvi"]').classList.add('active');
   chartMetric = defaultMetric;
-  drawLineChart(county, defaultMetric);
+  renderChart(county, defaultMetric);
   document.getElementById('modal-overlay').classList.add('visible');
 }
 
@@ -308,13 +604,12 @@ function drawLineChart(county, cmetric) {
   if (!d) return;
   chartMetric = cmetric;
 
-  // Property tax metrics use bar chart with ACS annual data
-  if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
-    drawBarChart(county, cmetric);
-    return;
-  }
+  // routing handled by renderChart()
 
-  document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + ' County (2016–2026)';
+  const _startYr = history.length ? history[0].date.slice(0,4) : '';
+  const _endYr = history.length ? history[history.length-1].date.slice(0,4) : '';
+  const _suffix = isZip ? '' : ' County';
+  document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + _suffix + (_startYr ? ` (${_startYr}–${_endYr})` : '');
   const history = d.history.filter(r => r[cmetric] != null);
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
@@ -328,7 +623,7 @@ function drawLineChart(county, cmetric) {
   const y = d3.scaleLinear().domain([d3.min(history,r=>r[cmetric])*0.92, d3.max(history,r=>r[cmetric])*1.05]).range([ih,0]);
 
   y.ticks(5).forEach(t=>{
-    g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t)).attr('stroke','rgba(0,0,0,0.07)').attr('stroke-width',1);
+    g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t)).attr('stroke','rgba(0,0,0,0.13)').attr('stroke-width',1);
   });
 
   const defs = lsvg.append('defs');
@@ -340,7 +635,7 @@ function drawLineChart(county, cmetric) {
   g.append('path').datum(history).attr('d',area).attr('fill','url(#ag)').attr('stroke','none');
 
   const line = d3.line().x(r=>x(parseDate(r.date))).y(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
-  g.append('path').datum(history).attr('d',line).attr('fill','none').attr('stroke','#1a3a5c').attr('stroke-width',2.5);
+  g.append('path').datum(history).attr('d',line).attr('fill','none').attr('stroke','#1a3a5c').attr('stroke-width',3);
 
   // Compact label formatter (e.g. $301K, 37 days, 24.1%)
   function fmtCompact(val) {
@@ -361,7 +656,8 @@ function drawLineChart(county, cmetric) {
   });
   // Same month as latest data point, every 2 years
   const latestMonth = history[history.length-1].date.split('-')[1];
-  const labelYears = new Set(['2016','2018','2020','2022','2024','2026']);
+  const allYears = [...new Set(history.map(r=>r.date.slice(0,4)))].sort();
+  const labelYears = new Set(allYears.filter((_,i)=>i%2===0).concat([allYears[allYears.length-1]]));
   const annualPts = history.filter((r,i) => {
     if (i === history.length-1) return true;
     const [yr, mo] = r.date.split('-');
@@ -380,15 +676,23 @@ function drawLineChart(county, cmetric) {
     .attr('stroke-width', 1.5);
 
   // Labels only on every OTHER year (2016, 2018, 2020, 2022, 2024, 2026)
+  // White pill background behind each callout label
+  g.selectAll('.albl-bg').data(annualPts).enter().append('rect')
+    .attr('class','albl-bg')
+    .attr('x', r=>x(parseDate(r.date))-18)
+    .attr('y', r=>Math.max(2, y(r[cmetric])-32))
+    .attr('width', 36).attr('height', 16).attr('rx', 4)
+    .attr('fill','#fff').attr('stroke','rgba(0,0,0,0.12)').attr('stroke-width',0.8);
   g.selectAll('.albl').data(annualPts).enter().append('text')
     .attr('class','albl')
     .attr('x', r=>x(parseDate(r.date)))
-    .attr('y', r=>Math.max(14, y(r[cmetric])-9))
+    .attr('y', r=>Math.max(14, y(r[cmetric])-20))
     .attr('text-anchor','middle')
-    .attr('font-size','9px')
+    .attr('font-size','10px')
     .attr('font-family','Montserrat,sans-serif')
-    .attr('font-weight','700')
-    .attr('fill','#333')
+    .attr('font-weight','900')
+    .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','2px').style('stroke-linejoin','round')
+    .attr('fill','#1a3a5c')
     .text(r => fmtCompact(r[cmetric]));
 
   // Hover interaction
@@ -430,31 +734,93 @@ function drawLineChart(county, cmetric) {
     })
     .on('mouseleave', () => { hoverLine.style('opacity',0); hoverDot.style('opacity',0); hoverCard.style('opacity',0); });
 
-  const fmtY = (cmetric==='zhvi'||cmetric==='median_list_price'||cmetric==='median_property_tax') ? v=>'$'+d3.format('.2s')(v).replace('k','K') : (cmetric==='price_reduced_pct'||cmetric==='property_tax_rate') ? v=>v.toFixed(2)+'%' : v=>d3.format('.2s')(v);
-  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(d3.timeYear.every(2)).tickFormat(d3.timeFormat('%Y')).tickSize(0)).call(ax=>ax.select('.domain').remove()).selectAll('text').attr('fill','rgba(0,0,0,0.4)').attr('font-size','9px').attr('font-family','Montserrat');
-  g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtY)).call(ax=>ax.select('.domain').remove()).selectAll('text').attr('fill','rgba(0,0,0,0.38)').attr('font-size','9px').attr('font-family','Montserrat');
+  const fmtY = fmtAxisCompact(cmetric);
+  g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(d3.timeYear.every(2)).tickFormat(d3.timeFormat('%Y')).tickSize(0)).call(ax=>ax.select('.domain').remove()).selectAll('text').attr('fill','rgba(0,0,0,0.85)').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','700');
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtY)).call(ax=>ax.select('.domain').remove()).selectAll('text').attr('fill','rgba(0,0,0,0.85)').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','700');
 }
 
 // Modal close
-document.getElementById('close-btn').addEventListener('click', () => { document.getElementById('modal-overlay').classList.remove('visible'); selectedCounty=null; });
-document.getElementById('modal-overlay').addEventListener('click', e => { if(e.target===document.getElementById('modal-overlay')){ document.getElementById('modal-overlay').classList.remove('visible'); selectedCounty=null; }});
+document.getElementById('close-btn').addEventListener('click', () => { document.getElementById('modal-overlay').classList.remove('visible'); selectedCounty=null; if(_dismissClickCard) _dismissClickCard(); if(selectedZip&&map){try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false})}catch(e){}} selectedZip=null; });
+document.getElementById('modal-overlay').addEventListener('click', e => { if(e.target===document.getElementById('modal-overlay')){ document.getElementById('modal-overlay').classList.remove('visible'); selectedCounty=null; if(_dismissClickCard) _dismissClickCard(); }});
 
 // Chart tabs
+document.getElementById('pill-state').addEventListener('click', () => setMode('state'));
+document.getElementById('pill-metro').addEventListener('click', () => setMode('metro'));
+document.getElementById('pill-county').addEventListener('click', () => setMode('county'));
+document.getElementById('pill-zip').addEventListener('click', () => setMode('zip'));
+
 document.querySelectorAll('.chart-tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
-    if (selectedCounty) drawLineChart(selectedCounty, tab.dataset.cmetric);
+    const cm = tab.dataset.cmetric;
+    if (mapMode === 'zip' && selectedZip) {
+      renderZipChart(selectedZip, cm);
+    } else if (mapMode === 'metro' && selectedMetro) {
+      const d = metroDataMap[selectedMetro];
+      if (d) {
+        if (YOY_METRICS.has(cm)) {
+          drawMonthlyBarChart(d.metro, cm, getYOYRows(d, cm), true);
+        } else if (cm === 'price_reduced_pct') {
+          drawAnnualBarChart(d.metro, cm, d.history, true);
+        } else {
+          drawMonthlyBarChart(d.metro, cm, d.history, true);
+        }
+      }
+    } else if (mapMode === 'state' && STATE_DATA) {
+      const d = STATE_DATA;
+      if (YOY_METRICS.has(cm)) {
+        drawMonthlyBarChart('Ohio', cm, getYOYRows(d, cm), true);
+      } else if (cm === 'price_reduced_pct') {
+        drawAnnualBarChart('Ohio', cm, d.history, true);
+      } else {
+        drawMonthlyBarChart('Ohio', cm, d.history, true);
+      }
+    } else if (selectedCounty) {
+      renderChart(selectedCounty, cm);
+    }
+    const src = document.querySelector('.attr-source');
+    if (src) src.innerHTML = `Source: <span class="attr-source-name">${sourceForMetric(cm)}</span>`;
   });
 });
 
+function getYOYRows(d, metric) {
+  const hist = d && d.yoy_history && d.yoy_history[metric] ? d.yoy_history[metric] : [];
+  // remap {date, value} → {date, [metric]: value} so drawMonthlyBarChart can read r[cmetric]
+  return hist.map(r => {
+    const row = {date: r.date || (r.year ? r.year+'-01' : null)};
+    row[metric] = r.value;
+    return row;
+  }).filter(r => r.date);
+}
+
+
+function renderChart(county, cmetric) {
+  const d = dataMap[county];
+  if (TAX_YOY.has(cmetric)) {
+    // Annual ACS-based YOY — use annual bar chart with YOY rows
+    const yoyRows = getYOYRows(d, cmetric).map(r => ({...r, date: r.date || ''}));
+    drawAnnualBarChart(county, cmetric, yoyRows, false);
+  } else if (YOY_METRICS.has(cmetric)) {
+    drawMonthlyBarChart(county, cmetric, getYOYRows(d, cmetric), false);
+  } else if (cmetric === 'price_reduced_pct') {
+    drawAnnualBarChart(county, cmetric);
+  } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
+    // Annual ACS data — convert prop_tax_history to have date field
+    const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
+    drawAnnualBarChart(county, cmetric, taxHist, false);
+  } else {
+    drawMonthlyBarChart(county, cmetric);
+  }
+}
+
 // Metric buttons
-document.querySelectorAll('.metric-btn').forEach(btn => {
+document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.metric-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.metric-btn[data-metric]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     mapMetric = btn.dataset.metric;
-    updateMapColors();
+    renderColors(mapMode);
   });
 });
 
@@ -466,7 +832,7 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
   }
 }).then(r=>r.json()).then(counties => {
   DATA = counties;
-  DATA.forEach(d => { dataMap[d.county] = d; });
+  DATA.forEach(d => { dataMap[d.county] = d; attachYOY(d); });
 
   // Inject metric values into GeoJSON properties via fetch
   fetch('/ohio-counties.json').then(r=>r.json()).then(geojson => {
@@ -477,13 +843,13 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
       if (d && d.latest) {
         const zhvi = d.latest.zhvi;
         const lbl = zhvi >= 1000000 ? '$'+(zhvi/1000000).toFixed(1)+'M' : zhvi >= 1000 ? '$'+Math.round(zhvi/1000)+'K' : zhvi ? '$'+Math.round(zhvi) : '';
-        Object.assign(f.properties, d.latest, {county: name, __label: lbl});
+        Object.assign(f.properties, d.latest, d.yoy_latest || {}, {county: name, __label: lbl});
       }
     });
 
     map = new mapboxgl.Map({
       container: 'map',
-      style: 'mapbox://styles/mapbox/light-v11',
+      style: 'mapbox://styles/mapbox/streets-v12',
       center: [-82.5, 40.15],
       zoom: 6.2,
       minZoom: 5,
@@ -493,20 +859,22 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
     map.addControl(new mapboxgl.NavigationControl({showCompass:false}), 'top-right');
 
     map.on('load', () => {
+      // Outside-Ohio dark overlay — added after all Ohio layers at end of load
+
       map.addSource('ohio-counties', { type:'geojson', data: geojson });
 
       const vals = DATA.map(d=>d.latest&&d.latest.zhvi).filter(v=>v!=null).sort((a,b)=>a-b);
       const mn = vals[0], mx = vals[vals.length-1];
 
       const initPal = PALETTE_NORM;
-      const initStops = initPal.flatMap((c,i)=>[mn+(mx-mn)*(i/(initPal.length-1)),c]);
+      const initStops = quantileStops(vals, initPal).flatMap(([v,c])=>[v,c]);
       map.addLayer({
         id: 'counties-fill',
         type: 'fill',
         source: 'ohio-counties',
         paint: {
-          'fill-color': ['interpolate',['linear'],['coalesce',['get','zhvi'],mn], ...initStops],
-          'fill-opacity': ['case',['boolean',['feature-state','selected'],false], 1, 0.92],
+          'fill-color': ['interpolate',['linear'],['coalesce',['get','zhvi'],vals[0]], ...initStops],
+          'fill-opacity': ['case',['boolean',['feature-state','selected'],false], 0.69, 0.49],
         }
       });
 
@@ -515,8 +883,8 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
         type: 'line',
         source: 'ohio-counties',
         paint: {
-          'line-color': '#111',
-          'line-width': ['interpolate',['linear'],['zoom'], 5,1.2, 8,2.0, 11,2.5],
+          'line-color': '#333',
+          'line-width': ['interpolate',['linear'],['zoom'], 5,1.5, 8,2.2, 11,2.8],
         }
       });
 
@@ -530,6 +898,16 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
         }
       });
 
+      map.addLayer({
+        id: 'counties-border-hover',
+        type: 'line',
+        source: 'ohio-counties',
+        paint: {
+          'line-color': '#000',
+          'line-width': ['case',['boolean',['feature-state','hover'],false],4,0],
+        }
+      });
+
 
       // County label layer — county name + value shown on map when zoomed in
       map.addLayer({
@@ -539,7 +917,7 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
         minzoom: 6.8,
         layout: {
           'text-field': ['concat', ['get','county'], '\n', ['coalesce',['get','__label'],'']],
-          'text-size': ['interpolate',['linear'],['zoom'], 6.8,12, 9,16, 11,18],
+          'text-size': ['interpolate',['linear'],['zoom'], 6.8,14, 9,19, 11,22],
           'text-font': ['DIN Pro Bold','Arial Unicode MS Bold'],
           'text-anchor': 'center',
           'text-max-width': 10,
@@ -551,7 +929,36 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
           'text-halo-width': 2,
         }
       });
-      updateMapColors();
+      renderColors('county');
+
+      // Outside-Ohio dark overlay — inverse mask using world bbox
+
+
+      fetch('/ohio-state.geojson').then(r=>r.json()).then(ohioGeo => {
+        // Build inverse: world rectangle with Ohio as a hole
+        const ohioCoords = ohioGeo.features[0].geometry.coordinates;
+        const worldRing = [[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]];
+        map.addSource('outside-ohio', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: {
+              type: 'Polygon',
+              coordinates: [worldRing, ...ohioCoords]
+            }
+          }
+        });
+        map.addLayer({
+          id: 'outside-ohio-mask',
+          type: 'fill',
+          source: 'outside-ohio',
+          paint: {
+            'fill-color': '#1a1a2e',
+            'fill-opacity': 0.45
+          }
+        }, 'counties-fill');  // insert BELOW data layers so mouse events pass through
+      });
+
       document.getElementById('loading').style.display='none';
 
       // Hover tooltip
@@ -566,11 +973,18 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
         hoveredId = f.id;
         map.setFeatureState({source:'ohio-counties',id:hoveredId},{hover:true});
         const name = f.properties.county;
-        const val = f.properties[mapMetric];
-        const fmtVal = val != null ? METRICS[mapMetric].fmt(Number(val)) : 'N/A';
+        let fmtVal;
+        if (YOY_METRICS.has(mapMetric)) {
+          fmtVal = f.properties.__label || 'N/A';
+        } else {
+          const val = f.properties[mapMetric];
+          fmtVal = val != null ? METRICS[mapMetric].fmt(Number(val)) : 'N/A';
+        }
+        const _cRaw = YOY_METRICS.has(mapMetric) ? getMetricVal(dataMap[name], mapMetric) : (f.properties[mapMetric] != null ? Number(f.properties[mapMetric]) : null);
+        const _cColor = _cRaw != null && _cRaw < 0 ? '#c0392b' : '#111';
         popup.setLngLat(e.lngLat).setHTML(`
           <div class="tt-county">${name} County</div>
-          <div class="tt-val">${fmtVal}</div>
+          <div class="tt-val" style="color:${_cColor}">${fmtVal}</div>
           <div class="tt-label">${METRICS[mapMetric].label}</div>
         `).addTo(map);
       });
@@ -582,8 +996,9 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
         popup.remove();
       });
 
-      // Click → modal
+      // Click → county modal
       map.on('click','counties-fill', e => {
+        if (mapMode !== 'county') return;
         if (!e.features.length) return;
         const f = e.features[0];
         const name = f.properties.county;
@@ -593,86 +1008,656 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
         map.setFeatureState({source:'ohio-counties',id:selectedFips},{selected:true});
         openModal(name);
       });
+
+      // --- ZIP layers (hidden until ZIP mode) ---
+      // Metro source + layers
+      map.addSource('ohio-metros', {type:'geojson', data:'/ohio-metros.geojson', promoteId:'region_id'});
+      map.addLayer({id:'metros-fill',type:'fill',source:'ohio-metros',layout:{visibility:'none'},
+        paint:{'fill-color':'#ccc','fill-opacity':0.57}});
+      map.addLayer({id:'metros-border',type:'line',source:'ohio-metros',layout:{visibility:'none'},
+        paint:{'line-color':'rgba(0,0,0,0.35)','line-width':0.8}});
+      map.addLayer({id:'metros-border-hover',type:'line',source:'ohio-metros',layout:{visibility:'none'},
+        paint:{'line-color':'#000','line-width':['case',['boolean',['feature-state','hover'],false],3,0]}});
+      map.addLayer({id:'metros-border-selected',type:'line',source:'ohio-metros',layout:{visibility:'none'},
+        paint:{'line-color':'#000','line-width':['case',['boolean',['feature-state','selected'],false],3.5,0]}});
+      map.addLayer({id:'metros-labels',type:'symbol',source:'ohio-metros',layout:{
+        visibility:'none',
+        'text-field':['get','name'],
+        'text-font':['DIN Offc Pro Medium','Arial Unicode MS Regular'],
+        'text-size':['interpolate',['linear'],['zoom'],5,9,8,12],
+        'text-allow-overlap':false,'symbol-avoid-edges':true
+      },paint:{'text-color':'#111','text-halo-color':'rgba(255,255,255,0.85)','text-halo-width':1.5}});
+
+      // Metro hover
+      map.on('mousemove','metros-fill', e => {
+        if (mapMode !== 'metro' || !e.features.length) return;
+        map.getCanvas().style.cursor = 'pointer';
+        if (metroHoveredId !== null) map.setFeatureState({source:'ohio-metros',id:metroHoveredId},{hover:false});
+        metroHoveredId = e.features[0].id;
+        map.setFeatureState({source:'ohio-metros',id:metroHoveredId},{hover:true});
+        const mf = e.features[0];
+        const rid = mf.properties && mf.properties.__rid;
+        const md = rid ? metroDataMap[rid] : null;
+        const mVal = md ? getMetricVal(md, mapMetric) : null;
+        const mFmt = mVal != null ? METRICS[mapMetric].fmt(mVal) : 'N/A';
+        const mName = (mf.properties && mf.properties.metro) || (md && md.metro) || '';
+        const _mColor = mVal != null && mVal < 0 ? '#c0392b' : '#111';
+        popup.setLngLat(e.lngLat).setHTML(`
+          <div class="tt-county">${mName}</div>
+          <div class="tt-val" style="color:${_mColor}">${mFmt}</div>
+          <div class="tt-label">${METRICS[mapMetric].label}</div>
+        `).addTo(map);
+      });
+      map.on('mouseleave','metros-fill', () => {
+        map.getCanvas().style.cursor = '';
+        if (metroHoveredId !== null) map.setFeatureState({source:'ohio-metros',id:metroHoveredId},{hover:false});
+        metroHoveredId = null;
+        popup.remove();
+      });
+      map.on('click','metros-fill', e => {
+        if (mapMode !== 'metro' || !e.features.length) return;
+        const rid = e.features[0].id;
+        if (selectedMetro) map.setFeatureState({source:'ohio-metros',id:selectedMetro},{selected:false});
+        selectedMetro = rid;
+        map.setFeatureState({source:'ohio-metros',id:selectedMetro},{selected:true});
+        openMetroModal(rid);
+      });
+
+      // State source + layers
+      map.addSource('ohio-state', {type:'geojson', data:'/ohio-state.geojson', promoteId:'name'});
+      map.addLayer({id:'state-fill',type:'fill',source:'ohio-state',layout:{visibility:'none'},
+        paint:{'fill-color':'#4393c3','fill-opacity':0.52}});
+      map.addLayer({id:'state-border',type:'line',source:'ohio-state',layout:{visibility:'none'},
+        paint:{'line-color':'rgba(0,0,0,0.4)','line-width':1.2}});
+      map.addLayer({id:'state-border-hover',type:'line',source:'ohio-state',layout:{visibility:'none'},
+        paint:{'line-color':'#000','line-width':['case',['boolean',['feature-state','hover'],false],3,0]}});
+
+      // State hover + click
+      map.on('mousemove','state-fill', e => {
+        if (mapMode !== 'state') return;
+        map.getCanvas().style.cursor = 'pointer';
+        map.setFeatureState({source:'ohio-state',id:'Ohio'},{hover:true});
+      });
+      map.on('mouseleave','state-fill', () => {
+        map.getCanvas().style.cursor = '';
+        map.setFeatureState({source:'ohio-state',id:'Ohio'},{hover:false});
+      });
+      map.on('click','state-fill', e => {
+        if (mapMode !== 'state') return;
+        openStateModal();
+      });
+
+      map.addSource('ohio-zips', {type:'geojson', data:'/ohio-zips.geojson', promoteId:'zip'});
+
+      map.addLayer({id:'zips-fill',type:'fill',source:'ohio-zips',layout:{visibility:'none'},
+        paint:{'fill-color':'#ccc','fill-opacity':0.47}});
+
+      map.addLayer({id:'zips-border',type:'line',source:'ohio-zips',layout:{visibility:'none'},
+        paint:{'line-color':'rgba(0,0,0,0.7)','line-width':0.8}});
+
+      map.addLayer({id:'zips-border-hover',type:'line',source:'ohio-zips',layout:{visibility:'none'},
+        paint:{'line-color':'#000','line-width':['case',['boolean',['feature-state','hover'],false],3,0]}});
+
+      map.addLayer({id:'zips-border-selected',type:'line',source:'ohio-zips',layout:{visibility:'none'},
+        paint:{'line-color':'#000','line-width':['case',['boolean',['feature-state','selected'],false],3.5,0]}});
+      map.addLayer({id:'zips-labels',type:'symbol',source:'ohio-zips',layout:{
+        visibility:'none',
+        'text-field':['get','zip'],
+        'text-font':['DIN Offc Pro Medium','Arial Unicode MS Regular'],
+        'text-size':['interpolate',['linear'],['zoom'], 7,9, 9,11, 11,13],
+        'text-allow-overlap':false,
+        'symbol-avoid-edges':true
+      },paint:{
+        'text-color':'#111',
+        'text-halo-color':'rgba(255,255,255,0.85)',
+        'text-halo-width':1.5
+      }});
+
+      // ZIP hover
+      map.on('mousemove','zips-fill', e => {
+        if (mapMode !== 'zip' || !e.features.length) return;
+        map.getCanvas().style.cursor = 'pointer';
+        if (zipHoveredId !== null) map.setFeatureState({source:'ohio-zips',id:zipHoveredId},{hover:false});
+        zipHoveredId = String(e.features[0].id || e.features[0].properties.__zip || e.features[0].properties.zip || '');
+        map.setFeatureState({source:'ohio-zips',id:zipHoveredId},{hover:true});
+        const zd = zipDataMap[zipHoveredId];
+        const zVal = zd ? getMetricVal(zd, mapMetric) : null;
+        const zFmt = zVal != null ? METRICS[mapMetric].fmt(zVal) : 'N/A';
+        const zCity = zd && zd.city ? zd.city : '';
+        const _zColor = zVal != null && zVal < 0 ? '#c0392b' : '#111';
+        popup.setLngLat(e.lngLat).setHTML(`
+          <div class="tt-county">${zipHoveredId}${zCity ? ' · '+zCity : ''}</div>
+          <div class="tt-val" style="color:${_zColor}">${zFmt}</div>
+          <div class="tt-label">${METRICS[mapMetric].label}</div>
+        `).addTo(map);
+      });
+      map.on('mouseleave','zips-fill', () => {
+        map.getCanvas().style.cursor = '';
+        if (zipHoveredId !== null) map.setFeatureState({source:'ohio-zips',id:zipHoveredId},{hover:false});
+        zipHoveredId = null;
+        popup.remove();
+      });
+
+      // ZIP click → modal
+      map.on('click','zips-fill', e => {
+        if (mapMode !== 'zip' || !e.features.length) return;
+        const z = String(e.features[0].id || e.features[0].properties.zip || e.features[0].properties.ZCTA5CE20);
+        if (!z || z === 'undefined') return;
+        if (!zipDataLoaded) return; // data not ready yet
+        if (selectedZip) map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false});
+        selectedZip = z;
+        map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:true});
+        openZipModal(z);
+      });
     });
   });
 }).catch(err => {
   document.getElementById('loading').innerHTML = '<div class="ld" style="color:#f87171">Error loading data</div>';
   console.error(err);
 });
-function drawBarChart(county, cmetric) {
-  const d = dataMap[county];
-  if (!d || !d.prop_tax_history) return;
-  const rows = d.prop_tax_history.filter(r => r[cmetric] != null);
-  document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + ' County (Census ACS 2021–2024)';
+function paletteForMetric(metric) {
+  const isInv = !YOY_METRICS.has(metric) && (
+    metric === 'days_on_market' || metric === 'price_reduced_pct' ||
+    metric === 'median_property_tax' || metric === 'property_tax_rate'
+  );
+  return isInv ? PALETTE_INV : PALETTE_NORM;
+}
+
+
+function drawMonthlyBarChart(county, cmetric, histOverride, isZip) {
+  const d = histOverride != null ? {history: histOverride} : dataMap[county];
+  if (!d || !d.history) return;
+  chartMetric = cmetric;
+  const rows = d.history.filter(r => r[cmetric] != null);
+  // Normalize date format YYYY-MM-DD → YYYY-MM and sort chronologically
+  rows.forEach(r => { if (r.date && r.date.length > 7) r.date = r.date.slice(0, 7); });
+  rows.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+
+  const startYr = rows.length ? rows[0].date.slice(0,4) : '';
+  const endYr = rows.length ? rows[rows.length-1].date.slice(0,4) : '';
+  const suffix = isZip ? '' : ' County';
+  document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + suffix + (startYr ? ` (${startYr}–${endYr})` : '');
 
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
   const W = lsvg.node().getBoundingClientRect().width || 760;
   const H = 349;
-  const m = {top:18, right:16, bottom:36, left:70};
+  const m = {top:28, right:16, bottom:36, left:62};
   const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
   const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
 
-  const x = d3.scaleBand().domain(rows.map(r=>r.year)).range([0,iw]).padding(0.28);
-  const y = d3.scaleLinear().domain([0, d3.max(rows,r=>r[cmetric])*1.15]).range([ih,0]);
-  const fmt = cmetric==='median_property_tax' ? v=>'$'+Math.round(v).toLocaleString() : v=>v.toFixed(2)+'%';
-  const fmtAxis = cmetric==='median_property_tax' ? v=>'$'+d3.format('.2s')(v).replace('k','K') : v=>v.toFixed(1)+'%';
+  const parseDate = d3.timeParse('%Y-%m');
+  const x = d3.scaleTime()
+    .domain(d3.extent(rows, r=>parseDate(r.date)))
+    .range([0, iw]);
+  const isZeroBased = !YOY_METRICS.has(cmetric) && (cmetric==='active_listings'||cmetric==='pending_listings'||cmetric==='price_reduced_pct'||cmetric==='property_tax_rate');
+  const _isYOY = YOY_METRICS.has(cmetric);
+  const _minVal = d3.min(rows, r=>r[cmetric]);
+  const _maxVal = d3.max(rows, r=>r[cmetric]);
+  const hasNeg = _minVal < 0;
+  // YOY charts always include zero in domain so bars anchor correctly
+  const yMin = _isYOY ? Math.min(0, hasNeg ? _minVal * 1.15 : 0)
+             : hasNeg ? _minVal * 1.15
+             : (isZeroBased ? 0 : _minVal * 0.92);
+  const yMax = _isYOY ? (_maxVal > 0 ? _maxVal * 1.08 : 0.001)
+             : (_maxVal > 0 ? _maxVal * 1.08 : _maxVal * 0.92);
+  const y = d3.scaleLinear()
+    .domain([yMin, yMax])
+    .range([ih, 0]);
+
+
+
+  // Bar width = slightly less than 1 month in pixels
+  const monthPx = iw / rows.length;
+
+  // Color: YOY metrics use diverging scale (red=negative, blue=positive); base metrics solid blue
+  const _isYOYChart = YOY_METRICS.has(cmetric);
+  const _sortedVals = rows.map(r=>r[cmetric]).filter(v=>v!=null).sort((a,b)=>a-b);
+  const barColor = _isYOYChart
+    ? (r => divergingColor(_sortedVals, r[cmetric]))
+    : (() => '#4393c3');
 
   // Grid
   y.ticks(5).forEach(t=>{
     g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t))
-      .attr('stroke','rgba(0,0,0,0.07)').attr('stroke-width',1);
+      .attr('stroke','rgba(0,0,0,0.13)').attr('stroke-width',1);
   });
+
+  // Persistent click tooltip
+  let clickedDate = null;
+  const clickCard = g.append('g').style('opacity',0);
+  _dismissClickCard = () => { clickCard.style('opacity',0); clickedDate = null; if(bars){bars.attr('fill', d=>barColor(d)).attr('fill-opacity',1.0).attr('stroke','#fff').attr('stroke-width',0.8);} };
+  // Clicking anywhere on SVG outside a bar vanishes the pinned card
+  lsvg.on('click', function(event) {
+    if (!event.target.classList.contains('mbar')) { _dismissClickCard(); }
+  });
+  const clickRect = clickCard.append('rect').attr('rx',8).attr('fill','#0d1e42')
+    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1.5)
+    .style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.55))');
+  const clickDateTxt = clickCard.append('text').attr('font-size','11px').attr('font-family','Montserrat').attr('font-weight','600').attr('fill','rgba(255,255,255,0.7)');
+  const clickValTxt  = clickCard.append('text').attr('font-size','22px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#fff');
+  const clickLabelTxt= clickCard.append('text').attr('font-size','10px').attr('font-family','Montserrat').attr('font-weight','500').attr('fill','rgba(255,255,255,0.8)');
+
+  // Zero line (visible when data crosses zero)
+  if (hasNeg || isZeroBased || _isYOY) {
+    g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(0)).attr('y2',y(0))
+      .attr('stroke','rgba(0,0,0,0.35)').attr('stroke-width',1.5);
+  }
+
+  // Bars — quantile color from same system as map
+  const bars = g.selectAll('.mbar').data(rows).join('rect').attr('class','mbar')
+    .attr('x', r=>x(parseDate(r.date)) - monthPx*0.45)
+    .attr('y', r => _isYOYChart ? Math.min(y(r[cmetric]), y(0)) : y(r[cmetric]))
+    .attr('width', monthPx*0.9)
+    .attr('height', r => _isYOYChart ? Math.abs(y(r[cmetric]) - y(0)) : ih - y(r[cmetric]))
+    .attr('fill', r => barColor(r))
+    .attr('fill-opacity', 1.0)
+    .attr('stroke', '#fff')
+    .attr('stroke-width', 0.8)
+    .attr('rx', 1)
+    .style('cursor','pointer')
+    .on('mouseover', function(event, r) {
+      if (r.date !== clickedDate) d3.select(this).attr('fill-opacity', 1);
+    })
+    .on('mouseout', function(event, r) {
+      if (r.date !== clickedDate) d3.select(this).attr('fill-opacity', 1.0);
+    })
+    .on('click', function(event, r) {
+      event.stopPropagation();
+      clickedDate = r.date;
+      bars.attr('fill', d => barColor(d)).attr('fill-opacity',1.0).attr('stroke','#fff').attr('stroke-width',0.8);
+      d3.select(this).attr('fill-opacity',1).attr('stroke','#1a1a2e').attr('stroke-width',2);
+      // Show click card
+      const cx = x(parseDate(r.date));
+      const cy = y(r[cmetric]);
+      const cardW=150, cardH=76;
+      const cardX = cx + cardW + 10 > iw ? cx - cardW - 10 : cx + 10;
+      const cardY = Math.max(0, Math.min(cy - 10, ih - cardH));
+      clickRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',cardH);
+      clickDateTxt.attr('x',cardX+12).attr('y',cardY+18).text(fmtMonthDate(r.date));
+      clickValTxt.attr('x',cardX+12).attr('y',cardY+46).text(METRICS[cmetric].fmt(r[cmetric]));
+      clickLabelTxt.attr('x',cardX+12).attr('y',cardY+64).text(METRICS[cmetric].label.toUpperCase());
+      clickCard.style('opacity',1);
+    });
+
+  // Hover interaction — use string bisect (avoids parseDate null → epoch date bug)
+  function fmtMonthDate(dateStr) {
+    if (!dateStr) return '';
+    const [y2, m2] = dateStr.split('-');
+    const MO = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    return (MO[parseInt(m2,10)-1] || '') + ' ' + y2;
+  }
+  const bisect = d3.bisector(r => r.date).left;
+  const hoverLine = g.append('line').attr('y1',0).attr('y2',ih)
+    .attr('stroke','rgba(26,82,150,0.3)').attr('stroke-width',1)
+    .attr('stroke-dasharray','4,3').style('opacity',0);
+  const hoverCard = g.append('g').style('opacity',0);
+  const hoverRect = hoverCard.append('rect').attr('rx',8).attr('fill','#fff')
+    .attr('stroke','rgba(26,82,150,0.18)').attr('stroke-width',1.5)
+    .style('filter','drop-shadow(0 4px 12px rgba(0,0,0,0.13))');
+  const hoverDateTxt = hoverCard.append('text').attr('font-size','11px').attr('font-family','Montserrat').attr('font-weight','600').attr('fill','#888');
+  const hoverValTxt  = hoverCard.append('text').attr('font-size','22px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#111');
+  const hoverLabelTxt= hoverCard.append('text').attr('font-size','10px').attr('font-family','Montserrat').attr('font-weight','500').attr('fill','#aaa');
+
+  const cardW=140, cardH=76;
+  lsvg.on('mousemove', function(event) {
+    const [mx] = d3.pointer(event, g.node());
+    const dateStr = d3.timeFormat('%Y-%m')(x.invert(mx));
+    const i = Math.min(rows.length-1, Math.max(0, bisect(rows, dateStr)));
+    const r = rows[i];
+    const cx = x(parseDate(r.date));
+    const cy = y(r[cmetric]);
+    const cardX = cx + cardW + 10 > iw ? cx - cardW - 10 : cx + 10;
+    const cardY = Math.max(0, Math.min(cy - 10, ih - cardH));
+    hoverLine.attr('x1',cx).attr('x2',cx).style('opacity',1);
+    hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',cardH);
+    hoverDateTxt.attr('x',cardX+12).attr('y',cardY+18).text(fmtMonthDate(r.date));
+    hoverValTxt.attr('x',cardX+12).attr('y',cardY+46).text(METRICS[cmetric].fmt(r[cmetric]));
+    hoverLabelTxt.attr('x',cardX+12).attr('y',cardY+64).text(METRICS[cmetric].label.toUpperCase());
+    hoverCard.style('opacity',1);
+  }).on('mouseleave', ()=>{ hoverLine.style('opacity',0); hoverCard.style('opacity',0); });
+
+  // X axis — year labels only
+  g.append('g').attr('transform',`translate(0,${ih})`)
+    .call(d3.axisBottom(x).ticks(d3.timeYear.every(2)).tickFormat(d3.timeFormat('%Y')).tickSize(0))
+    .call(ax=>ax.select('.domain').remove())
+    .selectAll('text').attr('fill','rgba(0,0,0,0.85)').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','700');
+
+  // Y axis
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtAxisCompact(cmetric)))
+    .call(ax=>ax.select('.domain').remove())
+    .selectAll('text').attr('fill','rgba(0,0,0,0.85)').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','700');
+}
+
+function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
+  const d = histOverride != null ? {history: histOverride} : dataMap[county];
+  if (!d || !d.history) return;
+  chartMetric = cmetric;
+  // Pull one data point per year at the latest available month (June preferred)
+  const byYear = {};
+  d.history.forEach(r => {
+    if (r[cmetric] == null) return;
+    const [yr, mo] = r.date.split('-');
+    if (!byYear[yr] || mo === '06') byYear[yr] = r;
+  });
+  const rows = Object.keys(byYear).sort().map(yr => ({year: yr, val: byYear[yr][cmetric]}));
+
+  document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + ' County (Annual · June)';
+
+  const lsvg = d3.select('#line-chart');
+  lsvg.selectAll('*').remove();
+  const W = lsvg.node().getBoundingClientRect().width || 760;
+  const H = 349;
+  const m = {top:28, right:16, bottom:36, left:62};
+  const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
+  const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
+
+  const _aMinVal = d3.min(rows,r=>r.val);
+  const _aMaxVal = d3.max(rows,r=>r.val);
+  const _aIsYOY = YOY_METRICS.has(cmetric);
+  const _aHasNeg = _aMinVal < 0;
+  const _aYMin = _aIsYOY ? Math.min(0, _aHasNeg ? _aMinVal * 1.15 : 0)
+               : (_aHasNeg ? _aMinVal * 1.15 : 0);
+  const _aYMax = _aIsYOY ? (_aMaxVal > 0 ? _aMaxVal * 1.2 : 0.001)
+               : (_aMaxVal > 0 ? _aMaxVal * 1.2 : _aMaxVal * 0.9);
+  const _aSortedVals = rows.map(r=>r.val).filter(v=>v!=null).sort((a,b)=>a-b);
+  const _aBarColor = _aIsYOY ? (r => divergingColor(_aSortedVals, r.val)) : (() => '#4393c3');
+  const x = d3.scaleBand().domain(rows.map(r=>r.year)).range([0,iw]).padding(0.28);
+  const y = d3.scaleLinear().domain([_aYMin, _aYMax]).range([ih,0]);
+
+  // Grid
+  y.ticks(5).forEach(t=>{
+    g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t))
+      .attr('stroke','rgba(0,0,0,0.13)').attr('stroke-width',1);
+  });
+
+  // Zero line (always for YOY, otherwise only if negative values exist)
+  if (_aHasNeg || _aIsYOY) {
+    g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(0)).attr('y2',y(0))
+      .attr('stroke','rgba(0,0,0,0.35)').attr('stroke-width',1.5);
+  }
 
   // Bars
   g.selectAll('.bar').data(rows).join('rect').attr('class','bar')
-    .attr('x', r=>x(r.year)).attr('y', r=>y(r[cmetric]))
+    .attr('x', r=>x(r.year))
+    .attr('y', r => Math.min(y(r.val), y(0)))
     .attr('width', x.bandwidth())
-    .attr('height', r=>ih-y(r[cmetric]))
+    .attr('height', r => Math.abs(y(r.val) - y(0)))
     .attr('rx', 4)
-    .attr('fill', (r,i)=> i===rows.length-1 ? '#4a7fb8' : 'rgba(74,127,184,0.4)')
-    .attr('stroke', (r,i)=> i===rows.length-1 ? '#78a8cc' : 'rgba(120,168,204,0.4)')
-    .attr('stroke-width', 1);
+    .attr('fill', r => _aBarColor(r))
+    .attr('fill-opacity', 1.0)
+    .attr('stroke', '#fff')
+    .attr('stroke-width', 1.5);
 
-  // Value labels on bars
+  // Value labels above/below bars
   g.selectAll('.bar-lbl').data(rows).join('text').attr('class','bar-lbl')
-    .attr('x', r=>x(r.year)+x.bandwidth()/2).attr('y', r=>y(r[cmetric])-35)
-    .attr('text-anchor','middle').attr('font-size','11px').attr('font-weight','500')
+    .attr('x', r=>x(r.year)+x.bandwidth()/2)
+    .attr('y', r=> r.val >= 0 ? y(r.val)-8 : y(r.val)+16)
+    .attr('text-anchor','middle').attr('font-size','10px').attr('font-weight','900')
     .attr('font-family','Montserrat').attr('fill','#1a1a2e')
-    .text(r=>fmt(r[cmetric]));
-
-  // YoY on every bar except first
-  rows.forEach((r, i) => {
-    if (i === 0) return;
-    const prev = rows[i-1][cmetric];
-    const curr = r[cmetric];
-    const pct = ((curr-prev)/prev*100).toFixed(1);
-    const arrow = curr >= prev ? '▲' : '▼';
-    const clr = curr >= prev ? '#f87171' : '#4ade80';
-    g.append('text')
-      .attr('x', x(r.year)+x.bandwidth()/2)
-      .attr('y', y(curr)-20)
-      .attr('text-anchor','middle').attr('font-size','9px').attr('font-weight','500')
-      .attr('font-family','Montserrat').attr('fill',clr)
-      .text(`${arrow}${pct}%`);
-  });
-
-  // Source note
-  g.append('text').attr('x',iw).attr('y',ih+30).attr('text-anchor','end')
-    .attr('font-size','8px').attr('fill','rgba(0,0,0,0.22)').attr('font-family','Montserrat')
-    .text('Source: US Census Bureau ACS 5-Year Estimates');
+    .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','2px').style('stroke-linejoin','round')
+    .text(r=>METRICS[cmetric].fmt(r.val));
 
   // Axes
   g.append('g').attr('transform',`translate(0,${ih})`)
     .call(d3.axisBottom(x).tickSize(0))
     .call(ax=>ax.select('.domain').remove())
-    .selectAll('text').attr('fill','rgba(0,0,0,0.5)').attr('font-size','11px')
+    .selectAll('text').attr('fill','rgba(0,0,0,0.65)').attr('font-size','11px')
     .attr('font-family','Montserrat').attr('font-weight','600');
 
-  g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtAxis))
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtAxisCompact(cmetric)))
     .call(ax=>ax.select('.domain').remove())
-    .selectAll('text').attr('fill','rgba(0,0,0,0.38)').attr('font-size','9px')
+    .selectAll('text').attr('fill','rgba(0,0,0,0.65)').attr('font-size','12px')
     .attr('font-family','Montserrat');
+}
+
+function setMode(mode) {
+  mapMode = mode;
+  ['state','metro','county','zip'].forEach(m => {
+    document.getElementById('pill-'+m).classList.toggle('active', mode===m);
+  });
+  const placeholders = {state:'Ohio statewide data', metro:'Search Ohio metros…', county:'Search Ohio counties…', zip:'Search ZIP codes…'};
+  document.getElementById('search-input').placeholder = placeholders[mode] || 'Search…';
+  document.getElementById('search-results').style.display='none';
+
+  const countyLayers = ['counties-fill','counties-border','counties-border-hover','counties-border-selected','counties-labels'];
+  const zipLayers = ['zips-fill','zips-border','zips-border-hover','zips-border-selected','zips-labels'];
+  const metroLayers = ['metros-fill','metros-border','metros-border-hover','metros-border-selected','metros-labels'];
+  const stateLayers = ['state-fill','state-border','state-border-hover'];
+
+  countyLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='county'?'visible':'none')}catch(e){} });
+  zipLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='zip'?'visible':'none')}catch(e){} });
+  metroLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='metro'?'visible':'none')}catch(e){} });
+  stateLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='state'?'visible':'none')}catch(e){} });
+
+  if (mode === 'zip') { loadZipData(); }
+  else if (mode === 'metro') { loadMetroData(); }
+  else if (mode === 'state') { loadStateData(); }
+  else {
+    if (selectedZip) { try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false})}catch(e){} selectedZip=null; }
+    if (selectedMetro) { try{map.setFeatureState({source:'ohio-metros',id:selectedMetro},{selected:false})}catch(e){} selectedMetro=null; }
+  }
+  // Close modal when switching modes
+  document.getElementById('modal-overlay').classList.remove('visible');
+  selectedCounty = null;
+}
+
+
+// --- Metro Mode ---
+function loadMetroData() {
+  if (metroDataLoaded) { renderColors('metro'); return; }
+  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+  Promise.all([
+    fetch('/ohio-metros.geojson').then(r=>r.json()),
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_metros?select=region_id,metro,latest,history', {
+      headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
+    }).then(r=>r.json())
+  ]).then(([geojson, metros]) => {
+    METRO_DATA = metros;
+    METRO_DATA.forEach(d => { metroDataMap[d.region_id] = d; attachYOY(d); });
+    metroDataLoaded = true;
+    geojson.features.forEach(f => {
+      const rid = f.properties && f.properties.region_id;
+      const d = rid ? metroDataMap[rid] : null;
+      if (d && d.latest) Object.assign(f.properties, d.latest, d.yoy_latest || {}, {__rid: rid, name: d.metro});
+    });
+    metroGeoJSON = geojson;
+    map.getSource('ohio-metros').setData(geojson);
+    renderColors('metro');
+  }).catch(err => console.error('Metro data load error:', err));
+}
+
+
+function openMetroModal(rid) {
+  const d = metroDataMap[rid];
+  if (!d) return;
+  selectedCounty = null; selectedZip = null;
+  const l = d.latest || {};
+  document.getElementById('modal-county').textContent = d.metro;
+  document.getElementById('modal-sub').textContent = '';
+  const chips = ['Metro'];
+  if (d.metro.includes('OH')) chips.push('State: Ohio');
+  setAttrHeader(chips, mapMetric);
+  document.getElementById('s-zhvi').textContent = l.zhvi ? fmt$(l.zhvi) : '—';
+  document.getElementById('s-active').textContent = l.active_listings ? fmtN(l.active_listings) : '—';
+  document.getElementById('s-pending').textContent = l.pending_listings ? fmtN(l.pending_listings) : '—';
+  document.getElementById('s-dom').textContent = l.days_on_market != null ? l.days_on_market+'d' : '—';
+  document.getElementById('s-pct').textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
+  document.getElementById('s-ptax').textContent = '—';
+  document.getElementById('s-ptaxrate').textContent = '—';
+  document.getElementById('s-rank').textContent = (() => {
+    const sorted = METRO_DATA.filter(x=>x.latest&&x.latest[mapMetric]!=null).sort((a,b)=>b.latest[mapMetric]-a.latest[mapMetric]);
+    const rank = sorted.findIndex(x=>x.region_id===rid)+1;
+    return rank > 0 ? '#'+rank+' of '+sorted.length : '—';
+  })();
+  document.getElementById('modal-overlay').classList.add('visible');
+  document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
+  if (YOY_METRICS.has(mapMetric)) {
+    drawMonthlyBarChart(d.metro, mapMetric, getYOYRows(d, mapMetric), true);
+  } else if (mapMetric === 'price_reduced_pct') {
+    drawAnnualBarChart(d.metro, mapMetric, d.history, true);
+  } else {
+    drawMonthlyBarChart(d.metro, mapMetric, d.history, true);
+  }
+}
+
+// --- State Mode ---
+function loadStateData() {
+  if (stateDataLoaded) { return; }
+  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_state?select=region_id,name,latest,history', {
+    headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
+  }).then(r=>r.json()).then(rows => {
+    STATE_DATA = rows[0] || null;
+    if (STATE_DATA) attachYOY(STATE_DATA);
+    stateDataLoaded = true;
+    // State fill is a single solid color — no quantile needed
+    // Optionally show statewide modal on load
+  }).catch(err => console.error('State data load error:', err));
+}
+
+function openStateModal() {
+  if (!STATE_DATA) {
+    loadStateData();
+    setTimeout(openStateModal, 600);
+    return;
+  }
+  const d = STATE_DATA;
+  const l = d.latest || {};
+  selectedCounty = null; selectedZip = null; selectedMetro = null;
+  document.getElementById('modal-county').textContent = 'Ohio';
+  document.getElementById('modal-sub').textContent = '';
+  setAttrHeader(['State: Ohio'], mapMetric);
+  document.getElementById('s-zhvi').textContent = l.zhvi ? fmt$(l.zhvi) : '—';
+  document.getElementById('s-active').textContent = l.active_listings ? fmtN(l.active_listings) : '—';
+  document.getElementById('s-pending').textContent = l.pending_listings ? fmtN(l.pending_listings) : '—';
+  document.getElementById('s-dom').textContent = l.days_on_market != null ? l.days_on_market+'d' : '—';
+  document.getElementById('s-pct').textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
+  document.getElementById('s-ptax').textContent = '—';
+  document.getElementById('s-ptaxrate').textContent = '—';
+  document.getElementById('s-rank').textContent = 'Statewide';
+  document.getElementById('modal-overlay').classList.add('visible');
+  document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
+  document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
+  if (YOY_METRICS.has(mapMetric)) {
+    drawMonthlyBarChart('Ohio', mapMetric, getYOYRows(d, mapMetric), true);
+  } else if (mapMetric === 'price_reduced_pct') {
+    drawAnnualBarChart('Ohio', mapMetric, d.history, true);
+  } else {
+    drawMonthlyBarChart('Ohio', mapMetric, d.history, true);
+  }
+}
+
+let zipGeoJSON = null;
+function loadZipData() {
+  if (zipDataLoaded) { renderColors('zip'); return; }
+  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+  Promise.all([
+    fetch('/ohio-zips.geojson').then(r=>r.json()),
+    (async () => {
+      const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY, 'Range-Unit': 'items'};
+      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,city,county,metro,latest,history,prop_tax_history';
+      const [p1, p2] = await Promise.all([
+        fetch(base+'&limit=1000&offset=0', {headers}).then(r=>r.json()),
+        fetch(base+'&limit=1000&offset=1000', {headers}).then(r=>r.json()),
+      ]);
+      return [...p1, ...p2];
+    })()
+  ]).then(([geojson, zips]) => {
+    ZIP_DATA = zips;
+    // Normalize ZIP history: merge rows with same YYYY-MM (data has both YYYY-MM and YYYY-MM-DD rows for same months)
+    ZIP_DATA.forEach(d => {
+      if (d.history) {
+        const merged = {};
+        d.history.forEach(r => {
+          const key = r.date ? r.date.slice(0, 7) : null;
+          if (!key) return;
+          if (!merged[key]) {
+            merged[key] = {...r, date: key};
+          } else {
+            // Merge: keep non-null values from both rows (short-date rows have richer data)
+            Object.entries(r).forEach(([k, v]) => {
+              if (v != null && merged[key][k] == null) merged[key][k] = v;
+            });
+            merged[key].date = key;
+          }
+        });
+        d.history = Object.values(merged).sort((a, b) => a.date < b.date ? -1 : 1);
+      }
+      zipDataMap[d.zip] = d;
+      attachYOY(d);
+    });
+    zipDataLoaded = true;
+    // Merge metric properties directly into GeoJSON features
+    geojson.features.forEach(f => {
+      const zip = (f.properties && f.properties.zip) || String(f.id);
+      const d = zipDataMap[zip] || zipDataMap[String(f.id)];
+      if (d && d.latest) Object.assign(f.properties, d.latest, d.yoy_latest || {}, {__zip: zip});
+    });
+    zipGeoJSON = geojson;
+    map.getSource('ohio-zips').setData(geojson);
+    renderColors('zip');
+  }).catch(err => console.error('ZIP data load error:', err));
+}
+
+
+
+function openZipModal(zip) {
+  const d = zipDataMap[zip];
+  if (!d) return;
+  selectedCounty = null;
+  const l = d.latest || {};
+  const city = d.city || zip;
+  document.getElementById('modal-county').textContent = zip;
+  document.getElementById('modal-sub').textContent = (d.city || '') + (d.city ? ', Ohio' : 'Ohio');
+  const _chips = [];
+  if (d.county) _chips.push('County: ' + d.county);
+  if (d.city) _chips.push('City: ' + d.city);
+  _chips.push('State: Ohio');
+  setAttrHeader(_chips, mapMetric);
+
+  // Snap grid values
+  document.getElementById('s-zhvi').textContent = l.zhvi ? '$'+Math.round(l.zhvi).toLocaleString() : '—';
+  document.getElementById('s-active').textContent = l.active_listings != null ? Math.round(l.active_listings).toLocaleString() : '—';
+  document.getElementById('s-pending').textContent = l.pending_listings != null ? Math.round(l.pending_listings).toLocaleString() : '—';
+  document.getElementById('s-dom').textContent = l.days_on_market != null ? Math.round(l.days_on_market)+' days' : '—';
+  document.getElementById('s-pct').textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
+  document.getElementById('s-ptax').textContent = l.median_property_tax ? '$'+Math.round(l.median_property_tax).toLocaleString() : '—';
+  document.getElementById('s-ptaxrate').textContent = l.property_tax_rate != null ? l.property_tax_rate.toFixed(2)+'%' : '—';
+
+  // ZIP rank by zhvi
+  const sorted = ZIP_DATA.filter(z=>z.latest&&z.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
+  const rank = sorted.findIndex(z=>z.zip===zip)+1;
+  document.getElementById('s-rank').textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
+
+  // Chart tabs
+  const defaultMetric = mapMetric==='median_property_tax'||mapMetric==='property_tax_rate' ? 'zhvi' : mapMetric;
+  document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
+  const at = document.querySelector(`.chart-tab[data-cmetric="${defaultMetric}"]`);
+  if (at) at.classList.add('active');
+  chartMetric = defaultMetric;
+  renderZipChart(zip, defaultMetric);
+  document.getElementById('modal-overlay').classList.add('visible');
+}
+
+function renderZipChart(zip, cmetric) {
+  const d = zipDataMap[zip];
+  if (!d) return;
+  chartMetric = cmetric;
+  if (TAX_YOY.has(cmetric)) {
+    const yoyRows = getYOYRows(d, cmetric).map(r => ({...r, date: r.date || ''}));
+    drawAnnualBarChart(zip, cmetric, yoyRows, true);
+  } else if (YOY_METRICS.has(cmetric)) {
+    drawMonthlyBarChart(zip, cmetric, getYOYRows(d, cmetric), true);
+  } else if (cmetric==='price_reduced_pct') {
+    drawAnnualBarChart(zip, cmetric, d.history, true);
+  } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
+    const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
+    drawAnnualBarChart(zip, cmetric, taxHist, true);
+  } else {
+    drawMonthlyBarChart(zip, cmetric, d.history, true);
+  }
 }
 
 // --- County Search ---
@@ -681,12 +1666,64 @@ const searchResults = document.getElementById('search-results');
 const searchClear = document.getElementById('search-clear');
 const COUNTY_NAMES = Object.values(FIPS_NAME).sort();
 
-function doSearch(q) {
-  q = q.trim().toLowerCase();
+function showZipResults(raw) {
   searchResults.innerHTML = '';
-  if (!q) { searchResults.style.display='none'; return; }
-  const matches = COUNTY_NAMES.filter(n => n.toLowerCase().startsWith(q))
-    .concat(COUNTY_NAMES.filter(n => !n.toLowerCase().startsWith(q) && n.toLowerCase().includes(q)))
+  const matches = Object.keys(zipDataMap).filter(z => z.startsWith(raw)).sort().slice(0, 8);
+  if (!matches.length) { searchResults.style.display='none'; return; }
+  matches.forEach(z => {
+    const li = document.createElement('li');
+    const d = zipDataMap[z];
+    const val = d && d.latest && d.latest[mapMetric] != null ? METRICS[mapMetric].fmt(Number(d.latest[mapMetric])) : '';
+    li.innerHTML = `<div>${z}${d&&d.city?' — '+d.city:''}</div><div class="sr-sub">${d&&d.county?d.county+' County':''}${val?' · '+METRICS[mapMetric].label+': '+val:''}</div>`;
+    li.addEventListener('click', () => selectZip(z));
+    searchResults.appendChild(li);
+  });
+  searchResults.style.display = 'block';
+}
+
+function doSearch(q) {
+  const raw = q.trim();
+  searchResults.innerHTML = '';
+  if (!raw) { searchResults.style.display='none'; return; }
+
+  // ZIP detection: starts with digits
+  if (/^\d/.test(raw)) {
+    if (!zipDataLoaded) {
+      // Load ZIP data first, then show results
+      loadZipData();
+      const wait = setInterval(() => {
+        if (zipDataLoaded) { clearInterval(wait); showZipResults(searchInput.value.trim()); }
+      }, 150);
+    } else {
+      showZipResults(raw);
+    }
+    return;
+  }
+
+  // Metro search
+  if (mapMode === 'metro') {
+    const ql = raw.toLowerCase();
+    const metroNames = METRO_DATA.map(d => d.metro);
+    const matches = metroNames.filter(n => n.toLowerCase().startsWith(ql))
+      .concat(metroNames.filter(n => !n.toLowerCase().startsWith(ql) && n.toLowerCase().includes(ql)))
+      .slice(0, 8);
+    if (!matches.length) { searchResults.style.display='none'; return; }
+    matches.forEach(name => {
+      const li = document.createElement('li');
+      const d = METRO_DATA.find(x => x.metro === name);
+      const val = d && d.latest && d.latest[mapMetric] != null ? METRICS[mapMetric].fmt(Number(d.latest[mapMetric])) : '';
+      li.innerHTML = `<div>${name}</div><div class="sr-sub">Metro · ${METRICS[mapMetric].label}${val?' — '+val:''}</div>`;
+      li.addEventListener('click', () => selectMetro(d.region_id));
+      searchResults.appendChild(li);
+    });
+    searchResults.style.display = 'block';
+    return;
+  }
+
+  // County search (no mode switch until selection)
+  const ql = raw.toLowerCase();
+  const matches = COUNTY_NAMES.filter(n => n.toLowerCase().startsWith(ql))
+    .concat(COUNTY_NAMES.filter(n => !n.toLowerCase().startsWith(ql) && n.toLowerCase().includes(ql)))
     .slice(0, 8);
   if (!matches.length) { searchResults.style.display='none'; return; }
   matches.forEach(name => {
@@ -698,6 +1735,71 @@ function doSearch(q) {
     searchResults.appendChild(li);
   });
   searchResults.style.display = 'block';
+}
+
+function selectZip(zip) {
+  const d = zipDataMap[zip];
+  searchInput.value = zip + (d && d.city ? ' — ' + d.city : '');
+  searchResults.style.display = 'none';
+  searchClear.style.display = 'block';
+  if (!map) return;
+  // Switch to ZIP mode if needed
+  if (mapMode !== 'zip') setMode('zip');
+  // Clear previous selection
+  if (selectedZip) { try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false})}catch(e){} }
+  selectedZip = zip;
+  try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:true})}catch(e){}
+  // Zoom first, open modal after animation
+  let zoomed = false;
+  if (zipGeoJSON && zipGeoJSON.features) {
+    const feat = zipGeoJSON.features.find(f => f.id === zip || (f.properties && (f.properties.zip === zip || f.properties.ZCTA5CE20 === zip)));
+    if (feat) {
+      const coords = [];
+      const collect = g => {
+        if (!g) return;
+        if (g.type==='Polygon') g.coordinates.forEach(r=>r.forEach(c=>coords.push(c)));
+        else if (g.type==='MultiPolygon') g.coordinates.forEach(p=>p.forEach(r=>r.forEach(c=>coords.push(c))));
+      };
+      collect(feat.geometry);
+      if (coords.length) {
+        const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
+        const bounds = [[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]];
+        map.fitBounds(bounds, {padding:80, maxZoom:13, duration:800});
+        zoomed = true;
+      }
+    }
+  }
+}
+
+function selectMetro(rid) {
+  const d = metroDataMap[rid];
+  if (!d) return;
+  searchInput.value = d.metro;
+  searchResults.style.display = 'none';
+  searchClear.style.display = 'block';
+  if (mapMode !== 'metro') setMode('metro');
+  if (selectedMetro) { try{map.setFeatureState({source:'ohio-metros',id:selectedMetro},{selected:false})}catch(e){} }
+  selectedMetro = rid;
+  try{map.setFeatureState({source:'ohio-metros',id:selectedMetro},{selected:true})}catch(e){}
+  // Zoom to metro bounds
+  if (metroGeoJSON) {
+    const feat = metroGeoJSON.features.find(f => f.properties && f.properties.region_id === rid);
+    if (feat) {
+      const coords = [];
+      const collect = g => {
+        if (!g) return;
+        if (g.type==='Polygon') g.coordinates.forEach(r=>r.forEach(c=>coords.push(c)));
+        else if (g.type==='MultiPolygon') g.coordinates.forEach(p=>p.forEach(r=>r.forEach(c=>coords.push(c))));
+      };
+      collect(feat.geometry);
+      if (coords.length) {
+        const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
+        const bounds = [[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]];
+        map.fitBounds(bounds, {padding:80, maxZoom:11, duration:800});
+      }
+    }
+  }
+  setTimeout(() => openMetroModal(rid), 900);
 }
 
 function selectCounty(name) {
@@ -750,6 +1852,7 @@ function selectCounty(name) {
       if (coords.length) {
         const lons = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
         map.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]], {padding:120, maxZoom:11, duration:700});
+        boundsFound = true;
       }
     }
   }
