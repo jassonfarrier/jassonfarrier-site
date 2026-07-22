@@ -1,0 +1,34 @@
+[[redirects]]
+  from = "/bio"
+  to = "/bio.html"
+  status = 200
+
+[[redirects]]
+  from = "/contact"
+  to = "/contact.html"
+  status = 200
+
+[[redirects]]
+  from = "/ohio-housing-data"
+  to = "/ohio-housing-data.html"
+  status = 200
+
+[[redirects]]
+  from = "/ohio-housing-data-methodology"
+  to = "/ohio-housing-data-methodology/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/housing-market-updates"
+  to = "/housing-market-updates.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://api.mapbox.com https://cdnjs.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://static.klaviyo.com https://www.youtube.com; worker-src blob:; style-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; frame-src https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://nmerqwjfrnmzqgdpgrys.supabase.co https://www.google-analytics.com https://stats.g.doubleclick.net;"
