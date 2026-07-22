@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ohio Housing Data Methodology | Jasson Farrier</title>
+<meta name="description" content="How the metrics on the Ohio Housing Market Data page are defined, sourced, and calculated. Definitions from Zillow, Realtor.com, and the U.S. Census Bureau.">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Montserrat',sans-serif;color:#0D1E42;background:#f7f8fa;min-height:100vh;display:flex;flex-direction:column}
+
+nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 64px;border-bottom:1px solid #f5f5f5}
+.nav-brand{font-size:13px;font-weight:700;color:#0D1E42;text-decoration:none;white-space:nowrap}
+.nav-brand span{color:#0D1E42;font-weight:700}
+.nav-right{display:flex;gap:28px;align-items:center}
+.nav-right a{font-size:12px;font-weight:500;color:#9DA6AB;text-decoration:none;transition:color .2s}
+.nav-right a:hover,.nav-right a.active{color:#0D1E42}
+.nav-right a.active{font-weight:700}
+
+.page-wrap{flex:1;max-width:780px;margin:0 auto;padding:56px 24px 80px;width:100%}
+.page-title{font-size:28px;font-weight:900;color:#0D1E42;letter-spacing:-0.5px;margin-bottom:8px}
+.page-subtitle{font-size:13px;color:#9DA6AB;font-weight:500;margin-bottom:12px;line-height:1.6}
+.back-link{display:inline-block;font-size:11px;font-weight:600;color:#0D1E42;text-decoration:none;margin-bottom:36px;letter-spacing:0.5px}
+.back-link:hover{text-decoration:underline}
+.intro{font-size:13px;color:#9DA6AB;line-height:1.8;margin-bottom:48px;border-left:3px solid #0D1E42;padding-left:16px}
+
+.source-section{margin-bottom:52px}
+.source-header{display:flex;align-items:center;gap:12px;margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid #f5f5f5}
+.source-badge{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#fff;background:#0D1E42;padding:4px 10px;border-radius:4px}
+.source-link{font-size:11px;font-weight:500;color:#0D1E42;text-decoration:none}
+.source-link:hover{text-decoration:underline}
+
+.metric-card{background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:10px;padding:22px 24px;margin-bottom:12px}
+.metric-name{font-size:13px;font-weight:700;color:#0D1E42;margin-bottom:4px}
+.metric-tag{display:inline-block;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:#9DA6AB;background:#f7f8fa;padding:2px 8px;border-radius:3px;margin-bottom:10px}
+.metric-provider-def{font-size:12px;color:#0D1E42;line-height:1.75;margin-bottom:8px}
+.metric-plain{font-size:12px;color:#0D1E42;font-weight:500;line-height:1.6;padding:10px 14px;background:#f7f8fa;border-radius:6px;border-left:3px solid #0D1E42}
+.metric-plain strong{font-weight:700}
+.metric-card.yoy{background:#f7f8fa;border-color:rgba(0,0,0,0.06)}
+.metric-card.yoy .metric-name{color:#0D1E42;font-weight:600}
+
+.site-footer{background:#fff;border-top:1px solid #f5f5f5;padding:24px 64px;margin-top:auto}
+.footer-nav{display:flex;gap:24px;margin-bottom:14px;flex-wrap:wrap}
+.footer-nav a{font-size:11px;font-weight:500;color:#9DA6AB;text-decoration:none}
+.footer-nav a:hover{color:#0D1E42}
+.footer-disclaimer{display:flex;align-items:flex-start;gap:12px}
+.footer-disclaimer img{width:24px;height:auto;opacity:0.5;flex-shrink:0;margin-top:2px}
+.footer-disclaimer p{font-size:10px;color:rgba(0,0,0,0.38);line-height:1.7}
+
+@media(max-width:600px){
+  nav{padding:0 20px}
+  .page-wrap{padding:36px 16px 60px}
+  .site-footer{padding:20px}
+  .page-title{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">Jasson Farrier <span>— Kiger Realty</span></a>
+  <div class="nav-right">
+    <a href="/housing-market-updates">Market Updates</a>
+    <a href="/ohio-housing-data">Data</a>
+    <a href="/bio">About</a>
+    <a href="/contact">Contact</a>
+    <a href="https://www.youtube.com/@OhioHousingNerd" aria-label="YouTube" target="_blank" rel="noopener">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#9DA6AB"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/></svg>
+    </a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <a href="/ohio-housing-data" class="back-link">← Back to Ohio Housing Data</a>
+  <h1 class="page-title">Ohio Housing Data Methodology</h1>
+  <p class="page-subtitle">How every metric on the data page is defined, sourced, and calculated.</p>
+  <p class="intro">Every metric on the Ohio Housing Market Data page comes from a primary data provider — Zillow, Realtor.com, or the U.S. Census Bureau. Definitions below are sourced directly from each provider, followed by a plain-English explanation of what the number actually tells you.</p>
+
+  <!-- ZILLOW -->
+  <div class="source-section">
+    <div class="source-header">
+      <span class="source-badge">Zillow</span>
+      <a href="https://www.zillow.com/research/data/" class="source-link" target="_blank" rel="noopener">zillow.com/research/data →</a>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-name">Home Value</div>
+      <div class="metric-tag">Monthly · Single-Family · Mid-Tier · Smoothed &amp; Seasonally Adjusted</div>
+      <p class="metric-provider-def">Zillow Home Value Index (ZHVI): a smoothed, seasonally adjusted measure of the typical home value across a given region and housing type. It reflects the full distribution of home values — not just those that sold — and is reported for the middle tier of the market (33rd–67th percentile).</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> What a mid-range single-family home in this area is worth right now, based on Zillow's estimate of the entire housing stock — not just homes that happened to sell that month.</div>
+    </div>
+
+    <div class="metric-card yoy">
+      <div class="metric-name">Home Value YOY %</div>
+      <div class="metric-tag">Monthly · Derived from ZHVI History</div>
+      <p class="metric-provider-def">Year-over-year percent change in ZHVI, calculated by comparing the current month's value to the same month 12 months prior.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How much home values have gone up or down compared to exactly one year ago.</div>
+    </div>
+  </div>
+
+  <!-- REALTOR.COM -->
+  <div class="source-section">
+    <div class="source-header">
+      <span class="source-badge">Realtor.com</span>
+      <a href="https://www.realtor.com/research/data/" class="source-link" target="_blank" rel="noopener">realtor.com/research/data →</a>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-name">Active Listings</div>
+      <div class="metric-tag">Monthly · Count</div>
+      <p class="metric-provider-def">Realtor.com defines active listings as properties listed for sale that are not yet under contract as of month-end. This count reflects available supply in the market at that point in time.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many homes are sitting on the market available to buy right now.</div>
+    </div>
+
+    <div class="metric-card yoy">
+      <div class="metric-name">Active Listings YOY %</div>
+      <div class="metric-tag">Monthly · Year-over-Year Change</div>
+      <p class="metric-provider-def">Year-over-year percent change in the active listing count compared to the same month in the prior year.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether there are more or fewer homes for sale than this time last year.</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-name">Pending Sales</div>
+      <div class="metric-tag">Monthly · Count</div>
+      <p class="metric-provider-def">Realtor.com defines pending listings as homes with an accepted offer that have not yet closed as of month-end. Pending sales lead closed sales by approximately 30–60 days.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> Homes under contract — the best leading indicator of where closed sales are heading in the next 30–60 days.</div>
+    </div>
+
+    <div class="metric-card yoy">
+      <div class="metric-name">Pending Sales YOY %</div>
+      <div class="metric-tag">Monthly · Year-over-Year Change</div>
+      <p class="metric-provider-def">Year-over-year percent change in pending sales count compared to the same month in the prior year.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether buyer demand is stronger or weaker than it was a year ago.</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-name">Days on Market</div>
+      <div class="metric-tag">Monthly · Median Days</div>
+      <p class="metric-provider-def">Realtor.com defines median days on market as the median number of days from a listing's active date to the date it went under contract, for all homes that went pending that month.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How fast homes are selling — lower means a hotter market, higher means buyers have more time.</div>
+    </div>
+
+    <div class="metric-card yoy">
+      <div class="metric-name">Days on Market YOY %</div>
+      <div class="metric-tag">Monthly · Year-over-Year Change</div>
+      <p class="metric-provider-def">Year-over-year percent change in median days on market compared to the same month in the prior year.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether homes are selling faster or slower than they were a year ago.</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-name">Price Cut %</div>
+      <div class="metric-tag">Monthly · Share of Active Listings</div>
+      <p class="metric-provider-def">Realtor.com defines price reduced listings as the share of active listings that have received at least one price reduction from their original list price as of month-end.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many sellers have had to drop their asking price — rising means sellers are losing pricing power.</div>
+    </div>
+
+    <div class="metric-card yoy">
+      <div class="metric-name">Price Cut % YOY</div>
+      <div class="metric-tag">Monthly · Year-over-Year Change</div>
+      <p class="metric-provider-def">Year-over-year change in the share of active listings with a price reduction, compared to the same month in the prior year.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether sellers are cutting prices more or less than they were a year ago.</div>
+    </div>
+  </div>
+
+  <!-- CENSUS ACS -->
+  <div class="source-section">
+    <div class="source-header">
+      <span class="source-badge">U.S. Census Bureau — ACS</span>
+      <a href="https://data.census.gov/" class="source-link" target="_blank" rel="noopener">data.census.gov →</a>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-name">Annual Property Tax</div>
+      <div class="metric-tag">Annual · 5-Year Estimate · Median</div>
+      <p class="metric-provider-def">U.S. Census Bureau American Community Survey (ACS) 5-year estimates: median annual real estate taxes paid by owner-occupied housing units. The 5-year estimate pools responses over a 60-month period to produce reliable county-level data.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> The typical property tax bill for a homeowner in this area — updated once a year when the Census releases new ACS estimates.</div>
+    </div>
+
+    <div class="metric-card yoy">
+      <div class="metric-name">Property Tax YOY %</div>
+      <div class="metric-tag">Annual · Year-over-Year Change</div>
+      <p class="metric-provider-def">Year-over-year percent change in median annual property tax from one ACS 5-year release to the next.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How much the typical tax bill changed — reflecting local reassessments and levy changes.</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-name">Effective Tax Rate</div>
+      <div class="metric-tag">Annual · Derived: ACS ÷ Zillow ZHVI</div>
+      <p class="metric-provider-def">Median annual property tax (ACS 5-year estimate) divided by the Zillow Home Value Index for that county, expressed as a percentage. This is a derived metric — not published directly by either source.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> The actual tax burden as a share of home value — lets you compare tax load across counties regardless of price level.</div>
+    </div>
+
+    <div class="metric-card yoy">
+      <div class="metric-name">Tax Rate YOY %</div>
+      <div class="metric-tag">Annual · Year-over-Year Change</div>
+      <p class="metric-provider-def">Year-over-year percent change in the effective tax rate (ACS median tax ÷ ZHVI) compared to the prior annual period.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether the tax burden relative to home value went up or down compared to last year.</div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="site-footer">
+  <nav class="footer-nav">
+    <a href="/housing-market-updates">Market Updates</a>
+    <a href="/ohio-housing-data">Data</a>
+    <a href="/bio">About</a>
+    <a href="/contact">Contact</a>
+  </nav>
+  <div class="footer-disclaimer">
+    <img src="/fair-housing.webp" alt="Equal Housing Opportunity">
+    <p>Jasson Farrier · Kiger Realty · Realtor · License #2018004483 · 614-699-3007<br>
+    Equal Housing Opportunity · Information deemed reliable but not guaranteed.</p>
+  </div>
+</footer>
+
+</body>
+</html>
+
