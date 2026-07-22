@@ -1766,11 +1766,9 @@ function selectZip(zip) {
         const bounds = [[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]];
         map.fitBounds(bounds, {padding:80, maxZoom:13, duration:800});
         zoomed = true;
-        setTimeout(() => openZipModal(zip), 850);
       }
     }
   }
-  if (!zoomed) openZipModal(zip);
 }
 
 function selectMetro(rid) {
