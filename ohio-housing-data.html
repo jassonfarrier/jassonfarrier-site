@@ -1278,6 +1278,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip) {
       clickDateTxt.attr('x',cardX+12).attr('y',cardY+18).text(fmtMonthDate(r.date));
       clickValTxt.attr('x',cardX+12).attr('y',cardY+46).text(METRICS[cmetric].fmt(r[cmetric]));
       clickLabelTxt.attr('x',cardX+12).attr('y',cardY+64).text(METRICS[cmetric].label.toUpperCase());
+      clickCard.raise();
       clickCard.style('opacity',1);
     });
 
