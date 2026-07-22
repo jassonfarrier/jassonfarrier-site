@@ -1431,7 +1431,10 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
     hoverValTxt.attr('x',cardX+12).attr('y',cardY+46).text(METRICS[cmetric].fmt(r[cmetric]));
     hoverLabelTxt.attr('x',cardX+12).attr('y',cardY+64).text(METRICS[cmetric].label.toUpperCase());
     if (deltaText) {
-      hoverDeltaTxt.attr('x',cardX+12).attr('y',cardY+82).text(deltaText).style('opacity',1);
+      const isNegDelta = deltaText.startsWith('▼') || deltaText.startsWith('-');
+      hoverDeltaTxt.attr('x',cardX+12).attr('y',cardY+82).text(deltaText)
+        .attr('fill', isNegDelta ? '#c0392b' : '#1a5296')
+        .style('opacity',1);
     } else {
       hoverDeltaTxt.style('opacity',0);
     }
