@@ -92,6 +92,16 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .yoy-tab{font-size:10px;padding:6px 12px;color:rgba(0,0,0,0.35);margin-top:-2px}
 .yoy-tab.active{background:#dce8f7;color:#0D1E42}
 #line-chart{width:100%;height:480px}
+#data-table th{background:#0d1e42;color:#fff;padding:10px 12px;text-align:right;font-size:10px;font-weight:700;letter-spacing:0.8px;white-space:nowrap;cursor:pointer;user-select:none;position:sticky;top:0;}
+#data-table th:first-child{text-align:left;}
+#data-table th.sort-asc::after{content:" ▲";}
+#data-table th.sort-desc::after{content:" ▼";}
+#data-table td{padding:9px 12px;text-align:right;border-bottom:1px solid rgba(0,0,0,0.06);color:#222;}
+#data-table td:first-child{text-align:left;font-weight:600;color:#0d1e42;cursor:pointer;}
+#data-table td:first-child:hover{text-decoration:underline;color:#1a5296;}
+#data-table tr:hover td{background:#f0f4ff;}
+#data-table tr:last-child td{border-bottom:none;}
+.tbl-pos{color:#2166ac;}.tbl-neg{color:#c0392b;}.tbl-na{color:#bbb;}
 @keyframes bar-pulse {
   0%,100%{filter:brightness(1);}
   50%{filter:brightness(2.2) saturate(0.3);}
@@ -180,6 +190,17 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     </div>
   </div>
 <div id="map"></div>
+<div id="table-view" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:#f7f8fa;z-index:10;overflow:auto;padding:80px 24px 24px;">
+  <div id="table-inner" style="max-width:1400px;margin:0 auto;">
+    <div id="table-title" style="font-size:13px;font-weight:700;font-family:Montserrat;color:#0d1e42;margin-bottom:12px;letter-spacing:0.5px;"></div>
+    <div style="overflow-x:auto;border-radius:10px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 2px 12px rgba(0,0,0,0.07);">
+      <table id="data-table" style="width:100%;border-collapse:collapse;font-family:Montserrat;font-size:12px;background:#fff;">
+        <thead id="table-head"></thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 <div id="search-bar">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
   <input id="search-input" type="text" placeholder="Search counties or ZIP codes…" autocomplete="off" style="flex:1;min-width:160px">
@@ -190,6 +211,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="mode-pill" id="pill-metro">Metro</button>
     <button class="mode-pill active" id="pill-county">County</button>
     <button class="mode-pill" id="pill-zip">ZIP Code</button>
+    <button class="mode-pill" id="pill-table" style="margin-left:6px;border-left:1px solid rgba(0,0,0,0.12);padding-left:14px;">⊞ Table</button>
   </div>
   <ul id="search-results"></ul>
 </div>
@@ -773,6 +795,7 @@ document.getElementById('pill-state').addEventListener('click', () => setMode('s
 document.getElementById('pill-metro').addEventListener('click', () => setMode('metro'));
 document.getElementById('pill-county').addEventListener('click', () => setMode('county'));
 document.getElementById('pill-zip').addEventListener('click', () => setMode('zip'));
+document.getElementById('pill-table').addEventListener('click', toggleTableView);
 
 document.querySelectorAll('.chart-tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -1544,6 +1567,141 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
     .attr('font-family','Montserrat').attr('dx','-8');
 }
 
+// ── TABLE VIEW ──────────────────────────────────────────────────────────────
+let tableViewActive = false;
+let tableSortCol = null, tableSortDir = 1;
+
+const TABLE_COLS = [
+  {key:'zhvi',           label:'Home Value',         fmt:v=>v!=null?'$'+Math.round(v).toLocaleString():null},
+  {key:'zhvi_yoy',       label:'HV YOY %',           fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
+  {key:'active_listings',label:'Active Listings',    fmt:v=>v!=null?Math.round(v).toLocaleString():null},
+  {key:'active_listings_yoy',label:'AL YOY %',       fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
+  {key:'pending_listings',label:'Pending Sales',     fmt:v=>v!=null?Math.round(v).toLocaleString():null},
+  {key:'pending_listings_yoy',label:'PS YOY %',      fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
+  {key:'days_on_market', label:'Days on Market',     fmt:v=>v!=null?Math.round(v)+'d':null},
+  {key:'days_on_market_yoy',label:'DOM YOY %',       fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
+  {key:'price_reduced_pct',label:'Price Cut %',      fmt:v=>v!=null?v.toFixed(1)+'%':null},
+  {key:'price_reduced_pct_yoy',label:'PC YOY %',     fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
+  {key:'median_property_tax',label:'Property Tax',   fmt:v=>v!=null?'$'+Math.round(v).toLocaleString():null},
+  {key:'property_tax_rate',  label:'Tax Rate',       fmt:v=>v!=null?v.toFixed(2)+'%':null},
+];
+
+function toggleTableView() {
+  tableViewActive = !tableViewActive;
+  document.getElementById('table-view').style.display = tableViewActive ? 'block' : 'none';
+  document.getElementById('pill-table').classList.toggle('active', tableViewActive);
+  if (tableViewActive) renderTable();
+}
+
+function getTableRows() {
+  if (mapMode === 'state') {
+    if (!STATE_DATA) return [];
+    const d = STATE_DATA;
+    const l = d.latest || {};
+    const y = d.yoy_latest || {};
+    return [{name:'Ohio (Statewide)', id:'ohio', ...l, ...y}];
+  }
+  if (mapMode === 'metro') {
+    return Object.values(metroDataMap).map(d => {
+      const l = d.latest || {};
+      const y = d.yoy_latest || {};
+      return {name: d.metro, id: d.region_id, ...l, ...y};
+    });
+  }
+  if (mapMode === 'county') {
+    return Object.entries(dataMap).map(([county, d]) => {
+      const l = d.latest || {};
+      const y = d.yoy_latest || {};
+      return {name: county + ' County', id: county, ...l, ...y};
+    });
+  }
+  if (mapMode === 'zip') {
+    return ZIP_DATA.map(d => {
+      const l = d.latest || {};
+      const y = d.yoy_latest || {};
+      return {name: d.zip + (d.city ? ' — ' + d.city : ''), id: d.zip, zip: d.zip, ...l, ...y};
+    });
+  }
+  return [];
+}
+
+function renderTable() {
+  const modeLabel = {state:'State', metro:'Metros', county:'Counties', zip:'ZIP Codes'};
+  document.getElementById('table-title').textContent =
+    'Ohio ' + (modeLabel[mapMode]||'') + ' — All Metrics (Current Month)  ·  Click a row to open detail';
+
+  let rows = getTableRows();
+  if (!rows.length) {
+    document.getElementById('table-body').innerHTML = '<tr><td colspan="99" style="padding:24px;text-align:center;color:#aaa;">Loading data…</td></tr>';
+    return;
+  }
+
+  // Sort
+  if (tableSortCol) {
+    rows.sort((a, b) => {
+      const av = a[tableSortCol]; const bv = b[tableSortCol];
+      if (av == null && bv == null) return 0;
+      if (av == null) return 1; if (bv == null) return -1;
+      return (av - bv) * tableSortDir;
+    });
+  }
+
+  // Header
+  const thead = document.getElementById('table-head');
+  const nameLbl = mapMode === 'zip' ? 'ZIP / City' : mapMode === 'county' ? 'County' : mapMode === 'metro' ? 'Metro' : 'Geography';
+  let hrow = '<tr><th data-col="name" style="text-align:left;">' + nameLbl + '</th>';
+  TABLE_COLS.forEach(c => {
+    const cls = tableSortCol === c.key ? (tableSortDir===1?' sort-asc':' sort-desc') : '';
+    hrow += '<th class="' + cls + '" data-col="' + c.key + '">' + c.label + '</th>';
+  });
+  hrow += '</tr>';
+  thead.innerHTML = hrow;
+
+  // Body
+  const tbody = document.getElementById('table-body');
+  let html = '';
+  rows.forEach(row => {
+    html += '<tr>';
+    html += '<td data-id="' + row.id + '">' + (row.name || row.id) + '</td>';
+    TABLE_COLS.forEach(c => {
+      const v = row[c.key];
+      const disp = c.fmt(v);
+      if (disp == null) { html += '<td class="tbl-na">—</td>'; return; }
+      let cls = '';
+      if (c.yoy) cls = v > 0 ? 'tbl-pos' : v < 0 ? 'tbl-neg' : '';
+      html += '<td class="' + cls + '">' + disp + '</td>';
+    });
+    html += '</tr>';
+  });
+  tbody.innerHTML = html;
+
+  // Sort click on headers
+  thead.querySelectorAll('th').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.col;
+      if (tableSortCol === col) { tableSortDir *= -1; }
+      else { tableSortCol = col; tableSortDir = col === 'name' ? 1 : -1; }
+      renderTable();
+    });
+  });
+
+  // Row click → open modal
+  tbody.querySelectorAll('td:first-child').forEach(td => {
+    td.addEventListener('click', () => {
+      const id = td.dataset.id;
+      if (!id) return;
+      if (mapMode === 'zip') selectZip(id);
+      else if (mapMode === 'metro') openMetroModal(id);
+      else if (mapMode === 'county') openCountyModal(id);
+      else if (mapMode === 'state') openStateModal();
+    });
+  });
+}
+
+// Re-render table when mode changes if table is open
+const _origSetMode = setMode;
+// Patch setMode to also refresh table
+
 function setMode(mode) {
   mapMode = mode;
   ['state','metro','county','zip'].forEach(m => {
@@ -1573,6 +1731,8 @@ function setMode(mode) {
   // Close modal when switching modes
   document.getElementById('modal-overlay').classList.remove('visible');
   selectedCounty = null;
+  // Refresh table if open
+  if (tableViewActive) { setTimeout(renderTable, 100); }
 }
 
 
