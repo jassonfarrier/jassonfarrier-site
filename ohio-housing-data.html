@@ -1313,9 +1313,16 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   // Color: YOY metrics use diverging scale (red=negative, blue=positive); base metrics solid blue
   const _isYOYChart = YOY_METRICS.has(cmetric);
   const _sortedVals = rows.map(r=>r[cmetric]).filter(v=>v!=null).sort((a,b)=>a-b);
+  const _seqMin = d3.min(rows, r => r[cmetric]);
+  const _seqMax = d3.max(rows, r => r[cmetric]);
+  const seqColor = r => {
+    if (_seqMax === _seqMin) return '#1a5296';
+    const t = (r[cmetric] - _seqMin) / (_seqMax - _seqMin);
+    return d3.interpolateRgb('#9ecae1', '#0d2a5e')(t);
+  };
   const barColor = _isYOYChart
     ? (r => divergingColor(_sortedVals, r[cmetric]))
-    : (() => '#1a5296');
+    : seqColor;
 
   // Grid
   y.ticks(5).forEach(t=>{
