@@ -1300,8 +1300,9 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip) {
   const hoverDateTxt = hoverCard.append('text').attr('font-size','11px').attr('font-family','Montserrat').attr('font-weight','600').attr('fill','#888');
   const hoverValTxt  = hoverCard.append('text').attr('font-size','22px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#111');
   const hoverLabelTxt= hoverCard.append('text').attr('font-size','10px').attr('font-family','Montserrat').attr('font-weight','500').attr('fill','#aaa');
+  const hoverDeltaTxt= hoverCard.append('text').attr('font-size','11px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#1a5296').style('opacity',0);
 
-  const cardW=140, cardH=76;
+  const cardW=160, cardH=76;
   lsvg.on('mousemove', function(event) {
     const [mx] = d3.pointer(event, g.node());
     const dateStr = d3.timeFormat('%Y-%m')(x.invert(mx));
@@ -1309,13 +1310,33 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip) {
     const r = rows[i];
     const cx = x(parseDate(r.date));
     const cy = y(r[cmetric]);
+    // Compute delta from pinned bar
+    let deltaText = null;
+    if (clickedDate && clickedDate !== r.date) {
+      const pinnedRow = rows.find(p => p.date === clickedDate);
+      if (pinnedRow && pinnedRow[cmetric] != null && r[cmetric] != null && pinnedRow[cmetric] !== 0) {
+        if (_isYOY) {
+          const diff = r[cmetric] - pinnedRow[cmetric];
+          deltaText = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'pp from ' + fmtMonthDate(clickedDate);
+        } else {
+          const pct = ((r[cmetric] - pinnedRow[cmetric]) / Math.abs(pinnedRow[cmetric])) * 100;
+          deltaText = (pct >= 0 ? '▲ ' : '▼ ') + Math.abs(pct).toFixed(1) + '% from ' + fmtMonthDate(clickedDate);
+        }
+      }
+    }
+    const curCardH = deltaText ? 96 : cardH;
     const cardX = cx + cardW + 10 > iw ? cx - cardW - 10 : cx + 10;
-    const cardY = Math.max(0, Math.min(cy - 10, ih - cardH));
+    const cardY = Math.max(0, Math.min(cy - 10, ih - curCardH));
     hoverLine.attr('x1',cx).attr('x2',cx).style('opacity',1);
-    hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',cardH);
+    hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',curCardH);
     hoverDateTxt.attr('x',cardX+12).attr('y',cardY+18).text(fmtMonthDate(r.date));
     hoverValTxt.attr('x',cardX+12).attr('y',cardY+46).text(METRICS[cmetric].fmt(r[cmetric]));
     hoverLabelTxt.attr('x',cardX+12).attr('y',cardY+64).text(METRICS[cmetric].label.toUpperCase());
+    if (deltaText) {
+      hoverDeltaTxt.attr('x',cardX+12).attr('y',cardY+82).text(deltaText).style('opacity',1);
+    } else {
+      hoverDeltaTxt.style('opacity',0);
+    }
     hoverCard.style('opacity',1);
   }).on('mouseleave', ()=>{ hoverLine.style('opacity',0); hoverCard.style('opacity',0); });
 
