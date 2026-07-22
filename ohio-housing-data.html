@@ -1590,7 +1590,33 @@ function toggleTableView() {
   tableViewActive = !tableViewActive;
   document.getElementById('table-view').style.display = tableViewActive ? 'block' : 'none';
   document.getElementById('pill-table').classList.toggle('active', tableViewActive);
-  if (tableViewActive) renderTable();
+  if (tableViewActive) _ensureDataThenRenderTable();
+}
+
+function _ensureDataThenRenderTable() {
+  if (mapMode === 'zip') {
+    if (!zipDataLoaded) {
+      document.getElementById('table-body').innerHTML = '<tr><td colspan="99" style="padding:24px;text-align:center;color:#aaa;">Loading ZIP data…</td></tr>';
+      loadZipData();
+      const wait = setInterval(() => { if (zipDataLoaded) { clearInterval(wait); renderTable(); } }, 200);
+      return;
+    }
+  } else if (mapMode === 'metro') {
+    if (!metroDataLoaded) {
+      document.getElementById('table-body').innerHTML = '<tr><td colspan="99" style="padding:24px;text-align:center;color:#aaa;">Loading metro data…</td></tr>';
+      loadMetroData();
+      const wait = setInterval(() => { if (metroDataLoaded) { clearInterval(wait); renderTable(); } }, 200);
+      return;
+    }
+  } else if (mapMode === 'state') {
+    if (!STATE_DATA) {
+      document.getElementById('table-body').innerHTML = '<tr><td colspan="99" style="padding:24px;text-align:center;color:#aaa;">Loading state data…</td></tr>';
+      loadStateData();
+      const wait = setInterval(() => { if (STATE_DATA) { clearInterval(wait); renderTable(); } }, 200);
+      return;
+    }
+  }
+  renderTable();
 }
 
 function getTableRows() {
@@ -1690,9 +1716,9 @@ function renderTable() {
     td.addEventListener('click', () => {
       const id = td.dataset.id;
       if (!id) return;
-      if (mapMode === 'zip') selectZip(id);
+      if (mapMode === 'zip') openZipModal(id);
       else if (mapMode === 'metro') openMetroModal(id);
-      else if (mapMode === 'county') openCountyModal(id);
+      else if (mapMode === 'county') openModal(id);
       else if (mapMode === 'state') openStateModal();
     });
   });
@@ -1732,7 +1758,7 @@ function setMode(mode) {
   document.getElementById('modal-overlay').classList.remove('visible');
   selectedCounty = null;
   // Refresh table if open
-  if (tableViewActive) { setTimeout(renderTable, 100); }
+  if (tableViewActive) { setTimeout(_ensureDataThenRenderTable, 100); }
 }
 
 
