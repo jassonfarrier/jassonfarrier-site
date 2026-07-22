@@ -274,7 +274,7 @@ const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
 
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null, selectedFips = null;
-let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, selectedZip = null, zipHoveredId = null;
+let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, zipHistoryCache = {}, selectedZip = null, zipHoveredId = null;
 let METRO_DATA = [], metroDataMap = {}, metroDataLoaded = false, metroGeoJSON = null, selectedMetro = null, metroHoveredId = null;
 let STATE_DATA = null, stateDataLoaded = false, selectedState = null;
 let _dismissClickCard = null; // set by active chart to vanish pinned tooltip
@@ -1558,37 +1558,16 @@ function loadZipData() {
     fetch('/ohio-zips.geojson').then(r=>r.json()),
     (async () => {
       const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY, 'Range-Unit': 'items'};
-      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,city,county,metro,latest,history,prop_tax_history';
+      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,city,county,metro,latest';
       const pages = await Promise.all([
-        fetch(base+'&limit=250&offset=0', {headers}).then(r=>r.json()),
-        fetch(base+'&limit=250&offset=250', {headers}).then(r=>r.json()),
-        fetch(base+'&limit=250&offset=500', {headers}).then(r=>r.json()),
-        fetch(base+'&limit=250&offset=750', {headers}).then(r=>r.json()),
-        fetch(base+'&limit=250&offset=1000', {headers}).then(r=>r.json()),
+        fetch(base+'&limit=1000&offset=0', {headers}).then(r=>r.json()),
+        fetch(base+'&limit=1000&offset=1000', {headers}).then(r=>r.json()),
       ]);
       return pages.flat();
     })()
   ]).then(([geojson, zips]) => {
     ZIP_DATA = zips;
-    // Normalize ZIP history: merge rows with same YYYY-MM (data has both YYYY-MM and YYYY-MM-DD rows for same months)
     ZIP_DATA.forEach(d => {
-      if (d.history) {
-        const merged = {};
-        d.history.forEach(r => {
-          const key = r.date ? r.date.slice(0, 7) : null;
-          if (!key) return;
-          if (!merged[key]) {
-            merged[key] = {...r, date: key};
-          } else {
-            // Merge: keep non-null values from both rows (short-date rows have richer data)
-            Object.entries(r).forEach(([k, v]) => {
-              if (v != null && merged[key][k] == null) merged[key][k] = v;
-            });
-            merged[key].date = key;
-          }
-        });
-        d.history = Object.values(merged).sort((a, b) => a.date < b.date ? -1 : 1);
-      }
       zipDataMap[d.zip] = d;
       attachYOY(d);
     });
@@ -1612,7 +1591,6 @@ function openZipModal(zip) {
   if (!d) return;
   selectedCounty = null;
   const l = d.latest || {};
-  const city = d.city || zip;
   document.getElementById('modal-county').textContent = zip;
   document.getElementById('modal-sub').textContent = (d.city || '') + (d.city ? ', Ohio' : 'Ohio');
   const _chips = [];
@@ -1641,14 +1619,67 @@ function openZipModal(zip) {
   const at = document.querySelector(`.chart-tab[data-cmetric="${defaultMetric}"]`);
   if (at) at.classList.add('active');
   chartMetric = defaultMetric;
-  renderZipChart(zip, defaultMetric);
   document.getElementById('modal-overlay').classList.add('visible');
+  renderZipChart(zip, defaultMetric);
+}
+
+function fetchZipHistory(zip) {
+  if (zipHistoryCache[zip]) return Promise.resolve(zipHistoryCache[zip]);
+  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+  return fetch(
+    'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,history,prop_tax_history&zip=eq.'+zip,
+    {headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}}
+  ).then(r => r.json()).then(rows => {
+    if (!rows || !rows.length) return null;
+    const row = rows[0];
+    // Normalize history: merge YYYY-MM and YYYY-MM-DD rows for same month
+    if (row.history) {
+      const merged = {};
+      row.history.forEach(r => {
+        const key = r.date ? r.date.slice(0, 7) : null;
+        if (!key) return;
+        if (!merged[key]) { merged[key] = {...r, date: key}; }
+        else {
+          Object.entries(r).forEach(([k, v]) => { if (v != null && merged[key][k] == null) merged[key][k] = v; });
+          merged[key].date = key;
+        }
+      });
+      row.history = Object.values(merged).sort((a, b) => a.date < b.date ? -1 : 1);
+    }
+    // Merge into zipDataMap entry
+    if (zipDataMap[zip]) {
+      zipDataMap[zip].history = row.history;
+      zipDataMap[zip].prop_tax_history = row.prop_tax_history;
+      attachYOY(zipDataMap[zip]);
+    }
+    zipHistoryCache[zip] = row;
+    return row;
+  });
 }
 
 function renderZipChart(zip, cmetric) {
   const d = zipDataMap[zip];
   if (!d) return;
   chartMetric = cmetric;
+  // If history already loaded, render immediately
+  if (d.history !== undefined) {
+    _doRenderZipChart(zip, cmetric);
+    return;
+  }
+  // Fetch history on demand, then render
+  const chartEl = document.getElementById('chart');
+  if (chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:120px;color:rgba(0,0,0,0.35);font-size:12px;">Loading chart data…</div>';
+  fetchZipHistory(zip).then(() => {
+    // Only render if still showing this zip
+    if (selectedZip === zip) _doRenderZipChart(zip, cmetric);
+  }).catch(() => {
+    if (chartEl) chartEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:120px;color:rgba(0,0,0,0.35);font-size:12px;">Chart data unavailable</div>';
+  });
+}
+
+function _doRenderZipChart(zip, cmetric) {
+  const d = zipDataMap[zip];
+  if (!d) return;
   if (TAX_YOY.has(cmetric)) {
     const yoyRows = getYOYRows(d, cmetric).map(r => ({...r, date: r.date || ''}));
     drawAnnualBarChart(zip, cmetric, yoyRows, true);
