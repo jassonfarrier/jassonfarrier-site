@@ -63,9 +63,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 
 /* CENTER MODAL */
 #modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
-#modal-search-bar{position:absolute;top:-22px;left:50%;transform:translateX(-50%);background:#fff;border-radius:20px;border:1px solid rgba(0,0,0,0.13);box-shadow:0 4px 16px rgba(0,0,0,0.18);display:flex;align-items:center;padding:6px 14px;gap:8px;min-width:280px;z-index:10;}
+#modal-wrapper{position:relative;display:flex;flex-direction:column;align-items:center;width:min(1715px,96vw);}#modal-search-bar{position:absolute;top:-40px;left:50%;transform:translateX(-50%);background:#fff;border-radius:20px;border:1px solid rgba(0,0,0,0.13);box-shadow:0 4px 16px rgba(0,0,0,0.18);display:flex;align-items:center;padding:6px 14px;gap:8px;min-width:280px;z-index:500;white-space:nowrap;}
 #modal-search-input{border:none;outline:none;font-family:Montserrat,sans-serif;font-size:13px;font-weight:500;color:#0D1E42;background:transparent;min-width:200px;}
-#modal-search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.15);list-style:none;margin:0;padding:4px 0;display:none;z-index:20;max-height:220px;overflow-y:auto;}
+#modal-search-results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.1);box-shadow:0 8px 24px rgba(0,0,0,0.15);list-style:none;margin:0;padding:4px 0;display:none;z-index:600;max-height:220px;overflow-y:auto;}
 #modal-search-results li{padding:9px 14px;font-size:12px;font-weight:600;font-family:Montserrat;color:#0d1e42;cursor:pointer;}
 #modal-search-results li:hover{background:#f0f4ff;}
 #modal-overlay.visible{display:flex}
@@ -229,12 +229,13 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 
 <!-- MODAL -->
 <div id="modal-overlay">
-  <div id="modal" style="position:relative;">
+  <div id="modal-wrapper">
     <div id="modal-search-bar">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input id="modal-search-input" type="text" placeholder="Search ZIP, county, or metro…" autocomplete="off">
       <ul id="modal-search-results"></ul>
     </div>
+  <div id="modal" style="position:relative;width:100%;">
     <div class="modal-header">
       <div class="modal-header-left">
         <div class="attr-chips" id="attr-chips"></div>
@@ -294,8 +295,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       </div>
     </div>
   </div>
-  </div>
-</div>
+  </div><!-- /modal -->
+  </div><!-- /modal-wrapper -->
+</div><!-- /modal-overlay -->
 
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoiamFzc29uZmFy'
