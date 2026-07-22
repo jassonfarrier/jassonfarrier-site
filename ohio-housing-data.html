@@ -163,11 +163,6 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn yoy-btn" data-metric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span></button>
     <hr>
 
-    <div id="zip-loading-indicator" style="display:none;align-items:center;gap:8px;padding:10px 4px;font-size:10px;color:rgba(26,82,150,0.7);font-weight:600;letter-spacing:0.5px;">
-      <div style="width:14px;height:14px;border:2px solid rgba(26,82,150,0.15);border-top-color:#0D1E42;border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0"></div>
-      Loading ZIP data…
-    </div>
-
     <div class="src" style="margin-top:auto;font-size:9px;color:rgba(0,0,0,0.35);line-height:1.6;padding-top:12px;border-top:1px solid rgba(0,0,0,0.07)">
       <img src="/fair-housing.webp" alt="Equal Housing Opportunity" style="width:24px;height:auto;opacity:0.5;filter:invert(0.4);display:block;margin-bottom:6px;">
       Jasson Farrier · Kiger Realty · Realtor · License #2018004483 · 614-699-3007<br>
@@ -279,7 +274,7 @@ const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
 
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null, selectedFips = null;
-let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, zipDataLoading = false, selectedZip = null, zipHoveredId = null;
+let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, selectedZip = null, zipHoveredId = null;
 let METRO_DATA = [], metroDataMap = {}, metroDataLoaded = false, metroGeoJSON = null, selectedMetro = null, metroHoveredId = null;
 let STATE_DATA = null, stateDataLoaded = false, selectedState = null;
 let _dismissClickCard = null; // set by active chart to vanish pinned tooltip
@@ -1558,10 +1553,6 @@ function openStateModal() {
 let zipGeoJSON = null;
 function loadZipData() {
   if (zipDataLoaded) { renderColors('zip'); return; }
-  if (zipDataLoading) return; // already fetching, don't double-load
-  zipDataLoading = true;
-  const loadingEl = document.getElementById('zip-loading-indicator');
-  if (loadingEl) loadingEl.style.display = 'flex';
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
   Promise.all([
     fetch('/ohio-zips.geojson').then(r=>r.json()),
@@ -1599,7 +1590,6 @@ function loadZipData() {
       attachYOY(d);
     });
     zipDataLoaded = true;
-    if (loadingEl) loadingEl.style.display = 'none';
     // Merge metric properties directly into GeoJSON features
     geojson.features.forEach(f => {
       const zip = (f.properties && f.properties.zip) || String(f.id);
@@ -1608,13 +1598,8 @@ function loadZipData() {
     });
     zipGeoJSON = geojson;
     map.getSource('ohio-zips').setData(geojson);
-    // Only render if still in zip mode
-    if (mapMode === 'zip') renderColors('zip');
-  }).catch(err => {
-    console.error('ZIP data load error:', err);
-    zipDataLoading = false; // allow retry on error
-    if (loadingEl) loadingEl.style.display = 'none';
-  });
+    renderColors('zip');
+  }).catch(err => console.error('ZIP data load error:', err));
 }
 
 
