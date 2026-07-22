@@ -24,8 +24,23 @@
   status = 200
 
 [[redirects]]
+  from = "/housing-market-updates/:slug"
+  to = "/housing-market-updates/:slug.html"
+  status = 200
+
+[[redirects]]
+  from = "/market-updates/:slug"
+  to = "/housing-market-updates/:slug"
+  status = 301
+
+[[redirects]]
   from = "/privacy"
   to = "/privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/free"
+  to = "/free.html"
   status = 200
 
 [[headers]]
