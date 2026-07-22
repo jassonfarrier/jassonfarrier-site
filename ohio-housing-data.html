@@ -762,8 +762,6 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
       if (d) {
         if (YOY_METRICS.has(cm)) {
           drawMonthlyBarChart(d.metro, cm, getYOYRows(d, cm), true);
-        } else if (cm === 'price_reduced_pct') {
-          drawAnnualBarChart(d.metro, cm, d.history, true);
         } else {
           drawMonthlyBarChart(d.metro, cm, d.history, true);
         }
@@ -772,8 +770,6 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
       const d = STATE_DATA;
       if (YOY_METRICS.has(cm)) {
         drawMonthlyBarChart('Ohio', cm, getYOYRows(d, cm), true);
-      } else if (cm === 'price_reduced_pct') {
-        drawAnnualBarChart('Ohio', cm, d.history, true);
       } else {
         drawMonthlyBarChart('Ohio', cm, d.history, true);
       }
@@ -804,8 +800,6 @@ function renderChart(county, cmetric) {
     drawAnnualBarChart(county, cmetric, yoyRows, false);
   } else if (YOY_METRICS.has(cmetric)) {
     drawMonthlyBarChart(county, cmetric, getYOYRows(d, cmetric), false);
-  } else if (cmetric === 'price_reduced_pct') {
-    drawAnnualBarChart(county, cmetric);
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
     // Annual ACS data — convert prop_tax_history to have date field
     const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
@@ -1518,8 +1512,6 @@ function openMetroModal(rid) {
   document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
   if (YOY_METRICS.has(mapMetric)) {
     drawMonthlyBarChart(d.metro, mapMetric, getYOYRows(d, mapMetric), true);
-  } else if (mapMetric === 'price_reduced_pct') {
-    drawAnnualBarChart(d.metro, mapMetric, d.history, true);
   } else {
     drawMonthlyBarChart(d.metro, mapMetric, d.history, true);
   }
@@ -1565,8 +1557,6 @@ function openStateModal() {
   document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
   if (YOY_METRICS.has(mapMetric)) {
     drawMonthlyBarChart('Ohio', mapMetric, getYOYRows(d, mapMetric), true);
-  } else if (mapMetric === 'price_reduced_pct') {
-    drawAnnualBarChart('Ohio', mapMetric, d.history, true);
   } else {
     drawMonthlyBarChart('Ohio', mapMetric, d.history, true);
   }
@@ -1709,8 +1699,6 @@ function _doRenderZipChart(zip, cmetric) {
     drawAnnualBarChart(zip, cmetric, yoyRows, true);
   } else if (YOY_METRICS.has(cmetric)) {
     drawMonthlyBarChart(zip, cmetric, getYOYRows(d, cmetric), true);
-  } else if (cmetric==='price_reduced_pct') {
-    drawAnnualBarChart(zip, cmetric, d.history, true);
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
     const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
     drawAnnualBarChart(zip, cmetric, taxHist, true);
