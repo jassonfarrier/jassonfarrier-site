@@ -761,7 +761,7 @@ function drawLineChart(county, cmetric) {
 
   const fmtY = fmtAxisCompact(cmetric);
   g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).ticks(d3.timeYear.every(2)).tickFormat(d3.timeFormat('%Y')).tickSize(0)).call(ax=>ax.select('.domain').remove()).selectAll('text').attr('fill','rgba(0,0,0,0.85)').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','700');
-  g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtY)).call(ax=>ax.select('.domain').remove()).selectAll('text').attr('fill','rgba(0,0,0,0.85)').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','700');
+  g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtY)).call(ax=>ax.select('.domain').remove()).selectAll('text').attr('fill','rgba(0,0,0,0.85)').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','700').attr('dx','-8');
 }
 
 // Modal close
@@ -1447,7 +1447,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   // Y axis
   g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtAxisCompact(cmetric)))
     .call(ax=>ax.select('.domain').remove())
-    .selectAll('text').attr('fill','rgba(0,0,0,0.85)').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','700');
+    .selectAll('text').attr('fill','rgba(0,0,0,0.85)').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','700').attr('dx','-8');
 }
 
 function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
@@ -1531,7 +1531,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
   g.append('g').call(d3.axisLeft(y).ticks(5).tickSize(0).tickFormat(fmtAxisCompact(cmetric)))
     .call(ax=>ax.select('.domain').remove())
     .selectAll('text').attr('fill','rgba(0,0,0,0.65)').attr('font-size','12px')
-    .attr('font-family','Montserrat');
+    .attr('font-family','Montserrat').attr('dx','-8');
 }
 
 function setMode(mode) {
