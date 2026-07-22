@@ -92,6 +92,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .yoy-tab{font-size:10px;padding:6px 12px;color:rgba(0,0,0,0.35);margin-top:-2px}
 .yoy-tab.active{background:#dce8f7;color:#0D1E42}
 #line-chart{width:100%;height:554px}
+#slider-start,#slider-end{top:50%;transform:translateY(-50%);height:24px;cursor:pointer;}
+#slider-start::-webkit-slider-thumb,#slider-end::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#0d1e42;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);pointer-events:all;cursor:grab;}
+#slider-start::-moz-range-thumb,#slider-end::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#0d1e42;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);pointer-events:all;cursor:grab;}
 
 /* LOADING */
 #loading{position:fixed;inset:0;background:#060d1f;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:16px}
@@ -109,6 +112,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   #map{height:65vw;min-height:280px}
   .snap-grid{grid-template-columns:repeat(2,1fr)}
   #line-chart{height:286px}
+  #chart-slider-wrap{padding-left:48px !important;}
   #legend{left:10px}
   nav{padding:0 16px}
   .nav-right a:not(.nav-yt){display:none}
@@ -238,6 +242,18 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <div class="modal-right">
         <div class="chart-label" id="chart-label">Historical Trend</div>
         <svg id="line-chart"></svg>
+        <div id="chart-slider-wrap" style="display:none;padding:10px 0 0 62px;box-sizing:border-box;">
+          <div style="display:flex;align-items:center;gap:10px;position:relative;">
+            <span id="slider-start-lbl" style="font-size:11px;font-weight:700;font-family:Montserrat;color:#0d1e42;min-width:36px;"></span>
+            <div style="position:relative;flex:1;height:24px;">
+              <input type="range" id="slider-start" style="position:absolute;width:100%;pointer-events:none;-webkit-appearance:none;appearance:none;height:4px;background:transparent;outline:none;" />
+              <input type="range" id="slider-end" style="position:absolute;width:100%;pointer-events:none;-webkit-appearance:none;appearance:none;height:4px;background:transparent;outline:none;" />
+              <div id="slider-track" style="position:absolute;top:50%;transform:translateY(-50%);width:100%;height:4px;background:#e5e7eb;border-radius:2px;pointer-events:none;"></div>
+              <div id="slider-range" style="position:absolute;top:50%;transform:translateY(-50%);height:4px;background:#0d1e42;border-radius:2px;pointer-events:none;"></div>
+            </div>
+            <span id="slider-end-lbl" style="font-size:11px;font-weight:700;font-family:Montserrat;color:#0d1e42;min-width:36px;text-align:right;"></span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -274,6 +290,7 @@ const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
 
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null, selectedFips = null;
+let chartSliderStartYr = null, chartSliderEndYr = null, _chartHistoryFull = null, _chartCounty = null, _chartCmetric = null, _chartIsZip = false;
 let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, zipHistoryCache = {}, selectedZip = null, zipHoveredId = null;
 let METRO_DATA = [], metroDataMap = {}, metroDataLoaded = false, metroGeoJSON = null, selectedMetro = null, metroHoveredId = null;
 let STATE_DATA = null, stateDataLoaded = false, selectedState = null;
@@ -1161,14 +1178,95 @@ function paletteForMetric(metric) {
 }
 
 
-function drawMonthlyBarChart(county, cmetric, histOverride, isZip) {
+function _initChartSlider(allRows) {
+  const wrap = document.getElementById('chart-slider-wrap');
+  if (!wrap) return;
+  wrap.style.display = 'block';
+  const minYr = parseInt(allRows[0].date.slice(0,4));
+  const maxYr = parseInt(allRows[allRows.length-1].date.slice(0,4));
+  const sStart = document.getElementById('slider-start');
+  const sEnd = document.getElementById('slider-end');
+  const lStart = document.getElementById('slider-start-lbl');
+  const lEnd = document.getElementById('slider-end-lbl');
+  const track = document.getElementById('slider-range');
+
+  sStart.min = sEnd.min = minYr;
+  sStart.max = sEnd.max = maxYr;
+  sStart.value = minYr;
+  sEnd.value = maxYr;
+  chartSliderStartYr = minYr;
+  chartSliderEndYr = maxYr;
+  lStart.textContent = minYr;
+  lEnd.textContent = maxYr;
+
+  function updateTrack() {
+    const pct1 = (sStart.value - minYr) / (maxYr - minYr) * 100;
+    const pct2 = (sEnd.value - minYr) / (maxYr - minYr) * 100;
+    track.style.left = pct1 + '%';
+    track.style.width = (pct2 - pct1) + '%';
+  }
+  updateTrack();
+
+  // Remove old listeners by cloning
+  const ns = sStart.cloneNode(true);
+  const ne = sEnd.cloneNode(true);
+  sStart.parentNode.replaceChild(ns, sStart);
+  sEnd.parentNode.replaceChild(ne, sEnd);
+
+  function redraw() {
+    let sv = parseInt(ns.value), ev = parseInt(ne.value);
+    if (sv > ev - 1) { if (this === ns) sv = ev - 1; else ev = sv + 1; ns.value = sv; ne.value = ev; }
+    chartSliderStartYr = sv;
+    chartSliderEndYr = ev;
+    document.getElementById('slider-start-lbl').textContent = sv;
+    document.getElementById('slider-end-lbl').textContent = ev;
+    const pct1 = (sv - minYr) / (maxYr - minYr) * 100;
+    const pct2 = (ev - minYr) / (maxYr - minYr) * 100;
+    document.getElementById('slider-range').style.left = pct1 + '%';
+    document.getElementById('slider-range').style.width = (pct2 - pct1) + '%';
+    if (_chartHistoryFull) {
+      drawMonthlyBarChart(_chartCounty, _chartCmetric,
+        _chartHistoryFull, _chartIsZip, true);
+    }
+  }
+  ns.addEventListener('input', redraw);
+  ne.addEventListener('input', redraw);
+  // z-index: whichever thumb is closer to mouse takes pointer events on top
+  ns.style.zIndex = '3'; ne.style.zIndex = '4';
+  ns.addEventListener('mousedown', ()=>{ ns.style.zIndex='5'; ne.style.zIndex='4'; });
+  ne.addEventListener('mousedown', ()=>{ ne.style.zIndex='5'; ns.style.zIndex='4'; });
+}
+
+
+function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter) {
   const d = histOverride != null ? {history: histOverride} : dataMap[county];
   if (!d || !d.history) return;
   chartMetric = cmetric;
-  const rows = d.history.filter(r => r[cmetric] != null);
-  // Normalize date format YYYY-MM-DD → YYYY-MM and sort chronologically
-  rows.forEach(r => { if (r.date && r.date.length > 7) r.date = r.date.slice(0, 7); });
-  rows.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+  // Store full history for slider re-renders
+  if (!_sliderFilter) {
+    _chartHistoryFull = d.history;
+    _chartCounty = county;
+    _chartCmetric = cmetric;
+    _chartIsZip = isZip;
+    // Reset slider range to full
+    const allRows = d.history.filter(r => r[cmetric] != null);
+    allRows.forEach(r => { if (r.date && r.date.length > 7) r.date = r.date.slice(0, 7); });
+    allRows.sort((a,b) => a.date < b.date ? -1 : 1);
+    if (allRows.length) {
+      chartSliderStartYr = parseInt(allRows[0].date.slice(0,4));
+      chartSliderEndYr = parseInt(allRows[allRows.length-1].date.slice(0,4));
+      _initChartSlider(allRows);
+    }
+  }
+  let allRowsFull = d.history.filter(r => r[cmetric] != null);
+  allRowsFull.forEach(r => { if (r.date && r.date.length > 7) r.date = r.date.slice(0, 7); });
+  allRowsFull.sort((a,b) => a.date < b.date ? -1 : 1);
+  const rows = _sliderFilter
+    ? allRowsFull.filter(r => {
+        const yr = parseInt(r.date.slice(0,4));
+        return yr >= chartSliderStartYr && yr <= chartSliderEndYr;
+      })
+    : allRowsFull;
 
   const startYr = rows.length ? rows[0].date.slice(0,4) : '';
   const endYr = rows.length ? rows[rows.length-1].date.slice(0,4) : '';
@@ -1348,6 +1446,8 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip) {
 }
 
 function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
+  const sliderWrap = document.getElementById('chart-slider-wrap');
+  if (sliderWrap) sliderWrap.style.display = 'none';
   const d = histOverride != null ? {history: histOverride} : dataMap[county];
   if (!d || !d.history) return;
   chartMetric = cmetric;
