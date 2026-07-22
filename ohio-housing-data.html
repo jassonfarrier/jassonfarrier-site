@@ -1558,7 +1558,7 @@ function loadZipData() {
     fetch('/ohio-zips.geojson').then(r=>r.json()),
     (async () => {
       const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY, 'Range-Unit': 'items'};
-      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,city,county,metro,latest';
+      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,city,county,metro,latest,yoy_latest';
       const pages = await Promise.all([
         fetch(base+'&limit=1000&offset=0', {headers}).then(r=>r.json()),
         fetch(base+'&limit=1000&offset=1000', {headers}).then(r=>r.json()),
@@ -1568,8 +1568,10 @@ function loadZipData() {
   ]).then(([geojson, zips]) => {
     ZIP_DATA = zips;
     ZIP_DATA.forEach(d => {
+      // yoy_latest comes pre-computed from DB — use directly
+      d.yoy_latest = d.yoy_latest || {};
+      d.yoy_history = {};
       zipDataMap[d.zip] = d;
-      attachYOY(d);
     });
     zipDataLoaded = true;
     // Merge metric properties directly into GeoJSON features
