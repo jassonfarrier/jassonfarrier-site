@@ -1559,11 +1559,14 @@ function loadZipData() {
     (async () => {
       const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY, 'Range-Unit': 'items'};
       const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,city,county,metro,latest,history,prop_tax_history';
-      const [p1, p2] = await Promise.all([
-        fetch(base+'&limit=1000&offset=0', {headers}).then(r=>r.json()),
-        fetch(base+'&limit=1000&offset=1000', {headers}).then(r=>r.json()),
+      const pages = await Promise.all([
+        fetch(base+'&limit=250&offset=0', {headers}).then(r=>r.json()),
+        fetch(base+'&limit=250&offset=250', {headers}).then(r=>r.json()),
+        fetch(base+'&limit=250&offset=500', {headers}).then(r=>r.json()),
+        fetch(base+'&limit=250&offset=750', {headers}).then(r=>r.json()),
+        fetch(base+'&limit=250&offset=1000', {headers}).then(r=>r.json()),
       ]);
-      return [...p1, ...p2];
+      return pages.flat();
     })()
   ]).then(([geojson, zips]) => {
     ZIP_DATA = zips;
