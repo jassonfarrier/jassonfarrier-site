@@ -92,6 +92,11 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .yoy-tab{font-size:10px;padding:6px 12px;color:rgba(0,0,0,0.35);margin-top:-2px}
 .yoy-tab.active{background:#dce8f7;color:#0D1E42}
 #line-chart{width:100%;height:554px}
+@keyframes bar-pulse {
+  0%,100%{filter:brightness(1);}
+  50%{filter:brightness(1.35);}
+}
+.bar-hover{animation:bar-pulse 1.2s ease-in-out infinite;}
 #slider-start,#slider-end{top:50%;transform:translateY(-50%);height:24px;cursor:pointer;}
 #slider-start::-webkit-slider-thumb,#slider-end::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#0d1e42;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);pointer-events:all;cursor:grab;}
 #slider-start::-moz-range-thumb,#slider-end::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#0d1e42;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.3);pointer-events:all;cursor:grab;}
@@ -1293,7 +1298,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   // YOY charts always include zero in domain so bars anchor correctly
   const yMin = _isYOY ? Math.min(0, hasNeg ? _minVal * 1.15 : 0)
              : hasNeg ? _minVal * 1.15
-             : (isZeroBased ? 0 : _minVal * 0.92);
+             : 0;
   const yMax = _isYOY ? (_maxVal > 0 ? _maxVal * 1.08 : 0.001)
              : (_maxVal > 0 ? _maxVal * 1.08 : _maxVal * 0.92);
   const y = d3.scaleLinear()
@@ -1351,10 +1356,10 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
     .attr('rx', 1)
     .style('cursor','pointer')
     .on('mouseover', function(event, r) {
-      if (r.date !== clickedDate) d3.select(this).attr('fill-opacity', 1);
+      if (r.date !== clickedDate) d3.select(this).classed('bar-hover', true);
     })
     .on('mouseout', function(event, r) {
-      if (r.date !== clickedDate) d3.select(this).attr('fill-opacity', 1.0);
+      d3.select(this).classed('bar-hover', false);
     })
     .on('click', function(event, r) {
       event.stopPropagation();
