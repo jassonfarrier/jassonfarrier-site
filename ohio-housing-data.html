@@ -72,7 +72,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 #modal{background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:14px;width:min(1715px,96vw);max-height:90vh;overflow-y:auto;padding:37px 37px 32px;box-shadow:0 8px 40px rgba(0,0,0,0.18);position:relative}
 .modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:24px}
 .modal-header-left{flex:1;min-width:0}
-.modal-header-right{text-align:right;flex-shrink:0}.modal-header-center{flex:1;display:flex;align-items:center;justify-content:center}.modal-metric-label{font-family:Montserrat,sans-serif;font-size:20px;font-weight:800;color:#0d1e42;letter-spacing:0.06em;text-transform:uppercase}.modal-header-center{flex:1;display:flex;align-items:center;justify-content:center;text-align:center}.modal-metric-label{font-family:Montserrat,sans-serif;font-size:22px;font-weight:800;color:#0d1e42;letter-spacing:0.04em;line-height:1.1}
+.modal-header-right{text-align:right;flex-shrink:0}.modal-header-center{flex:1;display:flex;align-items:center;justify-content:center}.modal-metric-label{font-family:Montserrat,sans-serif;font-size:36px;font-weight:800;color:#c0392b;line-height:1;letter-spacing:-1px}.modal-header-center{flex:1;display:flex;align-items:center;justify-content:center;text-align:center}.modal-metric-label{font-family:Montserrat,sans-serif;font-size:22px;font-weight:800;color:#0d1e42;letter-spacing:0.04em;line-height:1.1}
 .modal-county{font-size:36px;font-weight:800;color:#c0392b;line-height:1;letter-spacing:-1px}
 .modal-sub{font-size:13px;font-weight:500;color:#888;margin-top:4px}
 .attr-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
@@ -253,16 +253,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       </div>
       <button class="close-btn" id="close-btn">✕</button>
     </div>
-    <div class="snap-grid">
-      <div class="snap-card"><div class="snap-val" id="s-zhvi"></div><div class="snap-lbl">Home Value</div></div>
-      <div class="snap-card"><div class="snap-val" id="s-active"></div><div class="snap-lbl">Active Listings</div></div>
-      <div class="snap-card"><div class="snap-val" id="s-pending"></div><div class="snap-lbl">Pending Sales</div></div>
-      <div class="snap-card"><div class="snap-val" id="s-dom"></div><div class="snap-lbl">Days on Market</div></div>
-      <div class="snap-card"><div class="snap-val" id="s-pct"></div><div class="snap-lbl">Price Cut %</div></div>
-      <div class="snap-card"><div class="snap-val" id="s-ptax"></div><div class="snap-lbl">Property Tax</div></div>
-      <div class="snap-card"><div class="snap-val" id="s-ptaxrate"></div><div class="snap-lbl">Tax Rate</div></div>
-      <div class="snap-card"><div class="snap-val" id="s-rank"></div><div class="snap-lbl">Value Rank</div></div>
-    </div>
+
     <div class="modal-body">
       <div class="modal-left">
         <div class="chart-label">Chart Type</div>
@@ -284,7 +275,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
         </div>
       </div>
       <div class="modal-right">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><button id="btn-record-high" style="display:none;background:#fff;border:2px solid #c0392b;color:#c0392b;border-radius:8px;padding:5px 14px;font-size:11px;font-weight:800;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.05em;">⭐ RECORD HIGH</button></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><button id="btn-record-high" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">RECORD HIGH</button></div>
         <svg id="line-chart"></svg>
         <div id="chart-slider-wrap" style="display:none;padding:10px 0 0 62px;box-sizing:border-box;">
           <div style="display:flex;align-items:center;gap:10px;position:relative;">
