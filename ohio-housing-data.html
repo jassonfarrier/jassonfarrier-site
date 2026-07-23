@@ -672,7 +672,7 @@ function drawLineChart(county, cmetric) {
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
   const W = lsvg.node().getBoundingClientRect().width || 760;
-  const H = 349;
+  const H = lsvg.node().clientHeight || 600;
   const m = {top:12, right:16, bottom:32, left:90};
   const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
   const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
@@ -1334,7 +1334,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
   const W = lsvg.node().getBoundingClientRect().width || 760;
-  const H = 349;
+  const H = lsvg.node().clientHeight || 600;
   const m = {top:28, right:16, bottom:36, left:90};
   const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
   const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
@@ -1605,7 +1605,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
   const W = lsvg.node().getBoundingClientRect().width || 760;
-  const H = 349;
+  const H = lsvg.node().clientHeight || 600;
   const m = {top:28, right:16, bottom:36, left:90};
   const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
   const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
