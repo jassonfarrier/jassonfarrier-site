@@ -1405,7 +1405,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const rhGroup  = g.append('g').attr('class','rh-callout').style('opacity',0);
   const rhRect   = rhGroup.append('rect').attr('rx',12).attr('fill','#c0392b')
     .style('filter','drop-shadow(0 4px 20px rgba(192,57,43,0.7))');
-  const rhLbl    = rhGroup.append('text').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','rgba(255,255,255,0.9)').attr('letter-spacing','0.1em').attr('text-anchor','middle').attr('font-size','11px').text('ALL-TIME HIGH');
+  const rhLbl    = rhGroup.append('text').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','rgba(255,255,255,0.9)').attr('letter-spacing','0.1em').attr('text-anchor','middle').attr('font-size','11px').text('RECORD HIGH');
   const rhVal    = rhGroup.append('text').attr('font-family','Montserrat').attr('font-weight','900').attr('fill','#fff').attr('text-anchor','middle').attr('font-size','30px');
 
   let _rhPeakDate = null; // track which bar is highlighted
