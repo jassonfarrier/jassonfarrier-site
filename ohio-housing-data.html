@@ -1371,7 +1371,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const seqColor = r => {
     if (_seqMax === _seqMin) return '#1a5296';
     const t = (r[cmetric] - _seqMin) / (_seqMax - _seqMin);
-    return d3.interpolateRgb('#9ecae1', '#0d2a5e')(t);
+    return d3.interpolateRgb('#dce9f5', '#0d2a5e')(Math.pow(t, 0.7));
   };
   const barColor = _isYOYChart
     ? (r => divergingColor(_sortedVals, r[cmetric]))
