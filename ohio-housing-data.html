@@ -634,16 +634,16 @@ function openModal(county) {
   document.getElementById('modal-county').textContent = county + ' County';
   document.getElementById('modal-sub').textContent = '';
   setAttrHeader(['County: ' + county, 'State: Ohio'], mapMetric);
-  document.getElementById('s-zhvi').textContent = fmt$(l.zhvi);
-  document.getElementById('s-active').textContent = fmtN(l.active_listings);
-  document.getElementById('s-pending').textContent = fmtN(l.pending_listings);
-  document.getElementById('s-dom').textContent = l.days_on_market != null ? l.days_on_market+' days' : '—';
-  document.getElementById('s-pct').textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
-  document.getElementById('s-ptax').textContent = l.median_property_tax ? '$'+Math.round(l.median_property_tax).toLocaleString() : '—';
-  document.getElementById('s-ptaxrate').textContent = l.property_tax_rate != null ? l.property_tax_rate.toFixed(2)+'%' : '—';
+  (document.getElementById('s-zhvi')||{}).textContent = fmt$(l.zhvi);
+  (document.getElementById('s-active')||{}).textContent = fmtN(l.active_listings);
+  (document.getElementById('s-pending')||{}).textContent = fmtN(l.pending_listings);
+  (document.getElementById('s-dom')||{}).textContent = l.days_on_market != null ? l.days_on_market+' days' : '—';
+  (document.getElementById('s-pct')||{}).textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
+  (document.getElementById('s-ptax')||{}).textContent = l.median_property_tax ? '$'+Math.round(l.median_property_tax).toLocaleString() : '—';
+  (document.getElementById('s-ptaxrate')||{}).textContent = l.property_tax_rate != null ? l.property_tax_rate.toFixed(2)+'%' : '—';
     const sorted = [...DATA].filter(c=>c.latest&&c.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
   const rank = sorted.findIndex(c=>c.county===county)+1;
-  document.getElementById('s-rank').textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
+  (document.getElementById('s-rank')||{}).textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
   // Default chart to current map metric
   const defaultMetric = mapMetric;
   document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
@@ -1898,14 +1898,14 @@ function openMetroModal(rid) {
   const chips = ['Metro'];
   if (d.metro.includes('OH')) chips.push('State: Ohio');
   setAttrHeader(chips, mapMetric);
-  document.getElementById('s-zhvi').textContent = l.zhvi ? fmt$(l.zhvi) : '—';
-  document.getElementById('s-active').textContent = l.active_listings ? fmtN(l.active_listings) : '—';
-  document.getElementById('s-pending').textContent = l.pending_listings ? fmtN(l.pending_listings) : '—';
-  document.getElementById('s-dom').textContent = l.days_on_market != null ? l.days_on_market+'d' : '—';
-  document.getElementById('s-pct').textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
-  document.getElementById('s-ptax').textContent = '—';
-  document.getElementById('s-ptaxrate').textContent = '—';
-  document.getElementById('s-rank').textContent = (() => {
+  (document.getElementById('s-zhvi')||{}).textContent = l.zhvi ? fmt$(l.zhvi) : '—';
+  (document.getElementById('s-active')||{}).textContent = l.active_listings ? fmtN(l.active_listings) : '—';
+  (document.getElementById('s-pending')||{}).textContent = l.pending_listings ? fmtN(l.pending_listings) : '—';
+  (document.getElementById('s-dom')||{}).textContent = l.days_on_market != null ? l.days_on_market+'d' : '—';
+  (document.getElementById('s-pct')||{}).textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
+  (document.getElementById('s-ptax')||{}).textContent = '—';
+  (document.getElementById('s-ptaxrate')||{}).textContent = '—';
+  (document.getElementById('s-rank')||{textContent:''}).textContent = (() => {
     const sorted = METRO_DATA.filter(x=>x.latest&&x.latest[mapMetric]!=null).sort((a,b)=>b.latest[mapMetric]-a.latest[mapMetric]);
     const rank = sorted.findIndex(x=>x.region_id===rid)+1;
     return rank > 0 ? '#'+rank+' of '+sorted.length : '—';
@@ -1947,14 +1947,14 @@ function openStateModal() {
   document.getElementById('modal-county').textContent = 'Ohio';
   document.getElementById('modal-sub').textContent = '';
   setAttrHeader(['State: Ohio'], mapMetric);
-  document.getElementById('s-zhvi').textContent = l.zhvi ? fmt$(l.zhvi) : '—';
-  document.getElementById('s-active').textContent = l.active_listings ? fmtN(l.active_listings) : '—';
-  document.getElementById('s-pending').textContent = l.pending_listings ? fmtN(l.pending_listings) : '—';
-  document.getElementById('s-dom').textContent = l.days_on_market != null ? l.days_on_market+'d' : '—';
-  document.getElementById('s-pct').textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
-  document.getElementById('s-ptax').textContent = '—';
-  document.getElementById('s-ptaxrate').textContent = '—';
-  document.getElementById('s-rank').textContent = 'Statewide';
+  (document.getElementById('s-zhvi')||{}).textContent = l.zhvi ? fmt$(l.zhvi) : '—';
+  (document.getElementById('s-active')||{}).textContent = l.active_listings ? fmtN(l.active_listings) : '—';
+  (document.getElementById('s-pending')||{}).textContent = l.pending_listings ? fmtN(l.pending_listings) : '—';
+  (document.getElementById('s-dom')||{}).textContent = l.days_on_market != null ? l.days_on_market+'d' : '—';
+  (document.getElementById('s-pct')||{}).textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
+  (document.getElementById('s-ptax')||{}).textContent = '—';
+  (document.getElementById('s-ptaxrate')||{}).textContent = '—';
+  (document.getElementById('s-rank')||{}).textContent = 'Statewide';
   document.getElementById('modal-overlay').classList.add('visible');
   document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
   document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
@@ -2017,18 +2017,18 @@ function openZipModal(zip) {
   setAttrHeader(_chips, mapMetric);
 
   // Snap grid values
-  document.getElementById('s-zhvi').textContent = l.zhvi ? '$'+Math.round(l.zhvi).toLocaleString() : '—';
-  document.getElementById('s-active').textContent = l.active_listings != null ? Math.round(l.active_listings).toLocaleString() : '—';
-  document.getElementById('s-pending').textContent = l.pending_listings != null ? Math.round(l.pending_listings).toLocaleString() : '—';
-  document.getElementById('s-dom').textContent = l.days_on_market != null ? Math.round(l.days_on_market)+' days' : '—';
-  document.getElementById('s-pct').textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
-  document.getElementById('s-ptax').textContent = l.median_property_tax ? '$'+Math.round(l.median_property_tax).toLocaleString() : '—';
-  document.getElementById('s-ptaxrate').textContent = l.property_tax_rate != null ? l.property_tax_rate.toFixed(2)+'%' : '—';
+  (document.getElementById('s-zhvi')||{}).textContent = l.zhvi ? '$'+Math.round(l.zhvi).toLocaleString() : '—';
+  (document.getElementById('s-active')||{}).textContent = l.active_listings != null ? Math.round(l.active_listings).toLocaleString() : '—';
+  (document.getElementById('s-pending')||{}).textContent = l.pending_listings != null ? Math.round(l.pending_listings).toLocaleString() : '—';
+  (document.getElementById('s-dom')||{}).textContent = l.days_on_market != null ? Math.round(l.days_on_market)+' days' : '—';
+  (document.getElementById('s-pct')||{}).textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
+  (document.getElementById('s-ptax')||{}).textContent = l.median_property_tax ? '$'+Math.round(l.median_property_tax).toLocaleString() : '—';
+  (document.getElementById('s-ptaxrate')||{}).textContent = l.property_tax_rate != null ? l.property_tax_rate.toFixed(2)+'%' : '—';
 
   // ZIP rank by zhvi
   const sorted = ZIP_DATA.filter(z=>z.latest&&z.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
   const rank = sorted.findIndex(z=>z.zip===zip)+1;
-  document.getElementById('s-rank').textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
+  (document.getElementById('s-rank')||{}).textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
 
   // Chart tabs
   const defaultMetric = mapMetric==='median_property_tax'||mapMetric==='property_tax_rate' ? 'zhvi' : mapMetric;
