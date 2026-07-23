@@ -809,11 +809,23 @@ document.getElementById('pill-county').addEventListener('click', () => setMode('
 document.getElementById('pill-zip').addEventListener('click', () => setMode('zip'));
 document.getElementById('pill-table').addEventListener('click', toggleTableView);
 
+function _updateRecordHighBtn(cm) {
+  const rhb = document.getElementById('btn-record-high');
+  if (!rhb) return;
+  const isYOY = cm && (cm.endsWith('_yoy') || cm === 'price_reduced_pct_yoy');
+  if (isYOY) {
+    rhb.style.display = 'none';
+    rhb.classList.remove('active');
+  } else {
+    rhb.style.display = '';
+  }
+}
 document.querySelectorAll('.chart-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     const cm = tab.dataset.cmetric;
+    _updateRecordHighBtn(cm);
     if (mapMode === 'zip' && selectedZip) {
       renderZipChart(selectedZip, cm);
     } else if (mapMode === 'metro' && selectedMetro) {
@@ -1288,6 +1300,10 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
     _chartCounty = county;
     _chartCmetric = cmetric;
     _chartIsZip = isZip;
+    // Reset record high button when metric/county changes
+    const _rhBtnReset = document.getElementById('btn-record-high');
+    if (_rhBtnReset) { _rhBtnReset.classList.remove('active'); }
+    _updateRecordHighBtn(cmetric);
     // Reset slider range to full
     const allRows = d.history.filter(r => r[cmetric] != null);
     allRows.forEach(r => { if (r.date && r.date.length > 7) r.date = r.date.slice(0, 7); });
@@ -1369,6 +1385,58 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   let clickedDate = null;
   const clickCard = g.append('g').style('opacity',0);
   _dismissClickCard = () => { clickCard.style('opacity',0); clickedDate = null; if(bars){bars.attr('fill', d=>barColor(d)).attr('fill-opacity',1.0).attr('stroke','#fff').attr('stroke-width',0.8);} };
+
+  // ── RECORD HIGH CALLOUT ─────────────────────────────────────────────
+  g.selectAll('.rh-callout').remove();
+  const rhGroup = g.append('g').attr('class','rh-callout').style('opacity',0);
+  const rhLine  = rhGroup.append('line').attr('stroke','#c0392b').attr('stroke-width',2.5).attr('stroke-dasharray','6,3');
+  const rhRect  = rhGroup.append('rect').attr('rx',12).attr('fill','#c0392b')
+    .style('filter','drop-shadow(0 4px 16px rgba(192,57,43,0.5))');
+  const rhLbl   = rhGroup.append('text').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','rgba(255,255,255,0.85)').attr('letter-spacing','0.1em').attr('text-anchor','middle').attr('font-size','11px').text('ALL-TIME HIGH');
+  const rhVal   = rhGroup.append('text').attr('font-family','Montserrat').attr('font-weight','900').attr('fill','#fff').attr('text-anchor','middle').attr('font-size','30px');
+
+  function _showRecordHigh() {
+    const fullRows = (_chartHistoryFull || []).filter(r => r[cmetric] != null);
+    if (!fullRows.length) return;
+    fullRows.forEach(r => { if (r.date && r.date.length > 7) r.date = r.date.slice(0,7); });
+    const athRow = fullRows.reduce((a,b) => (b[cmetric] > a[cmetric] ? b : a));
+    const athYr = parseInt(athRow.date.slice(0,4));
+    // Expand slider to include ATH year if needed
+    let needRedraw = false;
+    if (athYr < chartSliderStartYr) { chartSliderStartYr = athYr; needRedraw = true; }
+    if (athYr > chartSliderEndYr)   { chartSliderEndYr   = athYr; needRedraw = true; }
+    if (needRedraw) {
+      drawMonthlyBarChart(_chartCounty, _chartCmetric, _chartHistoryFull, _chartIsZip, true);
+      return;
+    }
+    const visRow = rows.find(r => r.date === athRow.date);
+    if (!visRow) return;
+    const cx = x(parseDate(visRow.date));
+    const cy = y(visRow[cmetric]);
+    const boxW = 230, boxH = 72;
+    const boxX = Math.max(4, Math.min(cx - boxW/2, iw - boxW - 4));
+    const boxY = cy > boxH + 32 ? cy - boxH - 24 : cy + 24;
+    rhLine.attr('x1',cx).attr('y1', cy > boxH + 32 ? boxY + boxH : boxY).attr('x2',cx).attr('y2',cy);
+    rhRect.attr('x',boxX).attr('y',boxY).attr('width',boxW).attr('height',boxH);
+    rhLbl.attr('x',boxX+boxW/2).attr('y',boxY+22);
+    rhVal.attr('x',boxX+boxW/2).attr('y',boxY+58).text(METRICS[cmetric].fmt(visRow[cmetric]));
+    rhGroup.raise();
+    rhGroup.transition().duration(200).style('opacity',1);
+  }
+
+  // Wire Record High button for this chart instance
+  const _rhBtnEl = document.getElementById('btn-record-high');
+  if (_rhBtnEl) {
+    const _newRhBtn = _rhBtnEl.cloneNode(true);
+    _rhBtnEl.parentNode.replaceChild(_newRhBtn, _rhBtnEl);
+    _newRhBtn.addEventListener('click', () => {
+      const isOn = _newRhBtn.classList.toggle('active');
+      if (isOn) _showRecordHigh();
+      else rhGroup.transition().duration(150).style('opacity',0);
+    });
+    if (_newRhBtn.classList.contains('active')) _showRecordHigh();
+  }
+  // ─────────────────────────────────────────────────────────────────────
   // Clicking anywhere on SVG outside a bar vanishes the pinned card
   lsvg.on('click', function(event) {
     if (!event.target.classList.contains('mbar')) { _dismissClickCard(); }
