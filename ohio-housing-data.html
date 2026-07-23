@@ -73,7 +73,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:24px}.attr-chips{display:none}
 .modal-header-left{flex:1;min-width:0}
 .modal-header-right{text-align:right;flex-shrink:0}
-.modal-county{display:none}.modal-sub-hidden{display:none}.upper-third{background:#0d1e42;border-radius:8px;padding:12px 20px;display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:12px;}.upper-third-county{font-family:Montserrat,sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-sep{color:rgba(255,255,255,0.4);margin:0 14px;font-size:18px;font-weight:300}.upper-third-metric{font-family:Montserrat,sans-serif;font-size:18px;font-weight:500;color:rgba(255,255,255,0.75);letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}
+.modal-county{display:none}.modal-sub-hidden{display:none}.upper-third{background:#0d1e42;border-radius:8px;padding:12px 20px;display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:12px;}.upper-third-county{font-family:Montserrat,sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-sep{color:rgba(255,255,255,0.4);margin:0 14px;font-size:18px;font-weight:300}.upper-third-metric{font-family:Montserrat,sans-serif;font-size:18px;font-weight:500;color:rgba(255,255,255,0.75);letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-source{font-family:Montserrat,sans-serif;font-size:12px;font-weight:400;color:rgba(255,255,255,0.45);margin-left:10px;white-space:nowrap}.upper-third-source a{color:rgba(255,255,255,0.55);text-decoration:none}.upper-third-source a:hover{color:#fff}
 .modal-sub{display:none}
 .attr-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .attr-chip{background:#fff;border:1px solid rgba(0,0,0,0.18);color:#222;font-size:12px;font-weight:500;padding:5px 12px;border-radius:6px;font-family:Montserrat,sans-serif;white-space:nowrap}
@@ -237,9 +237,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     </div>
   <div id="modal" style="position:relative;width:100%;">
     <div class="modal-header">
-      <div class="modal-header-left">
-        <div class="attr-source" style="font-size:11px;color:#aaa;">Source: <span class="attr-source-name"><a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener" style="color:#aaa;text-decoration:none">Zillow</a></span></div>
-      </div>
+      <div class="modal-header-left"></div>
 <div class="modal-header-right">
         <div class="modal-county" id="modal-county"></div>
         <div class="modal-sub" id="modal-sub"></div>
@@ -272,6 +270,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <span class="upper-third-county" id="ut-county"></span>
           <span class="upper-third-sep">·</span>
           <span class="upper-third-metric" id="ut-metric"></span>
+          <span class="upper-third-source" id="ut-source"></span>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><button id="btn-record-high" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">RECORD HIGH</button></div>
         <svg id="line-chart"></svg>
@@ -622,6 +621,8 @@ function setAttrHeader(chips, metric) {
   (document.getElementById('attr-chips')||{innerHTML:''}).innerHTML = chips.map(c=>`<span class="attr-chip">${c}</span>`).join('');
   const src = document.querySelector('.attr-source');
   if (src) src.innerHTML = `Source: <span class="attr-source-name">${sourceForMetric(metric)}</span>`;
+  const uts = document.getElementById('ut-source');
+  if (uts) uts.innerHTML = sourceForMetric(metric);
 }
 
 function openModal(county) {
@@ -847,6 +848,8 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
     }
     const src = document.querySelector('.attr-source');
     if (src) src.innerHTML = `Source: <span class="attr-source-name">${sourceForMetric(cm)}</span>`;
+    const uts = document.getElementById('ut-source');
+    if (uts) uts.innerHTML = sourceForMetric(cm);
   });
 });
 
