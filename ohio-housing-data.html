@@ -1387,46 +1387,60 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   _dismissClickCard = () => { clickCard.style('opacity',0); clickedDate = null; if(bars){bars.attr('fill', d=>barColor(d)).attr('fill-opacity',1.0).attr('stroke','#fff').attr('stroke-width',0.8);} };
 
   // ── RECORD HIGH CALLOUT ─────────────────────────────────────────────
+  // Add glow filter to SVG defs (once)
+  let _rhDefs = lsvg.select('defs.rh-defs');
+  if (_rhDefs.empty()) {
+    _rhDefs = lsvg.append('defs').attr('class','rh-defs');
+    const glowFilter = _rhDefs.append('filter').attr('id','rh-glow-filter').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
+    glowFilter.append('feColorMatrix').attr('type','matrix').attr('values','1 0 0 0 0.75  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0').attr('result','redOnly');
+    glowFilter.append('feGaussianBlur').attr('in','redOnly').attr('stdDeviation','6').attr('result','blur');
+    const feMerge = glowFilter.append('feMerge');
+    feMerge.append('feMergeNode').attr('in','blur');
+    feMerge.append('feMergeNode').attr('in','SourceGraphic');
+  }
+
   g.selectAll('.rh-callout').remove();
   const rhGroup  = g.append('g').attr('class','rh-callout').style('opacity',0);
-  const rhArrow  = rhGroup.append('polygon').attr('fill','#c0392b')
-    .style('filter','drop-shadow(0 2px 6px rgba(192,57,43,0.6))');
   const rhRect   = rhGroup.append('rect').attr('rx',12).attr('fill','#c0392b')
-    .style('filter','drop-shadow(0 4px 16px rgba(192,57,43,0.5))');
-  const rhLbl    = rhGroup.append('text').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','rgba(255,255,255,0.85)').attr('letter-spacing','0.1em').attr('text-anchor','middle').attr('font-size','11px').text('ALL-TIME HIGH');
+    .style('filter','drop-shadow(0 4px 20px rgba(192,57,43,0.7))');
+  const rhLbl    = rhGroup.append('text').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','rgba(255,255,255,0.9)').attr('letter-spacing','0.1em').attr('text-anchor','middle').attr('font-size','11px').text('ALL-TIME HIGH');
   const rhVal    = rhGroup.append('text').attr('font-family','Montserrat').attr('font-weight','900').attr('fill','#fff').attr('text-anchor','middle').attr('font-size','30px');
+
+  let _rhPeakDate = null; // track which bar is highlighted
 
   function _showRecordHigh() {
     // Use only the VISIBLE rows (current slider range) — record high = peak of what you're looking at
     const visRows = rows.filter(r => r[cmetric] != null);
     if (!visRows.length) return;
     const peakRow = visRows.reduce((a,b) => (b[cmetric] > a[cmetric] ? b : a));
+    _rhPeakDate = peakRow.date;
+    // Highlight the peak bar — glow red
+    g.selectAll('.mbar').each(function(r) {
+      if (r.date === _rhPeakDate) {
+        d3.select(this)
+          .attr('fill','#c0392b')
+          .style('filter','url(#rh-glow-filter)');
+      }
+    });
+    // Floating label above the peak bar
     const cx = x(parseDate(peakRow.date));
     const cy = y(peakRow[cmetric]);
     const boxW = 230, boxH = 72;
-    // Arrow: downward-pointing triangle, tip just touching top of peak bar
-    const aw = 22, ah = 18; // arrow width, height
-    const arrowTipY = cy - 2;          // tip of arrow sits 2px above bar top
-    const arrowBaseY = arrowTipY - ah;
-    const arrowPts = `${cx},${arrowTipY} ${cx - aw/2},${arrowBaseY} ${cx + aw/2},${arrowBaseY}`;
-    rhArrow.attr('points', arrowPts);
-    // Callout box sits above arrow
-    const boxGap = 6;
     const boxX = Math.max(4, Math.min(cx - boxW/2, iw - boxW - 4));
-    const boxY = arrowBaseY - boxH - boxGap;
-    // If box would go above chart, flip below bar instead
-    const finalBoxY = boxY >= 0 ? boxY : arrowTipY + ah + boxGap;
-    const finalArrowPts = boxY >= 0
-      ? arrowPts  // pointing down toward bar (standard)
-      : `${cx},${cy + 2} ${cx - aw/2},${cy + ah + 2} ${cx + aw/2},${cy + ah + 2}`; // pointing up
-    rhArrow.attr('points', finalArrowPts);
-    rhRect.attr('x',boxX).attr('y',finalBoxY).attr('width',boxW).attr('height',boxH);
-    rhLbl.attr('x',boxX+boxW/2).attr('y',finalBoxY+22);
-    rhVal.attr('x',boxX+boxW/2).attr('y',finalBoxY+58).text(METRICS[cmetric].fmt(peakRow[cmetric]));
+    const boxY = Math.max(4, cy - boxH - 16);
+    rhRect.attr('x',boxX).attr('y',boxY).attr('width',boxW).attr('height',boxH);
+    rhLbl.attr('x',boxX+boxW/2).attr('y',boxY+22);
+    rhVal.attr('x',boxX+boxW/2).attr('y',boxY+58).text(METRICS[cmetric].fmt(peakRow[cmetric]));
     rhGroup.style('pointer-events','none');
-    // Force to absolute top of SVG so arrow is always above bars
     lsvg.node().appendChild(rhGroup.node());
     rhGroup.transition().duration(200).style('opacity',1);
+  }
+
+  function _hideRecordHigh() {
+    // Restore bar colors
+    g.selectAll('.mbar').attr('fill', r => barColor(r)).style('filter', null);
+    _rhPeakDate = null;
+    rhGroup.transition().duration(150).style('opacity',0);
   }
 
   // Wire Record High button for this chart instance
@@ -1437,7 +1451,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
     _newRhBtn.addEventListener('click', () => {
       const isOn = _newRhBtn.classList.toggle('active');
       if (isOn) _showRecordHigh();
-      else rhGroup.transition().duration(150).style('opacity',0);
+      else _hideRecordHigh();
     });
     if (_newRhBtn.classList.contains('active')) _showRecordHigh();
   }
