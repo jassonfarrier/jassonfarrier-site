@@ -2009,7 +2009,7 @@ function openZipModal(zip) {
   selectedCounty = null;
   const l = d.latest || {};
   document.getElementById('modal-county').textContent = zip;
-  const _utc4 = document.getElementById('ut-county'); if (_utc4) _utc4.textContent = zip;
+  const _utc4 = document.getElementById('ut-county'); if (_utc4) _utc4.textContent = zip + (d.city ? ' · ' + d.city : '');
   document.getElementById('modal-sub').textContent = (d.city || '') + (d.city ? ', Ohio' : 'Ohio');
   const _chips = [];
   if (d.county) _chips.push('County: ' + d.county);
