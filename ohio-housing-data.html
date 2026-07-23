@@ -761,7 +761,7 @@ function drawLineChart(county, cmetric) {
   const hoverRect = hoverCard.append('rect').attr('rx',12).attr('fill','#fff').attr('stroke','rgba(26,82,150,0.12)').attr('stroke-width',1.5).style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.18))');
   const hoverDateTxt = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888').attr('letter-spacing','0.06em');
   const hoverValTxt = hoverCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
-  const hoverLabelTxt = hoverCard.append('text').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','500').attr('fill','#555');
+  const hoverLabelTxt = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
 
   function fmtDate(d) {
     const [y,m] = d.split('-');
@@ -1467,7 +1467,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
     .style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.55))');
   const clickDateTxt = clickCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
   const clickValTxt  = clickCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
-  const clickLabelTxt= clickCard.append('text').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','500').attr('fill','#555');
+  const clickLabelTxt= clickCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
 
   // Zero line (visible when data crosses zero)
   if (hasNeg || isZeroBased || _isYOY) {
@@ -1528,8 +1528,8 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
     .style('filter','drop-shadow(0 4px 12px rgba(0,0,0,0.13))');
   const hoverDateTxt = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
   const hoverValTxt  = hoverCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
-  const hoverLabelTxt= hoverCard.append('text').attr('font-size','12px').attr('font-family','Montserrat').attr('font-weight','500').attr('fill','#555');
-  const hoverDeltaTxt= hoverCard.append('text').attr('font-size','11px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#1a5296').style('opacity',0);
+  const hoverLabelTxt= hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
+  const hoverDeltaTxt= hoverCard.append('text').attr('font-size','15px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#1a5296').style('opacity',0);
 
   const cardW=240, cardH=125;
   lsvg.on('mousemove', function(event) {
