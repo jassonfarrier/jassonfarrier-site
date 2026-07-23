@@ -89,7 +89,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .snap-val.up{color:#15803d}.snap-val.dn{color:#dc2626}
 .snap-lbl{font-size:8px;font-weight:400;letter-spacing:1px;text-transform:uppercase;color:rgba(0,0,0,0.38);margin-top:4px}
 
-.modal-body{display:flex;gap:0;align-items:stretch;flex:1;min-height:0;}.modal-left{width:130px;flex-shrink:0;border-right:1px solid rgba(0,0,0,0.07);padding-right:10px;margin-right:14px;overflow-y:auto;}.modal-left .md{display:none;}.sortable-ghost{opacity:0.3;}.modal-right{flex:1;min-width:0;display:flex;flex-direction:column;}.chart-label{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:10px}.chart-label#chart-label{display:none}
+.modal-body{display:flex;gap:0;align-items:stretch;flex:1;min-height:0;}.modal-left{width:130px;flex-shrink:0;border-right:1px solid rgba(0,0,0,0.07);padding-right:10px;margin-right:14px;overflow-y:auto;}.modal-left .md{display:none;}.metric-move{display:inline-flex;flex-direction:column;gap:1px;margin-left:4px;opacity:0;transition:opacity .15s;flex-shrink:0;}.chart-tab:hover .metric-move{opacity:1;}.metric-move button{background:none;border:none;padding:0;cursor:pointer;font-size:8px;color:#888;line-height:1;}.metric-move button:hover{color:#0d1e42;}.modal-right{flex:1;min-width:0;display:flex;flex-direction:column;}.chart-label{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:10px}.chart-label#chart-label{display:none}
 .chart-tabs{display:flex;flex-direction:column;gap:4px;}
 .chart-tab{background:transparent;border:none;border-radius:7px;padding:9px 12px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif;text-align:left;width:100%;}
 .chart-tab:hover{background:#edf2fb;color:#0D1E42}
@@ -401,11 +401,11 @@ function divergingColor(vals, val) {
   if (val < 0) {
     const t = Math.min(Math.abs(val) / absMax, 1);
     // Ramp from light-but-visible pink to deep red
-    return d3.interpolateRgb('#f4a582', '#7b0d1e')(Math.pow(t, 0.6));
+    return d3.interpolateRgb('#fddbc7', '#67001f')(Math.pow(t, 0.35));
   } else {
     const t = Math.min(val / absMax, 1);
     // Ramp from light-but-visible blue to deep navy
-    return d3.interpolateRgb('#9ecae1', '#0d1e42')(Math.pow(t, 0.6));
+    return d3.interpolateRgb('#deebf7', '#08306b')(Math.pow(t, 0.35));
   }
 }
 
