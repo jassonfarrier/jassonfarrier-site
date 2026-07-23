@@ -274,7 +274,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><button id="btn-record-high" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">RECORD HIGH</button></div>
         <svg id="line-chart"></svg>
-        <div id="chart-slider-wrap" style="display:none;padding:10px 0 0 62px;box-sizing:border-box;">
+        <div id="chart-slider-wrap" style="display:none;padding:10px 0 0 90px;box-sizing:border-box;">
           <div style="display:flex;align-items:center;gap:10px;position:relative;">
             <span id="slider-start-lbl" style="font-size:11px;font-weight:700;font-family:Montserrat;color:#0d1e42;min-width:36px;"></span>
             <div style="position:relative;flex:1;height:24px;">
@@ -673,7 +673,7 @@ function drawLineChart(county, cmetric) {
   lsvg.selectAll('*').remove();
   const W = lsvg.node().getBoundingClientRect().width || 760;
   const H = 349;
-  const m = {top:12, right:16, bottom:32, left:62};
+  const m = {top:12, right:16, bottom:32, left:90};
   const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
   const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
   const parseDate = d3.timeParse('%Y-%m');
@@ -1335,7 +1335,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   lsvg.selectAll('*').remove();
   const W = lsvg.node().getBoundingClientRect().width || 760;
   const H = 349;
-  const m = {top:28, right:16, bottom:36, left:62};
+  const m = {top:28, right:16, bottom:36, left:90};
   const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
   const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
 
@@ -1606,7 +1606,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
   lsvg.selectAll('*').remove();
   const W = lsvg.node().getBoundingClientRect().width || 760;
   const H = 349;
-  const m = {top:28, right:16, bottom:36, left:62};
+  const m = {top:28, right:16, bottom:36, left:90};
   const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
   const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
 
