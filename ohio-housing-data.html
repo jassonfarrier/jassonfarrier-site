@@ -72,8 +72,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 #modal{background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:14px;width:min(1715px,96vw);max-height:90vh;overflow-y:auto;padding:37px 37px 32px;box-shadow:0 8px 40px rgba(0,0,0,0.18);position:relative}
 .modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:24px}
 .modal-header-left{flex:1;min-width:0}
-.modal-header-right{text-align:right;flex-shrink:0}.modal-header-center{flex:1;display:flex;align-items:center;justify-content:center}.modal-metric-label{font-family:Montserrat,sans-serif;font-size:36px;font-weight:800;color:#c0392b;line-height:1;letter-spacing:-1px}
-.modal-county{font-size:36px;font-weight:800;color:#c0392b;line-height:1;letter-spacing:-1px}
+.modal-header-right{text-align:right;flex-shrink:0}
+.modal-county{font-size:36px;font-weight:800;color:#c0392b;line-height:1;letter-spacing:-1px}.upper-third{background:#0d1e42;border-radius:8px 8px 0 0;padding:10px 20px;display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:0;}.upper-third-county{font-family:Montserrat,sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-sep{color:rgba(255,255,255,0.4);margin:0 14px;font-size:18px;font-weight:300}.upper-third-metric{font-family:Montserrat,sans-serif;font-size:18px;font-weight:500;color:rgba(255,255,255,0.75);letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}
 .modal-sub{font-size:13px;font-weight:500;color:#888;margin-top:4px}
 .attr-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .attr-chip{background:#fff;border:1px solid rgba(0,0,0,0.18);color:#222;font-size:12px;font-weight:500;padding:5px 12px;border-radius:6px;font-family:Montserrat,sans-serif;white-space:nowrap}
@@ -241,10 +241,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
         <div class="attr-chips" id="attr-chips"></div>
         <div class="attr-source">Source: <span class="attr-source-name"><a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Zillow</a></span></div>
       </div>
-      <div class="modal-header-center">
-        <div class="modal-metric-label" id="modal-metric-label"></div>
-      </div>
-      <div class="modal-header-right">
+<div class="modal-header-right">
         <div class="modal-county" id="modal-county"></div>
         <div class="modal-sub" id="modal-sub"></div>
       </div>
@@ -272,6 +269,11 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
         </div>
       </div>
       <div class="modal-right">
+        <div class="upper-third" id="upper-third">
+          <span class="upper-third-county" id="ut-county"></span>
+          <span class="upper-third-sep">·</span>
+          <span class="upper-third-metric" id="ut-metric"></span>
+        </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><button id="btn-record-high" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">RECORD HIGH</button></div>
         <svg id="line-chart"></svg>
         <div id="chart-slider-wrap" style="display:none;padding:10px 0 0 62px;box-sizing:border-box;">
@@ -629,6 +631,7 @@ function openModal(county) {
   selectedCounty = county;
   const l = d.latest || {};
   document.getElementById('modal-county').textContent = county + ' County';
+  const _utc1 = document.getElementById('ut-county'); if (_utc1) _utc1.textContent = county + ' County';
   document.getElementById('modal-sub').textContent = '';
   setAttrHeader(['County: ' + county, 'State: Ohio'], mapMetric);
   (document.getElementById('s-zhvi')||{}).textContent = fmt$(l.zhvi);
@@ -663,9 +666,8 @@ function drawLineChart(county, cmetric) {
   const _endYr = history.length ? history[history.length-1].date.slice(0,4) : '';
   const _suffix = isZip ? '' : ' County';
   document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + _suffix + (_startYr ? ` (${_startYr}–${_endYr})` : '');
-  const _mml1 = document.getElementById('modal-metric-label'); if (_mml1) _mml1.textContent = METRICS[cmetric].label;
-  const _mml = document.getElementById('modal-metric-label');
-  if (_mml) _mml.textContent = METRICS[cmetric].label;
+  const _utm1 = document.getElementById('ut-metric'); if (_utm1) _utm1.textContent = METRICS[cmetric].label;
+  
   const history = d.history.filter(r => r[cmetric] != null);
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
@@ -1325,7 +1327,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const endYr = rows.length ? rows[rows.length-1].date.slice(0,4) : '';
   const suffix = isZip ? '' : ' County';
   document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + suffix + (startYr ? ` (${startYr}–${endYr})` : '');
-  const _mml2 = document.getElementById('modal-metric-label'); if (_mml2) _mml2.textContent = METRICS[cmetric].label;
+  const _utm2 = document.getElementById('ut-metric'); if (_utm2) _utm2.textContent = METRICS[cmetric].label;
 
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
@@ -1596,7 +1598,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
   const rows = Object.keys(byYear).sort().map(yr => ({year: yr, val: byYear[yr][cmetric]}));
 
   document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + ' County (Annual · June)';
-  const _mml3 = document.getElementById('modal-metric-label'); if (_mml3) _mml3.textContent = METRICS[cmetric].label;
+  const _utm3 = document.getElementById('ut-metric'); if (_utm3) _utm3.textContent = METRICS[cmetric].label;
 
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
@@ -1891,6 +1893,7 @@ function openMetroModal(rid) {
   selectedCounty = null; selectedZip = null;
   const l = d.latest || {};
   document.getElementById('modal-county').textContent = d.metro;
+  const _utc2 = document.getElementById('ut-county'); if (_utc2) _utc2.textContent = d.metro;
   document.getElementById('modal-sub').textContent = '';
   const chips = ['Metro'];
   if (d.metro.includes('OH')) chips.push('State: Ohio');
@@ -1942,6 +1945,7 @@ function openStateModal() {
   const l = d.latest || {};
   selectedCounty = null; selectedZip = null; selectedMetro = null;
   document.getElementById('modal-county').textContent = 'Ohio';
+  const _utc3 = document.getElementById('ut-county'); if (_utc3) _utc3.textContent = 'Ohio';
   document.getElementById('modal-sub').textContent = '';
   setAttrHeader(['State: Ohio'], mapMetric);
   (document.getElementById('s-zhvi')||{}).textContent = l.zhvi ? fmt$(l.zhvi) : '—';
@@ -2006,6 +2010,7 @@ function openZipModal(zip) {
   selectedCounty = null;
   const l = d.latest || {};
   document.getElementById('modal-county').textContent = zip;
+  const _utc4 = document.getElementById('ut-county'); if (_utc4) _utc4.textContent = zip;
   document.getElementById('modal-sub').textContent = (d.city || '') + (d.city ? ', Ohio' : 'Ohio');
   const _chips = [];
   if (d.county) _chips.push('County: ' + d.county);
