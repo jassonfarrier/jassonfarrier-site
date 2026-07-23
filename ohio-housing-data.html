@@ -1396,31 +1396,23 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const rhVal   = rhGroup.append('text').attr('font-family','Montserrat').attr('font-weight','900').attr('fill','#fff').attr('text-anchor','middle').attr('font-size','30px');
 
   function _showRecordHigh() {
-    const fullRows = (_chartHistoryFull || []).filter(r => r[cmetric] != null);
-    if (!fullRows.length) return;
-    fullRows.forEach(r => { if (r.date && r.date.length > 7) r.date = r.date.slice(0,7); });
-    const athRow = fullRows.reduce((a,b) => (b[cmetric] > a[cmetric] ? b : a));
-    const athYr = parseInt(athRow.date.slice(0,4));
-    // Expand slider to include ATH year if needed
-    let needRedraw = false;
-    if (athYr < chartSliderStartYr) { chartSliderStartYr = athYr; needRedraw = true; }
-    if (athYr > chartSliderEndYr)   { chartSliderEndYr   = athYr; needRedraw = true; }
-    if (needRedraw) {
-      drawMonthlyBarChart(_chartCounty, _chartCmetric, _chartHistoryFull, _chartIsZip, true);
-      return;
-    }
-    const visRow = rows.find(r => r.date === athRow.date);
-    if (!visRow) return;
-    const cx = x(parseDate(visRow.date));
-    const cy = y(visRow[cmetric]);
+    // Use only the VISIBLE rows (current slider range) — record high = peak of what you're looking at
+    const visRows = rows.filter(r => r[cmetric] != null);
+    if (!visRows.length) return;
+    const peakRow = visRows.reduce((a,b) => (b[cmetric] > a[cmetric] ? b : a));
+    const cx = x(parseDate(peakRow.date));
+    const cy = y(peakRow[cmetric]);
     const boxW = 230, boxH = 72;
     const boxX = Math.max(4, Math.min(cx - boxW/2, iw - boxW - 4));
     const boxY = cy > boxH + 32 ? cy - boxH - 24 : cy + 24;
-    rhLine.attr('x1',cx).attr('y1', cy > boxH + 32 ? boxY + boxH : boxY).attr('x2',cx).attr('y2',cy);
+    const lineY1 = cy > boxH + 32 ? boxY + boxH : boxY;
+    rhLine.attr('x1',cx).attr('y1',lineY1).attr('x2',cx).attr('y2',cy);
     rhRect.attr('x',boxX).attr('y',boxY).attr('width',boxW).attr('height',boxH);
     rhLbl.attr('x',boxX+boxW/2).attr('y',boxY+22);
-    rhVal.attr('x',boxX+boxW/2).attr('y',boxY+58).text(METRICS[cmetric].fmt(visRow[cmetric]));
-    rhGroup.raise();
+    rhVal.attr('x',boxX+boxW/2).attr('y',boxY+58).text(METRICS[cmetric].fmt(peakRow[cmetric]));
+    rhGroup.style('pointer-events','none');
+    // Force to absolute top of SVG
+    lsvg.node().appendChild(rhGroup.node());
     rhGroup.transition().duration(200).style('opacity',1);
   }
 
