@@ -619,7 +619,7 @@ function sourceForMetric(m) {
   return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
 }
 function setAttrHeader(chips, metric) {
-  document.getElementById('attr-chips').innerHTML = chips.map(c=>`<span class="attr-chip">${c}</span>`).join('');
+  (document.getElementById('attr-chips')||{innerHTML:''}).innerHTML = chips.map(c=>`<span class="attr-chip">${c}</span>`).join('');
   const src = document.querySelector('.attr-source');
   if (src) src.innerHTML = `Source: <span class="attr-source-name">${sourceForMetric(metric)}</span>`;
 }
