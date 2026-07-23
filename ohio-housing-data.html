@@ -1553,17 +1553,17 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
         }
       }
     }
-    const curCardH = deltaText ? 160 : 125;
+    const curCardH = deltaText ? 175 : 145;
     const cardX = cx + cardW + 10 > iw ? cx - cardW - 10 : cx + 10;
     const cardY = Math.max(0, Math.min(cy - 10, ih - curCardH));
     hoverLine.attr('x1',cx).attr('x2',cx).style('opacity',1);
     hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',curCardH);
     hoverDateTxt.attr('x',cardX+18).attr('y',cardY+28).text(fmtMonthDate(r.date));
     hoverValTxt.attr('x',cardX+18).attr('y',cardY+82).text(METRICS[cmetric].fmt(r[cmetric]));
-    hoverLabelTxt.attr('x',cardX+18).attr('y',cardY+108).text(METRICS[cmetric].label.toUpperCase());
+    hoverLabelTxt.attr('x',cardX+18).attr('y',cardY+115).text(METRICS[cmetric].label.toUpperCase());
     if (deltaText) {
       const isNegDelta = deltaText.startsWith('▼') || deltaText.startsWith('-');
-      hoverDeltaTxt.attr('x',cardX+18).attr('y',cardY+136).text(deltaText)
+      hoverDeltaTxt.attr('x',cardX+18).attr('y',cardY+148).text(deltaText)
         .attr('fill', isNegDelta ? '#c0392b' : '#1a5296')
         .style('opacity',1);
     } else {
