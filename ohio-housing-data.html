@@ -812,12 +812,12 @@ document.getElementById('pill-table').addEventListener('click', toggleTableView)
 function _updateRecordHighBtn(cm) {
   const rhb = document.getElementById('btn-record-high');
   if (!rhb) return;
-  const isYOY = cm && (cm.endsWith('_yoy') || cm === 'price_reduced_pct_yoy');
+  const isYOY = cm && cm.endsWith('_yoy');
   if (isYOY) {
     rhb.style.display = 'none';
     rhb.classList.remove('active');
   } else {
-    rhb.style.display = '';
+    rhb.style.display = 'inline-block';
   }
 }
 document.querySelectorAll('.chart-tab').forEach(tab => {
