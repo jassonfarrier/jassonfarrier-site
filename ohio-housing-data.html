@@ -72,7 +72,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 #modal{background:#fff;border:1px solid rgba(0,0,0,0.12);border-radius:14px;width:min(1715px,96vw);max-height:90vh;overflow-y:auto;padding:37px 37px 32px;box-shadow:0 8px 40px rgba(0,0,0,0.18);position:relative}
 .modal-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:24px}
 .modal-header-left{flex:1;min-width:0}
-.modal-header-right{text-align:right;flex-shrink:0}
+.modal-header-right{text-align:right;flex-shrink:0}.modal-header-center{flex:1;display:flex;align-items:center;justify-content:center}.modal-metric-label{font-family:Montserrat,sans-serif;font-size:20px;font-weight:800;color:#0d1e42;letter-spacing:0.06em;text-transform:uppercase}.modal-header-center{flex:1;display:flex;align-items:center;justify-content:center;text-align:center}.modal-metric-label{font-family:Montserrat,sans-serif;font-size:22px;font-weight:800;color:#0d1e42;letter-spacing:0.04em;line-height:1.1}
 .modal-county{font-size:36px;font-weight:800;color:#c0392b;line-height:1;letter-spacing:-1px}
 .modal-sub{font-size:13px;font-weight:500;color:#888;margin-top:4px}
 .attr-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
@@ -89,7 +89,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .snap-val.up{color:#15803d}.snap-val.dn{color:#dc2626}
 .snap-lbl{font-size:8px;font-weight:400;letter-spacing:1px;text-transform:uppercase;color:rgba(0,0,0,0.38);margin-top:4px}
 
-.modal-body{display:flex;gap:0;align-items:stretch;}.modal-left{width:200px;flex-shrink:0;border-right:1px solid rgba(0,0,0,0.07);padding-right:14px;margin-right:18px;max-height:480px;overflow-y:auto;}.modal-right{flex:1;min-width:0;}.chart-label{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:10px}
+.modal-body{display:flex;gap:0;align-items:stretch;}.modal-left{width:200px;flex-shrink:0;border-right:1px solid rgba(0,0,0,0.07);padding-right:14px;margin-right:18px;max-height:480px;overflow-y:auto;}.modal-right{flex:1;min-width:0;}.chart-label{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:10px}.chart-label#chart-label{display:none}
 .chart-tabs{display:flex;flex-direction:column;gap:4px;}
 .chart-tab{background:transparent;border:none;border-radius:7px;padding:9px 12px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif;text-align:left;width:100%;}
 .chart-tab:hover{background:#edf2fb;color:#0D1E42}
@@ -240,6 +240,12 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <div class="modal-header-left">
         <div class="attr-chips" id="attr-chips"></div>
         <div class="attr-source">Source: <span class="attr-source-name"><a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Zillow</a></span></div>
+      </div>
+      <div class="modal-header-center">
+        <div class="modal-metric-label" id="modal-metric-label"></div>
+      </div>
+      <div class="modal-header-center">
+        <div class="modal-metric-label" id="modal-metric-label"></div>
       </div>
       <div class="modal-header-right">
         <div class="modal-county" id="modal-county"></div>
@@ -669,6 +675,9 @@ function drawLineChart(county, cmetric) {
   const _endYr = history.length ? history[history.length-1].date.slice(0,4) : '';
   const _suffix = isZip ? '' : ' County';
   document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + _suffix + (_startYr ? ` (${_startYr}–${_endYr})` : '');
+  const _mml1 = document.getElementById('modal-metric-label'); if (_mml1) _mml1.textContent = METRICS[cmetric].label;
+  const _mml = document.getElementById('modal-metric-label');
+  if (_mml) _mml.textContent = METRICS[cmetric].label;
   const history = d.history.filter(r => r[cmetric] != null);
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
@@ -1328,6 +1337,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const endYr = rows.length ? rows[rows.length-1].date.slice(0,4) : '';
   const suffix = isZip ? '' : ' County';
   document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + suffix + (startYr ? ` (${startYr}–${endYr})` : '');
+  const _mml2 = document.getElementById('modal-metric-label'); if (_mml2) _mml2.textContent = METRICS[cmetric].label;
 
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
@@ -1598,6 +1608,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
   const rows = Object.keys(byYear).sort().map(yr => ({year: yr, val: byYear[yr][cmetric]}));
 
   document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + ' County (Annual · June)';
+  const _mml3 = document.getElementById('modal-metric-label'); if (_mml3) _mml3.textContent = METRICS[cmetric].label;
 
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
