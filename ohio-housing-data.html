@@ -1037,6 +1037,7 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
       const dcPopup = new mapboxgl.Popup({closeButton:false,closeOnClick:false,offset:10,maxWidth:'240px'});
       map.on('mouseenter','dc-circles',e=>{
         map.getCanvas().style.cursor='pointer';
+        popup.remove();
         const p=e.features[0].properties;
         const sc=p.status==='Operational'?'#27ae60':p.status==='Construction'?'#e67e22':p.status==='Planned'?'#3498db':'#95a5a6';
         dcPopup.setLngLat(e.features[0].geometry.coordinates).setHTML(
