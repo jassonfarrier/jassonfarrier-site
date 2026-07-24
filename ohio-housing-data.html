@@ -1050,11 +1050,7 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&o
         ).addTo(map);
       });
       map.on('mouseleave','dc-circles',()=>{map.getCanvas().style.cursor='';dcPopup.remove();});
-      document.getElementById('dc-toggle').addEventListener('change',function(){
-        _dcVisible=this.checked;
-        map.setLayoutProperty('dc-circles','visibility',_dcVisible?'visible':'none');
-        map.setLayoutProperty('dc-labels','visibility',_dcVisible?'visible':'none');
-      });
+      // dc-toggle listener: see delegated handler below
       // ---- END DATA CENTERS ----
 
 
@@ -2430,4 +2426,13 @@ function updateMapSelection(mode, id) {
   } catch(e) {}
 }
 
+
+// DC toggle — delegated so it works regardless of map.on('load') timing
+document.addEventListener('change', function(e){
+  if (e.target.id !== 'dc-toggle') return;
+  if (!map || !map.getLayer('dc-circles')) return;
+  var vis = e.target.checked ? 'visible' : 'none';
+  map.setLayoutProperty('dc-circles', 'visibility', vis);
+  map.setLayoutProperty('dc-labels', 'visibility', vis);
+});
 </script>
