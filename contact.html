@@ -64,6 +64,8 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
 }
 .btn-primary { display: inline-block; background: #0D1E42; color: #fff; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; padding: 14px 32px; border-radius: 100px; border: none; cursor: pointer; text-decoration: none; letter-spacing: 0.3px; margin-top: 8px; }
 .btn-primary:hover { opacity: 0.85; }
+.form-check { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #666; cursor: pointer; margin-bottom: 20px; line-height: 1.5; }
+.form-check input[type="checkbox"] { margin-top: 2px; accent-color: #0D1E42; flex-shrink: 0; width: 15px; height: 15px; }
 </style>
 <meta property="og:type" content="website"><meta property="og:title" content="Contact Jasson Farrier"><meta property="og:description" content="Get in touch with Jasson Farrier — Ohio Realtor and housing market analyst."><meta property="og:url" content="https://jassonfarrier.com/contact"><meta property="og:image" content="https://jassonfarrier.com/jasson-farrier.jpg">
 <!-- Google Analytics -->
@@ -143,7 +145,10 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
         <label>Leave blank</label>
         <input type="text" id="hp-field" name="website" tabindex="-1" autocomplete="off" />
       </div>
-      <p class="form-note">I'll also add you to my weekly newsletter. Unsubscribe anytime.</p>
+      <label class="form-check">
+        <input type="checkbox" id="newsletter-opt" checked>
+        Keep me updated with Jasson's Ohio housing market analysis. Unsubscribe anytime.
+      </label>
       <button type="submit" class="btn-primary" id="submit-btn" style="border:none;cursor:pointer;">Send Message →</button>
     </form>
 
