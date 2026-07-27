@@ -215,6 +215,88 @@ blockquote p { font-size: 18px; font-style: italic; color: #0D1E42; font-weight:
   <div class="stat-box"><div class="stat-num">22%</div><div class="stat-label">Dublin price cut rate (was 7% in 2023)</div></div>
 </div>
 
+<!-- GRAPHIC 4: Ohio price cuts choropleth map -->
+<div class="chart-wrap" style="padding:20px 24px 16px;">
+  <div class="chart-title">Ohio Price Cuts by County — Live Data</div>
+  <div class="chart-subtitle">Hover a county to see its price cut rate &nbsp;·&nbsp; Source: Realtor.com via Ohio Housing Nerd</div>
+  <div id="ohpc-map-wrap" style="position:relative;margin:16px 0 12px;">
+    <svg id="ohpc-map" viewBox="0 0 700 460" style="width:100%;height:auto;display:block;"></svg>
+    <div id="ohpc-tooltip" style="display:none;position:absolute;background:#0D1E42;color:#fff;font-family:Montserrat,sans-serif;font-size:12px;font-weight:600;padding:8px 12px;border-radius:6px;pointer-events:none;white-space:nowrap;z-index:10;"></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <span style="font-size:11px;color:#9DA6AB;font-weight:600;">Low cuts</span>
+    <div id="ohpc-legend" style="display:flex;gap:2px;"></div>
+    <span style="font-size:11px;color:#9DA6AB;font-weight:600;">High cuts</span>
+  </div>
+  <a href="/ohio-housing-data" style="display:inline-block;background:#0D1E42;color:#fff;font-size:12px;font-weight:700;padding:12px 22px;border-radius:100px;text-decoration:none;letter-spacing:0.3px;">Full interactive map — all metrics →</a>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script>
+(function() {
+  const PALETTE = ['#2166ac','#4393c3','#92c5de','#d1e5f0','#f7f7f7','#fddbc7','#f4a582','#d6604d','#b2182b'];
+  const SUPABASE_URL = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fips,county,latest&order=county';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+
+  Promise.all([
+    fetch('/ohio-counties.json').then(r => r.json()),
+    fetch(SUPABASE_URL, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }).then(r => r.json())
+  ]).then(([geo, counties]) => {
+    // Build fips → data map
+    const dataMap = {};
+    counties.forEach(c => { dataMap[c.fips] = { county: c.county, pct: c.latest && c.latest.price_reduced_pct != null ? c.latest.price_reduced_pct : null }; });
+
+    // Inject data into GeoJSON
+    geo.features.forEach(f => {
+      const d = dataMap[f.properties.fips];
+      if (d) { f.properties.county = d.county; f.properties.pct = d.pct; }
+    });
+
+    // Color scale
+    const vals = counties.map(c => c.latest && c.latest.price_reduced_pct).filter(v => v != null).sort((a,b) => a-b);
+    const colorScale = d3.scaleQuantile().domain(vals).range(PALETTE);
+
+    // Render legend
+    const leg = document.getElementById('ohpc-legend');
+    PALETTE.forEach(c => {
+      const s = document.createElement('div');
+      s.style.cssText = 'width:24px;height:12px;border-radius:2px;background:' + c;
+      leg.appendChild(s);
+    });
+
+    // Draw map
+    const svg = d3.select('#ohpc-map');
+    const projection = d3.geoAlbers()
+      .rotate([82.5, 0]).center([0, 40.4])
+      .parallels([38, 42]).scale(6200)
+      .translate([350, 230]);
+    const path = d3.geoPath().projection(projection);
+    const tooltip = document.getElementById('ohpc-tooltip');
+    const wrap = document.getElementById('ohpc-map-wrap');
+
+    svg.selectAll('path')
+      .data(geo.features)
+      .join('path')
+        .attr('d', path)
+        .attr('fill', d => d.properties.pct != null ? colorScale(d.properties.pct) : '#e0e0e0')
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 0.6)
+        .style('cursor', 'default')
+        .on('mousemove', function(event, d) {
+          const name = d.properties.county || 'Unknown';
+          const pct = d.properties.pct != null ? d.properties.pct.toFixed(1) + '% price cuts' : 'No data';
+          tooltip.textContent = name + ' County — ' + pct;
+          tooltip.style.display = 'block';
+          const rect = wrap.getBoundingClientRect();
+          tooltip.style.left = (event.clientX - rect.left + 12) + 'px';
+          tooltip.style.top = (event.clientY - rect.top - 36) + 'px';
+        })
+        .on('mouseleave', function() { tooltip.style.display = 'none'; });
+  }).catch(err => {
+    document.getElementById('ohpc-map').innerHTML = '<text x=350 y=230 text-anchor=middle font-family=Montserrat,sans-serif font-size=13 fill=#9DA6AB>Map unavailable</text>';
+  });
+})();
+</script>
+
 <h2>Why Are Ohio Sellers Cutting Their Prices?</h2>
 <p>Three things are happening at once. They've been building for years.</p>
 
@@ -458,89 +540,6 @@ blockquote p { font-size: 18px; font-style: italic; color: #0D1E42; font-weight:
 <h2>How to Find Homes With a Price Cut</h2>
 <p>There are two things you're looking for here, and they require two different tools. The first is understanding the trend — is your target county moving in a buyer-friendly direction or not? For that, use the <a href="https://jassonfarrier.com/ohio-housing-data">Ohio housing data dashboard</a>. It shows price cut rates, days on market, and price trends by county in one place. The second is finding specific listings that have already been reduced. For that, you have two options: call a <a href="https://www.nar.realtor/" target="_blank" rel="noopener">REALTOR&reg;</a> and ask them to set up an automated search for homes with recent price reductions in your area, or go directly to <a href="https://www.zillow.com/homes/for_sale/" target="_blank" rel="noopener">Zillow</a> and use the "Price Reduced" filter. Both take about two minutes.</p>
 <p>Start with the <a href="https://jassonfarrier.com/ohio-housing-data">Ohio housing data dashboard</a>. Before you do anything else, check how your target county is trending — whether price cuts are rising or falling and what prices are doing. County data gives you direction. But hyperlocal matters more. Two neighborhoods in the same county can tell completely different stories, so once you know your county is trending toward buyer territory, you need to drill down to the street level.</p>
-
-<!-- GRAPHIC 4: Ohio price cuts choropleth map -->
-<div class="chart-wrap" style="padding:20px 24px 16px;">
-  <div class="chart-title">Ohio Price Cuts by County — Live Data</div>
-  <div class="chart-subtitle">Hover a county to see its price cut rate &nbsp;·&nbsp; Source: Realtor.com via Ohio Housing Nerd</div>
-  <div id="ohpc-map-wrap" style="position:relative;margin:16px 0 12px;">
-    <svg id="ohpc-map" viewBox="0 0 700 460" style="width:100%;height:auto;display:block;"></svg>
-    <div id="ohpc-tooltip" style="display:none;position:absolute;background:#0D1E42;color:#fff;font-family:Montserrat,sans-serif;font-size:12px;font-weight:600;padding:8px 12px;border-radius:6px;pointer-events:none;white-space:nowrap;z-index:10;"></div>
-  </div>
-  <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-    <span style="font-size:11px;color:#9DA6AB;font-weight:600;">Low cuts</span>
-    <div id="ohpc-legend" style="display:flex;gap:2px;"></div>
-    <span style="font-size:11px;color:#9DA6AB;font-weight:600;">High cuts</span>
-  </div>
-  <a href="/ohio-housing-data" style="display:inline-block;background:#0D1E42;color:#fff;font-size:12px;font-weight:700;padding:12px 22px;border-radius:100px;text-decoration:none;letter-spacing:0.3px;">Full interactive map — all metrics →</a>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-<script>
-(function() {
-  const PALETTE = ['#2166ac','#4393c3','#92c5de','#d1e5f0','#f7f7f7','#fddbc7','#f4a582','#d6604d','#b2182b'];
-  const SUPABASE_URL = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fips,county,latest&order=county';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
-
-  Promise.all([
-    fetch('/ohio-counties.json').then(r => r.json()),
-    fetch(SUPABASE_URL, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }).then(r => r.json())
-  ]).then(([geo, counties]) => {
-    // Build fips → data map
-    const dataMap = {};
-    counties.forEach(c => { dataMap[c.fips] = { county: c.county, pct: c.latest && c.latest.price_reduced_pct != null ? c.latest.price_reduced_pct : null }; });
-
-    // Inject data into GeoJSON
-    geo.features.forEach(f => {
-      const d = dataMap[f.properties.fips];
-      if (d) { f.properties.county = d.county; f.properties.pct = d.pct; }
-    });
-
-    // Color scale
-    const vals = counties.map(c => c.latest && c.latest.price_reduced_pct).filter(v => v != null).sort((a,b) => a-b);
-    const colorScale = d3.scaleQuantile().domain(vals).range(PALETTE);
-
-    // Render legend
-    const leg = document.getElementById('ohpc-legend');
-    PALETTE.forEach(c => {
-      const s = document.createElement('div');
-      s.style.cssText = 'width:24px;height:12px;border-radius:2px;background:' + c;
-      leg.appendChild(s);
-    });
-
-    // Draw map
-    const svg = d3.select('#ohpc-map');
-    const projection = d3.geoAlbers()
-      .rotate([82.5, 0]).center([0, 40.4])
-      .parallels([38, 42]).scale(6200)
-      .translate([350, 230]);
-    const path = d3.geoPath().projection(projection);
-    const tooltip = document.getElementById('ohpc-tooltip');
-    const wrap = document.getElementById('ohpc-map-wrap');
-
-    svg.selectAll('path')
-      .data(geo.features)
-      .join('path')
-        .attr('d', path)
-        .attr('fill', d => d.properties.pct != null ? colorScale(d.properties.pct) : '#e0e0e0')
-        .attr('stroke', '#fff')
-        .attr('stroke-width', 0.6)
-        .style('cursor', 'default')
-        .on('mousemove', function(event, d) {
-          const name = d.properties.county || 'Unknown';
-          const pct = d.properties.pct != null ? d.properties.pct.toFixed(1) + '% price cuts' : 'No data';
-          tooltip.textContent = name + ' County — ' + pct;
-          tooltip.style.display = 'block';
-          const rect = wrap.getBoundingClientRect();
-          tooltip.style.left = (event.clientX - rect.left + 12) + 'px';
-          tooltip.style.top = (event.clientY - rect.top - 36) + 'px';
-        })
-        .on('mouseleave', function() { tooltip.style.display = 'none'; });
-  }).catch(err => {
-    document.getElementById('ohpc-map').innerHTML = '<text x=350 y=230 text-anchor=middle font-family=Montserrat,sans-serif font-size=13 fill=#9DA6AB>Map unavailable</text>';
-  });
-})();
-</script>
-
 <p>From there, Zillow makes it easy. There's a filter specifically for homes with price reductions. Free, takes 30 seconds, and it narrows your search to sellers who've already shown flexibility.</p>
 <p>If you're working with a <a href="https://www.nar.realtor/" target="_blank" rel="noopener">REALTOR&reg;</a>, ask them to set up an automated list of homes with recent price reductions in your target area. Any agent worth their commission can do this in minutes — and it means you'll know the moment a seller blinks.</p>
 <p>But here's what most buyers miss: a home without a price cut can still be very negotiable.</p>
