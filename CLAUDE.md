@@ -161,6 +161,20 @@ Every page must include:
 
 ---
 
+### Email & lead infrastructure
+
+- **Kit (ConvertKit)** — email platform for all subscriber lists and market update sends
+  - jassonfarrier.com form ID: `9195650`
+  - ohiohousingnerd.com form ID: `9195654`
+  - Welcome sequence IDs: JF = `2810566`, OHN = `2810567`
+  - Newsletter opt-in is handled via checkbox on contact form (pre-checked, can uncheck)
+- **Farrier CRM** — `farrier-crm.vercel.app` — all leads stored in Supabase (`tkfexsnablkotgimmjat`)
+- **Lead API endpoint** — `https://farrier-crm.vercel.app/api/leads` (POST)
+- **Email notifications** — sent via Resend to jassonfarrier@gmail.com on new leads
+- When a contact form is submitted with newsletter opt-in checked → subscriber goes to both CRM AND Kit
+
+---
+
 ### Rules Jasson has set — permanent
 
 - NEVER ask Jasson to run a terminal command
