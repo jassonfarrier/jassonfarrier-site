@@ -121,6 +121,27 @@ This exact CSS must be present in the `<style>` block of every market update pag
 - Light background: `#f7f8fa`
 - Font: Montserrat (Google Fonts)
 
+### Contact CTA — required on every market update
+
+Place this block immediately before the subscribe bar on every market update page:
+
+```html
+<div class="contact-cta">
+  <p>Buying or selling in Ohio? <a href="/contact">Let's talk.</a></p>
+</div>
+```
+
+Required CSS (add to `<style>` block):
+
+```css
+.contact-cta { background: #f7f8fa; border-left: 3px solid #0D1E42; padding: 20px 28px; margin: 48px 0; }
+.contact-cta p { font-size: 16px; font-weight: 700; color: #0D1E42; margin: 0; }
+.contact-cta a { color: #0D1E42; text-decoration: underline; }
+.contact-cta a:hover { opacity: 0.7; }
+```
+
+---
+
 ### Footer requirements
 
 Every page must include:
