@@ -239,8 +239,9 @@ blockquote p { font-size: 18px; font-style: italic; color: #0D1E42; font-weight:
 
   Promise.all([
     fetch('/ohio-counties.json').then(r => r.json()),
-    fetch(SUPABASE_URL, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }).then(r => r.json())
-  ]).then(([geo, counties]) => {
+    fetch(SUPABASE_URL, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }).then(r => r.json()),
+    fetch('/ohio-state.geojson').then(r => r.json())
+  ]).then(([geo, counties, stateGeo]) => {
     // Build fips → data map
     const dataMap = {};
     counties.forEach(c => { dataMap[c.fips] = { county: c.county, pct: c.latest && c.latest.price_reduced_pct != null ? c.latest.price_reduced_pct : null }; });
@@ -291,6 +292,16 @@ blockquote p { font-size: 18px; font-style: italic; color: #0D1E42; font-weight:
           tooltip.style.top = (event.clientY - rect.top - 36) + 'px';
         })
         .on('mouseleave', function() { tooltip.style.display = 'none'; });
+
+    // State outline on top
+    svg.append('path')
+      .datum(stateGeo)
+      .attr('d', path)
+      .attr('fill', 'none')
+      .attr('stroke', '#0D1E42')
+      .attr('stroke-width', 2.5)
+      .attr('stroke-linejoin', 'round')
+      .style('pointer-events', 'none');
   }).catch(err => {
     document.getElementById('ohpc-map').innerHTML = '<text x=350 y=230 text-anchor=middle font-family=Montserrat,sans-serif font-size=13 fill=#9DA6AB>Map unavailable</text>';
   });
