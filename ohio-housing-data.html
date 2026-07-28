@@ -125,27 +125,40 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 @media(max-width:768px){
   html,body{overflow:auto}
   .main{flex-direction:column;height:auto}
-  .sidebar{width:100%;flex-direction:row;flex-wrap:nowrap;gap:6px;padding:8px 10px;border-right:none;border-bottom:1px solid rgba(0,0,0,0.09);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-  .sidebar::-webkit-scrollbar{display:none}
-  .sidebar-label,.src,.hint{display:none}
-  .sidebar hr{display:none}
-  .metric-btn{flex:0 0 auto;min-width:auto;white-space:nowrap;font-size:11px;padding:7px 12px}
-  .sidebar .metric-btn{display:none}
-  .sidebar .sidebar-label{display:none}
-  .sidebar hr{display:none}
-  .chart-tabs{display:none}
-  .chart-label{display:none}
-  .metric-btn .md{display:none}
-  #map{height:60vw;min-height:260px}
+  /* Sidebar: hidden on mobile — replaced by #mobile-metric-bar */
+  .sidebar{display:none}
+  #map{height:65vw;min-height:270px;width:100%}
   .snap-grid{grid-template-columns:repeat(2,1fr)}
   .snap-val{font-size:15px}
   #line-chart{height:220px}
-  #chart-slider-wrap{padding-left:48px !important;}
   #legend{left:10px}
   nav{padding:0 16px}
   .nav-hamburger{display:flex}
   .nav-right a:not(.nav-yt){display:none}
   .nav-yt{display:none}
+  #search-bar{min-width:calc(100vw - 32px);left:16px;transform:none;top:10px;flex-wrap:wrap;padding:6px 10px;gap:6px}
+  .mode-pills{width:100%;display:flex;overflow-x:auto;gap:4px;padding-bottom:2px;scrollbar-width:none}
+  .mode-pills::-webkit-scrollbar{display:none}
+  .mode-pill{flex-shrink:0;padding:4px 10px;font-size:10px}
+  #modal-wrapper{width:100vw}
+  #modal{padding:10px 12px;height:92vh;border-radius:10px}
+  .modal-header{flex-wrap:wrap;gap:8px;margin-bottom:8px}
+  .modal-county{font-size:13px!important;white-space:normal!important}
+  .modal-sub{font-size:11px!important}
+  .close-btn{align-self:flex-start}
+  .modal-body{flex-direction:column;gap:8px;overflow-y:auto}
+  .modal-left{width:100%;padding-bottom:4px;flex-shrink:0}
+  .chart-label{display:none}
+  .chart-tabs{display:none}
+  #chart-metric-select-mobile{display:block;width:100%;margin-bottom:8px}
+  .modal-right{flex:1;min-height:0}
+  .upper-third{font-size:11px!important;padding:8px 12px;flex-wrap:wrap;gap:2px;overflow:hidden}
+  .upper-third-county{font-size:13px!important;white-space:normal;letter-spacing:0.02em}
+  .upper-third-sep{margin:0 6px;font-size:13px}
+  .upper-third-metric{font-size:12px!important;white-space:normal;letter-spacing:0.02em}
+  .upper-third-source{font-size:10px!important;margin-left:4px}
+  #chart-slider-wrap{padding-left:16px!important}
+}
   #search-bar{min-width:calc(100vw - 32px);left:16px;transform:none;top:10px;flex-wrap:wrap;padding:6px 10px;gap:6px}
   .mode-pills{width:100%;display:flex;overflow-x:auto;gap:4px;padding-bottom:2px;scrollbar-width:none}
   .mode-pills::-webkit-scrollbar{display:none}
@@ -190,16 +203,16 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .nav-mobile-menu a:last-child{border-bottom:none}
 .nav-mobile-menu.open{display:flex}
 
-#metric-select-mobile,#chart-metric-select-mobile{
-  width:100%;padding:9px 12px;font-family:Montserrat,sans-serif;
-  font-size:13px;font-weight:600;color:#0d1e42;background:#fff;
-  border:1.5px solid #0d1e42;border-radius:8px;cursor:pointer;
-  -webkit-appearance:none;appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230d1e42' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
+/* select styles handled in #mobile-metric-bar and modal CSS */
+
+/* Mobile metric picker bar */
+#mobile-metric-bar{display:none}
+@media(max-width:768px){
+  #mobile-metric-bar{display:block;padding:10px 16px;background:#fff;border-bottom:1.5px solid #e8eaed;position:sticky;top:52px;z-index:15}
+  #mobile-metric-bar select{width:100%;padding:10px 14px;font-family:Montserrat,sans-serif;font-size:13px;font-weight:600;color:#0d1e42;background:#fff;border:1.5px solid #0d1e42;border-radius:8px;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230d1e42' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:36px}
 }
 @media(min-width:769px){
-  #metric-select-mobile,#chart-metric-select-mobile{display:none}
+  #mobile-metric-bar,#chart-metric-select-mobile{display:none}
 }
 </style>
 <!-- Google Analytics -->
@@ -236,26 +249,28 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   <a href="https://www.youtube.com/@OhioHousingNerd">YouTube</a>
 </div>
 
+<div id="mobile-metric-bar">
+  <select id="metric-select-mobile">
+    <option value="zhvi">Home Value</option>
+    <option value="zhvi_yoy">Home Value YOY %</option>
+    <option value="active_listings">Active Listings</option>
+    <option value="active_listings_yoy">Active Listings YOY %</option>
+    <option value="pending_listings">Pending Sales</option>
+    <option value="pending_listings_yoy">Pending Sales YOY %</option>
+    <option value="days_on_market">Days on Market</option>
+    <option value="days_on_market_yoy">Days on Market YOY %</option>
+    <option value="price_reduced_pct">Price Cut %</option>
+    <option value="price_reduced_pct_yoy">Price Cut % YOY</option>
+    <option value="median_property_tax">Property Tax</option>
+    <option value="median_property_tax_yoy">Property Tax YOY %</option>
+    <option value="property_tax_rate">Tax Rate</option>
+    <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
+  </select>
+</div>
 <div class="main">
   <div class="sidebar">
     <div class="page-eyebrow" style="padding:18px 0 10px;letter-spacing:3px;font-size:11px;font-weight:700;text-transform:uppercase;color:#0D1E42;font-family:Montserrat,sans-serif">Ohio Housing Data</div>
-    <div class="sidebar-label">Map Metric</div>
-    <select id="metric-select-mobile">
-      <option value="zhvi">Home Value</option>
-      <option value="zhvi_yoy">Home Value YOY %</option>
-      <option value="active_listings">Active Listings</option>
-      <option value="active_listings_yoy">Active Listings YOY %</option>
-      <option value="pending_listings">Pending Sales</option>
-      <option value="pending_listings_yoy">Pending Sales YOY %</option>
-      <option value="days_on_market">Days on Market</option>
-      <option value="days_on_market_yoy">Days on Market YOY %</option>
-      <option value="price_reduced_pct">Price Cut %</option>
-      <option value="price_reduced_pct_yoy">Price Cut % YOY</option>
-      <option value="median_property_tax">Property Tax</option>
-      <option value="median_property_tax_yoy">Property Tax YOY %</option>
-      <option value="property_tax_rate">Tax Rate</option>
-      <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
-    </select>
+
     <button class="metric-btn active" data-metric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span></button>
     <button class="metric-btn yoy-btn" data-metric="zhvi_yoy"><span class="mn">Home Value YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
