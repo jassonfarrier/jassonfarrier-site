@@ -29,6 +29,7 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
 .footer-legal p { font-size: 10px; color: rgba(255,255,255,0.2); line-height: 2; }
 @media (max-width: 768px) {
   nav { padding: 0 24px; }
+  .nav-hamburger { display: flex; }
   .nav-right a:not(.nav-pill) { display: none; }
   .nav-yt { display: none; }
   footer { padding: 40px 24px 28px; }
@@ -66,6 +67,47 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
 .btn-primary:hover { opacity: 0.85; }
 .form-check { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: #666; cursor: pointer; margin-bottom: 20px; line-height: 1.5; }
 .form-check input[type="checkbox"] { margin-top: 2px; accent-color: #0D1E42; flex-shrink: 0; width: 15px; height: 15px; }
+
+/* ---- HAMBURGER / MOBILE MENU ---- */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 200;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #0D1E42;
+  border-radius: 2px;
+}
+.nav-mobile-menu {
+  display: none;
+  position: sticky;
+  top: 68px;
+  z-index: 99;
+  flex-direction: column;
+  background: #fff;
+  border-bottom: 1px solid #f5f5f5;
+  padding: 8px 24px 16px;
+}
+.nav-mobile-menu a {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0D1E42;
+  text-decoration: none;
+  padding: 13px 0;
+  border-bottom: 1px solid #f5f5f5;
+  display: block;
+}
+.nav-mobile-menu a:last-child { border-bottom: none; }
+.nav-mobile-menu.open { display: flex; }
 </style>
 <meta property="og:type" content="website"><meta property="og:title" content="Contact Jasson Farrier"><meta property="og:description" content="Get in touch with Jasson Farrier — Ohio Realtor and housing market analyst."><meta property="og:url" content="https://jassonfarrier.com/contact"><meta property="og:image" content="https://jassonfarrier.com/jasson-farrier.jpg">
 <!-- Google Analytics -->
@@ -94,8 +136,18 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
       </svg>
     </a>
     
+      <button class="nav-hamburger" aria-label="Menu" onclick="document.querySelector('.nav-mobile-menu').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+<div class="nav-mobile-menu">
+  <a href="/housing-market-updates">Market Updates</a>
+  <a href="/ohio-housing-data">Data</a>
+  <a href="/bio">About</a>
+  <a href="/contact">Contact</a>
+  <a href="https://www.youtube.com/@OhioHousingNerd">YouTube ↗</a>
+</div>
 <div class="page-header">
   <div class="page-header-inner">
     <span class="hero-tag">Work With Me</span>
