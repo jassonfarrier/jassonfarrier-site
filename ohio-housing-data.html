@@ -125,9 +125,11 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 @media(max-width:768px){
   html,body{overflow:auto}
   .main{flex-direction:column;height:auto}
-  .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;gap:5px;padding:10px;border-right:none;border-bottom:1px solid rgba(0,210,255,0.1);overflow-x:auto}
-  .sidebar-label,.src,.hint{width:100%}
-  .metric-btn{flex:1;min-width:100px;font-size:11px;padding:6px 8px}
+  .sidebar{width:100%;flex-direction:row;flex-wrap:nowrap;gap:6px;padding:8px 10px;border-right:none;border-bottom:1px solid rgba(0,0,0,0.09);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .sidebar::-webkit-scrollbar{display:none}
+  .sidebar-label,.src,.hint{display:none}
+  .sidebar hr{display:none}
+  .metric-btn{flex:0 0 auto;min-width:auto;white-space:nowrap;font-size:11px;padding:7px 12px}
   .metric-btn .md{display:none}
   #map{height:60vw;min-height:260px}
   .snap-grid{grid-template-columns:repeat(2,1fr)}
