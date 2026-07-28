@@ -349,6 +349,22 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <div class="modal-body">
       <div class="modal-left">
         <div class="chart-label">Chart Type</div>
+        <select id="chart-metric-select-mobile" style="display:none;width:100%;margin-bottom:8px;padding:9px 14px;font-family:Montserrat,sans-serif;font-size:13px;font-weight:600;color:#0d1e42;background:#fff;border:1.5px solid #0d1e42;border-radius:8px;-webkit-appearance:none;appearance:none">
+          <option value="zhvi">Home Value</option>
+          <option value="zhvi_yoy">Home Value YOY %</option>
+          <option value="active_listings">Active Listings</option>
+          <option value="active_listings_yoy">Active Listings YOY %</option>
+          <option value="pending_listings">Pending Sales</option>
+          <option value="pending_listings_yoy">Pending Sales YOY %</option>
+          <option value="days_on_market">Days on Market</option>
+          <option value="days_on_market_yoy">Days on Market YOY %</option>
+          <option value="price_reduced_pct">Price Cut %</option>
+          <option value="price_reduced_pct_yoy">Price Cut % YOY</option>
+          <option value="median_property_tax">Property Tax</option>
+          <option value="median_property_tax_yoy">Property Tax YOY %</option>
+          <option value="property_tax_rate">Tax Rate</option>
+          <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
+        </select>
         <div class="chart-tabs" id="chart-tabs">
           <button class="metric-btn chart-tab active" data-cmetric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_yoy"><span class="mn">Home Value YOY %</span><span class="md">Year-over-year change</span></button>
