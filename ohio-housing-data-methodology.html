@@ -52,6 +52,47 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   .site-footer{padding:20px}
   .page-title{font-size:22px}
 }
+
+/* ---- HAMBURGER / MOBILE MENU ---- */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 200;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #0D1E42;
+  border-radius: 2px;
+}
+.nav-mobile-menu {
+  display: none;
+  position: sticky;
+  top: 68px;
+  z-index: 99;
+  flex-direction: column;
+  background: #fff;
+  border-bottom: 1px solid #f5f5f5;
+  padding: 8px 24px 16px;
+}
+.nav-mobile-menu a {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0D1E42;
+  text-decoration: none;
+  padding: 13px 0;
+  border-bottom: 1px solid #f5f5f5;
+  display: block;
+}
+.nav-mobile-menu a:last-child { border-bottom: none; }
+.nav-mobile-menu.open { display: flex; }
 </style>
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KKVH0B7EZ0"></script>
@@ -74,8 +115,18 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <a href="https://www.youtube.com/@OhioHousingNerd" aria-label="YouTube" target="_blank" rel="noopener">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#9DA6AB"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/></svg>
     </a>
+      <button class="nav-hamburger" aria-label="Menu" onclick="document.querySelector('.nav-mobile-menu').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+<div class="nav-mobile-menu">
+  <a href="/housing-market-updates">Market Updates</a>
+  <a href="/ohio-housing-data">Data</a>
+  <a href="/bio">About</a>
+  <a href="/contact">Contact</a>
+  <a href="https://www.youtube.com/@OhioHousingNerd">YouTube ↗</a>
+</div>
 
 <div class="page-wrap">
   <a href="/ohio-housing-data" class="back-link">← Back to Ohio Housing Data</a>
