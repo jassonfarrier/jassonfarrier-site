@@ -130,6 +130,13 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   .sidebar-label,.src,.hint{display:none}
   .sidebar hr{display:none}
   .metric-btn{flex:0 0 auto;min-width:auto;white-space:nowrap;font-size:11px;padding:7px 12px}
+  #metric-select-mobile{display:block}
+  .sidebar .metric-btn{display:none}
+  .sidebar .sidebar-label{display:none}
+  .sidebar hr{display:none}
+  #chart-metric-select-mobile{display:block}
+  .chart-tabs{display:none}
+  .chart-label{display:none}
   .metric-btn .md{display:none}
   #map{height:60vw;min-height:260px}
   .snap-grid{grid-template-columns:repeat(2,1fr)}
@@ -184,6 +191,15 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .nav-mobile-menu a{font-size:14px;font-weight:600;color:#0D1E42;text-decoration:none;padding:13px 0;border-bottom:1px solid #f5f5f5;display:block}
 .nav-mobile-menu a:last-child{border-bottom:none}
 .nav-mobile-menu.open{display:flex}
+
+#metric-select-mobile,#chart-metric-select-mobile{
+  display:none;width:100%;padding:9px 12px;font-family:Montserrat,sans-serif;
+  font-size:13px;font-weight:600;color:#0d1e42;background:#fff;
+  border:1.5px solid #0d1e42;border-radius:8px;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230d1e42' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
+}
 </style>
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KKVH0B7EZ0"></script>
@@ -223,6 +239,22 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   <div class="sidebar">
     <div class="page-eyebrow" style="padding:18px 0 10px;letter-spacing:3px;font-size:11px;font-weight:700;text-transform:uppercase;color:#0D1E42;font-family:Montserrat,sans-serif">Ohio Housing Data</div>
     <div class="sidebar-label">Map Metric</div>
+    <select id="metric-select-mobile">
+      <option value="zhvi">Home Value</option>
+      <option value="zhvi_yoy">Home Value YOY %</option>
+      <option value="active_listings">Active Listings</option>
+      <option value="active_listings_yoy">Active Listings YOY %</option>
+      <option value="pending_listings">Pending Sales</option>
+      <option value="pending_listings_yoy">Pending Sales YOY %</option>
+      <option value="days_on_market">Days on Market</option>
+      <option value="days_on_market_yoy">Days on Market YOY %</option>
+      <option value="price_reduced_pct">Price Cut %</option>
+      <option value="price_reduced_pct_yoy">Price Cut % YOY</option>
+      <option value="median_property_tax">Property Tax</option>
+      <option value="median_property_tax_yoy">Property Tax YOY %</option>
+      <option value="property_tax_rate">Tax Rate</option>
+      <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
+    </select>
     <button class="metric-btn active" data-metric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span></button>
     <button class="metric-btn yoy-btn" data-metric="zhvi_yoy"><span class="mn">Home Value YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
@@ -2491,4 +2523,31 @@ document.addEventListener('change', function(e){
   map.setLayoutProperty('dc-circles', 'visibility', vis);
   map.setLayoutProperty('dc-labels', 'visibility', vis);
 });
+
+// Mobile metric selects
+(function() {
+  var mSel = document.getElementById('metric-select-mobile');
+  var cSel = document.getElementById('chart-metric-select-mobile');
+  if (mSel) {
+    mSel.addEventListener('change', function() {
+      var btn = document.querySelector('.metric-btn[data-metric="' + this.value + '"]');
+      if (btn) btn.click();
+    });
+  }
+  if (cSel) {
+    cSel.addEventListener('change', function() {
+      var btn = document.querySelector('.chart-tab[data-cmetric="' + this.value + '"]');
+      if (btn) btn.click();
+    });
+  }
+  // Keep chart select in sync when opened via map click
+  var origOpenModal = window.openModal;
+  document.addEventListener('click', function() {
+    if (cSel) {
+      var active = document.querySelector('.chart-tab.active[data-cmetric]');
+      if (active) cSel.value = active.dataset.cmetric;
+    }
+  }, true);
+})();
+
 </script>
