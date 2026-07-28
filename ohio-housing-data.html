@@ -130,11 +130,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   .sidebar-label,.src,.hint{display:none}
   .sidebar hr{display:none}
   .metric-btn{flex:0 0 auto;min-width:auto;white-space:nowrap;font-size:11px;padding:7px 12px}
-  #metric-select-mobile{display:block}
   .sidebar .metric-btn{display:none}
   .sidebar .sidebar-label{display:none}
   .sidebar hr{display:none}
-  #chart-metric-select-mobile{display:block}
   .chart-tabs{display:none}
   .chart-label{display:none}
   .metric-btn .md{display:none}
@@ -193,12 +191,15 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .nav-mobile-menu.open{display:flex}
 
 #metric-select-mobile,#chart-metric-select-mobile{
-  display:none;width:100%;padding:9px 12px;font-family:Montserrat,sans-serif;
+  width:100%;padding:9px 12px;font-family:Montserrat,sans-serif;
   font-size:13px;font-weight:600;color:#0d1e42;background:#fff;
   border:1.5px solid #0d1e42;border-radius:8px;cursor:pointer;
   -webkit-appearance:none;appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%230d1e42' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;
+}
+@media(min-width:769px){
+  #metric-select-mobile,#chart-metric-select-mobile{display:none}
 }
 </style>
 <!-- Google Analytics -->
