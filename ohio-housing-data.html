@@ -127,15 +127,27 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   .main{flex-direction:column;height:auto}
   .sidebar{width:100%;flex-direction:row;flex-wrap:wrap;gap:5px;padding:10px;border-right:none;border-bottom:1px solid rgba(0,210,255,0.1);overflow-x:auto}
   .sidebar-label,.src,.hint{width:100%}
-  .metric-btn{flex:1;min-width:110px}
+  .metric-btn{flex:1;min-width:100px;font-size:11px;padding:6px 8px}
   .metric-btn .md{display:none}
-  #map{height:65vw;min-height:280px}
+  #map{height:60vw;min-height:260px}
   .snap-grid{grid-template-columns:repeat(2,1fr)}
-  #line-chart{height:286px}
+  .snap-val{font-size:15px}
+  #line-chart{height:220px}
   #chart-slider-wrap{padding-left:48px !important;}
   #legend{left:10px}
   nav{padding:0 16px}
+  .nav-hamburger{display:flex}
   .nav-right a:not(.nav-yt){display:none}
+  .nav-yt{display:none}
+  #search-bar{min-width:calc(100vw - 32px);left:16px;transform:none;top:10px;flex-wrap:wrap;padding:6px 10px;gap:6px}
+  .mode-pills{width:100%;display:flex;overflow-x:auto;gap:4px;padding-bottom:2px;scrollbar-width:none}
+  .mode-pills::-webkit-scrollbar{display:none}
+  .mode-pill{flex-shrink:0;padding:4px 10px;font-size:10px}
+  #modal{padding:12px 16px;height:92vh}
+  .modal-body{flex-direction:column;gap:10px}
+  .modal-left{width:100%;max-height:140px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:4px}
+  .chart-tabs{flex-direction:row;flex-wrap:wrap;gap:4px}
+  .chart-tabs .metric-btn{flex:0 0 auto;min-width:auto}
 }
 
 #search-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:20;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.13);box-shadow:0 4px 20px rgba(0,0,0,0.13);display:flex;align-items:center;padding:0 12px;gap:8px;min-width:420px}.mode-pills{display:flex;gap:4px;margin-left:6px;flex-shrink:0}.mode-pill{background:transparent;border:1px solid rgba(0,0,0,0.15);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;font-family:Montserrat,sans-serif;color:rgba(0,0,0,0.4);cursor:pointer;transition:all .2s;white-space:nowrap}.mode-pill.active{background:#1a5296;color:#fff;border-color:#0D1E42}.mode-pill:hover:not(.active){background:#edf2fb;color:#0D1E42;border-color:rgba(26,82,150,0.3)}
@@ -149,6 +161,13 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 #search-results li:hover{background:#f7f8fa;color:#0D1E42}
 #search-results li .sr-sub{font-size:10px;font-weight:400;color:rgba(0,0,0,0.38);margin-top:1px}
 
+
+.nav-hamburger{display:none;flex-direction:column;justify-content:center;gap:5px;background:none;border:none;cursor:pointer;padding:4px;z-index:200}
+.nav-hamburger span{display:block;width:22px;height:2px;background:#0D1E42;border-radius:2px}
+.nav-mobile-menu{display:none;position:fixed;top:68px;left:0;right:0;z-index:99;flex-direction:column;background:#fff;border-bottom:1px solid rgba(0,0,0,0.09);padding:8px 24px 16px}
+.nav-mobile-menu a{font-size:14px;font-weight:600;color:#0D1E42;text-decoration:none;padding:13px 0;border-bottom:1px solid #f5f5f5;display:block}
+.nav-mobile-menu a:last-child{border-bottom:none}
+.nav-mobile-menu.open{display:flex}
 </style>
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-KKVH0B7EZ0"></script>
@@ -173,8 +192,16 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <a href="https://www.youtube.com/@OhioHousingNerd" class="nav-yt" aria-label="YouTube" target="_blank" rel="noopener">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#9DA6AB"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/></svg>
     </a>
+    <button class="nav-hamburger" aria-label="Menu" onclick="document.querySelector('.nav-mobile-menu').classList.toggle('open')"><span></span><span></span><span></span></button>
   </div>
 </nav>
+<div class="nav-mobile-menu">
+  <a href="/housing-market-updates">Market Updates</a>
+  <a href="/ohio-housing-data">Data</a>
+  <a href="/bio">About</a>
+  <a href="/contact">Contact</a>
+  <a href="https://www.youtube.com/@OhioHousingNerd">YouTube</a>
+</div>
 
 <div class="main">
   <div class="sidebar">
