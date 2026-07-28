@@ -64,6 +64,7 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
 /* MOBILE */
 @media (max-width: 768px) {
   nav { padding: 0 24px; }
+  .nav-hamburger { display: flex; }
   .nav-right a:not(.nav-pill) { display: none; }
   .nav-yt { display: none; }
   .hero-inner { flex-direction: column; padding: 48px 24px; gap: 32px; }
@@ -76,6 +77,47 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
   .stat-row, .stat-grid { flex-wrap: wrap; }
   section, .section { padding: 40px 20px; }
 }
+
+/* ---- HAMBURGER / MOBILE MENU ---- */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  z-index: 200;
+}
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #0D1E42;
+  border-radius: 2px;
+}
+.nav-mobile-menu {
+  display: none;
+  position: sticky;
+  top: 68px;
+  z-index: 99;
+  flex-direction: column;
+  background: #fff;
+  border-bottom: 1px solid #f5f5f5;
+  padding: 8px 24px 16px;
+}
+.nav-mobile-menu a {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0D1E42;
+  text-decoration: none;
+  padding: 13px 0;
+  border-bottom: 1px solid #f5f5f5;
+  display: block;
+}
+.nav-mobile-menu a:last-child { border-bottom: none; }
+.nav-mobile-menu.open { display: flex; }
 </style>
 <meta property="og:type" content="profile"><meta property="og:title" content="About Jasson Farrier — Ohio Realtor & Housing Analyst"><meta property="og:description" content="Jasson Farrier is a Central Ohio Realtor and data-driven housing market analyst covering Ohio and counties."><meta property="og:url" content="https://jassonfarrier.com/bio"><meta property="og:image" content="https://jassonfarrier.com/jasson-farrier.jpg">
 <!-- Google Analytics -->
@@ -104,8 +146,18 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
       </svg>
     </a>
     
+      <button class="nav-hamburger" aria-label="Menu" onclick="document.querySelector('.nav-mobile-menu').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+<div class="nav-mobile-menu">
+  <a href="/housing-market-updates">Market Updates</a>
+  <a href="/ohio-housing-data">Data</a>
+  <a href="/bio">About</a>
+  <a href="/contact">Contact</a>
+  <a href="https://www.youtube.com/@OhioHousingNerd">YouTube ↗</a>
+</div>
 <div class="hero">
   <div class="hero-inner">
     <img src="https://images.squarespace-cdn.com/content/v1/5b96b43a75f9ee5fa8fbbadb/1629466533420-8AF62KY7ETA2APRXP2EX/0C2A5519_DONE.JPG" alt="Jasson Farrier" class="hero-img" />
