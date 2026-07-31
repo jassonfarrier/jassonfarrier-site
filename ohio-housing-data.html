@@ -1881,7 +1881,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
       const cardX = cx + cardW + 10 > iw ? cx - cardW - 10 : cx + 10;
       const cardY = Math.max(0, Math.min(cy - 10, ih - cardH));
       hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',cardH);
-      hoverYear.attr('x',cardX+18).attr('y',cardY+28).text(r.date.slice(0,4));
+      hoverYear.attr('x',cardX+18).attr('y',cardY+28).text(moName + ' ' + r.date.slice(0,4));
       hoverVal.attr('x',cardX+18).attr('y',cardY+82).text(METRICS[cmetric].fmt(r[cmetric]));
       hoverLbl.attr('x',cardX+18).attr('y',cardY+112).text(METRICS[cmetric].label.toUpperCase());
       hoverDot.attr('cx',cx).attr('cy',cy).style('opacity',1);
