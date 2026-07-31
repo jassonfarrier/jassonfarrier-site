@@ -361,9 +361,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Supply</div>
           <button class="metric-btn chart-tab" data-cmetric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 2000–2024</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="mf_permits_per_1k"><span class="mn">MF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 2000–2024</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="total_permits_per_1k"><span class="mn">Total Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 2000–2024</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 1990–2025</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="mf_permits_per_1k"><span class="mn">MF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 1990–2025</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="total_permits_per_1k"><span class="mn">Total Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 1990–2025</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Demand</div>
           <button class="metric-btn chart-tab" data-cmetric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
@@ -733,6 +733,7 @@ function sourceForMetric(m) {
   const base = YOY_BASE[m] || m;
   if (base==='zhvi') return '<a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Zillow</a>';
   if (base==='median_property_tax'||base==='property_tax_rate') return '<a href="https://data.census.gov/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census ACS</a>';
+  if (base==='sf_permits_per_1k'||base==='mf_permits_per_1k'||base==='total_permits_per_1k') return '<a href="https://www.census.gov/construction/bps/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census BPS</a>';
   return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
 }
 function setAttrHeader(chips, metric) {
