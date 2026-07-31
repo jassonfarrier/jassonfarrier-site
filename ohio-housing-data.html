@@ -241,6 +241,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="median_property_tax_yoy">Property Tax YOY %</option>
     <option value="property_tax_rate">Tax Rate</option>
     <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
+    <option value="sf_permits_per_1k">SF Permits / 1K</option>
+    <option value="total_permits_per_1k">Total Permits / 1K</option>
   </select>
 </div>
 <div class="main">
@@ -261,6 +263,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
     <button class="metric-btn yoy-btn" data-metric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span></button>
+    <button class="metric-btn" data-metric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Single-family permits per 1,000 residents</span></button>
+    <button class="metric-btn" data-metric="total_permits_per_1k"><span class="mn">Total Permits / 1K</span><span class="md">All permits per 1,000 residents</span></button>
     <hr>
     <div style="padding:6px 3px 0;"><label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;font-family:Montserrat,sans-serif"><input type="checkbox" id="dc-toggle" style="cursor:pointer;accent-color:#0d1e42"> Data Centers</label></div>
 
@@ -340,6 +344,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="median_property_tax_yoy">Property Tax YOY %</option>
           <option value="property_tax_rate">Tax Rate</option>
           <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
+          <option value="sf_permits_per_1k">SF Permits / 1K</option>
+          <option value="total_permits_per_1k">Total Permits / 1K</option>
         </select>
         <div class="chart-tabs" id="chart-tabs">
           <button class="metric-btn chart-tab active" data-cmetric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span></button>
@@ -411,6 +417,8 @@ const METRICS = {
   median_property_tax_yoy:{label:'Property Tax YOY %',fmt:v=>v.toFixed(1)+'%',         lo:'Declining',hi:'Growing'},
   property_tax_rate:  {label:'Effective Tax Rate',  fmt:v=>v.toFixed(2)+'%',               lo:'Lower', hi:'Higher'},
   property_tax_rate_yoy:{label:'Tax Rate YOY %',fmt:v=>v.toFixed(1)+'%',               lo:'Declining',hi:'Growing'},
+  sf_permits_per_1k:   {label:'SF Permits per 1K',    fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
+  total_permits_per_1k:{label:'Total Permits per 1K', fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
 };
 const YOY_METRICS = new Set(['zhvi_yoy','active_listings_yoy','pending_listings_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy']);
 const YOY_BASE = {zhvi_yoy:'zhvi', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate'};
@@ -700,6 +708,7 @@ function fmtAxisCompact(cmetric) {
     }
     if (cmetric==='price_reduced_pct'||cmetric==='property_tax_rate') return v.toFixed(1)+'%';
     if (cmetric==='days_on_market') return v+'d';
+    if (cmetric==='sf_permits_per_1k'||cmetric==='total_permits_per_1k') return v.toFixed(1);
     if (Math.abs(v)>=1000) return d3.format('.2s')(v).replace('k','K');
     return v;
   };
@@ -972,6 +981,27 @@ function renderChart(county, cmetric) {
     // Annual ACS data — convert prop_tax_history to have date field
     const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
     drawAnnualBarChart(county, cmetric, taxHist, false);
+  } else if (cmetric === 'sf_permits_per_1k' || cmetric === 'total_permits_per_1k') {
+    const field = cmetric === 'sf_permits_per_1k' ? 'sf_per_1k' : 'total_per_1k';
+    const doRenderPermit = (ph) => {
+      const rows = ph.map(r => ({...r, [cmetric]: r[field], date: r.year + '-06'}));
+      drawAnnualBarChart(county, cmetric, rows, false);
+    };
+    if (d.permit_history) {
+      doRenderPermit(d.permit_history);
+    } else {
+      fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fips,permit_history&fips=eq.' + d.fips, {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI'
+        }
+      }).then(r => r.json()).then(rows => {
+        if (rows[0] && rows[0].permit_history) {
+          d.permit_history = rows[0].permit_history;
+          doRenderPermit(d.permit_history);
+        }
+      });
+    }
   } else {
     drawMonthlyBarChart(county, cmetric);
   }
