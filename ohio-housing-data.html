@@ -951,7 +951,7 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
         if (YOY_METRICS.has(cm)) {
           drawMonthlyBarChart(d.metro, cm, getYOYRows(d, cm), true);
         } else {
-          drawMonthlyBarChart(d.metro, cm, d.history, true);
+          drawAnnualLineChart(d.metro, cm, d.history, true);
         }
       }
     } else if (mapMode === 'state' && STATE_DATA) {
@@ -959,7 +959,7 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
       if (YOY_METRICS.has(cm)) {
         drawMonthlyBarChart('Ohio', cm, getYOYRows(d, cm), true);
       } else {
-        drawMonthlyBarChart('Ohio', cm, d.history, true);
+        drawAnnualLineChart('Ohio', cm, d.history, true);
       }
     } else if (selectedCounty) {
       renderChart(selectedCounty, cm);
@@ -2256,7 +2256,7 @@ function openMetroModal(rid) {
   if (YOY_METRICS.has(mapMetric)) {
     drawMonthlyBarChart(d.metro, mapMetric, getYOYRows(d, mapMetric), true);
   } else {
-    drawMonthlyBarChart(d.metro, mapMetric, d.history, true);
+    drawAnnualLineChart(d.metro, mapMetric, d.history, true);
   }
 }
 
@@ -2302,7 +2302,7 @@ function openStateModal() {
   if (YOY_METRICS.has(mapMetric)) {
     drawMonthlyBarChart('Ohio', mapMetric, getYOYRows(d, mapMetric), true);
   } else {
-    drawMonthlyBarChart('Ohio', mapMetric, d.history, true);
+    drawAnnualLineChart('Ohio', mapMetric, d.history, true);
   }
 }
 
@@ -2446,9 +2446,9 @@ function _doRenderZipChart(zip, cmetric) {
     drawMonthlyBarChart(zip, cmetric, getYOYRows(d, cmetric), true);
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
     const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
-    drawAnnualBarChart(zip, cmetric, taxHist, true);
+    drawAnnualLineChart(zip, cmetric, taxHist, true);
   } else {
-    drawMonthlyBarChart(zip, cmetric, d.history, true);
+    drawAnnualLineChart(zip, cmetric, d.history, true);
   }
 }
 
