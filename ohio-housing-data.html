@@ -769,8 +769,8 @@ function openModal(county) {
   if (activeTab) activeTab.classList.add('active');
   else document.querySelector('.chart-tab[data-cmetric="zhvi"]').classList.add('active');
   chartMetric = defaultMetric;
-  renderChart(county, defaultMetric);
   document.getElementById('modal-overlay').classList.add('visible');
+  setTimeout(() => renderChart(county, defaultMetric), 30);
 }
 
 function drawLineChart(county, cmetric) {
@@ -2251,13 +2251,15 @@ function openMetroModal(rid) {
     return rank > 0 ? '#'+rank+' of '+sorted.length : '—';
   })();
   document.getElementById('modal-overlay').classList.add('visible');
-  document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
-  document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
-  if (YOY_METRICS.has(mapMetric)) {
-    drawMonthlyBarChart(d.metro, mapMetric, getYOYRows(d, mapMetric), true);
-  } else {
-    drawAnnualLineChart(d.metro, mapMetric, d.history, true);
-  }
+  setTimeout(() => {
+    document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
+    document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
+    if (YOY_METRICS.has(mapMetric)) {
+      drawMonthlyBarChart(d.metro, mapMetric, getYOYRows(d, mapMetric), true);
+    } else {
+      drawAnnualLineChart(d.metro, mapMetric, d.history, true);
+    }
+  }, 30);
 }
 
 // --- State Mode ---
@@ -2297,13 +2299,15 @@ function openStateModal() {
   (document.getElementById('s-ptaxrate')||{}).textContent = '—';
   (document.getElementById('s-rank')||{}).textContent = 'Statewide';
   document.getElementById('modal-overlay').classList.add('visible');
-  document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
-  document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
-  if (YOY_METRICS.has(mapMetric)) {
-    drawMonthlyBarChart('Ohio', mapMetric, getYOYRows(d, mapMetric), true);
-  } else {
-    drawAnnualLineChart('Ohio', mapMetric, d.history, true);
-  }
+  setTimeout(() => {
+    document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
+    document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
+    if (YOY_METRICS.has(mapMetric)) {
+      drawMonthlyBarChart('Ohio', mapMetric, getYOYRows(d, mapMetric), true);
+    } else {
+      drawAnnualLineChart('Ohio', mapMetric, d.history, true);
+    }
+  }, 30);
 }
 
 let zipGeoJSON = null;
@@ -2379,7 +2383,7 @@ function openZipModal(zip) {
   if (at) at.classList.add('active');
   chartMetric = defaultMetric;
   document.getElementById('modal-overlay').classList.add('visible');
-  renderZipChart(zip, defaultMetric);
+  setTimeout(() => renderZipChart(zip, defaultMetric), 30);
 }
 
 function fetchZipHistory(zip) {
