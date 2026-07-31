@@ -631,7 +631,7 @@ function renderColors(mode) {
   const isInverse = !isYOY && (metric === 'days_on_market' || metric === 'price_reduced_pct' ||
                     metric === 'median_property_tax' || metric === 'property_tax_rate');
   const isDistress = DISTRESS_METRICS.has(metric);
-  const palette = isDistress ? PALETTE_DIST : (isInverse ? PALETTE_INV : PALETTE_NORM);
+  const palette = (isDistress || isInverse) ? PALETTE_INV : PALETTE_NORM;
 
   // Always update legend labels when metric changes
   document.getElementById('leg-lo').textContent = METRICS[metric].lo;
@@ -1471,8 +1471,7 @@ function paletteForMetric(metric) {
     metric === 'days_on_market' || metric === 'price_reduced_pct' ||
     metric === 'median_property_tax' || metric === 'property_tax_rate'
   );
-  if (DISTRESS_METRICS.has(m)) return PALETTE_DIST;
-  return isInv ? PALETTE_INV : PALETTE_NORM;
+  return (DISTRESS_METRICS.has(m) || isInv) ? PALETTE_INV : PALETTE_NORM;
 }
 
 
