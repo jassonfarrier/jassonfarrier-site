@@ -991,9 +991,8 @@ function renderChart(county, cmetric) {
   } else if (YOY_METRICS.has(cmetric)) {
     drawMonthlyBarChart(county, cmetric, getYOYRows(d, cmetric), false);
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
-    // Annual ACS data — convert prop_tax_history to have date field
     const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
-    drawAnnualBarChart(county, cmetric, taxHist, false);
+    drawAnnualLineChart(county, cmetric, taxHist, false);
   } else if (cmetric === 'sf_permits_per_1k' || cmetric === 'mf_permits_per_1k' || cmetric === 'total_permits_per_1k') {
     const field = cmetric === 'sf_permits_per_1k' ? 'sf_per_1k' : cmetric === 'mf_permits_per_1k' ? 'mf_per_1k' : 'total_per_1k';
     const doRenderPermit = (ph) => {
@@ -1015,7 +1014,7 @@ function renderChart(county, cmetric) {
         }
       });
     }
-  } else if (cmetric === 'zhvi') {
+  } else if (cmetric === 'zhvi' || cmetric === 'active_listings' || cmetric === 'pending_listings' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct') {
     drawAnnualLineChart(county, cmetric);
   } else {
     drawMonthlyBarChart(county, cmetric);
@@ -1414,12 +1413,11 @@ function _initChartSlider(allRows) {
 
   sStart.min = sEnd.min = minYr;
   sStart.max = sEnd.max = maxYr;
-  const defaultStart = Math.max(minYr, maxYr - 5);
-  sStart.value = defaultStart;
+  sStart.value = minYr;
   sEnd.value = maxYr;
-  chartSliderStartYr = defaultStart;
+  chartSliderStartYr = minYr;
   chartSliderEndYr = maxYr;
-  lStart.textContent = defaultStart;
+  lStart.textContent = minYr;
   lEnd.textContent = maxYr;
 
   function updateTrack() {
