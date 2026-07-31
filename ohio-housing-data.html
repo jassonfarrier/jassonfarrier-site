@@ -1865,6 +1865,20 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
     .selectAll('text').attr('fill','rgba(0,0,0,0.65)').attr('font-size','12px')
     .attr('font-family','Montserrat').attr('dx','-8');
 
+  // Click-to-pin + delta hover
+  let alcClickedYear = null;
+  _dismissClickCard = () => { alcClickCard.style('opacity',0); alcClickedYear = null; g.selectAll('.alc-dot').attr('r',4.5).attr('stroke-width',2); };
+
+  // Click card (pinned — dark)
+  const alcClickCard = g.append('g').style('opacity',0);
+  const alcClickRect = alcClickCard.append('rect').attr('rx',12).attr('fill','rgba(13,30,66,0.95)')
+    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1.5)
+    .style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.55))');
+  const alcClickYear = alcClickCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','rgba(255,255,255,0.7)');
+  const alcClickVal  = alcClickCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#fff');
+  const alcClickLbl  = alcClickCard.append('text').attr('font-size','13px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','rgba(255,255,255,0.6)');
+  const alcClickHint = alcClickCard.append('text').attr('font-size','11px').attr('font-family','Montserrat').attr('font-weight','600').attr('fill','rgba(255,255,255,0.45)').text('HOVER ANOTHER POINT TO COMPARE');
+
   // Hover — full-area mousemove finds nearest dot (no tiny target to hit)
   const hoverDot = g.append('circle').attr('r',7).attr('fill','#1a5296').attr('stroke','#fff').attr('stroke-width',2.5)
     .style('opacity',0).style('pointer-events','none');
@@ -1875,10 +1889,30 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
   const hoverYear = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
   const hoverVal  = hoverCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
   const hoverLbl  = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
-  const cardW = 220, cardH = 125;
+  const hoverDelta= hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#1a5296').style('opacity',0);
+  const cardW = 240, cardH = 125;
 
   // Transparent overlay catches all mouse events across full chart area
   g.append('rect').attr('width',iw).attr('height',ih).attr('fill','transparent')
+    .on('click', function(event) {
+      const [mx] = d3.pointer(event);
+      let nearest = rows[0], minDist = Infinity;
+      rows.forEach(r => { const dist = Math.abs(x(r.date.slice(0,4)) - mx); if (dist < minDist) { minDist = dist; nearest = r; } });
+      const yr = nearest.date.slice(0,4);
+      alcClickedYear = yr;
+      g.selectAll('.alc-dot').attr('r',4.5).attr('stroke-width',2);
+      g.selectAll('.alc-dot').filter(r => r.date.slice(0,4) === yr).attr('r',7).attr('stroke-width',3);
+      const cx = x(yr), cy = y(nearest[cmetric]);
+      const alcClickH = 135;
+      const cardX = cx + cardW + 10 > iw ? cx - cardW - 10 : cx + 10;
+      const cardY = Math.max(0, Math.min(cy - 30, ih - alcClickH));
+      alcClickRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',alcClickH);
+      alcClickYear.attr('x',cardX+18).attr('y',cardY+26).text(moName + ' ' + yr);
+      alcClickVal.attr('x',cardX+18).attr('y',cardY+80).text(METRICS[cmetric].fmt(nearest[cmetric]));
+      alcClickLbl.attr('x',cardX+18).attr('y',cardY+106).text(METRICS[cmetric].label.toUpperCase());
+      alcClickHint.attr('x',cardX+18).attr('y',cardY+126);
+      alcClickCard.raise().style('opacity',1);
+    })
     .on('mousemove', function(event) {
       const [mx] = d3.pointer(event);
       // Find nearest year by comparing pixel distance
@@ -1887,13 +1921,31 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
         const dist = Math.abs(x(r.date.slice(0,4)) - mx);
         if (dist < minDist) { minDist = dist; nearest = r; }
       });
-      const cx = x(nearest.date.slice(0,4)), cy = y(nearest[cmetric]);
+      const yr = nearest.date.slice(0,4);
+      const cx = x(yr), cy = y(nearest[cmetric]);
+      // Compute delta from pinned year
+      let deltaText = null;
+      if (alcClickedYear && alcClickedYear !== yr) {
+        const pinnedRow = rows.find(r => r.date.slice(0,4) === alcClickedYear);
+        if (pinnedRow && pinnedRow[cmetric] != null && nearest[cmetric] != null && pinnedRow[cmetric] !== 0) {
+          const pct = ((nearest[cmetric] - pinnedRow[cmetric]) / Math.abs(pinnedRow[cmetric])) * 100;
+          deltaText = (pct >= 0 ? '▲ ' : '▼ ') + Math.abs(pct).toFixed(1) + '% from ' + alcClickedYear;
+        }
+      }
+      const curCardH = deltaText ? 165 : cardH;
       const cardX = cx + cardW + 10 > iw ? cx - cardW - 10 : cx + 10;
-      const cardY = Math.max(0, Math.min(cy - 10, ih - cardH));
-      hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',cardH);
-      hoverYear.attr('x',cardX+18).attr('y',cardY+28).text(moName + ' ' + nearest.date.slice(0,4));
+      const cardY = Math.max(0, Math.min(cy - 10, ih - curCardH));
+      hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',curCardH);
+      hoverYear.attr('x',cardX+18).attr('y',cardY+28).text(moName + ' ' + yr);
       hoverVal.attr('x',cardX+18).attr('y',cardY+82).text(METRICS[cmetric].fmt(nearest[cmetric]));
       hoverLbl.attr('x',cardX+18).attr('y',cardY+112).text(METRICS[cmetric].label.toUpperCase());
+      if (deltaText) {
+        const isNeg = deltaText.startsWith('▼');
+        hoverDelta.attr('x',cardX+18).attr('y',cardY+148).text(deltaText)
+          .attr('fill', isNeg ? '#c0392b' : '#1a5296').style('opacity',1);
+      } else {
+        hoverDelta.style('opacity',0);
+      }
       hoverDot.attr('cx',cx).attr('cy',cy).style('opacity',1);
       hoverCard.raise().style('opacity',1);
     })
@@ -1972,7 +2024,21 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
     .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','2px').style('stroke-linejoin','round')
     .text(r=>METRICS[cmetric].fmt(r.val));
 
-  // Hover tooltip
+  // Click-to-pin + delta hover
+  let annClickedYear = null;
+  _dismissClickCard = () => { annClickCard.style('opacity',0); annClickedYear = null; g.selectAll('.bar').attr('stroke','#fff').attr('stroke-width',1.5); };
+
+  // Click card (pinned — dark)
+  const annClickCard = g.append('g').style('opacity',0);
+  const annClickRect = annClickCard.append('rect').attr('rx',12).attr('fill','rgba(13,30,66,0.95)')
+    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1.5)
+    .style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.55))');
+  const annClickYear = annClickCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','rgba(255,255,255,0.7)');
+  const annClickVal  = annClickCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#fff');
+  const annClickLbl  = annClickCard.append('text').attr('font-size','13px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','rgba(255,255,255,0.6)');
+  const annClickHint = annClickCard.append('text').attr('font-size','11px').attr('font-family','Montserrat').attr('font-weight','600').attr('fill','rgba(255,255,255,0.45)').text('HOVER ANOTHER BAR TO COMPARE');
+
+  // Hover card
   const annHoverCard = g.append('g').style('opacity',0).style('pointer-events','none');
   const annHoverRect = annHoverCard.append('rect').attr('rx',12).attr('fill','#fff')
     .attr('stroke','rgba(26,82,150,0.18)').attr('stroke-width',1.5)
@@ -1980,20 +2046,65 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
   const annHoverYear = annHoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
   const annHoverVal  = annHoverCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
   const annHoverLbl  = annHoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
-  const annCardW = 220, annCardH = 125;
+  const annHoverDelta= annHoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#1a5296').style('opacity',0);
+  const annCardW = 240;
+
+  // Dismiss click card on SVG background click
+  lsvg.on('click', function(event) {
+    if (!event.target.classList.contains('bar')) _dismissClickCard();
+  });
 
   g.selectAll('.bar')
     .style('cursor','pointer')
+    .on('click', function(event, r) {
+      event.stopPropagation();
+      annClickedYear = r.year;
+      g.selectAll('.bar').attr('stroke','#fff').attr('stroke-width',1.5);
+      d3.select(this).attr('stroke','#1a1a2e').attr('stroke-width',2.5);
+      const cx = parseFloat(d3.select(this).attr('x')) + x.bandwidth() / 2;
+      const cy = parseFloat(d3.select(this).attr('y'));
+      const annClickH = 135;
+      const cardX = cx + annCardW + 10 > iw ? cx - annCardW - 10 : cx + 10;
+      const cardY = Math.max(0, Math.min(cy - 10, ih - annClickH));
+      annClickRect.attr('x',cardX).attr('y',cardY).attr('width',annCardW).attr('height',annClickH);
+      annClickYear.attr('x',cardX+18).attr('y',cardY+26).text(r.year);
+      annClickVal.attr('x',cardX+18).attr('y',cardY+80).text(METRICS[cmetric].fmt(r.val));
+      annClickLbl.attr('x',cardX+18).attr('y',cardY+106).text(METRICS[cmetric].label.toUpperCase());
+      annClickHint.attr('x',cardX+18).attr('y',cardY+126);
+      annClickCard.raise().style('opacity',1);
+    })
     .on('mouseover', function(event, r) {
+      if (r.year === annClickedYear) return;
       const bx = parseFloat(d3.select(this).attr('x'));
       const by = parseFloat(d3.select(this).attr('y'));
       const cx = bx + x.bandwidth() / 2;
+      let deltaText = null;
+      if (annClickedYear && annClickedYear !== r.year) {
+        const pinnedRow = rows.find(p => p.year === annClickedYear);
+        if (pinnedRow && pinnedRow.val != null && r.val != null && pinnedRow.val !== 0) {
+          if (_aIsYOY) {
+            const diff = r.val - pinnedRow.val;
+            deltaText = (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'pp from ' + annClickedYear;
+          } else {
+            const pct = ((r.val - pinnedRow.val) / Math.abs(pinnedRow.val)) * 100;
+            deltaText = (pct >= 0 ? '▲ ' : '▼ ') + Math.abs(pct).toFixed(1) + '% from ' + annClickedYear;
+          }
+        }
+      }
+      const curCardH = deltaText ? 165 : 125;
       const cardX = cx + annCardW + 10 > iw ? cx - annCardW - 10 : cx + 10;
-      const cardY = Math.max(0, Math.min(by - 10, ih - annCardH));
-      annHoverRect.attr('x',cardX).attr('y',cardY).attr('width',annCardW).attr('height',annCardH);
+      const cardY = Math.max(0, Math.min(by - 10, ih - curCardH));
+      annHoverRect.attr('x',cardX).attr('y',cardY).attr('width',annCardW).attr('height',curCardH);
       annHoverYear.attr('x',cardX+18).attr('y',cardY+28).text(r.year);
       annHoverVal.attr('x',cardX+18).attr('y',cardY+82).text(METRICS[cmetric].fmt(r.val));
       annHoverLbl.attr('x',cardX+18).attr('y',cardY+112).text(METRICS[cmetric].label.toUpperCase());
+      if (deltaText) {
+        const isNeg = deltaText.startsWith('▼') || deltaText.startsWith('-');
+        annHoverDelta.attr('x',cardX+18).attr('y',cardY+148).text(deltaText)
+          .attr('fill', isNeg ? '#c0392b' : '#1a5296').style('opacity',1);
+      } else {
+        annHoverDelta.style('opacity',0);
+      }
       annHoverCard.raise().style('opacity',1);
     })
     .on('mouseout', function() { annHoverCard.style('opacity',0); });
@@ -2787,3 +2898,4 @@ document.addEventListener('change', function(e){
 })();
 
 </script>
+
