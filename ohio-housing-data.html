@@ -242,6 +242,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="property_tax_rate">Tax Rate</option>
     <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
     <option value="sf_permits_per_1k">SF Permits / 1K</option>
+    <option value="mf_permits_per_1k">MF Permits / 1K</option>
     <option value="total_permits_per_1k">Total Permits / 1K</option>
   </select>
 </div>
@@ -256,6 +257,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
     <button class="metric-btn yoy-btn" data-metric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Single-family permits per 1,000 residents</span></button>
+    <button class="metric-btn" data-metric="mf_permits_per_1k"><span class="mn">MF Permits / 1K</span><span class="md">Multifamily permits per 1,000 residents</span></button>
     <button class="metric-btn" data-metric="total_permits_per_1k"><span class="mn">Total Permits / 1K</span><span class="md">All permits per 1,000 residents</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Demand</div>
     <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
@@ -349,6 +351,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="property_tax_rate">Tax Rate</option>
           <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
           <option value="sf_permits_per_1k">SF Permits / 1K</option>
+          <option value="mf_permits_per_1k">MF Permits / 1K</option>
           <option value="total_permits_per_1k">Total Permits / 1K</option>
         </select>
         <div class="chart-tabs" id="chart-tabs">
@@ -359,6 +362,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab" data-cmetric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 2000–2024</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="mf_permits_per_1k"><span class="mn">MF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 2000–2024</span></button>
           <button class="metric-btn chart-tab" data-cmetric="total_permits_per_1k"><span class="mn">Total Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 2000–2024</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Demand</div>
           <button class="metric-btn chart-tab" data-cmetric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
@@ -426,6 +430,7 @@ const METRICS = {
   property_tax_rate:  {label:'Effective Tax Rate',  fmt:v=>v.toFixed(2)+'%',               lo:'Lower', hi:'Higher'},
   property_tax_rate_yoy:{label:'Tax Rate YOY %',fmt:v=>v.toFixed(1)+'%',               lo:'Declining',hi:'Growing'},
   sf_permits_per_1k:   {label:'SF Permits per 1K',    fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
+  mf_permits_per_1k:   {label:'MF Permits per 1K',    fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
   total_permits_per_1k:{label:'Total Permits per 1K', fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
 };
 const YOY_METRICS = new Set(['zhvi_yoy','active_listings_yoy','pending_listings_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy']);
@@ -716,7 +721,7 @@ function fmtAxisCompact(cmetric) {
     }
     if (cmetric==='price_reduced_pct'||cmetric==='property_tax_rate') return v.toFixed(1)+'%';
     if (cmetric==='days_on_market') return v+'d';
-    if (cmetric==='sf_permits_per_1k'||cmetric==='total_permits_per_1k') return v.toFixed(1);
+    if (cmetric==='sf_permits_per_1k'||cmetric==='mf_permits_per_1k'||cmetric==='total_permits_per_1k') return v.toFixed(1);
     if (Math.abs(v)>=1000) return d3.format('.2s')(v).replace('k','K');
     return v;
   };
@@ -989,8 +994,8 @@ function renderChart(county, cmetric) {
     // Annual ACS data — convert prop_tax_history to have date field
     const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
     drawAnnualBarChart(county, cmetric, taxHist, false);
-  } else if (cmetric === 'sf_permits_per_1k' || cmetric === 'total_permits_per_1k') {
-    const field = cmetric === 'sf_permits_per_1k' ? 'sf_per_1k' : 'total_per_1k';
+  } else if (cmetric === 'sf_permits_per_1k' || cmetric === 'mf_permits_per_1k' || cmetric === 'total_permits_per_1k') {
+    const field = cmetric === 'sf_permits_per_1k' ? 'sf_per_1k' : cmetric === 'mf_permits_per_1k' ? 'mf_per_1k' : 'total_per_1k';
     const doRenderPermit = (ph) => {
       const rows = ph.map(r => ({...r, [cmetric]: r[field], date: r.year + '-06'}));
       drawAnnualBarChart(county, cmetric, rows, false);
