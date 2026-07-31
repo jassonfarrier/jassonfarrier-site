@@ -1486,12 +1486,10 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   let allRowsFull = d.history.filter(r => r[cmetric] != null);
   allRowsFull.forEach(r => { if (r.date && r.date.length > 7) r.date = r.date.slice(0, 7); });
   allRowsFull.sort((a,b) => a.date < b.date ? -1 : 1);
-  const rows = _sliderFilter
-    ? allRowsFull.filter(r => {
-        const yr = parseInt(r.date.slice(0,4));
-        return yr >= chartSliderStartYr && yr <= chartSliderEndYr;
-      })
-    : allRowsFull;
+  const rows = allRowsFull.filter(r => {
+    const yr = parseInt(r.date.slice(0,4));
+    return yr >= chartSliderStartYr && yr <= chartSliderEndYr;
+  });
 
   const startYr = rows.length ? rows[0].date.slice(0,4) : '';
   const endYr = rows.length ? rows[rows.length-1].date.slice(0,4) : '';
