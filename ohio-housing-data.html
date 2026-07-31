@@ -511,6 +511,7 @@ function attachYOY(d) {
 
 const PALETTE_NORM  = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d1e5f0','#92c5de','#4393c3','#2166ac'];
 const PALETTE_INV   = ['#2166ac','#4393c3','#92c5de','#d1e5f0','#f7f7f7','#fddbc7','#f4a582','#d6604d','#b2182b'];
+const PALETTE_DIST  = ['#fff5f0','#fee0d2','#fcbba1','#fc9272','#fb6a4a','#ef3b2c','#cb181d','#a50f15','#67000d'];
 
 
 
@@ -629,7 +630,8 @@ function renderColors(mode) {
   const isYOY = YOY_METRICS.has(metric);
   const isInverse = !isYOY && (metric === 'days_on_market' || metric === 'price_reduced_pct' ||
                     metric === 'median_property_tax' || metric === 'property_tax_rate');
-  const palette = isInverse ? PALETTE_INV : PALETTE_NORM;
+  const isDistress = DISTRESS_METRICS.has(metric);
+  const palette = isDistress ? PALETTE_DIST : (isInverse ? PALETTE_INV : PALETTE_NORM);
 
   // Always update legend labels when metric changes
   document.getElementById('leg-lo').textContent = METRICS[metric].lo;
@@ -1469,6 +1471,7 @@ function paletteForMetric(metric) {
     metric === 'days_on_market' || metric === 'price_reduced_pct' ||
     metric === 'median_property_tax' || metric === 'property_tax_rate'
   );
+  if (DISTRESS_METRICS.has(m)) return PALETTE_DIST;
   return isInv ? PALETTE_INV : PALETTE_NORM;
 }
 
