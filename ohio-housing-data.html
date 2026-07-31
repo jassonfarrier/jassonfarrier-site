@@ -159,30 +159,6 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   .upper-third-source{font-size:10px!important;margin-left:4px}
   #chart-slider-wrap{padding-left:16px!important}
 }
-  #search-bar{min-width:calc(100vw - 32px);left:16px;transform:none;top:10px;flex-wrap:wrap;padding:6px 10px;gap:6px}
-  .mode-pills{width:100%;display:flex;overflow-x:auto;gap:4px;padding-bottom:2px;scrollbar-width:none}
-  .mode-pills::-webkit-scrollbar{display:none}
-  .mode-pill{flex-shrink:0;padding:4px 10px;font-size:10px}
-  #modal-wrapper{width:100vw}
-  #modal{padding:10px 12px;height:92vh;border-radius:10px}
-  .modal-header{flex-wrap:wrap;gap:8px;margin-bottom:8px}
-  .modal-county{font-size:13px!important;white-space:normal!important}
-  .modal-sub{font-size:11px!important}
-  .close-btn{align-self:flex-start}
-  .modal-body{flex-direction:column;gap:8px;overflow-y:auto}
-  .modal-left{width:100%;display:flex;flex-direction:row;flex-wrap:nowrap;overflow-x:auto;gap:5px;padding-bottom:4px;scrollbar-width:none;flex-shrink:0}
-  .modal-left::-webkit-scrollbar{display:none}
-  .chart-label{display:none}
-  .chart-tabs{flex-direction:row;flex-wrap:nowrap;gap:5px;overflow-x:auto}
-  .chart-tabs .metric-btn{flex:0 0 auto;white-space:nowrap;font-size:10px;padding:5px 10px}
-  .modal-right{flex:1;min-height:0}
-  .upper-third{font-size:11px!important;padding:8px 12px;flex-wrap:wrap;gap:2px;overflow:hidden}
-  .upper-third-county{font-size:13px!important;white-space:normal;letter-spacing:0.02em}
-  .upper-third-sep{margin:0 6px;font-size:13px}
-  .upper-third-metric{font-size:12px!important;white-space:normal;letter-spacing:0.02em}
-  .upper-third-source{font-size:10px!important;margin-left:4px}
-  #chart-slider-wrap{padding-left:16px!important}
-}
 
 #search-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:20;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.13);box-shadow:0 4px 20px rgba(0,0,0,0.13);display:flex;align-items:center;padding:0 12px;gap:8px;min-width:420px}.mode-pills{display:flex;gap:4px;margin-left:6px;flex-shrink:0}.mode-pill{background:transparent;border:1px solid rgba(0,0,0,0.15);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;font-family:Montserrat,sans-serif;color:rgba(0,0,0,0.4);cursor:pointer;transition:all .2s;white-space:nowrap}.mode-pill.active{background:#1a5296;color:#fff;border-color:#0D1E42}.mode-pill:hover:not(.active){background:#edf2fb;color:#0D1E42;border-color:rgba(26,82,150,0.3)}
 #search-input{flex:1;border:none;outline:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:#0D1E42;padding:12px 0;background:transparent}
@@ -1010,7 +986,7 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
 });
 
 // Load data + init map
-fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=*&order=county', {
+fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fips,county,latest,history,prop_tax_history&order=county', {
   headers: {
     'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI',
     'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI'
