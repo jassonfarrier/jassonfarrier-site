@@ -1843,8 +1843,8 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
   g.selectAll('.alc-lbl').data(rows.filter(r=>labelSet.has(r.date.slice(0,4)))).join('text')
     .attr('class','alc-lbl')
     .attr('x', r=>x(r.date.slice(0,4)))
-    .attr('y', r=>y(r[cmetric])-12)
-    .attr('text-anchor','middle').attr('font-size','10px').attr('font-weight','900')
+    .attr('y', r=>y(r[cmetric])-13)
+    .attr('text-anchor','middle').attr('font-size','11.5px').attr('font-weight','900')
     .attr('font-family','Montserrat,sans-serif').attr('fill','#0d1e42')
     .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','2.5px').style('stroke-linejoin','round')
     .text(r=>fmtC(r[cmetric]));
