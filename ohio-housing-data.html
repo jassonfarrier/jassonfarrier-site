@@ -998,7 +998,7 @@ function renderChart(county, cmetric) {
     const field = cmetric === 'sf_permits_per_1k' ? 'sf_per_1k' : cmetric === 'mf_permits_per_1k' ? 'mf_per_1k' : 'total_per_1k';
     const doRenderPermit = (ph) => {
       const rows = ph.map(r => ({...r, [cmetric]: r[field], date: r.year + '-06'}));
-      drawAnnualBarChart(county, cmetric, rows, false);
+      drawMonthlyBarChart(county, cmetric, rows, false);
     };
     if (d.permit_history) {
       doRenderPermit(d.permit_history);
@@ -1510,7 +1510,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const x = d3.scaleTime()
     .domain(d3.extent(rows, r=>parseDate(r.date)))
     .range([0, iw]);
-  const isZeroBased = !YOY_METRICS.has(cmetric) && (cmetric==='active_listings'||cmetric==='pending_listings'||cmetric==='price_reduced_pct'||cmetric==='property_tax_rate');
+  const isZeroBased = !YOY_METRICS.has(cmetric) && (cmetric==='active_listings'||cmetric==='pending_listings'||cmetric==='price_reduced_pct'||cmetric==='property_tax_rate'||cmetric==='sf_permits_per_1k'||cmetric==='mf_permits_per_1k'||cmetric==='total_permits_per_1k');
   const _isYOY = YOY_METRICS.has(cmetric);
   const _minVal = d3.min(rows, r=>r[cmetric]);
   const _maxVal = d3.max(rows, r=>r[cmetric]);
