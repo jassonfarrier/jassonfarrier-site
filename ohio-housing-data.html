@@ -1503,6 +1503,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
 
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
+  lsvg.on('click', null); // clear any stale click handler from a previous chart
   const W = lsvg.node().getBoundingClientRect().width || 760;
   const H = lsvg.node().clientHeight || 600;
   const m = {top:28, right:48, bottom:36, left:90};
@@ -1785,6 +1786,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
 
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
+  lsvg.on('click', null); // clear any stale click handler from a previous chart
   const W = lsvg.node().getBoundingClientRect().width || 760;
   const H = lsvg.node().clientHeight || 600;
   const m = {top:28, right:48, bottom:36, left:90};
@@ -1868,6 +1870,8 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
   // Click-to-pin + delta hover
   let alcClickedYear = null;
   _dismissClickCard = () => { alcClickCard.style('opacity',0); alcClickedYear = null; g.selectAll('.alc-dot').attr('r',4.5).attr('stroke-width',2); };
+  // Clicking SVG background (margins/axes area) dismisses pin
+  lsvg.on('click', function() { _dismissClickCard(); });
 
   // Click card (pinned — dark)
   const alcClickCard = g.append('g').style('opacity',0);
@@ -1895,6 +1899,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
   // Transparent overlay catches all mouse events across full chart area
   g.append('rect').attr('width',iw).attr('height',ih).attr('fill','transparent')
     .on('click', function(event) {
+      event.stopPropagation();
       const [mx] = d3.pointer(event);
       let nearest = rows[0], minDist = Infinity;
       rows.forEach(r => { const dist = Math.abs(x(r.date.slice(0,4)) - mx); if (dist < minDist) { minDist = dist; nearest = r; } });
@@ -1972,6 +1977,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
 
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
+  lsvg.on('click', null); // clear any stale click handler from a previous chart
   const W = lsvg.node().getBoundingClientRect().width || 760;
   const H = lsvg.node().clientHeight || 600;
   const m = {top:28, right:48, bottom:36, left:90};
