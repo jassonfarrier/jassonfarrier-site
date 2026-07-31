@@ -271,6 +271,13 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
     <button class="metric-btn yoy-btn" data-metric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Distress</div>
+    <button class="metric-btn" data-metric="distress_pct"><span class="mn">Distress %</span><span class="md">Pre-FC + REO + Upside Down (PropStream)</span></button>
+    <button class="metric-btn" data-metric="pre_fc"><span class="mn">Pre-Foreclosure</span><span class="md">Properties in pre-foreclosure stage</span></button>
+    <button class="metric-btn" data-metric="bank_owned"><span class="mn">Bank Owned (REO)</span><span class="md">Bank-owned / REO properties</span></button>
+    <button class="metric-btn" data-metric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">Tax delinquent properties</span></button>
+    <button class="metric-btn" data-metric="upside_down"><span class="mn">Upside Down</span><span class="md">Properties with negative equity</span></button>
+    <button class="metric-btn" data-metric="vacant"><span class="mn">Vacant</span><span class="md">Vacant properties (PropStream)</span></button>
     <hr>
     <div style="padding:6px 3px 0;"><label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;font-family:Montserrat,sans-serif"><input type="checkbox" id="dc-toggle" style="cursor:pointer;accent-color:#0d1e42"> Data Centers</label></div>
 
@@ -353,6 +360,12 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="sf_permits_per_1k">SF Permits / 1K</option>
           <option value="mf_permits_per_1k">MF Permits / 1K</option>
           <option value="total_permits_per_1k">Total Permits / 1K</option>
+          <option value="distress_pct">Distress %</option>
+          <option value="pre_fc">Pre-Foreclosure</option>
+          <option value="bank_owned">Bank Owned (REO)</option>
+          <option value="tax_delinquent">Tax Delinquent</option>
+          <option value="upside_down">Upside Down</option>
+          <option value="vacant">Vacant</option>
         </select>
         <div class="chart-tabs" id="chart-tabs">
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Prices</div>
@@ -376,10 +389,25 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Distress</div>
+          <button class="metric-btn chart-tab" data-cmetric="distress_pct"><span class="mn">Distress %</span><span class="md">PropStream · Jun–Jul 2026</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="pre_fc"><span class="mn">Pre-Foreclosure</span><span class="md">PropStream · Jun–Jul 2026</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="bank_owned"><span class="mn">Bank Owned (REO)</span><span class="md">PropStream · Jun–Jul 2026</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">PropStream · Jun–Jul 2026</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="upside_down"><span class="mn">Upside Down</span><span class="md">PropStream · Jun–Jul 2026</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="vacant"><span class="mn">Vacant</span><span class="md">PropStream · Jul 2026</span></button>
           
         </div>
       </div>
       <div class="modal-right">
+        <div id="distress-snapshot" style="display:none;flex-wrap:wrap;gap:8px;padding:10px 0 10px;border-bottom:1px solid rgba(0,0,0,0.07);margin-bottom:8px;">
+          <div class="snap-card"><div class="snap-val" id="s-distress-pct">—</div><div class="snap-lbl">Distress %</div><div id="s-distress-pct-mom" style="font-size:10px;font-weight:600;margin-top:3px;"></div></div>
+          <div class="snap-card"><div class="snap-val" id="s-pre-fc">—</div><div class="snap-lbl">Pre-FC</div><div id="s-pre-fc-mom" style="font-size:10px;font-weight:600;margin-top:3px;"></div></div>
+          <div class="snap-card"><div class="snap-val" id="s-bank-owned">—</div><div class="snap-lbl">REO</div><div id="s-bank-owned-mom" style="font-size:10px;font-weight:600;margin-top:3px;"></div></div>
+          <div class="snap-card"><div class="snap-val" id="s-upside-down">—</div><div class="snap-lbl">Upside Down</div><div id="s-upside-down-mom" style="font-size:10px;font-weight:600;margin-top:3px;"></div></div>
+          <div class="snap-card"><div class="snap-val" id="s-tax-delinquent">—</div><div class="snap-lbl">Tax Delinq.</div><div id="s-tax-delinquent-mom" style="font-size:10px;font-weight:600;margin-top:3px;"></div></div>
+          <div class="snap-card"><div class="snap-val" id="s-vacant">—</div><div class="snap-lbl">Vacant</div></div>
+        </div>
         <div class="upper-third" id="upper-third">
           <span class="upper-third-county" id="ut-county"></span>
           <span class="upper-third-sep">·</span>
@@ -432,10 +460,18 @@ const METRICS = {
   sf_permits_per_1k:   {label:'SF Permits per 1K',    fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
   mf_permits_per_1k:   {label:'MF Permits per 1K',    fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
   total_permits_per_1k:{label:'Total Permits per 1K', fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
+  distress_pct:   {label:'Distress %',       fmt:v=>v.toFixed(2)+'%',             lo:'Lower', hi:'Higher'},
+  pre_fc:         {label:'Pre-Foreclosure',  fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
+  bank_owned:     {label:'Bank Owned (REO)', fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
+  tax_delinquent: {label:'Tax Delinquent',   fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
+  upside_down:    {label:'Upside Down',      fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
+  vacant:         {label:'Vacant',           fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
+  tax_del_pct:    {label:'Tax Delinquent %', fmt:v=>v.toFixed(2)+'%',             lo:'Lower', hi:'Higher'},
 };
 const YOY_METRICS = new Set(['zhvi_yoy','active_listings_yoy','pending_listings_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy']);
 const YOY_BASE = {zhvi_yoy:'zhvi', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
+const DISTRESS_METRICS = new Set(['distress_pct','pre_fc','bank_owned','tax_delinquent','upside_down','vacant','tax_del_pct']);
 
 const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
 
@@ -734,6 +770,7 @@ function sourceForMetric(m) {
   if (base==='zhvi') return '<a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Zillow</a>';
   if (base==='median_property_tax'||base==='property_tax_rate') return '<a href="https://data.census.gov/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census ACS</a>';
   if (base==='sf_permits_per_1k'||base==='mf_permits_per_1k'||base==='total_permits_per_1k') return '<a href="https://www.census.gov/construction/bps/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census BPS</a>';
+  if (DISTRESS_METRICS.has(base)) return '<a href="https://www.propstream.com/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">PropStream</a>';
   return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
 }
 function setAttrHeader(chips, metric) {
@@ -763,6 +800,32 @@ function openModal(county) {
     const sorted = [...DATA].filter(c=>c.latest&&c.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
   const rank = sorted.findIndex(c=>c.county===county)+1;
   (document.getElementById('s-rank')||{}).textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
+  // Distress snapshot panel
+  const _dSnap = document.getElementById('distress-snapshot');
+  if (_dSnap) {
+    if (l.distress_pct != null) {
+      _dSnap.style.display = 'flex';
+      const fmtMom = (v, isCt) => {
+        if (v == null) return '';
+        const sign = v > 0 ? '+' : '';
+        const txt = isCt ? sign+Math.round(v).toLocaleString() : sign+v.toFixed(2)+'%';
+        return '<span style="color:'+(v > 0 ? '#dc2626' : v < 0 ? '#15803d' : '#888')+'">'+txt+' MoM</span>';
+      };
+      document.getElementById('s-distress-pct').textContent = l.distress_pct != null ? l.distress_pct.toFixed(2)+'%' : '—';
+      document.getElementById('s-distress-pct-mom').innerHTML = fmtMom(l.distress_pct_mom, false);
+      document.getElementById('s-pre-fc').textContent = l.pre_fc != null ? l.pre_fc.toLocaleString() : '—';
+      document.getElementById('s-pre-fc-mom').innerHTML = fmtMom(l.pre_fc_mom, true);
+      document.getElementById('s-bank-owned').textContent = l.bank_owned != null ? l.bank_owned.toLocaleString() : '—';
+      document.getElementById('s-bank-owned-mom').innerHTML = fmtMom(l.bank_owned_mom, true);
+      document.getElementById('s-upside-down').textContent = l.upside_down != null ? l.upside_down.toLocaleString() : '—';
+      document.getElementById('s-upside-down-mom').innerHTML = fmtMom(l.upside_down_mom, true);
+      document.getElementById('s-tax-delinquent').textContent = l.tax_delinquent != null ? l.tax_delinquent.toLocaleString() : '—';
+      document.getElementById('s-tax-delinquent-mom').innerHTML = fmtMom(l.tax_delinquent_mom, true);
+      document.getElementById('s-vacant').textContent = l.vacant != null ? l.vacant.toLocaleString() : '—';
+    } else {
+      _dSnap.style.display = 'none';
+    }
+  }
   // Default chart to current map metric
   const defaultMetric = mapMetric;
   document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
@@ -1016,6 +1079,26 @@ function renderChart(county, cmetric) {
         if (rows[0] && rows[0].permit_history) {
           d.permit_history = rows[0].permit_history;
           doRenderPermit(d.permit_history);
+        }
+      });
+    }
+  } else if (DISTRESS_METRICS.has(cmetric)) {
+    const doRenderDistress = (dh) => {
+      const rows = dh.map(r => ({...r, date: r.month})).filter(r => r[cmetric] != null);
+      drawMonthlyBarChart(county, cmetric, rows, false);
+    };
+    if (d.distress_history) {
+      doRenderDistress(d.distress_history);
+    } else {
+      fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fips,distress_history&fips=eq.' + d.fips, {
+        headers: {
+          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI'
+        }
+      }).then(r => r.json()).then(rows => {
+        if (rows[0] && rows[0].distress_history) {
+          d.distress_history = rows[0].distress_history;
+          doRenderDistress(d.distress_history);
         }
       });
     }
@@ -1515,7 +1598,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const x = d3.scaleTime()
     .domain(d3.extent(rows, r=>parseDate(r.date)))
     .range([0, iw]);
-  const isZeroBased = !YOY_METRICS.has(cmetric) && (cmetric==='active_listings'||cmetric==='pending_listings'||cmetric==='price_reduced_pct'||cmetric==='property_tax_rate'||cmetric==='sf_permits_per_1k'||cmetric==='mf_permits_per_1k'||cmetric==='total_permits_per_1k');
+  const isZeroBased = !YOY_METRICS.has(cmetric) && (cmetric==='active_listings'||cmetric==='pending_listings'||cmetric==='price_reduced_pct'||cmetric==='property_tax_rate'||cmetric==='sf_permits_per_1k'||cmetric==='mf_permits_per_1k'||cmetric==='total_permits_per_1k'||DISTRESS_METRICS.has(cmetric));
   const _isYOY = YOY_METRICS.has(cmetric);
   const _minVal = d3.min(rows, r=>r[cmetric]);
   const _maxVal = d3.max(rows, r=>r[cmetric]);
