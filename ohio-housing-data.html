@@ -1084,8 +1084,72 @@ function renderChart(county, cmetric) {
     }
   } else if (DISTRESS_METRICS.has(cmetric)) {
     const doRenderDistress = (dh) => {
-      const rows = dh.map(r => ({...r, date: r.month})).filter(r => r[cmetric] != null);
-      drawMonthlyBarChart(county, cmetric, rows, false);
+      const sliderWrap = document.getElementById('chart-slider-wrap');
+      if (sliderWrap) sliderWrap.style.display = 'none';
+      const MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const rows = dh
+        .map(r => {
+          const [yr, mo] = r.month.split('-');
+          return {label: MNAMES[parseInt(mo)-1]+' '+yr, val: r[cmetric]};
+        })
+        .filter(r => r.val != null);
+      if (!rows.length) return;
+      const suffix = ' County';
+      document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + suffix;
+      const utm = document.getElementById('ut-metric'); if (utm) utm.textContent = METRICS[cmetric].label;
+      const lsvg = d3.select('#line-chart');
+      lsvg.selectAll('*').remove();
+      lsvg.on('click', null);
+      const W = lsvg.node().getBoundingClientRect().width || 760;
+      const H = lsvg.node().clientHeight || 600;
+      const m = {top:40, right:48, bottom:44, left:90};
+      const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
+      const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
+      const x = d3.scaleBand().domain(rows.map(r=>r.label)).range([0,iw]).padding(0.5);
+      const maxV = d3.max(rows, r=>r.val);
+      const y = d3.scaleLinear().domain([0, maxV * 1.25]).range([ih, 0]);
+      y.ticks(5).forEach(t=>{
+        g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t))
+          .attr('stroke','rgba(0,0,0,0.1)').attr('stroke-width',1);
+      });
+      g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(v=>METRICS[cmetric].fmt(v)))
+        .call(ax=>ax.select('.domain').remove())
+        .call(ax=>ax.selectAll('.tick line').remove())
+        .call(ax=>ax.selectAll('text').attr('font-family','Montserrat').attr('font-size','11px').attr('fill','rgba(0,0,0,0.45)'));
+      g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).tickSize(0))
+        .call(ax=>ax.select('.domain').remove())
+        .call(ax=>ax.selectAll('text').attr('font-family','Montserrat').attr('font-size','13px').attr('font-weight','700').attr('fill','#0d1e42').attr('dy','1.5em'));
+      const barColors = rows.map((_,i) => i === rows.length-1 ? '#0d1e42' : 'rgba(13,30,66,0.22)');
+      g.selectAll('.bar').data(rows).join('rect').attr('class','bar')
+        .attr('x',r=>x(r.label)).attr('y',r=>y(r.val))
+        .attr('width',x.bandwidth()).attr('height',r=>ih-y(r.val))
+        .attr('rx',5).attr('fill',(_,i)=>barColors[i])
+        .attr('stroke','#fff').attr('stroke-width',1.5);
+      g.selectAll('.barlbl').data(rows).join('text').attr('class','barlbl')
+        .attr('x',r=>x(r.label)+x.bandwidth()/2).attr('y',r=>y(r.val)-10)
+        .attr('text-anchor','middle').attr('font-size','13px').attr('font-weight','900')
+        .attr('font-family','Montserrat').attr('fill','#1a1a2e')
+        .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','3px').style('stroke-linejoin','round')
+        .text(r=>METRICS[cmetric].fmt(r.val));
+      if (rows.length >= 2) {
+        const delta = rows[rows.length-1].val - rows[rows.length-2].val;
+        const sign = delta >= 0 ? '+' : '';
+        const color = delta > 0 ? '#dc2626' : delta < 0 ? '#15803d' : '#888';
+        const midX = iw / 2;
+        const midY = ih * 0.35;
+        g.append('text').attr('x',midX).attr('y',midY)
+          .attr('text-anchor','middle').attr('font-size','22px').attr('font-weight','900')
+          .attr('font-family','Montserrat').attr('fill',color)
+          .text(sign + METRICS[cmetric].fmt(delta) + ' MoM');
+        const pct = rows[rows.length-2].val !== 0
+          ? ((delta/Math.abs(rows[rows.length-2].val))*100).toFixed(1) : null;
+        if (pct) {
+          g.append('text').attr('x',midX).attr('y',midY+24)
+            .attr('text-anchor','middle').attr('font-size','13px').attr('font-weight','700')
+            .attr('font-family','Montserrat').attr('fill',color)
+            .text('('+sign+pct+'%)');
+        }
+      }
     };
     if (d.distress_history) {
       doRenderDistress(d.distress_history);
