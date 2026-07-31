@@ -400,14 +400,6 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
         </div>
       </div>
       <div class="modal-right">
-        <div id="distress-snapshot" style="display:none;flex-wrap:wrap;gap:8px;padding:10px 0 10px;border-bottom:1px solid rgba(0,0,0,0.07);margin-bottom:8px;">
-          <div class="snap-card"><div class="snap-val" id="s-distress-pct">—</div><div class="snap-lbl">Distress %</div><div id="s-distress-pct-mom" style="font-size:10px;font-weight:600;margin-top:3px;"></div></div>
-          <div class="snap-card"><div class="snap-val" id="s-pre-fc">—</div><div class="snap-lbl">Pre-FC</div><div id="s-pre-fc-mom" style="font-size:10px;font-weight:600;margin-top:3px;"></div></div>
-          <div class="snap-card"><div class="snap-val" id="s-bank-owned">—</div><div class="snap-lbl">REO</div><div id="s-bank-owned-mom" style="font-size:10px;font-weight:600;margin-top:3px;"></div></div>
-          <div class="snap-card"><div class="snap-val" id="s-upside-down">—</div><div class="snap-lbl">Upside Down</div><div id="s-upside-down-mom" style="font-size:10px;font-weight:600;margin-top:3px;"></div></div>
-          <div class="snap-card"><div class="snap-val" id="s-tax-delinquent">—</div><div class="snap-lbl">Tax Delinq.</div><div id="s-tax-delinquent-mom" style="font-size:10px;font-weight:600;margin-top:3px;"></div></div>
-          <div class="snap-card"><div class="snap-val" id="s-vacant">—</div><div class="snap-lbl">Vacant</div></div>
-        </div>
         <div class="upper-third" id="upper-third">
           <span class="upper-third-county" id="ut-county"></span>
           <span class="upper-third-sep">·</span>
@@ -800,32 +792,6 @@ function openModal(county) {
     const sorted = [...DATA].filter(c=>c.latest&&c.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
   const rank = sorted.findIndex(c=>c.county===county)+1;
   (document.getElementById('s-rank')||{}).textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
-  // Distress snapshot panel
-  const _dSnap = document.getElementById('distress-snapshot');
-  if (_dSnap) {
-    if (l.distress_pct != null) {
-      _dSnap.style.display = 'flex';
-      const fmtMom = (v, isCt) => {
-        if (v == null) return '';
-        const sign = v > 0 ? '+' : '';
-        const txt = isCt ? sign+Math.round(v).toLocaleString() : sign+v.toFixed(2)+'%';
-        return '<span style="color:'+(v > 0 ? '#dc2626' : v < 0 ? '#15803d' : '#888')+'">'+txt+' MoM</span>';
-      };
-      document.getElementById('s-distress-pct').textContent = l.distress_pct != null ? l.distress_pct.toFixed(2)+'%' : '—';
-      document.getElementById('s-distress-pct-mom').innerHTML = fmtMom(l.distress_pct_mom, false);
-      document.getElementById('s-pre-fc').textContent = l.pre_fc != null ? l.pre_fc.toLocaleString() : '—';
-      document.getElementById('s-pre-fc-mom').innerHTML = fmtMom(l.pre_fc_mom, true);
-      document.getElementById('s-bank-owned').textContent = l.bank_owned != null ? l.bank_owned.toLocaleString() : '—';
-      document.getElementById('s-bank-owned-mom').innerHTML = fmtMom(l.bank_owned_mom, true);
-      document.getElementById('s-upside-down').textContent = l.upside_down != null ? l.upside_down.toLocaleString() : '—';
-      document.getElementById('s-upside-down-mom').innerHTML = fmtMom(l.upside_down_mom, true);
-      document.getElementById('s-tax-delinquent').textContent = l.tax_delinquent != null ? l.tax_delinquent.toLocaleString() : '—';
-      document.getElementById('s-tax-delinquent-mom').innerHTML = fmtMom(l.tax_delinquent_mom, true);
-      document.getElementById('s-vacant').textContent = l.vacant != null ? l.vacant.toLocaleString() : '—';
-    } else {
-      _dSnap.style.display = 'none';
-    }
-  }
   // Default chart to current map metric
   const defaultMetric = mapMetric;
   document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
@@ -1131,25 +1097,6 @@ function renderChart(county, cmetric) {
         .attr('font-family','Montserrat').attr('fill','#1a1a2e')
         .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','3px').style('stroke-linejoin','round')
         .text(r=>METRICS[cmetric].fmt(r.val));
-      if (rows.length >= 2) {
-        const delta = rows[rows.length-1].val - rows[rows.length-2].val;
-        const sign = delta >= 0 ? '+' : '';
-        const color = delta > 0 ? '#dc2626' : delta < 0 ? '#15803d' : '#888';
-        const midX = iw / 2;
-        const midY = ih * 0.35;
-        g.append('text').attr('x',midX).attr('y',midY)
-          .attr('text-anchor','middle').attr('font-size','22px').attr('font-weight','900')
-          .attr('font-family','Montserrat').attr('fill',color)
-          .text(sign + METRICS[cmetric].fmt(delta) + ' MoM');
-        const pct = rows[rows.length-2].val !== 0
-          ? ((delta/Math.abs(rows[rows.length-2].val))*100).toFixed(1) : null;
-        if (pct) {
-          g.append('text').attr('x',midX).attr('y',midY+24)
-            .attr('text-anchor','middle').attr('font-size','13px').attr('font-weight','700')
-            .attr('font-family','Montserrat').attr('fill',color)
-            .text('('+sign+pct+'%)');
-        }
-      }
     };
     if (d.distress_history) {
       doRenderDistress(d.distress_history);
