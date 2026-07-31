@@ -272,12 +272,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn" data-metric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
     <button class="metric-btn yoy-btn" data-metric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Distress</div>
-    <button class="metric-btn" data-metric="distress_pct"><span class="mn">Distress %</span><span class="md">Pre-FC + REO + Upside Down (PropStream)</span></button>
-    <button class="metric-btn" data-metric="pre_fc"><span class="mn">Pre-Foreclosure</span><span class="md">Properties in pre-foreclosure stage</span></button>
-    <button class="metric-btn" data-metric="bank_owned"><span class="mn">Bank Owned (REO)</span><span class="md">Bank-owned / REO properties</span></button>
     <button class="metric-btn" data-metric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">Tax delinquent properties</span></button>
-    <button class="metric-btn" data-metric="upside_down"><span class="mn">Upside Down</span><span class="md">Properties with negative equity</span></button>
-    <button class="metric-btn" data-metric="vacant"><span class="mn">Vacant</span><span class="md">Vacant properties (PropStream)</span></button>
     <hr>
     <div style="padding:6px 3px 0;"><label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;font-family:Montserrat,sans-serif"><input type="checkbox" id="dc-toggle" style="cursor:pointer;accent-color:#0d1e42"> Data Centers</label></div>
 
@@ -360,12 +355,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="sf_permits_per_1k">SF Permits / 1K</option>
           <option value="mf_permits_per_1k">MF Permits / 1K</option>
           <option value="total_permits_per_1k">Total Permits / 1K</option>
-          <option value="distress_pct">Distress %</option>
-          <option value="pre_fc">Pre-Foreclosure</option>
-          <option value="bank_owned">Bank Owned (REO)</option>
           <option value="tax_delinquent">Tax Delinquent</option>
-          <option value="upside_down">Upside Down</option>
-          <option value="vacant">Vacant</option>
         </select>
         <div class="chart-tabs" id="chart-tabs">
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Prices</div>
@@ -390,12 +380,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab" data-cmetric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Distress</div>
-          <button class="metric-btn chart-tab" data-cmetric="distress_pct"><span class="mn">Distress %</span><span class="md">PropStream · Jun–Jul 2026</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="pre_fc"><span class="mn">Pre-Foreclosure</span><span class="md">PropStream · Jun–Jul 2026</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="bank_owned"><span class="mn">Bank Owned (REO)</span><span class="md">PropStream · Jun–Jul 2026</span></button>
           <button class="metric-btn chart-tab" data-cmetric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">PropStream · Jun–Jul 2026</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="upside_down"><span class="mn">Upside Down</span><span class="md">PropStream · Jun–Jul 2026</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="vacant"><span class="mn">Vacant</span><span class="md">PropStream · Jul 2026</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">PropStream · Jun–Jul 2026</span></button>
           
         </div>
       </div>
@@ -452,18 +438,13 @@ const METRICS = {
   sf_permits_per_1k:   {label:'SF Permits per 1K',    fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
   mf_permits_per_1k:   {label:'MF Permits per 1K',    fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
   total_permits_per_1k:{label:'Total Permits per 1K', fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
-  distress_pct:   {label:'Distress %',       fmt:v=>v.toFixed(2)+'%',             lo:'Lower', hi:'Higher'},
-  pre_fc:         {label:'Pre-Foreclosure',  fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
-  bank_owned:     {label:'Bank Owned (REO)', fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
   tax_delinquent: {label:'Tax Delinquent',   fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
-  upside_down:    {label:'Upside Down',      fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
-  vacant:         {label:'Vacant',           fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
   tax_del_pct:    {label:'Tax Delinquent %', fmt:v=>v.toFixed(2)+'%',             lo:'Lower', hi:'Higher'},
 };
 const YOY_METRICS = new Set(['zhvi_yoy','active_listings_yoy','pending_listings_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy']);
 const YOY_BASE = {zhvi_yoy:'zhvi', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
-const DISTRESS_METRICS = new Set(['distress_pct','pre_fc','bank_owned','tax_delinquent','upside_down','vacant','tax_del_pct']);
+const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct']);
 
 const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
 
