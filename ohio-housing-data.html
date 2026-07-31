@@ -1861,31 +1861,39 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
     .selectAll('text').attr('fill','rgba(0,0,0,0.65)').attr('font-size','12px')
     .attr('font-family','Montserrat').attr('dx','-8');
 
-  // Hover card
+  // Hover — full-area mousemove finds nearest dot (no tiny target to hit)
   const hoverDot = g.append('circle').attr('r',7).attr('fill','#1a5296').attr('stroke','#fff').attr('stroke-width',2.5)
     .style('opacity',0).style('pointer-events','none');
   const hoverCard = g.append('g').style('opacity',0).style('pointer-events','none');
   const hoverRect = hoverCard.append('rect').attr('rx',12).attr('fill','#fff')
     .attr('stroke','rgba(26,82,150,0.18)').attr('stroke-width',1.5)
-    .style('filter','drop-shadow(0 4px 12px rgba(0,0,0,0.13))');
+    .style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.18))');
   const hoverYear = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
   const hoverVal  = hoverCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
   const hoverLbl  = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
   const cardW = 220, cardH = 125;
 
-  g.selectAll('.alc-dot')
-    .on('mouseover', function(event, r) {
-      const cx = x(r.date.slice(0,4)), cy = y(r[cmetric]);
+  // Transparent overlay catches all mouse events across full chart area
+  g.append('rect').attr('width',iw).attr('height',ih).attr('fill','transparent')
+    .on('mousemove', function(event) {
+      const [mx] = d3.pointer(event);
+      // Find nearest year by comparing pixel distance
+      let nearest = rows[0], minDist = Infinity;
+      rows.forEach(r => {
+        const dist = Math.abs(x(r.date.slice(0,4)) - mx);
+        if (dist < minDist) { minDist = dist; nearest = r; }
+      });
+      const cx = x(nearest.date.slice(0,4)), cy = y(nearest[cmetric]);
       const cardX = cx + cardW + 10 > iw ? cx - cardW - 10 : cx + 10;
       const cardY = Math.max(0, Math.min(cy - 10, ih - cardH));
       hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',cardH);
-      hoverYear.attr('x',cardX+18).attr('y',cardY+28).text(moName + ' ' + r.date.slice(0,4));
-      hoverVal.attr('x',cardX+18).attr('y',cardY+82).text(METRICS[cmetric].fmt(r[cmetric]));
+      hoverYear.attr('x',cardX+18).attr('y',cardY+28).text(moName + ' ' + nearest.date.slice(0,4));
+      hoverVal.attr('x',cardX+18).attr('y',cardY+82).text(METRICS[cmetric].fmt(nearest[cmetric]));
       hoverLbl.attr('x',cardX+18).attr('y',cardY+112).text(METRICS[cmetric].label.toUpperCase());
       hoverDot.attr('cx',cx).attr('cy',cy).style('opacity',1);
       hoverCard.raise().style('opacity',1);
     })
-    .on('mouseout', function() { hoverCard.style('opacity',0); hoverDot.style('opacity',0); });
+    .on('mouseleave', function() { hoverCard.style('opacity',0); hoverDot.style('opacity',0); });
 }
 
 function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
