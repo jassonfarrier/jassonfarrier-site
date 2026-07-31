@@ -988,13 +988,7 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
       }
     } else if (mapMode === 'state' && STATE_DATA) {
       const d = STATE_DATA;
-      if (YOY_METRICS.has(cm)) {
-        drawMonthlyBarChart('Ohio', cm, getYOYRows(d, cm), true);
-      } else if (cm === 'median_property_tax' || cm === 'property_tax_rate') {
-        drawAnnualBarChart('Ohio', cm, [], true);
-      } else {
-        drawAnnualLineChart('Ohio', cm, d.history, true);
-      }
+      renderStateChart('Ohio', cm, d);
     } else if (selectedCounty) {
       renderChart(selectedCounty, cm);
     }
@@ -2484,7 +2478,7 @@ function openMetroModal(rid) {
 function loadStateData() {
   if (stateDataLoaded) { return; }
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
-  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_state?select=region_id,name,latest,history', {
+  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_state?select=region_id,name,latest,history,distress_history', {
     headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
   }).then(r=>r.json()).then(rows => {
     STATE_DATA = rows[0] || null;
@@ -2520,14 +2514,63 @@ function openStateModal() {
   setTimeout(() => {
     document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
     document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
-    if (YOY_METRICS.has(mapMetric)) {
-      drawMonthlyBarChart('Ohio', mapMetric, getYOYRows(d, mapMetric), true);
-    } else if (mapMetric === 'median_property_tax' || mapMetric === 'property_tax_rate') {
-      drawAnnualBarChart('Ohio', mapMetric, [], true);
-    } else {
-      drawAnnualLineChart('Ohio', mapMetric, d.history, true);
-    }
+    renderStateChart('Ohio', mapMetric, d);
   }, 30);
+}
+
+function renderStateChart(name, cmetric, d) {
+  if (YOY_METRICS.has(cmetric)) {
+    drawMonthlyBarChart(name, cmetric, getYOYRows(d, cmetric), true);
+  } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
+    drawAnnualBarChart(name, cmetric, [], true);
+  } else if (DISTRESS_METRICS.has(cmetric)) {
+    const dh = d.distress_history;
+    if (!dh || !dh.length) { d3.select('#line-chart').selectAll('*').remove(); return; }
+    const sliderWrap = document.getElementById('chart-slider-wrap');
+    if (sliderWrap) sliderWrap.style.display = 'none';
+    const MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const rows = dh
+      .map(r => { const [yr,mo]=r.month.split('-'); return {label:MNAMES[parseInt(mo)-1]+' '+yr, val:r[cmetric]}; })
+      .filter(r => r.val != null);
+    if (!rows.length) return;
+    document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — Ohio';
+    const utm = document.getElementById('ut-metric'); if (utm) utm.textContent = METRICS[cmetric].label;
+    const lsvg = d3.select('#line-chart');
+    lsvg.selectAll('*').remove(); lsvg.on('click', null);
+    const W = lsvg.node().getBoundingClientRect().width || 760;
+    const H = lsvg.node().clientHeight || 600;
+    const m = {top:40,right:48,bottom:44,left:90};
+    const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
+    const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
+    const x = d3.scaleBand().domain(rows.map(r=>r.label)).range([0,iw]).padding(0.5);
+    const maxV = d3.max(rows,r=>r.val);
+    const y = d3.scaleLinear().domain([0,maxV*1.25]).range([ih,0]);
+    y.ticks(5).forEach(t=>{
+      g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t))
+        .attr('stroke','rgba(0,0,0,0.1)').attr('stroke-width',1);
+    });
+    g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(v=>METRICS[cmetric].fmt(v)))
+      .call(ax=>ax.select('.domain').remove())
+      .call(ax=>ax.selectAll('.tick line').remove())
+      .call(ax=>ax.selectAll('text').attr('font-family','Montserrat').attr('font-size','11px').attr('fill','rgba(0,0,0,0.45)'));
+    g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).tickSize(0))
+      .call(ax=>ax.select('.domain').remove())
+      .call(ax=>ax.selectAll('text').attr('font-family','Montserrat').attr('font-size','13px').attr('font-weight','700').attr('fill','#0d1e42').attr('dy','1.5em'));
+    const barColors = rows.map((_,i)=>i===rows.length-1?'#0d1e42':'rgba(13,30,66,0.22)');
+    g.selectAll('.bar').data(rows).join('rect').attr('class','bar')
+      .attr('x',r=>x(r.label)).attr('y',r=>y(r.val))
+      .attr('width',x.bandwidth()).attr('height',r=>ih-y(r.val))
+      .attr('rx',5).attr('fill',(_,i)=>barColors[i])
+      .attr('stroke','#fff').attr('stroke-width',1.5);
+    g.selectAll('.barlbl').data(rows).join('text').attr('class','barlbl')
+      .attr('x',r=>x(r.label)+x.bandwidth()/2).attr('y',r=>y(r.val)-10)
+      .attr('text-anchor','middle').attr('font-size','13px').attr('font-weight','900')
+      .attr('font-family','Montserrat').attr('fill','#1a1a2e')
+      .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','3px').style('stroke-linejoin','round')
+      .text(r=>METRICS[cmetric].fmt(r.val));
+  } else {
+    drawAnnualLineChart(name, cmetric, d.history, true);
+  }
 }
 
 let zipGeoJSON = null;
