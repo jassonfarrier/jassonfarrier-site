@@ -400,7 +400,13 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <span class="upper-third-metric" id="ut-metric"></span>
           <span class="upper-third-source" id="ut-source"></span>
         </div>
-        <div id="pending-ratio-badge" style="display:none;font-family:Montserrat,sans-serif;font-size:11px;font-weight:700;color:#0d1e42;background:#dce8f7;border-radius:7px;padding:5px 12px;margin-bottom:8px;align-self:flex-start;letter-spacing:0.02em;">PENDING RATIO &nbsp;<span id="pending-ratio-val" style="font-weight:500;"></span></div>
+        <div id="pending-ratio-badge" style="display:none;font-family:Montserrat,sans-serif;background:#dce8f7;border-radius:9px;padding:10px 16px;margin-bottom:12px;">
+          <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:4px;">
+            <span style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(13,30,66,0.55);">Pending Ratio</span>
+            <span id="pending-ratio-val" style="font-size:28px;font-weight:800;color:#0d1e42;line-height:1;"></span>
+          </div>
+          <div style="font-size:11px;font-weight:500;color:rgba(13,30,66,0.6);line-height:1.4;">Pending sales &divide; active listings. Higher = more demand relative to supply.</div>
+        </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><button id="btn-record-high" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">RECORD HIGH</button></div>
         <svg id="line-chart"></svg>
         <div id="chart-slider-wrap" style="display:none;padding:10px 0 0 90px;box-sizing:border-box;">
