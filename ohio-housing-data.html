@@ -1020,7 +1020,7 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
         } else if (cm === 'median_property_tax' || cm === 'property_tax_rate') {
           drawAnnualBarChart(d.metro, cm, [], true);
         } else if (cm === 'pending_ratio') {
-          drawMonthlyBarChart(d.metro, cm, d.history, true);
+          drawAnnualLineChart(d.metro, cm, d.history, true);
         } else {
           drawAnnualLineChart(d.metro, cm, d.history, true);
         }
@@ -1146,7 +1146,7 @@ function renderChart(county, cmetric) {
         }
       });
     }
-  } else if (cmetric === 'zhvi' || cmetric === 'active_listings' || cmetric === 'pending_listings' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct') {
+  } else if (cmetric === 'zhvi' || cmetric === 'active_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct') {
     drawAnnualLineChart(county, cmetric);
   } else {
     drawMonthlyBarChart(county, cmetric);
@@ -2510,7 +2510,7 @@ function openMetroModal(rid) {
     } else if (mapMetric === 'median_property_tax' || mapMetric === 'property_tax_rate') {
       drawAnnualBarChart(d.metro, mapMetric, [], true);
     } else if (mapMetric === 'pending_ratio') {
-      drawMonthlyBarChart(d.metro, mapMetric, d.history, true);
+      drawAnnualLineChart(d.metro, mapMetric, d.history, true);
     } else {
       drawAnnualLineChart(d.metro, mapMetric, d.history, true);
     }
@@ -2613,7 +2613,7 @@ function renderStateChart(name, cmetric, d) {
       .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','3px').style('stroke-linejoin','round')
       .text(r=>METRICS[cmetric].fmt(r.val));
   } else if (cmetric === 'pending_ratio') {
-    drawMonthlyBarChart(name, cmetric, d.history, true);
+    drawAnnualLineChart(name, cmetric, d.history, true);
   } else {
     drawAnnualLineChart(name, cmetric, d.history, true);
   }
@@ -2762,7 +2762,7 @@ function _doRenderZipChart(zip, cmetric) {
     const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
     drawAnnualBarChart(zip, cmetric, taxHist, true);
   } else if (cmetric === 'pending_ratio') {
-    drawMonthlyBarChart(zip, cmetric, d.history, true);
+    drawAnnualLineChart(zip, cmetric, d.history, true);
   } else {
     drawAnnualLineChart(zip, cmetric, d.history, true);
   }
