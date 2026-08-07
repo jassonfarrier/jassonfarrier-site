@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ohio Housing Market Shifting Toward Buyers — Here's Where | Jasson Farrier</title>
+<meta name="description" content="Ohio's pending ratio has fallen to 0.76 — the lowest since before the pandemic. See which of Ohio's 88 counties have shifted toward buyers in 2026.">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+.page-header { background: #0D1E42; padding: 80px 64px 72px; }
+.page-header-inner { max-width: 760px; margin: 0 auto; }
+.page-header h1 { font-size: clamp(24px, 3.5vw, 42px); font-weight: 700; color: #fff; line-height: 1.2; margin: 20px 0 0; }
+.back-link { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); text-decoration: none; display: block; margin-bottom: 20px; letter-spacing: 0.5px; }
+.back-link:hover { color: #fff; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #9DA6AB; display: block; margin-bottom: 12px; }
+.article-byline { font-size: 13px; color: rgba(255,255,255,0.5); margin: 10px 0 4px; }
+.article-byline a { color: rgba(255,255,255,0.65) !important; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.2); }
+.article-date { font-size: 12px; color: rgba(255,255,255,0.35); display: block; margin-top: 4px; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { overflow-x: hidden; font-family: 'Montserrat', sans-serif; background: #fff; color: #0D1E42; -webkit-font-smoothing: antialiased; }
+nav { position: sticky; top: 0; z-index: 100; background: #fff; height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 64px; border-bottom: 1px solid #f5f5f5; }
+.nav-brand { font-size: 13px; font-weight: 700; color: #0D1E42; text-decoration: none; white-space: nowrap; }
+.nav-brand span { font-weight: 700; color: #0D1E42; }
+.nav-right { display: flex; align-items: center; gap: 32px; }
+.nav-right a { font-size: 12px; font-weight: 500; color: #9DA6AB; text-decoration: none; transition: color 0.2s; }
+.nav-right a:hover, .nav-right a.active { color: #0D1E42; font-weight: 700; }
+.nav-pill { background: #0D1E42 !important; color: #fff !important; font-size: 12px; font-weight: 600; padding: 10px 22px; border-radius: 100px; text-decoration: none; white-space: nowrap; }
+footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padding: 48px 64px 36px; }
+.footer-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+.footer-brand { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7); }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.25); text-decoration: none; }
+.footer-links a:hover { color: rgba(255,255,255,0.6); }
+.footer-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin-bottom: 24px; }
+.footer-legal { display: flex; align-items: flex-start; gap: 16px; }
+.footer-legal p { font-size: 10px; color: rgba(255,255,255,0.2); line-height: 2; }
+.article { max-width: 760px; margin: 0 auto; padding: 64px 40px; }
+.article h2 { font-size: 22px; font-weight: 700; color: #0D1E42; margin: 48px 0 16px; line-height: 1.3; }
+.article h3 { font-size: 17px; font-weight: 700; color: #0D1E42; margin: 32px 0 12px; }
+.article p { font-size: 16px; color: #333; line-height: 1.85; margin-bottom: 20px; }
+.article ul, .article ol { padding-left: 24px; margin-bottom: 20px; }
+.article li { font-size: 16px; color: #333; line-height: 1.8; margin-bottom: 8px; }
+.article strong { color: #0D1E42; font-weight: 700; }
+.article a { color: #0D1E42; font-weight: 600; text-decoration: underline; }
+.article a:hover { color: #0D1E42; }
+blockquote { border-left: 3px solid #9DA6AB; padding: 16px 24px; margin: 32px 0; }
+blockquote p { font-size: 18px; font-style: italic; color: #0D1E42; font-weight: 600; line-height: 1.6; margin: 0; }
+.stat-row { display: flex; gap: 16px; margin: 32px 0; flex-wrap: wrap; }
+.stat-box { flex: 1; min-width: 140px; background: #f7f8fa; border: 1px solid #f7f8fa; border-radius: 8px; padding: 24px 20px; text-align: center; }
+.stat-num { font-size: clamp(28px, 4vw, 40px); font-weight: 900; color: #0D1E42; line-height: 1; margin-bottom: 8px; }
+.stat-label { font-size: 11px; font-weight: 600; color: #9DA6AB; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
+.tldr { background: #f5f5f5; border-left: 3px solid #0D1E42; padding: 24px 28px; margin: 32px 0; }
+.tldr-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #9DA6AB; display: block; margin-bottom: 12px; }
+.tldr ul { padding-left: 20px; }
+.tldr li { font-size: 15px; font-weight: 600; color: #0D1E42; line-height: 1.6; margin-bottom: 8px; }
+.data-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 13px; }
+.data-table th { background: #0D1E42; color: #fff; font-weight: 700; padding: 10px 12px; text-align: left; font-size: 11px; letter-spacing: 0.5px; }
+.data-table td { padding: 9px 12px; border-bottom: 1px solid #f5f5f5; color: #333; }
+.data-table tr:nth-child(even) td { background: #f7f8fa; }
+.chart-wrap { background: #f7f8fa; border-radius: 8px; padding: 24px; margin: 32px 0; }
+.chart-title { font-size: 12px; font-weight: 700; color: #9DA6AB; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+.chart-subtitle { font-size: 11px; color: #9DA6AB; margin-bottom: 20px; }
+.cta-link { display: inline-block; margin: 8px 0 20px; font-size: 14px; font-weight: 700; color: #0D1E42; text-decoration: none; border-bottom: 2px solid #0D1E42; padding-bottom: 2px; }
+.faq { margin: 48px 0 0; }
+.faq h2 { font-size: 22px; font-weight: 700; color: #0D1E42; margin-bottom: 24px; }
+.faq-item { border-top: 1px solid #f5f5f5; padding: 20px 0; }
+.faq-item h3 { font-size: 16px; font-weight: 700; color: #0D1E42; margin: 0 0 10px 0; }
+.faq-item p { font-size: 15px; color: #333; line-height: 1.75; margin: 0; }
+.sources { margin-top: 48px; padding-top: 32px; border-top: 1px solid #f5f5f5; }
+.sources h3 { font-size: 13px; font-weight: 700; color: #9DA6AB; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.sources ul { list-style: none; padding: 0; }
+.sources li { font-size: 13px; color: #9DA6AB; margin-bottom: 6px; }
+.sources a { color: #9DA6AB; font-weight: 600; }
+.author-bio { margin-top: 48px; padding-top: 32px; border-top: 1px solid #f5f5f5; font-size: 14px; color: #9DA6AB; font-style: italic; }
+.author-bio a { color: #0D1E42; font-weight: 600; }
+.contact-cta { background: #f7f8fa; border-left: 3px solid #0D1E42; padding: 20px 28px; margin: 48px 0; }
+.contact-cta p { font-size: 16px; font-weight: 700; color: #0D1E42; margin: 0; }
+.contact-cta a { color: #0D1E42; text-decoration: underline; }
+.subscribe-bar { background: #0D1E42; padding: 56px 40px; text-align: center; }
+.subscribe-bar h2 { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+.subscribe-bar > p { font-size: 15px; color: rgba(255,255,255,0.65); margin-bottom: 24px; }
+.direct-answer { background: #f7f8fa; border-left: 3px solid #0D1E42; padding: 20px 24px; margin: 0 0 32px; }
+.direct-answer p { font-size: 15px; color: #0D1E42; line-height: 1.75; margin: 0; font-weight: 600; }
+@media (max-width: 768px) {
+  nav { padding: 0 24px; }
+  .nav-hamburger { display: flex; }
+  .nav-right a:not(.nav-pill) { display: none; }
+  footer { padding: 40px 24px 28px; }
+  .footer-top { flex-direction: column; align-items: flex-start; }
+  .article { padding: 48px 24px; }
+  .stat-row { flex-wrap: wrap; }
+  .stat-box { min-width: 120px; }
+}
+.nav-hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; z-index: 200; }
+.nav-hamburger span { display: block; width: 22px; height: 2px; background: #0D1E42; border-radius: 2px; }
+.nav-mobile-menu { display: none; position: sticky; top: 68px; z-index: 99; flex-direction: column; background: #fff; border-bottom: 1px solid #f5f5f5; padding: 8px 24px 16px; }
+.nav-mobile-menu a { font-size: 14px; font-weight: 600; color: #0D1E42; text-decoration: none; padding: 13px 0; border-bottom: 1px solid #f5f5f5; display: block; }
+.nav-mobile-menu a:last-child { border-bottom: none; }
+.nav-mobile-menu.open { display: flex; }
+</style>
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ohio Housing Market Shifting Toward Buyers — Here's Where">
+<meta property="og:description" content="Ohio's pending ratio has fallen to 0.76 — the lowest since before the pandemic. See which of Ohio's 88 counties have shifted toward buyers in 2026.">
+<meta property="og:url" content="https://jassonfarrier.com/housing-market-updates/ohio-housing-market-shifting-buyers-2026">
+<meta property="og:image" content="https://jassonfarrier.com/jasson-farrier.jpg">
+<meta name="author" content="Jasson Farrier">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Ohio Housing Market Shifting Toward Buyers — Here's Where",
+  "description": "Ohio's pending ratio has fallen to 0.76 — the lowest since before the pandemic. See which of Ohio's 88 counties have shifted toward buyers in 2026.",
+  "author": {
+    "@type": "Person",
+    "name": "Jasson Farrier",
+    "url": "https://jassonfarrier.com/bio"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Jasson Farrier"
+  },
+  "datePublished": "2026-08-07",
+  "dateModified": "2026-08-07",
+  "url": "https://jassonfarrier.com/housing-market-updates/ohio-housing-market-shifting-buyers-2026",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://jassonfarrier.com/housing-market-updates/ohio-housing-market-shifting-buyers-2026"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question","name": "What does it mean when a housing market shifts toward buyers?","acceptedAnswer": {"@type": "Answer","text": "It means the number of active buyers is falling relative to homes for sale. Homes sit longer, price cuts become more common, and buyers gain more room to negotiate."}},
+    {"@type": "Question","name": "Which Ohio counties have shifted the most toward buyers?","acceptedAnswer": {"@type": "Answer","text": "Butler, Montgomery, Lorain, Lake, and Summit have seen the biggest swings among Ohio's largest counties since the 2021 peak."}},
+    {"@type": "Question","name": "Are Ohio's biggest counties still seller's markets?","acceptedAnswer": {"@type": "Answer","text": "No. All 10 of Ohio's most populated counties have shifted toward buyers since 2021 — Franklin, Cuyahoga, Hamilton, Summit, Montgomery, Butler, Lucas, Stark, Lorain, and Lake."}},
+    {"@type": "Question","name": "Are any Ohio counties still favoring sellers?","acceptedAnswer": {"@type": "Answer","text": "Yes — about a dozen, mostly smaller counties in Northeast Ohio (Medina, Portage, Wayne, Stark) and Northwest Ohio (Wood, Hancock, Defiance)."}},
+    {"@type": "Question","name": "Is now a good time to buy a house in Ohio?","acceptedAnswer": {"@type": "Answer","text": "It depends on where. In most of Ohio's biggest counties, buyers have more leverage than they've had in years. In a handful of smaller counties, sellers still have the edge."}},
+    {"@type": "Question","name": "How do I check my own county or ZIP code?","acceptedAnswer": {"@type": "Answer","text": "Use the Ohio housing data page to look up the pending ratio for your specific area and see whether it favors buyers or sellers."}}
+  ]
+}
+</script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KKVH0B7EZ0"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KKVH0B7EZ0');
+</script>
+<link rel="canonical" href="https://jassonfarrier.com/housing-market-updates/ohio-housing-market-shifting-buyers-2026">
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">Jasson Farrier <span>— Kiger Realty</span></a>
+  <div class="nav-right">
+    <a href="/housing-market-updates" class="active">Market Updates</a>
+    <a href="/ohio-housing-data">Data</a>
+    <a href="/bio">About</a>
+    <a href="/contact">Contact</a>
+    <a href="https://www.youtube.com/@OhioHousingNerd" class="nav-yt" aria-label="YouTube">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#9DA6AB"/>
+        <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/>
+      </svg>
+    </a>
+    <button class="nav-hamburger" aria-label="Menu" onclick="document.querySelector('.nav-mobile-menu').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="nav-mobile-menu">
+  <a href="/housing-market-updates">Market Updates</a>
+  <a href="/ohio-housing-data">Data</a>
+  <a href="/bio">About</a>
+  <a href="/contact">Contact</a>
+  <a href="https://www.youtube.com/@OhioHousingNerd">YouTube ↗</a>
+</div>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <a href="/housing-market-updates" class="back-link">← Back to Market Updates</a>
+    <span class="tag">Ohio Market Analysis · August 2026</span>
+    <p class="article-byline">By <a href="/bio">Jasson Farrier</a> &nbsp;·&nbsp; <a href="https://www.youtube.com/@OhioHousingNerd" target="_blank" rel="noopener">Ohio Housing Nerd</a> &nbsp;·&nbsp; August 2026</p>
+    <span class="article-date">Published: August 7, 2026</span>
+    <h1>Ohio Housing Market Shifting Toward Buyers — Here's Where</h1>
+  </div>
+</div>
+
+<div class="article">
+
+<p>The typical home in Ohio is now worth $255,750 — up from $247,286 a year ago. Prices are still climbing. But there are a lot more homes for sale right now — active listings are up 10% from last year. Buyer demand hasn't kept pace with the new supply.</p>
+<p>Put simply: supply is outpacing demand. That's a reversal from the past several years, when demand outpaced supply. And it's turning a growing number of Ohio markets from seller's markets into buyer's markets. This builds on what I found back in July — <a href="/housing-market-updates/buying-a-home-in-ohio-price-cuts">Ohio price cuts just hit a 7-year high</a>.</p>
+
+<div class="contact-cta">
+  <p>Not sure what this means for your situation? <a href="/contact">The conversation's free. Reach out anytime. →</a></p>
+</div>
+
+<div class="tldr">
+  <span class="tldr-label">Key Takeaways</span>
+  <ul>
+    <li>Ohio's pending ratio has fallen every year since peaking in 2021 — from 1.57 down to 0.76 today.</li>
+    <li>All 10 of Ohio's most populated counties have shifted toward buyers since 2021, including Franklin, Cuyahoga, and Hamilton.</li>
+    <li>A dozen smaller counties, mostly in Northeast and Northwest Ohio, still favor sellers.</li>
+    <li>Homes are sitting longer (41 days on market, up from 39) and more than 1 in 5 listings have had a price cut.</li>
+  </ul>
+</div>
+
+<div class="stat-row">
+  <div class="stat-box"><div class="stat-num">0.76</div><div class="stat-label">Ohio pending ratio — lowest since pre-pandemic</div></div>
+  <div class="stat-box"><div class="stat-num">+10%</div><div class="stat-label">Active listings year over year</div></div>
+  <div class="stat-box"><div class="stat-num">41</div><div class="stat-label">Days on market statewide</div></div>
+</div>
+
+<h2>Buyers Are Gaining Ground in Ohio</h2>
+
+<div class="direct-answer">
+  <p>Ohio's housing market is shifting toward buyers. Active listings are up 10% year-over-year. The pending ratio — a measure of buyer demand versus seller supply — has fallen to 0.76, the lowest since before the pandemic, giving buyers more negotiating room than at any point in the last five years.</p>
+</div>
+
+<p>One of the easiest ways to tell if buyers or sellers have the advantage is comparing how many buyers are active in the market to how many sellers are. The number of homes going under contract tells you how many buyers are in the game. The number of homes for sale tells you how many sellers are in the game.</p>
+<p>When buyers outnumber sellers, sellers have the advantage. When sellers outnumber buyers, buyers do.</p>
+<p>Back in 2016, sellers badly outnumbered buyers — for roughly every 10 homes for sale, only about 4 were finding a buyer. Demand kept building through 2019, up to about 7 out of every 10. Then 2020 hit and everything flipped. Active listings collapsed while buyer demand stayed strong. For the first time, buyers outnumbered sellers.</p>
+<p>By 2021 — the peak — there were about 16 buyers for every 10 homes for sale. That's when prices took off, jumping from $158,000 in 2019 to $198,000 by 2021. Since that peak, the trend has moved the other way every single year. By 2024, buyers and sellers were roughly even. Today it's about 8 buyers for every 10 sellers — the weakest buyer turnout since before the pandemic, five straight years of decline.</p>
+
+<div class="chart-wrap">
+  <div class="chart-title">Ohio Pending Ratio — 2016 to 2026</div>
+  <div class="chart-subtitle">Pending listings ÷ active listings &nbsp;·&nbsp; Source: Realtor.com via Ohio Housing Nerd Supabase</div>
+  <svg viewBox="0 0 680 230" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;" aria-label="Ohio pending ratio trend chart showing peak of 1.57 in 2021 declining to 0.76 in 2026">
+    <!-- Grid -->
+    <line x1="60" y1="20" x2="60" y2="185" stroke="#e5e7eb" stroke-width="1"/>
+    <line x1="60" y1="185" x2="660" y2="185" stroke="#e5e7eb" stroke-width="1"/>
+    <line x1="60" y1="143" x2="660" y2="143" stroke="#f0f0f0" stroke-width="1" stroke-dasharray="4,4"/>
+    <line x1="60" y1="102" x2="660" y2="102" stroke="#f0f0f0" stroke-width="1" stroke-dasharray="4,4"/>
+    <line x1="60" y1="60" x2="660" y2="60" stroke="#f0f0f0" stroke-width="1" stroke-dasharray="4,4"/>
+    <!-- Y labels (scale 0-1.8, 165px range) -->
+    <text x="52" y="189" text-anchor="end" font-family="Montserrat,sans-serif" font-size="10" fill="#9DA6AB">0.0</text>
+    <text x="52" y="147" text-anchor="end" font-family="Montserrat,sans-serif" font-size="10" fill="#9DA6AB">0.5</text>
+    <text x="52" y="106" text-anchor="end" font-family="Montserrat,sans-serif" font-size="10" fill="#9DA6AB">1.0</text>
+    <text x="52" y="64" text-anchor="end" font-family="Montserrat,sans-serif" font-size="10" fill="#9DA6AB">1.5</text>
+    <!-- Shaded area under line -->
+    <polygon points="70,153 128,137 186,133 244,128 302,66 360,54 418,84 476,84 534,104 592,118 650,122 650,185 70,185" fill="#0D1E42" opacity="0.07"/>
+    <!-- Line -->
+    <polyline points="70,153 128,137 186,133 244,128 302,66 360,54 418,84 476,84 534,104 592,118 650,122" fill="none" stroke="#0D1E42" stroke-width="2.5" stroke-linejoin="round"/>
+    <!-- Key dots -->
+    <circle cx="360" cy="54" r="6" fill="#0D1E42"/>
+    <text x="360" y="42" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="10" fill="#0D1E42" font-weight="700">1.57 peak</text>
+    <circle cx="650" cy="122" r="6" fill="#0D1E42"/>
+    <text x="650" y="110" text-anchor="end" font-family="Montserrat,sans-serif" font-size="10" fill="#0D1E42" font-weight="700">0.76 today</text>
+    <!-- X labels -->
+    <text x="70" y="200" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="10" fill="#9DA6AB">2016</text>
+    <text x="186" y="200" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="10" fill="#9DA6AB">2018</text>
+    <text x="302" y="200" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="10" fill="#9DA6AB">2020</text>
+    <text x="360" y="200" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="10" fill="#0D1E42" font-weight="700">2021</text>
+    <text x="476" y="200" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="10" fill="#9DA6AB">2023</text>
+    <text x="592" y="200" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="10" fill="#9DA6AB">2025</text>
+    <text x="650" y="200" text-anchor="middle" font-family="Montserrat,sans-serif" font-size="10" fill="#0D1E42" font-weight="700">2026</text>
+  </svg>
+</div>
+
+<h2>Ohio Buyers Are Gaining Leverage in the State's Biggest Counties</h2>
+
+<p>It's not just the small counties. Ohio's ten most populated counties — where most of the state actually lives — have all shifted toward buyers since 2021.</p>
+
+<table class="data-table">
+  <thead>
+    <tr><th>County</th><th>PR 2021</th><th>PR 2026</th><th>Change</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Butler</td><td>2.82</td><td>0.84</td><td>-1.98</td></tr>
+    <tr><td>Montgomery</td><td>2.12</td><td>0.78</td><td>-1.34</td></tr>
+    <tr><td>Lorain</td><td>1.97</td><td>0.97</td><td>-1.00</td></tr>
+    <tr><td>Lake</td><td>1.89</td><td>0.94</td><td>-0.96</td></tr>
+    <tr><td>Summit</td><td>1.66</td><td>0.91</td><td>-0.75</td></tr>
+    <tr><td>Hamilton</td><td>1.59</td><td>0.72</td><td>-0.87</td></tr>
+    <tr><td>Stark</td><td>1.74</td><td>1.02</td><td>-0.71</td></tr>
+    <tr><td>Cuyahoga</td><td>1.45</td><td>0.74</td><td>-0.71</td></tr>
+    <tr><td>Lucas</td><td>1.43</td><td>0.74</td><td>-0.69</td></tr>
+    <tr><td>Franklin</td><td>1.35</td><td>0.72</td><td>-0.63</td></tr>
+  </tbody>
+</table>
+
+<p>Every one of these counties had more buyers than sellers back in 2021. Today, every one of them has more sellers than buyers — except Stark, which is sitting almost dead even. Butler County had the biggest swing — nearly three buyers for every seller in 2021, down to less than one buyer per seller today. That's Cincinnati's northern suburbs, one of the fastest-growing areas in Ohio over the last five years.</p>
+<p>Want to see exactly where your county stands? <a href="/ohio-housing-data">Check the full breakdown on my Ohio housing data page.</a></p>
+
+<div class="contact-cta">
+  <p>Not sure what this means for your street? <a href="/contact">The conversation's free. Reach out anytime. →</a></p>
+</div>
+
+<h2>Where Buyers Still Outnumber Sellers</h2>
+
+<p>A dozen Ohio counties haven't flipped. Buyers still outnumber sellers there — and almost all of them are in the same two corners of the state.</p>
+
+<table class="data-table">
+  <thead>
+    <tr><th>County</th><th>2026 Pending Ratio</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Medina</td><td>1.27</td></tr>
+    <tr><td>Portage</td><td>1.18</td></tr>
+    <tr><td>Wayne</td><td>1.11</td></tr>
+    <tr><td>Tuscarawas</td><td>1.09</td></tr>
+    <tr><td>Henry</td><td>1.09</td></tr>
+    <tr><td>Wood</td><td>1.07</td></tr>
+    <tr><td>Champaign</td><td>1.03</td></tr>
+    <tr><td>Defiance</td><td>1.02</td></tr>
+    <tr><td>Stark</td><td>1.02</td></tr>
+    <tr><td>Hancock</td><td>1.01</td></tr>
+    <tr><td>Geauga</td><td>1.00</td></tr>
+    <tr><td>Auglaize</td><td>1.00</td></tr>
+  </tbody>
+</table>
+
+<p>Six of them — Medina, Portage, Wayne, Tuscarawas, Stark, and Geauga — sit in Northeast Ohio, stretching from the Cleveland-Akron area down through Amish country. The rest — Wood, Hancock, Defiance, Henry, Auglaize — cluster in Northwest Ohio around Toledo and Lima. Demand in these two regions has held up better than almost anywhere else in the state.</p>
+
+<h2>What This Means If You're Buying or Selling in Ohio Right Now</h2>
+
+<h3>If You're Buying</h3>
+<p>Head to my <a href="/ohio-housing-data">Ohio housing data page</a> and look up the pending ratio for your county — or better yet, your specific ZIP code. Check the trend: is it going up or down?</p>
+<ul>
+  <li><strong>Ratio near or above 1.0</strong> — buyers still outnumber sellers. That's a seller's market. You can still negotiate, but expect to pay close to asking.</li>
+  <li><strong>Ratio below 1.0, and dropping</strong> — sellers outnumber buyers. That's a buyer's market. Expect more listings to choose from, less competition, and more room to negotiate on price, repairs, or timeline.</li>
+</ul>
+
+<h3>If You're Selling</h3>
+<p>Same first step — look up your ZIP code's pending ratio on my <a href="/ohio-housing-data">Ohio housing data page</a>.</p>
+<ul>
+  <li><strong>Ratio near or above 1.0</strong> — you have leverage. Expect decent buyer interest and multiple offers, as long as you price it strategically. An overpriced home still won't sell, no matter how strong the market.</li>
+  <li><strong>Ratio below 1.0, and dropping</strong> — expect more competition from other sellers and more negotiating pressure from buyers. Pricing it right from day one matters more than it did two years ago.</li>
+</ul>
+
+<blockquote><p>This data is a compass, not an exact coordinate. County and ZIP-level numbers get you close, but hyperlocal analysis is what actually gets it right. A specific street, a specific school district, even a specific block can behave differently than the ZIP code average.</p></blockquote>
+
+<p>That's where working with a professional realtor matters — someone who can dial in exactly what to expect in your situation. <a href="/contact">The conversation's free — reach out anytime.</a></p>
+
+<div class="faq">
+  <h2>Frequently Asked Questions</h2>
+  <div class="faq-item">
+    <h3>What does it mean when a housing market shifts toward buyers?</h3>
+    <p>It means the number of active buyers is falling relative to the number of homes for sale. Homes sit longer, price cuts become more common, and buyers gain more room to negotiate.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Which Ohio counties have shifted the most toward buyers?</h3>
+    <p>Butler, Montgomery, Lorain, Lake, and Summit have seen the biggest swings among Ohio's largest counties since the 2021 peak.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Are Ohio's biggest counties still seller's markets?</h3>
+    <p>No. All 10 of Ohio's most populated counties have shifted toward buyers since 2021 — Franklin, Cuyahoga, Hamilton, Summit, Montgomery, Butler, Lucas, Stark, Lorain, and Lake.</p>
+  </div>
+  <div class="faq-item">
+    <h3>Are any Ohio counties still favoring sellers?</h3>
+    <p>Yes — about a dozen, mostly smaller counties in Northeast Ohio (Medina, Portage, Wayne, Stark) and Northwest Ohio (Wood, Hancock, Defiance).</p>
+  </div>
+  <div class="faq-item">
+    <h3>Is now a good time to buy a house in Ohio?</h3>
+    <p>It depends on where. In most of Ohio's biggest counties, buyers have more leverage than they've had in years. In a handful of smaller counties, sellers still have the edge.</p>
+  </div>
+  <div class="faq-item">
+    <h3>How do I check my own county or ZIP code?</h3>
+    <p>Use the <a href="/ohio-housing-data">Ohio housing data page</a> to look up the pending ratio for your specific area and see whether it favors buyers or sellers.</p>
+  </div>
+</div>
+
+<div class="sources">
+  <h3>Sources</h3>
+  <ul>
+    <li><a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener">Realtor.com Research &amp; Data</a> — pending ratio, active listings, days-on-market for Ohio and its counties</li>
+  </ul>
+</div>
+
+<div class="author-bio">
+  <p>Jasson Farrier is a licensed Realtor at Kiger Realty in Granville, Ohio (License #2018004483), and creator of <a href="https://www.youtube.com/@OhioHousingNerd" target="_blank" rel="noopener">Ohio Housing Nerd</a>. He covers all 88 Ohio counties using verified, source-linked data.</p>
+</div>
+
+</div><!-- end .article -->
+
+<div class="contact-cta" style="max-width:760px;margin:0 auto 0;padding:20px 40px;">
+  <p>Buying or selling in Ohio? <a href="/contact">Let's talk.</a></p>
+</div>
+
+<div class="subscribe-bar">
+  <h2>Get the Analysis in Your Inbox</h2>
+  <p>Weekly housing market data — county-level, data-driven, no hype.</p>
+  <form id="nl-form" onsubmit="handleNL(event)" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;max-width:480px;margin:0 auto;">
+    <input type="email" id="nl-email" placeholder="your@email.com" required style="flex:1;min-width:220px;padding:12px 16px;border:1px solid rgba(255,255,255,0.2);border-radius:2px;background:rgba(255,255,255,0.08);color:#fff;font-family:'Montserrat',sans-serif;font-size:14px;" />
+    <input type="text" id="nl-hp" name="website" style="position:absolute;left:-9999px;opacity:0;" tabindex="-1" autocomplete="off" />
+    <button type="submit" id="nl-btn" style="padding:12px 28px;background:#fff;color:#0D1E42;border:none;border-radius:2px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer;">Subscribe →</button>
+  </form>
+  <p id="nl-thanks" style="display:none;color:#fff;font-weight:700;font-size:15px;margin-top:8px;">You're in. Check your inbox.</p>
+  <script>
+  var _nlLoadTime=Date.now();async function handleNL(e){e.preventDefault();var b=document.getElementById('nl-btn');b.textContent='Subscribing...';b.disabled=true;if(document.getElementById('nl-hp').value||Date.now()-_nlLoadTime<2000){b.textContent='Subscribe →';b.disabled=false;return;}try{await fetch('https://farrier-crm.vercel.app/api/leads',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:document.getElementById('nl-email').value.trim(),first_name:'',last_name:'',phone:'',lead_source:'Jasson Farrier — Blog',source_site:'jassonfarrier.com',contact_type:'Subscriber',notes:'Newsletter signup from blog',newsletter:true})})}catch(err){console.error(err)}document.getElementById('nl-form').style.display='none';document.getElementById('nl-thanks').style.display='block'}
+  </script>
+</div>
+
+<footer>
+  <div class="footer-top">
+    <span class="footer-brand">Jasson Farrier &#183; Kiger Realty</span>
+    <div class="footer-links">
+      <a href="/housing-market-updates" class="active">Market Updates</a>
+      <a href="/ohio-housing-data">Data</a>
+      <a href="/bio">About</a>
+      <a href="/contact">Contact</a>
+    </div>
+  </div>
+  <hr class="footer-divider">
+  <div class="footer-legal">
+    <img src="/fair-housing.webp" alt="Equal Housing Opportunity" style="flex-shrink:0;width:32px;height:auto;opacity:0.6;filter:invert(1);margin-top:2px;">
+    <p>
+      Jasson Farrier &#183; Kiger Realty &#183; REALTOR&reg; &#183; License #2018004483<br>
+      Equal Housing Opportunity &#183; Information deemed reliable but not guaranteed.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
