@@ -400,6 +400,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <span class="upper-third-metric" id="ut-metric"></span>
           <span class="upper-third-source" id="ut-source"></span>
         </div>
+        <div id="pending-ratio-badge" style="display:none;font-family:Montserrat,sans-serif;font-size:11px;font-weight:700;color:#0d1e42;background:#dce8f7;border-radius:7px;padding:5px 12px;margin-bottom:8px;align-self:flex-start;letter-spacing:0.02em;">PENDING RATIO &nbsp;<span id="pending-ratio-val" style="font-weight:500;"></span></div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><button id="btn-record-high" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">RECORD HIGH</button></div>
         <svg id="line-chart"></svg>
         <div id="chart-slider-wrap" style="display:none;padding:10px 0 0 90px;box-sizing:border-box;">
@@ -765,6 +766,18 @@ function setAttrHeader(chips, metric) {
   if (uts) uts.innerHTML = sourceForMetric(metric);
 }
 
+function setPendingRatioBadge(val) {
+  const badge = document.getElementById('pending-ratio-badge');
+  const valEl = document.getElementById('pending-ratio-val');
+  if (!badge || !valEl) return;
+  if (val != null && !isNaN(val)) {
+    valEl.textContent = Number(val).toFixed(2);
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
 function openModal(county) {
   const d = dataMap[county];
   if (!d) return;
@@ -784,6 +797,7 @@ function openModal(county) {
     const sorted = [...DATA].filter(c=>c.latest&&c.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
   const rank = sorted.findIndex(c=>c.county===county)+1;
   (document.getElementById('s-rank')||{}).textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
+  setPendingRatioBadge(l.pending_ratio);
   // Default chart to current map metric
   const defaultMetric = mapMetric;
   document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
@@ -2455,6 +2469,7 @@ function openMetroModal(rid) {
     const rank = sorted.findIndex(x=>x.region_id===rid)+1;
     return rank > 0 ? '#'+rank+' of '+sorted.length : '—';
   })();
+  setPendingRatioBadge(l.pending_ratio);
   document.getElementById('modal-overlay').classList.add('visible');
   setTimeout(() => {
     document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
@@ -2507,6 +2522,7 @@ function openStateModal() {
   (document.getElementById('s-ptax')||{}).textContent = '—';
   (document.getElementById('s-ptaxrate')||{}).textContent = '—';
   (document.getElementById('s-rank')||{}).textContent = 'Statewide';
+  setPendingRatioBadge(l.pending_ratio);
   document.getElementById('modal-overlay').classList.add('visible');
   setTimeout(() => {
     document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
@@ -2637,6 +2653,7 @@ function openZipModal(zip) {
   const sorted = ZIP_DATA.filter(z=>z.latest&&z.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
   const rank = sorted.findIndex(z=>z.zip===zip)+1;
   (document.getElementById('s-rank')||{}).textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
+  setPendingRatioBadge(l.pending_ratio);
 
   // Chart tabs
   const defaultMetric = mapMetric==='median_property_tax'||mapMetric==='property_tax_rate' ? 'zhvi' : mapMetric;
