@@ -233,6 +233,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="active_listings_yoy">Active Listings YOY %</option>
     <option value="pending_listings">Pending Sales</option>
     <option value="pending_listings_yoy">Pending Sales YOY %</option>
+    <option value="pending_ratio">Pending Ratio</option>
     <option value="days_on_market">Days on Market</option>
     <option value="days_on_market_yoy">Days on Market YOY %</option>
     <option value="price_reduced_pct">Price Cut %</option>
@@ -262,6 +263,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Demand</div>
     <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
     <button class="metric-btn yoy-btn" data-metric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
+    <button class="metric-btn" data-metric="pending_ratio"><span class="mn">Pending Ratio</span><span class="md">Pending ÷ active listings</span></button>
     <button class="metric-btn" data-metric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span></button>
     <button class="metric-btn yoy-btn" data-metric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
@@ -345,6 +347,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="active_listings_yoy">Active Listings YOY %</option>
           <option value="pending_listings">Pending Sales</option>
           <option value="pending_listings_yoy">Pending Sales YOY %</option>
+          <option value="pending_ratio">Pending Ratio</option>
           <option value="days_on_market">Days on Market</option>
           <option value="days_on_market_yoy">Days on Market YOY %</option>
           <option value="price_reduced_pct">Price Cut %</option>
@@ -372,6 +375,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Demand</div>
           <button class="metric-btn chart-tab" data-cmetric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="pending_ratio"><span class="mn">Pending Ratio</span><span class="md">Pending ÷ active listings · Realtor.com · 2016–present</span></button>
           <button class="metric-btn chart-tab" data-cmetric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
@@ -429,6 +433,7 @@ const METRICS = {
   new_listings:     {label:'New Listings',    fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
   pending_listings: {label:'Pending Sales',   fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
   pending_listings_yoy:{label:'Pending Sales YOY %',fmt:v=>v.toFixed(1)+'%',            lo:'Declining',hi:'Growing'},
+  pending_ratio:    {label:'Pending Ratio',     fmt:v=>v.toFixed(2),                               lo:'Low Demand',hi:'High Demand'},
   days_on_market:   {label:'Days on Market',  fmt:v=>v+' days',                          lo:'Fast',     hi:'Slow'},
   days_on_market_yoy:{label:'Days on Market YOY %',fmt:v=>v.toFixed(1)+'%',             lo:'Declining',hi:'Growing'},
   price_reduced_pct:{label:'Price Cut %',fmt:v=>v.toFixed(1)+'%',                  lo:'Few Cuts', hi:'Many Cuts'},
@@ -1588,7 +1593,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const x = d3.scaleTime()
     .domain(d3.extent(rows, r=>parseDate(r.date)))
     .range([0, iw]);
-  const isZeroBased = !YOY_METRICS.has(cmetric) && (cmetric==='active_listings'||cmetric==='pending_listings'||cmetric==='price_reduced_pct'||cmetric==='property_tax_rate'||cmetric==='sf_permits_per_1k'||cmetric==='mf_permits_per_1k'||cmetric==='total_permits_per_1k'||DISTRESS_METRICS.has(cmetric));
+  const isZeroBased = !YOY_METRICS.has(cmetric) && (cmetric==='active_listings'||cmetric==='pending_listings'||cmetric==='pending_ratio'||cmetric==='price_reduced_pct'||cmetric==='property_tax_rate'||cmetric==='sf_permits_per_1k'||cmetric==='mf_permits_per_1k'||cmetric==='total_permits_per_1k'||DISTRESS_METRICS.has(cmetric));
   const _isYOY = YOY_METRICS.has(cmetric);
   const _minVal = d3.min(rows, r=>r[cmetric]);
   const _maxVal = d3.max(rows, r=>r[cmetric]);
@@ -2213,6 +2218,7 @@ const TABLE_COLS = [
   {key:'active_listings_yoy',label:'AL YOY %',       fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
   {key:'pending_listings',label:'Pending Sales',     fmt:v=>v!=null?Math.round(v).toLocaleString():null},
   {key:'pending_listings_yoy',label:'PS YOY %',      fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
+  {key:'pending_ratio',      label:'Pend. Ratio',    fmt:v=>v!=null?v.toFixed(2):null},
   {key:'days_on_market', label:'Days on Market',     fmt:v=>v!=null?Math.round(v)+'d':null},
   {key:'days_on_market_yoy',label:'DOM YOY %',       fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
   {key:'price_reduced_pct',label:'Price Cut %',      fmt:v=>v!=null?v.toFixed(1)+'%':null},
