@@ -203,7 +203,7 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
 
     // Send to Kit
     const kitForm = document.createElement('form');
-    kitForm.action = 'https://app.kit.com/forms/9195650/subscriptions';
+    kitForm.action = 'https://app.kit.com/forms/9795086/subscriptions';
     kitForm.method = 'post';
     kitForm.target = 'kit-frame';
     kitForm.style.display = 'none';
@@ -217,26 +217,6 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
     document.body.appendChild(iframe);
     kitForm.submit();
 
-    // Send to CRM
-    try {
-      await fetch('https://farrier-crm.vercel.app/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email,
-          first_name: '',
-          last_name: '',
-          phone: '',
-          lead_source: 'Jasson Farrier — Free Guide',
-          source_site: 'jassonfarrier.com',
-          contact_type: 'Free Guide Download',
-          notes: 'Downloaded: Should I Buy in 2026 or Wait? free guide',
-          newsletter: true
-        })
-      });
-    } catch(err) {
-      console.error('CRM error:', err);
-    }
 
     document.getElementById('free-guide-form').style.display = 'none';
     if (document.querySelector('.fine-print')) document.querySelector('.fine-print').style.display = 'none';
