@@ -268,7 +268,7 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
             source_site: 'jassonfarrier.com',
             contact_type: interestVal || 'Other',
             notes: noteLines.join('\n\n'),
-            newsletter: true
+            newsletter: document.getElementById('newsletter-opt').checked
           })
         });
       } catch(err) {
