@@ -354,6 +354,34 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
   <p>Tell me where you&#8217;re coming from, what you&#8217;re looking for, and your timeline. I&#8217;ll take it from there.</p>
   <a href="/contact" class="cta-btn">Let&#8217;s Talk &#8594;</a>
 </div>
+<div class="subscribe-bar">
+  <p>Get Ohio housing market data straight to your inbox — monthly, no fluff.</p>
+  <form id="mto-nl-form" class="subscribe-form" onsubmit="handleMtoNL(event)">
+    <input type="email" id="mto-nl-email" placeholder="Your email address" required>
+    <input type="text" id="mto-nl-hp" name="website" style="position:absolute;left:-9999px;opacity:0;" tabindex="-1" autocomplete="off">
+    <button type="submit" id="mto-nl-btn">Subscribe →</button>
+  </form>
+  <p id="mto-nl-thanks" style="display:none;color:#9DA6AB;font-weight:700;font-size:14px;">You're in. Check your inbox.</p>
+  <script>
+  var _mtoNlLoadTime=Date.now();
+  function handleMtoNL(e){
+    e.preventDefault();
+    var b=document.getElementById('mto-nl-btn');
+    b.textContent='Subscribing...';b.disabled=true;
+    if(document.getElementById('mto-nl-hp').value||Date.now()-_mtoNlLoadTime<2000){b.textContent='Subscribe →';b.disabled=false;return;}
+    var kitForm=document.createElement('form');
+    kitForm.action='https://app.kit.com/forms/9795096/subscriptions';
+    kitForm.method='post';kitForm.target='kit-frame-mto';kitForm.style.display='none';
+    var ef=document.createElement('input');ef.name='email_address';
+    ef.value=document.getElementById('mto-nl-email').value.trim();
+    kitForm.appendChild(ef);document.body.appendChild(kitForm);
+    var ifr=document.createElement('iframe');ifr.name='kit-frame-mto';ifr.style.display='none';
+    document.body.appendChild(ifr);kitForm.submit();
+    document.getElementById('mto-nl-form').style.display='none';
+    document.getElementById('mto-nl-thanks').style.display='block';
+  }
+  </script>
+</div>
 <footer>
   <div class="footer-top">
     <span class="footer-brand">Jasson Farrier &#183; Kiger Realty</span>
