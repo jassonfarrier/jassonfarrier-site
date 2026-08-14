@@ -1356,13 +1356,12 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
         map.setFeatureState({source:'ohio-counties',id:hoveredId},{hover:true});
         const name = f.properties.county;
         let fmtVal;
+        const _cRaw = getMetricVal(dataMap[name], mapMetric);
         if (YOY_METRICS.has(mapMetric)) {
           fmtVal = f.properties.__label || 'N/A';
         } else {
-          const val = f.properties[mapMetric];
-          fmtVal = val != null ? METRICS[mapMetric].fmt(Number(val)) : 'N/A';
+          fmtVal = _cRaw != null ? METRICS[mapMetric].fmt(_cRaw) : 'N/A';
         }
-        const _cRaw = YOY_METRICS.has(mapMetric) ? getMetricVal(dataMap[name], mapMetric) : (f.properties[mapMetric] != null ? Number(f.properties[mapMetric]) : null);
         const _cColor = _cRaw != null && _cRaw < 0 ? '#c0392b' : '#111';
         if (map.getLayer('dc-circles') && map.queryRenderedFeatures(e.point,{layers:['dc-circles']}).length) return;
         popup.setLngLat(e.lngLat).setHTML(`
