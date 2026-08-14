@@ -106,6 +106,11 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .yoy-tab{font-size:10px;padding:6px 12px;color:rgba(0,0,0,0.35);margin-top:-2px}
 .yoy-tab.active{background:#dce8f7;color:#0D1E42}
 #line-chart{width:100%;flex:1;min-height:0;}
+.metric-btn{position:relative;}
+.metric-help{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:rgba(0,0,0,0.12);color:rgba(0,0,0,0.45);font-size:8px;font-weight:700;text-decoration:none;flex-shrink:0;position:absolute;right:8px;top:50%;transform:translateY(-50%);transition:background .15s,color .15s;font-family:Montserrat,sans-serif;line-height:1;}
+.metric-help:hover{background:#0d1e42;color:#fff;}
+.metric-btn.active .metric-help{background:rgba(255,255,255,0.3);color:#fff;}
+.metric-btn.active .metric-help:hover{background:rgba(255,255,255,0.6);color:#0d1e42;}
 #data-table th{background:#0d1e42;color:#fff;padding:10px 12px;text-align:right;font-size:10px;font-weight:700;letter-spacing:0.8px;white-space:nowrap;cursor:pointer;user-select:none;position:sticky;top:0;}
 #data-table th:first-child{text-align:left;}
 #data-table th.sort-asc::after{content:" ▲";}
@@ -265,34 +270,34 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     </div>
     <div class="sidebar-scroll">
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Prices</div>
-    <button class="metric-btn active" data-metric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span></button>
-    <button class="metric-btn yoy-btn" data-metric="zhvi_yoy"><span class="mn">Home Value YOY %</span><span class="md">Year-over-year change</span></button>
+    <button class="metric-btn active" data-metric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn yoy-btn" data-metric="zhvi_yoy"><span class="mn">Home Value YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Supply</div>
-    <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
-    <button class="metric-btn yoy-btn" data-metric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
+    <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn yoy-btn" data-metric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Single-family permits per 1,000 residents</span></button>
     <button class="metric-btn" data-metric="mf_permits_per_1k"><span class="mn">MF Permits / 1K</span><span class="md">Multifamily permits per 1,000 residents</span></button>
     <button class="metric-btn" data-metric="total_permits_per_1k"><span class="mn">Total Permits / 1K</span><span class="md">All permits per 1,000 residents</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Demand</div>
-    <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
-    <button class="metric-btn yoy-btn" data-metric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
-    <button class="metric-btn" data-metric="pending_ratio"><span class="mn">Pending Ratio</span><span class="md">Pending ÷ active listings</span></button>
-    <button class="metric-btn yoy-btn" data-metric="pending_ratio_yoy"><span class="mn">Pending Ratio YOY %</span><span class="md">Year-over-year change</span></button>
-    <button class="metric-btn" data-metric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span></button>
-    <button class="metric-btn yoy-btn" data-metric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
-    <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
-    <button class="metric-btn yoy-btn" data-metric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span></button>
+    <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-sales" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn yoy-btn" data-metric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-sales-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="pending_ratio"><span class="mn">Pending Ratio</span><span class="md">Pending ÷ active listings</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-ratio" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn yoy-btn" data-metric="pending_ratio_yoy"><span class="mn">Pending Ratio YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-ratio-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span><a class="metric-help" href="/ohio-housing-data-methodology#days-on-market" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn yoy-btn" data-metric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#days-on-market-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span><a class="metric-help" href="/ohio-housing-data-methodology#price-cut" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn yoy-btn" data-metric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#price-cut-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Taxes</div>
-    <button class="metric-btn" data-metric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span></button>
-    <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span></button>
-    <button class="metric-btn" data-metric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
-    <button class="metric-btn yoy-btn" data-metric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span></button>
+    <button class="metric-btn" data-metric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-rate" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn yoy-btn" data-metric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-rate-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Distress</div>
-    <button class="metric-btn" data-metric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">Tax delinquent properties</span></button>
-    <button class="metric-btn" data-metric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">Tax delinquent as % of total properties</span></button>
+    <button class="metric-btn" data-metric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">Tax delinquent properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">Tax delinquent as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Cancellations</div>
-    <button class="metric-btn" data-metric="home_purchase_cancellations"><span class="mn">Contract Cancellations</span><span class="md">Homes that fell out of contract · Redfin</span></button>
-    <button class="metric-btn" data-metric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">% of pending sales cancelled · Redfin</span></button>
+    <button class="metric-btn" data-metric="home_purchase_cancellations"><span class="mn">Contract Cancellations</span><span class="md">Homes that fell out of contract · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellations" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">% of pending sales cancelled · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <hr>
     <div style="padding:6px 3px 0;"><label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;font-family:Montserrat,sans-serif"><input type="checkbox" id="dc-toggle" style="cursor:pointer;accent-color:#0d1e42"> Data Centers</label></div>
 
