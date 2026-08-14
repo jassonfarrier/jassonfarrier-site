@@ -142,14 +142,14 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <a href="https://www.zillow.com/research/data/" class="source-link" target="_blank" rel="noopener">zillow.com/research/data →</a>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="zhvi">
       <div class="metric-name">Home Value</div>
       <div class="metric-tag">Monthly · Single-Family · Mid-Tier · Smoothed &amp; Seasonally Adjusted</div>
       <p class="metric-provider-def">Zillow Home Value Index (ZHVI): a smoothed, seasonally adjusted measure of the typical home value across a given region and housing type. It reflects the full distribution of home values — not just those that sold — and is reported for the middle tier of the market (33rd–67th percentile).</p>
       <div class="metric-plain"><strong>In plain terms:</strong> What a mid-range single-family home in this area is worth right now, based on Zillow's estimate of the entire housing stock — not just homes that happened to sell that month.</div>
     </div>
 
-    <div class="metric-card yoy">
+    <div class="metric-card yoy" id="zhvi-yoy">
       <div class="metric-name">Home Value YOY %</div>
       <div class="metric-tag">Monthly · Derived from ZHVI History</div>
       <p class="metric-provider-def">Year-over-year percent change in ZHVI, calculated by comparing the current month's value to the same month 12 months prior.</p>
@@ -164,70 +164,70 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <a href="https://www.realtor.com/research/data/" class="source-link" target="_blank" rel="noopener">realtor.com/research/data →</a>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="active-listings">
       <div class="metric-name">Active Listings</div>
       <div class="metric-tag">Monthly · Count</div>
       <p class="metric-provider-def">Realtor.com defines active listings as properties listed for sale that are not yet under contract as of month-end. This count reflects available supply in the market at that point in time.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> How many homes are sitting on the market available to buy right now.</div>
     </div>
 
-    <div class="metric-card yoy">
+    <div class="metric-card yoy" id="active-listings-yoy">
       <div class="metric-name">Active Listings YOY %</div>
       <div class="metric-tag">Monthly · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in the active listing count compared to the same month in the prior year.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> Whether there are more or fewer homes for sale than this time last year.</div>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="pending-sales">
       <div class="metric-name">Pending Sales</div>
       <div class="metric-tag">Monthly · Count</div>
       <p class="metric-provider-def">Realtor.com defines pending listings as homes with an accepted offer that have not yet closed as of month-end. Pending sales lead closed sales by approximately 30–60 days.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> Homes under contract — the best leading indicator of where closed sales are heading in the next 30–60 days.</div>
     </div>
 
-    <div class="metric-card yoy">
+    <div class="metric-card yoy" id="pending-sales-yoy">
       <div class="metric-name">Pending Sales YOY %</div>
       <div class="metric-tag">Monthly · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in pending sales count compared to the same month in the prior year.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> Whether buyer demand is stronger or weaker than it was a year ago.</div>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="pending-ratio">
       <div class="metric-name">Pending Ratio</div>
       <div class="metric-tag">Monthly · Derived: Pending ÷ Active Listings · Realtor.com</div>
       <p class="metric-provider-def">Pending ratio is calculated by dividing the pending listing count by the active listing count for a given county and month, using Realtor.com data for both figures. Values above 1.0 indicate more homes under contract than available for sale.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> A measure of market tightness — the higher the ratio, the more competitive the market. A ratio above 1.0 means demand is overwhelming available supply. Below 0.5 suggests a buyer's market with plenty of choices.</div>
     </div>
 
-    <div class="metric-card yoy">
+    <div class="metric-card yoy" id="pending-ratio-yoy">
       <div class="metric-name">Pending Ratio YOY %</div>
       <div class="metric-tag">Monthly · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in the pending ratio compared to the same month in the prior year.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> Whether market competitiveness is increasing or decreasing relative to a year ago — rising means the market is getting tighter, falling means conditions are loosening for buyers.</div>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="days-on-market">
       <div class="metric-name">Days on Market</div>
       <div class="metric-tag">Monthly · Median Days</div>
       <p class="metric-provider-def">Realtor.com defines median days on market as the median number of days from a listing's active date to the date it went under contract, for all homes that went pending that month.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> How fast homes are selling — lower means a hotter market, higher means buyers have more time.</div>
     </div>
 
-    <div class="metric-card yoy">
+    <div class="metric-card yoy" id="days-on-market-yoy">
       <div class="metric-name">Days on Market YOY %</div>
       <div class="metric-tag">Monthly · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in median days on market compared to the same month in the prior year.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> Whether homes are selling faster or slower than they were a year ago.</div>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="price-cut">
       <div class="metric-name">Price Cut %</div>
       <div class="metric-tag">Monthly · Share of Active Listings</div>
       <p class="metric-provider-def">Realtor.com defines price reduced listings as the share of active listings that have received at least one price reduction from their original list price as of month-end.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> How many sellers have had to drop their asking price — rising means sellers are losing pricing power.</div>
     </div>
 
-    <div class="metric-card yoy">
+    <div class="metric-card yoy" id="price-cut-yoy">
       <div class="metric-name">Price Cut % YOY</div>
       <div class="metric-tag">Monthly · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year change in the share of active listings with a price reduction, compared to the same month in the prior year.</p>
@@ -242,28 +242,28 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <a href="https://data.census.gov/" class="source-link" target="_blank" rel="noopener">data.census.gov →</a>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="property-tax">
       <div class="metric-name">Annual Property Tax</div>
       <div class="metric-tag">Annual · 5-Year Estimate · Median</div>
       <p class="metric-provider-def">U.S. Census Bureau American Community Survey (ACS) 5-year estimates: median annual real estate taxes paid by owner-occupied housing units. The 5-year estimate pools responses over a 60-month period to produce reliable county-level data.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> The typical property tax bill for a homeowner in this area — updated once a year when the Census releases new ACS estimates.</div>
     </div>
 
-    <div class="metric-card yoy">
+    <div class="metric-card yoy" id="property-tax-yoy">
       <div class="metric-name">Property Tax YOY %</div>
       <div class="metric-tag">Annual · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in median annual property tax from one ACS 5-year release to the next.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> How much the typical tax bill changed — reflecting local reassessments and levy changes.</div>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="tax-rate">
       <div class="metric-name">Effective Tax Rate</div>
       <div class="metric-tag">Annual · Derived: ACS ÷ Zillow ZHVI</div>
       <p class="metric-provider-def">Median annual property tax (ACS 5-year estimate) divided by the Zillow Home Value Index for that county, expressed as a percentage. This is a derived metric — not published directly by either source.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> The actual tax burden as a share of home value — lets you compare tax load across counties regardless of price level.</div>
     </div>
 
-    <div class="metric-card yoy">
+    <div class="metric-card yoy" id="tax-rate-yoy">
       <div class="metric-name">Tax Rate YOY %</div>
       <div class="metric-tag">Annual · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in the effective tax rate (ACS median tax ÷ ZHVI) compared to the prior annual period.</p>
@@ -282,14 +282,14 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <a href="https://www.redfin.com/news/data-center/" class="source-link" target="_blank" rel="noopener">redfin.com/news/data-center →</a>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="cancellations">
       <div class="metric-name">Contract Cancellations</div>
       <div class="metric-tag">Monthly · Count · Redfin</div>
       <p class="metric-provider-def">Redfin defines home purchase cancellations as the number of home-purchase agreements that were cancelled in a given month. A cancellation occurs when a buyer and seller had a signed purchase agreement but the deal did not close.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> How many buyers in this county backed out of a deal after going under contract — rising cancellations signal buyer hesitation, often tied to affordability pressure, inspection issues, or financing problems.</div>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="cancellation-rate">
       <div class="metric-name">Cancellation Rate %</div>
       <div class="metric-tag">Monthly · Derived: Cancellations ÷ Pending Sales · Redfin</div>
       <p class="metric-provider-def">Cancellation rate is the number of cancelled home-purchase agreements in a given month divided by the total number of homes that went under contract (pending) in that month, expressed as a percentage.</p>
@@ -304,14 +304,14 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <a href="https://www.propstream.com/" class="source-link" target="_blank" rel="noopener">propstream.com →</a>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="tax-delinquent">
       <div class="metric-name">Tax Delinquent</div>
       <div class="metric-tag">Monthly · Count · PropStream</div>
       <p class="metric-provider-def">PropStream defines tax delinquent properties as parcels with unpaid property taxes past their due date as recorded in county tax records. Data is aggregated at the county level from PropStream's nationwide property database.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> The number of properties in a county where the owner has fallen behind on property taxes — a leading indicator of financial stress and potential future distress inventory.</div>
     </div>
 
-    <div class="metric-card">
+    <div class="metric-card" id="tax-delinquent-pct">
       <div class="metric-name">Tax Delinquent %</div>
       <div class="metric-tag">Monthly · Derived: Tax Delinquent ÷ Total Properties</div>
       <p class="metric-provider-def">Tax delinquent property count divided by total property count for that county, as reported by PropStream, expressed as a percentage. Both figures come from PropStream's property database for the same reporting month.</p>
