@@ -1984,9 +1984,11 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
     return METRICS[cmetric].fmt(val);
   }
 
-  // Every other year gets a label; always include last
-  const labelSet = new Set(allYears.filter((_,i)=>i%2===0));
-  labelSet.add(allYears[allYears.length-1]);
+  // Value labels: first, last, min, max only
+  const minVal = d3.min(rows, r=>r[cmetric]);
+  const maxVal = d3.max(rows, r=>r[cmetric]);
+  const labelSet = new Set([allYears[0], allYears[allYears.length-1]]);
+  rows.forEach(r => { if(r[cmetric]===minVal||r[cmetric]===maxVal) labelSet.add(r.date.slice(0,4)); });
 
   // Dots on every year
   g.selectAll('.alc-dot').data(rows).join('circle').attr('class','alc-dot')
@@ -2005,8 +2007,8 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
     .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','4px').style('stroke-linejoin','round')
     .text(r=>fmtC(r[cmetric]));
 
-  // X axis — every other year
-  const xTicks = allYears.filter((_,i)=>i%2===0);
+  // X axis — every year
+  const xTicks = allYears;
   g.append('g').attr('transform',`translate(0,${ih})`)
     .call(d3.axisBottom(x).tickValues(xTicks).tickSize(0))
     .call(ax=>ax.select('.domain').remove())
