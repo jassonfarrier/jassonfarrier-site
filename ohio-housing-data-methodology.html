@@ -38,6 +38,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .metric-card.yoy{background:#f7f8fa;border-color:rgba(0,0,0,0.06)}
 .metric-card.yoy .metric-name{color:#0D1E42;font-weight:600}
 
+.page-wrap{max-width:780px;margin:0 auto;padding:56px 40px 80px}
 .site-footer{background:#fff;border-top:1px solid #f5f5f5;padding:24px 64px;margin-top:auto}
 .footer-nav{display:flex;gap:24px;margin-bottom:14px;flex-wrap:wrap}
 .footer-nav a{font-size:11px;font-weight:500;color:#9DA6AB;text-decoration:none}
@@ -46,9 +47,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .footer-disclaimer img{width:24px;height:auto;opacity:0.5;flex-shrink:0;margin-top:2px}
 .footer-disclaimer p{font-size:10px;color:rgba(0,0,0,0.38);line-height:1.7}
 
-@media(max-width:600px){
+@media(max-width:768px){
   nav{padding:0 20px}
-  .page-wrap{padding:36px 16px 60px}
+  .page-wrap{padding:36px 20px 60px}
   .site-footer{padding:20px}
   .page-title{font-size:22px}
 }
@@ -192,6 +193,20 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     </div>
 
     <div class="metric-card">
+      <div class="metric-name">Pending Ratio</div>
+      <div class="metric-tag">Monthly · Derived: Pending ÷ Active Listings · Realtor.com</div>
+      <p class="metric-provider-def">Pending ratio is calculated by dividing the pending listing count by the active listing count for a given county and month, using Realtor.com data for both figures. Values above 1.0 indicate more homes under contract than available for sale.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> A measure of market tightness — the higher the ratio, the more competitive the market. A ratio above 1.0 means demand is overwhelming available supply. Below 0.5 suggests a buyer's market with plenty of choices.</div>
+    </div>
+
+    <div class="metric-card yoy">
+      <div class="metric-name">Pending Ratio YOY %</div>
+      <div class="metric-tag">Monthly · Year-over-Year Change</div>
+      <p class="metric-provider-def">Year-over-year percent change in the pending ratio compared to the same month in the prior year.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether market competitiveness is increasing or decreasing relative to a year ago — rising means the market is getting tighter, falling means conditions are loosening for buyers.</div>
+    </div>
+
+    <div class="metric-card">
       <div class="metric-name">Days on Market</div>
       <div class="metric-tag">Monthly · Median Days</div>
       <p class="metric-provider-def">Realtor.com defines median days on market as the median number of days from a listing's active date to the date it went under contract, for all homes that went pending that month.</p>
@@ -257,6 +272,31 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   </div>
 
 
+  <!-- REALTOR.COM — PENDING RATIO -->
+  <!-- (Pending Ratio is derived from Realtor.com data already in the section above — adding as a separate card) -->
+
+  <!-- REDFIN -->
+  <div class="source-section">
+    <div class="source-header">
+      <span class="source-badge" style="background:#cc0000;">Redfin</span>
+      <a href="https://www.redfin.com/news/data-center/" class="source-link" target="_blank" rel="noopener">redfin.com/news/data-center →</a>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-name">Contract Cancellations</div>
+      <div class="metric-tag">Monthly · Count · Redfin</div>
+      <p class="metric-provider-def">Redfin defines home purchase cancellations as the number of home-purchase agreements that were cancelled in a given month. A cancellation occurs when a buyer and seller had a signed purchase agreement but the deal did not close.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many buyers in this county backed out of a deal after going under contract — rising cancellations signal buyer hesitation, often tied to affordability pressure, inspection issues, or financing problems.</div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-name">Cancellation Rate %</div>
+      <div class="metric-tag">Monthly · Derived: Cancellations ÷ Pending Sales · Redfin</div>
+      <p class="metric-provider-def">Cancellation rate is the number of cancelled home-purchase agreements in a given month divided by the total number of homes that went under contract (pending) in that month, expressed as a percentage.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> The share of deals that fall apart after going under contract. A rising rate is a leading warning sign — it shows buyers are agreeing to deals but then walking away, which often precedes softening in closed sales and prices.</div>
+    </div>
+  </div>
+
   <!-- PROPSTREAM -->
   <div class="source-section">
     <div class="source-header">
@@ -297,5 +337,6 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 
 </body>
 </html>
+
 
 
