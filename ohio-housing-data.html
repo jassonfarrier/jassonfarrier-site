@@ -32,7 +32,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 
 .main{display:flex;flex:1;overflow:hidden;position:relative}
 
-.sidebar{width:220px;flex-shrink:0;background:#f7f8fa;border-right:1px solid rgba(0,0,0,0.09);padding:18px 12px;display:flex;flex-direction:column;gap:5px;overflow-y:auto;z-index:10}
+.sidebar{width:220px;flex-shrink:0;background:#f7f8fa;border-right:1px solid rgba(0,0,0,0.09);display:flex;flex-direction:column;overflow:hidden;z-index:10}.sidebar-sticky{padding:14px 12px 10px;flex-shrink:0;background:#f7f8fa;border-bottom:1px solid rgba(0,0,0,0.07)}.sidebar-scroll{flex:1;overflow-y:auto;padding:8px 12px 18px;display:flex;flex-direction:column;gap:5px}
 .sidebar-label{font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:5px;padding-left:3px}
 .metric-btn{background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:6px;padding:10px 12px;cursor:pointer;transition:all .2s;text-align:left;width:100%}
 .metric-btn:hover{background:#edf2fb;border-color:rgba(26,82,150,0.3)}
@@ -98,7 +98,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .snap-val.up{color:#15803d}.snap-val.dn{color:#dc2626}
 .snap-lbl{font-size:8px;font-weight:400;letter-spacing:1px;text-transform:uppercase;color:rgba(0,0,0,0.38);margin-top:4px}
 
-.modal-body{display:flex;gap:0;align-items:stretch;flex:1;min-height:0;}.modal-left{width:200px;flex-shrink:0;border-right:1px solid rgba(0,0,0,0.07);padding-right:14px;margin-right:18px;overflow-y:auto;}.modal-left .md{display:none;}.metric-move{display:inline-flex;flex-direction:column;gap:1px;margin-left:4px;opacity:0;transition:opacity .15s;flex-shrink:0;}.chart-tab:hover .metric-move{opacity:1;}.metric-move button{background:none;border:none;padding:0;cursor:pointer;font-size:8px;color:#888;line-height:1;}.metric-move button:hover{color:#0d1e42;}.modal-right{flex:1;min-width:0;display:flex;flex-direction:column;}.chart-label{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:10px}.chart-label#chart-label{display:none}
+.modal-body{display:flex;gap:0;align-items:stretch;flex:1;min-height:0;}.modal-left{width:200px;flex-shrink:0;border-right:1px solid rgba(0,0,0,0.07);padding-right:14px;margin-right:18px;display:flex;flex-direction:column;overflow:hidden;}.modal-left-sticky{flex-shrink:0;}.modal-left-scroll{flex:1;overflow-y:auto;}.modal-left .md{display:none;}.metric-move{display:inline-flex;flex-direction:column;gap:1px;margin-left:4px;opacity:0;transition:opacity .15s;flex-shrink:0;}.chart-tab:hover .metric-move{opacity:1;}.metric-move button{background:none;border:none;padding:0;cursor:pointer;font-size:8px;color:#888;line-height:1;}.metric-move button:hover{color:#0d1e42;}.modal-right{flex:1;min-width:0;display:flex;flex-direction:column;}.chart-label{font-size:9px;font-weight:400;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);margin-bottom:10px}.chart-label#chart-label{display:none}
 .chart-tabs{display:flex;flex-direction:column;gap:4px;}
 .chart-tab{background:transparent;border:none;border-radius:7px;padding:9px 12px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;transition:all .2s;font-family:'Montserrat',sans-serif;text-align:left;width:100%;}
 .chart-tab:hover{background:#edf2fb;color:#0D1E42}
@@ -259,8 +259,11 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 </div>
 <div class="main">
   <div class="sidebar">
-    <div class="page-eyebrow" style="padding:18px 0 10px;letter-spacing:3px;font-size:11px;font-weight:700;text-transform:uppercase;color:#0D1E42;font-family:Montserrat,sans-serif">Ohio Housing Data</div>
-
+    <div class="sidebar-sticky">
+      <div class="page-eyebrow" style="padding:4px 0 10px;letter-spacing:3px;font-size:11px;font-weight:700;text-transform:uppercase;color:#0D1E42;font-family:Montserrat,sans-serif">Ohio Housing Data</div>
+      <div id="pending-ratio-badge-placeholder"></div>
+    </div>
+    <div class="sidebar-scroll">
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Prices</div>
     <button class="metric-btn active" data-metric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span></button>
     <button class="metric-btn yoy-btn" data-metric="zhvi_yoy"><span class="mn">Home Value YOY %</span><span class="md">Year-over-year change</span></button>
@@ -274,6 +277,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
     <button class="metric-btn yoy-btn" data-metric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="pending_ratio"><span class="mn">Pending Ratio</span><span class="md">Pending ÷ active listings</span></button>
+    <button class="metric-btn yoy-btn" data-metric="pending_ratio_yoy"><span class="mn">Pending Ratio YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span></button>
     <button class="metric-btn yoy-btn" data-metric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
@@ -298,6 +302,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       Equal Housing Opportunity · Information deemed reliable but not guaranteed.<br>
       <a href="/ohio-housing-data-methodology.html" style="color:rgba(26,82,150,0.6);font-size:9px;font-weight:500;text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Methodology &amp; Data Sources →</a>
     </div>
+    </div><!-- end sidebar-scroll -->
   </div>
 <div id="map"></div>
 <div id="table-view" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:#f7f8fa;z-index:10;overflow:auto;padding:80px 24px 24px;">
@@ -378,7 +383,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="home_purchase_cancellations">Contract Cancellations</option>
           <option value="cancellation_pct">Cancellation Rate %</option>
         </select>
-        <div id="pending-ratio-badge" style="display:none;font-family:Montserrat,sans-serif;background:#edf2fb;border-radius:12px;padding:16px 12px 16px;margin-bottom:20px;">
+        <div class="modal-left-sticky"><div id="pending-ratio-badge" style="display:none;font-family:Montserrat,sans-serif;background:#edf2fb;border-radius:12px;padding:16px 12px 16px;margin-bottom:12px;">
           <svg viewBox="5 5 190 118" style="width:100%;display:block;margin:0 auto 8px;">
             <defs>
               <linearGradient id="pgrd" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -402,8 +407,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
             <span id="pending-ratio-val" style="font-size:28px;font-weight:800;color:#0d1e42;line-height:1;"></span>
             <div style="font-size:9px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:rgba(13,30,66,0.4);margin-top:4px;">Pending Ratio</div>
           </div>
-        </div>
-        <div class="chart-tabs" id="chart-tabs">
+        </div></div><!-- end modal-left-sticky -->
+        <div class="modal-left-scroll"><div class="chart-tabs" id="chart-tabs">
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Prices</div>
           <button class="metric-btn chart-tab active" data-cmetric="zhvi"><span class="mn">Home Value</span><span class="md">Zillow ZHVI typical value</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_yoy"><span class="mn">Home Value YOY %</span><span class="md">Year-over-year change</span></button>
@@ -417,6 +422,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab" data-cmetric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="pending_ratio"><span class="mn">Pending Ratio</span><span class="md">Pending ÷ active listings · Realtor.com · 2016–present</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="pending_ratio_yoy"><span class="mn">Pending Ratio YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
@@ -431,8 +437,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab" data-cmetric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">PropStream · Jun–Jul 2026</span></button>
           <button class="metric-btn chart-tab" data-cmetric="home_purchase_cancellations"><span class="mn">Contract Cancellations</span><span class="md">Redfin · Apr 2015–Jul 2026</span></button>
           <button class="metric-btn chart-tab" data-cmetric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">Redfin · Apr 2015–Jul 2026</span></button>
-          
-        </div>
+
+        </div></div><!-- end modal-left-scroll -->
       </div>
       <div class="modal-right">
         <div class="upper-third" id="upper-third">
@@ -478,6 +484,7 @@ const METRICS = {
   pending_listings: {label:'Pending Sales',   fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
   pending_listings_yoy:{label:'Pending Sales YOY %',fmt:v=>v.toFixed(1)+'%',            lo:'Declining',hi:'Growing'},
   pending_ratio:    {label:'Pending Ratio',     fmt:v=>v.toFixed(2),                               lo:'Low Demand',hi:'High Demand'},
+  pending_ratio_yoy:{label:'Pending Ratio YOY %',fmt:v=>(v>0?'+':'')+v.toFixed(1)+'%',            lo:'Falling',  hi:'Rising'},
   days_on_market:   {label:'Days on Market',  fmt:v=>v+' days',                          lo:'Fast',     hi:'Slow'},
   days_on_market_yoy:{label:'Days on Market YOY %',fmt:v=>v.toFixed(1)+'%',             lo:'Declining',hi:'Growing'},
   price_reduced_pct:{label:'Price Cut %',fmt:v=>v.toFixed(1)+'%',                  lo:'Few Cuts', hi:'Many Cuts'},
@@ -494,8 +501,8 @@ const METRICS = {
   home_purchase_cancellations: {label:'Contract Cancellations', fmt:v=>v.toLocaleString(), lo:'Fewer', hi:'More'},
   cancellation_pct:            {label:'Cancellation Rate %',    fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
 };
-const YOY_METRICS = new Set(['zhvi_yoy','active_listings_yoy','pending_listings_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy']);
-const YOY_BASE = {zhvi_yoy:'zhvi', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate'};
+const YOY_METRICS = new Set(['zhvi_yoy','active_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy']);
+const YOY_BASE = {zhvi_yoy:'zhvi', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct']);
 
