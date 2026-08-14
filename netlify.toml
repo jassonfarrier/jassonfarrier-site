@@ -43,6 +43,16 @@
   to = "/free.html"
   status = 200
 
+[[redirects]]
+  from = "/blog-property-tax-sep-2025"
+  to = "/housing-market-updates/property-tax-sep-2025"
+  status = 301
+
+[[redirects]]
+  from = "/blog-ohio-spring-2026"
+  to = "/housing-market-updates/ohio-spring-2026"
+  status = 301
+
 [[headers]]
   for = "/*"
   [headers.values]
