@@ -1438,7 +1438,7 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
         metroHoveredId = e.features[0].id;
         map.setFeatureState({source:'ohio-metros',id:metroHoveredId},{hover:true});
         const mf = e.features[0];
-        const rid = mf.properties && mf.properties.__rid;
+        const rid = mf.id || (mf.properties && mf.properties.__rid) || (mf.properties && mf.properties.region_id);
         const md = rid ? metroDataMap[rid] : null;
         const mVal = md ? getMetricVal(md, mapMetric) : null;
         const mFmt = mVal != null ? METRICS[mapMetric].fmt(mVal) : 'N/A';
