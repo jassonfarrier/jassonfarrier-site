@@ -2507,7 +2507,7 @@ function loadMetroData() {
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
   Promise.all([
     fetch('/ohio-metros.geojson').then(r=>r.json()),
-    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_metros?select=region_id,metro,latest,history', {
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_metros?select=region_id,metro,latest', {
       headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
     }).then(r=>r.json())
   ]).then(([geojson, metros]) => {
@@ -2529,6 +2529,16 @@ function loadMetroData() {
 function openMetroModal(rid) {
   const d = metroDataMap[rid];
   if (!d) return;
+  if (!d.history) {
+    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_metros?select=region_id,history&region_id=eq.'+rid, {
+      headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
+    }).then(r=>r.json()).then(rows => {
+      if (rows[0]) { d.history = rows[0].history; attachYOY(d); }
+      openMetroModal(rid);
+    });
+    return;
+  }
   selectedCounty = null; selectedZip = null;
   const l = d.latest || {};
   document.getElementById('modal-county').textContent = d.metro;
@@ -3140,6 +3150,7 @@ document.addEventListener('change', function(e){
 })();
 
 </script>
+
 
 
 
