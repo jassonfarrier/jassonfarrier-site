@@ -758,6 +758,20 @@ function renderColors(mode) {
         src.setData(src._data);
       }
       try { map.setPaintProperty('counties-fill', 'fill-color', ['coalesce', ['get', '__color'], '#ccc']); } catch(e) {}
+    } else if (isDistress) {
+      // Distress metrics: values come from distress_history, not GeoJSON properties
+      // Must use per-feature __color approach (same as YOY) — interpolate on ['get', metric] won't work
+      if (src && src._data && src._data.features) {
+        src._data.features.forEach(f => {
+          const name = f.properties && f.properties.county;
+          const d = name ? dataMap[name] : null;
+          const val = d ? getMetricVal(d, metric) : null;
+          f.properties.__color = colorFromStops(stops, val);
+          f.properties.__label = val != null ? METRICS[metric].fmt(val) : '';
+        });
+        src.setData(src._data);
+      }
+      try { map.setPaintProperty('counties-fill', 'fill-color', ['coalesce', ['get', '__color'], '#ccc']); } catch(e) {}
     } else {
       // Non-YOY: use Mapbox interpolate expression on GeoJSON property
       const flatStops = stops.flatMap(([v, c]) => [v, c]);
@@ -3155,6 +3169,7 @@ document.addEventListener('change', function(e){
 })();
 
 </script>
+
 
 
 
