@@ -664,6 +664,11 @@ function drawLegend(vals, palette) {
 // Add a new layer: add one entry to LAYER_CONFIG. Nothing else changes.
 function getMetricVal(d, metric) {
   if (YOY_METRICS.has(metric)) return d.yoy_latest && d.yoy_latest[metric] != null ? Number(d.yoy_latest[metric]) : null;
+  if (DISTRESS_METRICS.has(metric)) {
+    if (!d.distress_history || !d.distress_history.length) return null;
+    const last = d.distress_history[d.distress_history.length - 1];
+    return last[metric] != null ? Number(last[metric]) : null;
+  }
   return d.latest && d.latest[metric] != null ? Number(d.latest[metric]) : null;
 }
 
@@ -1212,7 +1217,7 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
 });
 
 // Load data + init map
-fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fips,county,latest,history,prop_tax_history&order=county', {
+fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fips,county,latest,history,prop_tax_history,distress_history&order=county', {
   headers: {
     'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI',
     'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI'
