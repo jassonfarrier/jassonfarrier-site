@@ -2507,12 +2507,12 @@ function loadMetroData() {
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
   Promise.all([
     fetch('/ohio-metros.geojson').then(r=>r.json()),
-    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_metros?select=region_id,metro,latest', {
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_metros?select=region_id,metro,latest,yoy_latest', {
       headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
     }).then(r=>r.json())
   ]).then(([geojson, metros]) => {
     METRO_DATA = metros;
-    METRO_DATA.forEach(d => { metroDataMap[d.region_id] = d; attachYOY(d); });
+    METRO_DATA.forEach(d => { metroDataMap[d.region_id] = d; d.yoy_latest = d.yoy_latest || {}; });
     metroDataLoaded = true;
     geojson.features.forEach(f => {
       const rid = f.properties && f.properties.region_id;
