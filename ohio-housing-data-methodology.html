@@ -155,17 +155,31 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     </div>
 
     <div class="metric-card" id="zhvi">
-      <div class="metric-name">Home Value</div>
+      <div class="metric-name">SFH Home Value</div>
       <div class="metric-tag">Monthly · Single-Family · Mid-Tier · Smoothed &amp; Seasonally Adjusted</div>
-      <p class="metric-provider-def">Zillow Home Value Index (ZHVI): a smoothed, seasonally adjusted measure of the typical home value across a given region and housing type. It reflects the full distribution of home values — not just those that sold — and is reported for the middle tier of the market (33rd–67th percentile).</p>
+      <p class="metric-provider-def">Zillow Home Value Index (ZHVI): a smoothed, seasonally adjusted measure of the typical single-family home value across a given region. It reflects the full distribution of home values — not just those that sold — and is reported for the middle tier of the market (33rd–67th percentile). Single-family only; condos and co-ops are excluded.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> What a mid-range single-family home in this area is worth right now, based on Zillow's estimate of the entire housing stock — not just homes that happened to sell that month.</div>
     </div>
 
     <div class="metric-card yoy" id="zhvi-yoy">
-      <div class="metric-name">Home Value YOY %</div>
+      <div class="metric-name">SFH Home Value YOY %</div>
       <div class="metric-tag">Monthly · Derived from ZHVI History</div>
-      <p class="metric-provider-def">Year-over-year percent change in ZHVI, calculated by comparing the current month's value to the same month 12 months prior.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> How much home values have gone up or down compared to exactly one year ago.</div>
+      <p class="metric-provider-def">Year-over-year percent change in single-family ZHVI, calculated by comparing the current month's value to the same month 12 months prior.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How much single-family home values have gone up or down compared to exactly one year ago.</div>
+    </div>
+
+    <div class="metric-card" id="zhvi-condo">
+      <div class="metric-name">Condo Home Value</div>
+      <div class="metric-tag">Monthly · Condo/Co-op · Mid-Tier · Smoothed &amp; Seasonally Adjusted</div>
+      <p class="metric-provider-def">Zillow Home Value Index (ZHVI): a smoothed, seasonally adjusted measure of the typical condo or co-op value across a given region. It reflects the full distribution of condo values — not just those that sold — and is reported for the middle tier of the market (33rd–67th percentile). Condos and co-ops only; single-family homes are excluded.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> What a mid-range condo in this area is worth right now, based on Zillow's estimate of the entire condo stock — not just units that happened to sell that month. Not all areas have condo data; rural markets with few condos may show N/A.</div>
+    </div>
+
+    <div class="metric-card yoy" id="zhvi-condo-yoy">
+      <div class="metric-name">Condo Home Value YOY %</div>
+      <div class="metric-tag">Monthly · Derived from Condo ZHVI History</div>
+      <p class="metric-provider-def">Year-over-year percent change in condo ZHVI, calculated by comparing the current month's value to the same month 12 months prior.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How much condo values have gone up or down compared to exactly one year ago.</div>
     </div>
   </div>
 
@@ -349,6 +363,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 
 </body>
 </html>
+
 
 
 
