@@ -1750,6 +1750,13 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
     ? (r => divergingColor(_sortedVals, r[cmetric]))
     : seqColor;
 
+  // Highlight every bar that shares the same calendar month as the most recent data point
+  // (e.g. all Julys highlighted when the latest month is July) — makes seasonal comparison easy
+  // and auto-advances every month with no manual update needed.
+  const _currentMM = rows.length ? rows[rows.length - 1].date.slice(5, 7) : null;
+  const HIGHLIGHT_COLOR = '#f5a623';
+  const isCurrentMonthBar = r => _currentMM != null && r.date.slice(5, 7) === _currentMM;
+
   // Grid
   y.ticks(5).forEach(t=>{
     g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t))
@@ -1854,9 +1861,10 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
     .attr('y', r => _isYOYChart ? Math.min(y(r[cmetric]), y(0)) : y(r[cmetric]))
     .attr('width', monthPx*0.9)
     .attr('height', r => _isYOYChart ? Math.abs(y(r[cmetric]) - y(0)) : ih - y(r[cmetric]))
-    .attr('fill', r => barColor(r))
+    .attr('fill', r => isCurrentMonthBar(r) ? HIGHLIGHT_COLOR : barColor(r))
     .attr('fill-opacity', 1.0)
-    .attr('stroke', 'none')
+    .attr('stroke', r => isCurrentMonthBar(r) ? '#c9820a' : 'none')
+    .attr('stroke-width', r => isCurrentMonthBar(r) ? 1.5 : 0)
     .attr('rx', 1)
     .style('cursor','pointer')
     .on('mouseover', function(event, r) {
