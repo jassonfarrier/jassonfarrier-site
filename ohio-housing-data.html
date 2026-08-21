@@ -307,6 +307,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span><a class="metric-help" href="/ohio-housing-data-methodology#price-cut" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#price-cut-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">% of pending sales cancelled · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn yoy-btn" data-metric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Taxes</div>
     <button class="metric-btn" data-metric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
@@ -397,6 +398,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="price_reduced_pct">Price Cut %</option>
           <option value="price_reduced_pct_yoy">Price Cut % YOY</option>
           <option value="cancellation_pct">Cancellation Rate %</option>
+          <option value="cancellation_pct_yoy">Cancellation Rate YOY %</option>
           <option value="median_property_tax">Property Tax</option>
           <option value="median_property_tax_yoy">Property Tax YOY %</option>
           <option value="property_tax_rate">Tax Rate</option>
@@ -465,6 +467,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab" data-cmetric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">PropStream</span></button>
           <button class="metric-btn chart-tab" data-cmetric="pre_fc"><span class="mn">Pre-Foreclosure</span><span class="md">PropStream</span></button>
           <button class="metric-btn chart-tab" data-cmetric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">Redfin · Apr 2015–Jul 2026</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="delisted_pct"><span class="mn">Delisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
 
         </div></div><!-- end modal-left-scroll -->
@@ -531,10 +534,11 @@ const METRICS = {
   tax_del_pct:    {label:'Tax Delinquent %', fmt:v=>v.toFixed(2)+'%',             lo:'Lower', hi:'Higher'},
   pre_fc:         {label:'Pre-Foreclosure',   fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
   cancellation_pct:            {label:'Cancellation Rate %',    fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
+  cancellation_pct_yoy:         {label:'Cancellation Rate YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   delisted_pct:                 {label:'Delisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
 };
-const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy']);
-const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate'};
+const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy']);
+const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc']);
 
@@ -2362,6 +2366,7 @@ const TABLE_COLS = [
   {key:'price_reduced_pct',label:'Price Cut %',      fmt:v=>v!=null?v.toFixed(1)+'%':null},
   {key:'price_reduced_pct_yoy',label:'PC YOY %',     fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
   {key:'cancellation_pct',label:'Cancel. Rate %',    fmt:v=>v!=null?v.toFixed(1)+'%':null},
+  {key:'cancellation_pct_yoy',label:'CR YOY %',        fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
   {key:'median_property_tax',label:'Property Tax',   fmt:v=>v!=null?'$'+Math.round(v).toLocaleString():null},
   {key:'median_property_tax_yoy',label:'PT YOY %',   fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
   {key:'property_tax_rate',  label:'Tax Rate',       fmt:v=>v!=null?v.toFixed(2)+'%':null},
