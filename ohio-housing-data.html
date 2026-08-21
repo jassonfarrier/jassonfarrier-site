@@ -313,6 +313,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn" data-metric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">Tax delinquent properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">Tax delinquent as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">% of pending sales cancelled · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="delisted_pct"><span class="mn">Delisted %</span><span class="md">% of listings pulled off market · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#delisted-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <hr>
     <div style="padding:6px 3px 0;"><label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;font-family:Montserrat,sans-serif"><input type="checkbox" id="dc-toggle" style="cursor:pointer;accent-color:#0d1e42"> Data Centers</label></div>
 
@@ -403,6 +404,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="tax_delinquent">Tax Delinquent</option>
           <option value="tax_del_pct">Tax Delinquent %</option>
           <option value="cancellation_pct">Cancellation Rate %</option>
+          <option value="delisted_pct">Delisted %</option>
         </select>
         <div class="modal-left-sticky"><div id="pending-ratio-badge" style="display:none;font-family:Montserrat,sans-serif;background:#edf2fb;border-radius:12px;padding:16px 12px 16px;margin-bottom:12px;">
           <svg viewBox="5 5 190 118" style="width:100%;display:block;margin:0 auto 8px;">
@@ -459,6 +461,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab" data-cmetric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">PropStream</span></button>
           <button class="metric-btn chart-tab" data-cmetric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">PropStream</span></button>
           <button class="metric-btn chart-tab" data-cmetric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">Redfin · Apr 2015–Jul 2026</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="delisted_pct"><span class="mn">Delisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
 
         </div></div><!-- end modal-left-scroll -->
       </div>
@@ -523,6 +526,7 @@ const METRICS = {
   tax_delinquent: {label:'Tax Delinquent',   fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
   tax_del_pct:    {label:'Tax Delinquent %', fmt:v=>v.toFixed(2)+'%',             lo:'Lower', hi:'Higher'},
   cancellation_pct:            {label:'Cancellation Rate %',    fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
+  delisted_pct:                 {label:'Delisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
 };
 const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy']);
 const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate'};
