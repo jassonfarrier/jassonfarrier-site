@@ -315,6 +315,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Distress</div>
     <button class="metric-btn" data-metric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">Tax delinquent properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">Tax delinquent as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="pre_fc"><span class="mn">Pre-Foreclosure</span><span class="md">Properties in pre-foreclosure</span><a class="metric-help" href="/ohio-housing-data-methodology#pre-foreclosure" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <hr>
     <div style="padding:6px 3px 0;"><label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;font-family:Montserrat,sans-serif"><input type="checkbox" id="dc-toggle" style="cursor:pointer;accent-color:#0d1e42"> Data Centers</label></div>
 
@@ -406,6 +407,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="delisted_pct">Delisted %</option>
           <option value="tax_delinquent">Tax Delinquent</option>
           <option value="tax_del_pct">Tax Delinquent %</option>
+          <option value="pre_fc">Pre-Foreclosure</option>
         </select>
         <div class="modal-left-sticky"><div id="pending-ratio-badge" style="display:none;font-family:Montserrat,sans-serif;background:#edf2fb;border-radius:12px;padding:16px 12px 16px;margin-bottom:12px;">
           <svg viewBox="5 5 190 118" style="width:100%;display:block;margin:0 auto 8px;">
@@ -461,6 +463,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Distress</div>
           <button class="metric-btn chart-tab" data-cmetric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">PropStream</span></button>
           <button class="metric-btn chart-tab" data-cmetric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">PropStream</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="pre_fc"><span class="mn">Pre-Foreclosure</span><span class="md">PropStream</span></button>
           <button class="metric-btn chart-tab" data-cmetric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">Redfin · Apr 2015–Jul 2026</span></button>
           <button class="metric-btn chart-tab" data-cmetric="delisted_pct"><span class="mn">Delisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
 
@@ -526,13 +529,14 @@ const METRICS = {
   total_permits_per_1k:{label:'Total Permits per 1K', fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
   tax_delinquent: {label:'Tax Delinquent',   fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
   tax_del_pct:    {label:'Tax Delinquent %', fmt:v=>v.toFixed(2)+'%',             lo:'Lower', hi:'Higher'},
+  pre_fc:         {label:'Pre-Foreclosure',   fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
   cancellation_pct:            {label:'Cancellation Rate %',    fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
   delisted_pct:                 {label:'Delisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
 };
 const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy']);
 const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
-const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct']);
+const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc']);
 
 const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
 
@@ -2356,6 +2360,7 @@ const TABLE_COLS = [
   {key:'property_tax_rate_yoy',label:'TR YOY %',     fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
   {key:'tax_delinquent',label:'Tax Delinquent',      fmt:v=>v!=null?Math.round(v).toLocaleString():null},
   {key:'tax_del_pct',   label:'Tax Delinq. %',       fmt:v=>v!=null?v.toFixed(2)+'%':null},
+  {key:'pre_fc',        label:'Pre-Foreclosure',     fmt:v=>v!=null?Math.round(v).toLocaleString():null},
 ];
 
 function toggleTableView() {
@@ -2601,6 +2606,39 @@ function openMetroModal(rid) {
 }
 
 // --- State Mode ---
+// Live-aggregate statewide distress metrics by summing every county's distress_history.
+// This replaces the manually-maintained ohio_state distress numbers with a self-correcting
+// total that's always consistent with the county-level data shown elsewhere on the page.
+function buildAggregatedStateDistressHistory() {
+  if (!DATA.length) return [];
+  const byMonth = {};
+  DATA.forEach(d => {
+    (d.distress_history || []).forEach(entry => {
+      const m = entry.month;
+      if (!m) return;
+      if (!byMonth[m]) byMonth[m] = {month: m, tax_delinquent: 0, pre_fc: 0, total_properties: 0, _counties: 0};
+      const row = byMonth[m];
+      if (entry.tax_delinquent != null) row.tax_delinquent += Number(entry.tax_delinquent);
+      if (entry.pre_fc != null) row.pre_fc += Number(entry.pre_fc);
+      if (entry.total_properties != null) row.total_properties += Number(entry.total_properties);
+      row._counties++;
+    });
+  });
+  return Object.values(byMonth).map(row => ({
+    month: row.month,
+    tax_delinquent: row.tax_delinquent,
+    pre_fc: row.pre_fc,
+    total_properties: row.total_properties,
+    tax_del_pct: row.total_properties ? +(row.tax_delinquent / row.total_properties * 100).toFixed(3) : null,
+    _counties_reporting: row._counties
+  })).sort((a,b) => a.month < b.month ? -1 : 1);
+}
+
+function _applyAggregatedStateDistress() {
+  if (!STATE_DATA || !DATA.length) return;
+  STATE_DATA.distress_history = buildAggregatedStateDistressHistory();
+}
+
 function loadStateData() {
   if (stateDataLoaded) { return; }
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
@@ -2609,6 +2647,16 @@ function loadStateData() {
   }).then(r=>r.json()).then(rows => {
     STATE_DATA = rows[0] || null;
     if (STATE_DATA) attachYOY(STATE_DATA);
+    // Overwrite distress_history with a live sum of all 88 counties — self-correcting,
+    // always matches the county-level table/map rather than a hand-maintained figure.
+    if (DATA.length) {
+      _applyAggregatedStateDistress();
+    } else {
+      // Counties haven't loaded yet — apply once they do.
+      const wait = setInterval(() => {
+        if (DATA.length) { clearInterval(wait); _applyAggregatedStateDistress(); }
+      }, 200);
+    }
     stateDataLoaded = true;
     // State fill is a single solid color — no quantile needed
     // Optionally show statewide modal on load
