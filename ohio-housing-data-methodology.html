@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ohio Housing Data Methodology | Jasson Farrier</title>
-<meta name="description" content="How the metrics on the Ohio Housing Market Data page are defined, sourced, and calculated. Definitions from Zillow, Realtor.com, and the U.S. Census Bureau.">
+<title>Ohio Housing Data Methodology | Zillow, Realtor.com, Redfin & Census Sources</title>
+<meta name="description" content="How the metrics on the Ohio Housing Market Data page are defined, sourced, and calculated for every Ohio county, metro, and zip code. Definitions from Zillow, Realtor.com, Redfin, PropStream, and the U.S. Census Bureau.">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -108,7 +108,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": "Ohio Housing Data Methodology",
-  "description": "How Jasson Farrier calculates and sources Ohio housing market metrics including home values, days on market, pending ratio, and distressed property data.",
+  "description": "How Jasson Farrier calculates and sources Ohio housing market metrics including home values, days on market, pending ratio, cancellation rate, delisted share, and distressed property data across Ohio counties, metros, and zip codes.",
   "url": "https://jassonfarrier.com/ohio-housing-data-methodology",
   "author": {"@type": "Person", "name": "Jasson Farrier"},
   "publisher": {"@type": "Person", "name": "Jasson Farrier"},
@@ -145,7 +145,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   <a href="/ohio-housing-data" class="back-link">← Back to Ohio Housing Data</a>
   <h1 class="page-title">Ohio Housing Data Methodology</h1>
   <p class="page-subtitle">How every metric on the data page is defined, sourced, and calculated.</p>
-  <p class="intro">Every metric on the Ohio Housing Market Data page comes from a primary data provider — Zillow, Realtor.com, or the U.S. Census Bureau. Definitions below are sourced directly from each provider, followed by a plain-English explanation of what the number actually tells you.</p>
+  <p class="intro">Every metric on the Ohio Housing Market Data page comes from a primary data provider — Zillow, Realtor.com, Redfin, PropStream, or the U.S. Census Bureau — covering all 88 Ohio counties, Ohio metro areas, and Ohio zip codes. Definitions below are sourced directly from each provider, followed by a plain-English explanation of what the number actually tells you about the Ohio housing market.</p>
 
   <!-- ZILLOW -->
   <div class="source-section">
@@ -158,28 +158,28 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <div class="metric-name">SFH Home Value</div>
       <div class="metric-tag">Monthly · Single-Family · Mid-Tier · Smoothed &amp; Seasonally Adjusted</div>
       <p class="metric-provider-def">Zillow Home Value Index (ZHVI): a smoothed, seasonally adjusted measure of the typical single-family home value across a given region. It reflects the full distribution of home values — not just those that sold — and is reported for the middle tier of the market (33rd–67th percentile). Single-family only; condos and co-ops are excluded.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> What a mid-range single-family home in this area is worth right now, based on Zillow's estimate of the entire housing stock — not just homes that happened to sell that month.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> What a mid-range single-family home in this Ohio county or city is worth right now, based on Zillow's estimate of the entire housing stock — not just homes that happened to sell that month.</div>
     </div>
 
     <div class="metric-card yoy" id="zhvi-yoy">
       <div class="metric-name">SFH Home Value YOY %</div>
       <div class="metric-tag">Monthly · Derived from ZHVI History</div>
       <p class="metric-provider-def">Year-over-year percent change in single-family ZHVI, calculated by comparing the current month's value to the same month 12 months prior.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> How much single-family home values have gone up or down compared to exactly one year ago.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> How much single-family home values in this part of Ohio have gone up or down compared to exactly one year ago.</div>
     </div>
 
     <div class="metric-card" id="zhvi-condo">
       <div class="metric-name">Condo Home Value</div>
       <div class="metric-tag">Monthly · Condo/Co-op · Mid-Tier · Smoothed &amp; Seasonally Adjusted</div>
       <p class="metric-provider-def">Zillow Home Value Index (ZHVI): a smoothed, seasonally adjusted measure of the typical condo or co-op value across a given region. It reflects the full distribution of condo values — not just those that sold — and is reported for the middle tier of the market (33rd–67th percentile). Condos and co-ops only; single-family homes are excluded.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> What a mid-range condo in this area is worth right now, based on Zillow's estimate of the entire condo stock — not just units that happened to sell that month. Not all areas have condo data; rural markets with few condos may show N/A.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> What a mid-range condo in this Ohio market is worth right now, based on Zillow's estimate of the entire condo stock — not just units that happened to sell that month. Not all Ohio counties have condo data; rural markets with few condos may show N/A.</div>
     </div>
 
     <div class="metric-card yoy" id="zhvi-condo-yoy">
       <div class="metric-name">Condo Home Value YOY %</div>
       <div class="metric-tag">Monthly · Derived from Condo ZHVI History</div>
       <p class="metric-provider-def">Year-over-year percent change in condo ZHVI, calculated by comparing the current month's value to the same month 12 months prior.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> How much condo values have gone up or down compared to exactly one year ago.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> How much Ohio condo values have gone up or down compared to exactly one year ago.</div>
     </div>
   </div>
 
@@ -194,70 +194,70 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <div class="metric-name">Active Listings</div>
       <div class="metric-tag">Monthly · Count</div>
       <p class="metric-provider-def">Realtor.com defines active listings as properties listed for sale that are not yet under contract as of month-end. This count reflects available supply in the market at that point in time.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> How many homes are sitting on the market available to buy right now.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many homes are sitting on the market available to buy right now in this Ohio county.</div>
     </div>
 
     <div class="metric-card yoy" id="active-listings-yoy">
       <div class="metric-name">Active Listings YOY %</div>
       <div class="metric-tag">Monthly · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in the active listing count compared to the same month in the prior year.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> Whether there are more or fewer homes for sale than this time last year.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether there are more or fewer Ohio homes for sale than this time last year.</div>
     </div>
 
     <div class="metric-card" id="pending-sales">
       <div class="metric-name">Pending Sales</div>
       <div class="metric-tag">Monthly · Count</div>
       <p class="metric-provider-def">Realtor.com defines pending listings as homes with an accepted offer that have not yet closed as of month-end. Pending sales lead closed sales by approximately 30–60 days.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> Homes under contract — the best leading indicator of where closed sales are heading in the next 30–60 days.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> Homes under contract in this Ohio market — the best leading indicator of where closed sales are heading in the next 30–60 days.</div>
     </div>
 
     <div class="metric-card yoy" id="pending-sales-yoy">
       <div class="metric-name">Pending Sales YOY %</div>
       <div class="metric-tag">Monthly · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in pending sales count compared to the same month in the prior year.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> Whether buyer demand is stronger or weaker than it was a year ago.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether buyer demand in this part of Ohio is stronger or weaker than it was a year ago.</div>
     </div>
 
     <div class="metric-card" id="pending-ratio">
       <div class="metric-name">Pending Ratio</div>
       <div class="metric-tag">Monthly · Realtor.com · Housing Inventory Core Metrics</div>
       <p class="metric-provider-def">Realtor.com defines the pending ratio as the share of pending listings to active listings in a given market during the specified month.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> How many homes are under contract relative to how many are sitting available. The further the ratio rises above 1.0, the more leverage sellers have. The further it falls below 1.0, the more leverage buyers have.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many Ohio homes are under contract relative to how many are sitting available. The further the ratio rises above 1.0, the more leverage sellers have. The further it falls below 1.0, the more leverage buyers have.</div>
     </div>
 
     <div class="metric-card yoy" id="pending-ratio-yoy">
       <div class="metric-name">Pending Ratio YOY %</div>
       <div class="metric-tag">Monthly · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in the pending ratio compared to the same month in the prior year. Published by Realtor.com as part of their Housing Inventory Core Metrics.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> Is the leverage shifting toward sellers or buyers compared to a year ago — a rising number means sellers are gaining ground, a falling number means buyers are.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> Is the leverage in this Ohio market shifting toward sellers or buyers compared to a year ago — a rising number means sellers are gaining ground, a falling number means buyers are.</div>
     </div>
 
     <div class="metric-card" id="days-on-market">
       <div class="metric-name">Days on Market</div>
       <div class="metric-tag">Monthly · Median Days</div>
       <p class="metric-provider-def">Realtor.com defines median days on market as the median number of days from a listing's active date to the date it went under contract, for all homes that went pending that month.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> How fast homes are selling — lower means a hotter market, higher means buyers have more time.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> How fast homes are selling in this Ohio market — lower means a hotter market, higher means buyers have more time.</div>
     </div>
 
     <div class="metric-card yoy" id="days-on-market-yoy">
       <div class="metric-name">Days on Market YOY %</div>
       <div class="metric-tag">Monthly · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in median days on market compared to the same month in the prior year.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> Whether homes are selling faster or slower than they were a year ago.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether Ohio homes here are selling faster or slower than they were a year ago.</div>
     </div>
 
     <div class="metric-card" id="price-cut">
       <div class="metric-name">Price Cut %</div>
       <div class="metric-tag">Monthly · Share of Active Listings</div>
       <p class="metric-provider-def">Realtor.com defines price reduced listings as the share of active listings that have received at least one price reduction from their original list price as of month-end.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> How many sellers have had to drop their asking price — rising means sellers are losing pricing power.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many Ohio sellers have had to drop their asking price — rising means sellers are losing pricing power.</div>
     </div>
 
     <div class="metric-card yoy" id="price-cut-yoy">
       <div class="metric-name">Price Cut % YOY</div>
       <div class="metric-tag">Monthly · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year change in the share of active listings with a price reduction, compared to the same month in the prior year.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> Whether sellers are cutting prices more or less than they were a year ago.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether Ohio sellers are cutting prices more or less than they were a year ago.</div>
     </div>
   </div>
 
@@ -272,28 +272,28 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <div class="metric-name">Annual Property Tax</div>
       <div class="metric-tag">Annual · 5-Year Estimate · Median</div>
       <p class="metric-provider-def">U.S. Census Bureau American Community Survey (ACS) 5-year estimates: median annual real estate taxes paid by owner-occupied housing units. The 5-year estimate pools responses over a 60-month period to produce reliable county-level data.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> The typical property tax bill for a homeowner in this area — updated once a year when the Census releases new ACS estimates.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> The typical property tax bill for an Ohio homeowner in this area — updated once a year when the Census releases new ACS estimates.</div>
     </div>
 
     <div class="metric-card yoy" id="property-tax-yoy">
       <div class="metric-name">Property Tax YOY %</div>
       <div class="metric-tag">Annual · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in median annual property tax from one ACS 5-year release to the next.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> How much the typical tax bill changed — reflecting local reassessments and levy changes.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> How much the typical Ohio property tax bill changed here — reflecting local reassessments and levy changes.</div>
     </div>
 
     <div class="metric-card" id="tax-rate">
       <div class="metric-name">Effective Tax Rate</div>
       <div class="metric-tag">Annual · Derived: ACS ÷ Zillow ZHVI</div>
       <p class="metric-provider-def">Median annual property tax (ACS 5-year estimate) divided by the Zillow Home Value Index for that county, expressed as a percentage. This is a derived metric — not published directly by either source.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> The actual tax burden as a share of home value — lets you compare tax load across counties regardless of price level.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> The actual tax burden as a share of home value — lets you compare tax load across Ohio counties regardless of price level.</div>
     </div>
 
     <div class="metric-card yoy" id="tax-rate-yoy">
       <div class="metric-name">Tax Rate YOY %</div>
       <div class="metric-tag">Annual · Year-over-Year Change</div>
       <p class="metric-provider-def">Year-over-year percent change in the effective tax rate (ACS median tax ÷ ZHVI) compared to the prior annual period.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> Whether the tax burden relative to home value went up or down compared to last year.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether the tax burden relative to home value in this Ohio county went up or down compared to last year.</div>
     </div>
   </div>
 
@@ -312,21 +312,21 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <div class="metric-name">Contract Cancellations</div>
       <div class="metric-tag">Monthly · Count · Redfin</div>
       <p class="metric-provider-def">Redfin defines home purchase cancellations as the number of home-purchase agreements that were cancelled in a given month. A cancellation occurs when a buyer and seller had a signed purchase agreement but the deal did not close.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> How many buyers in this county backed out of a deal after going under contract — rising cancellations signal buyer hesitation, often tied to affordability pressure, inspection issues, or financing problems.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many buyers in this Ohio county backed out of a deal after going under contract — rising cancellations signal buyer hesitation, often tied to affordability pressure, inspection issues, or financing problems.</div>
     </div>
 
     <div class="metric-card" id="cancellation-rate">
       <div class="metric-name">Cancellation Rate %</div>
       <div class="metric-tag">Monthly · Derived: Cancellations ÷ Pending Sales · Redfin</div>
       <p class="metric-provider-def">Cancellation rate is the number of cancelled home-purchase agreements in a given month divided by the total number of homes that went under contract (pending) in that month, expressed as a percentage.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> The share of deals that fall apart after going under contract. A rising rate is a leading warning sign — it shows buyers are agreeing to deals but then walking away, which often precedes softening in closed sales and prices.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> The share of Ohio deals that fall apart after going under contract. A rising rate is a leading warning sign — it shows buyers are agreeing to deals but then walking away, which often precedes softening in closed sales and prices.</div>
     </div>
 
     <div class="metric-card" id="delisted-pct">
       <div class="metric-name">Delisted %</div>
       <div class="metric-tag">Monthly · Share of Listings · Redfin</div>
       <p class="metric-provider-def">Redfin defines "homes delisted" as the total number of unsold home listings that were removed from the market during a given time period. A home is counted as delisted when it goes off the market without selling or going under contract. Delisted % expresses this as a share of that month's active listings.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> How many sellers gave up and pulled their house off the market instead of selling it or dropping the price. A rising number means more sellers are choosing to wait rather than accept what buyers are offering — a sign sellers think the market will turn back in their favor, or that they can't sell at a price buyers will pay.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many Ohio sellers gave up and pulled their house off the market instead of selling it or dropping the price. A rising number means more sellers in this area are choosing to wait rather than accept what buyers are offering — a sign sellers think the market will turn back in their favor, or that they can't sell at a price buyers will pay.</div>
     </div>
   </div>
 
@@ -341,14 +341,14 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <div class="metric-name">Tax Delinquent</div>
       <div class="metric-tag">Monthly · Count · PropStream</div>
       <p class="metric-provider-def">PropStream defines tax delinquent properties as parcels with unpaid property taxes past their due date as recorded in county tax records. Data is aggregated at the county level from PropStream's nationwide property database.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> The number of properties in a county where the owner has fallen behind on property taxes — a leading indicator of financial stress and potential future distress inventory.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> The number of properties in this Ohio county where the owner has fallen behind on property taxes — a leading indicator of financial stress and potential future distress inventory.</div>
     </div>
 
     <div class="metric-card" id="tax-delinquent-pct">
       <div class="metric-name">Tax Delinquent %</div>
       <div class="metric-tag">Monthly · Derived: Tax Delinquent ÷ Total Properties</div>
       <p class="metric-provider-def">Tax delinquent property count divided by total property count for that county, as reported by PropStream, expressed as a percentage. Both figures come from PropStream's property database for the same reporting month.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> The share of all properties in the county with delinquent taxes — normalizes the count so you can compare across counties of different sizes.</div>
+      <div class="metric-plain"><strong>In plain terms:</strong> The share of all properties in this Ohio county with delinquent taxes — normalizes the count so you can compare across counties of different sizes.</div>
     </div>
   </div>
 
