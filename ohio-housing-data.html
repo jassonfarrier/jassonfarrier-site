@@ -2758,7 +2758,7 @@ function loadZipData() {
     fetch('/ohio-zips.geojson').then(r=>r.json()),
     (async () => {
       const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY, 'Range-Unit': 'items'};
-      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,city,county,metro,latest,yoy_latest,distress_history';
+      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,city,county,metro,latest,yoy_latest';
       const pages = await Promise.all([
         fetch(base+'&limit=1000&offset=0', {headers}).then(r=>r.json()),
         fetch(base+'&limit=1000&offset=1000', {headers}).then(r=>r.json()),
