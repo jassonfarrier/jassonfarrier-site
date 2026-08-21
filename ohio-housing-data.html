@@ -1216,7 +1216,7 @@ function renderChart(county, cmetric) {
         }
       });
     }
-  } else if (cmetric === 'zhvi' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct') {
+  } else if (cmetric === 'zhvi' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct') {
     drawAnnualLineChart(county, cmetric);
   } else {
     drawMonthlyBarChart(county, cmetric);
