@@ -82,7 +82,13 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;gap:24px}.attr-chips{display:none}
 .modal-header-left{flex:1;min-width:0}
 .modal-header-right{text-align:right;flex-shrink:0}
-.modal-county{display:none}.modal-sub-hidden{display:none}.upper-third{background:#0d1e42;border-radius:8px;padding:12px 20px;display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:8px;}.upper-third-county{font-family:Montserrat,sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-sep{color:rgba(255,255,255,0.4);margin:0 14px;font-size:18px;font-weight:300}.upper-third-metric{font-family:Montserrat,sans-serif;font-size:18px;font-weight:500;color:rgba(255,255,255,0.75);letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-source{font-family:Montserrat,sans-serif;font-size:12px;font-weight:400;color:rgba(255,255,255,0.45);margin-left:10px;white-space:nowrap}.upper-third-source a{color:rgba(255,255,255,0.55);text-decoration:none}.upper-third-source a:hover{color:#fff}.upper-third-rank{font-family:Montserrat,sans-serif;font-size:11px;font-weight:600;color:#8fb8ff;margin-left:10px;white-space:nowrap;letter-spacing:0.02em}
+.modal-county{display:none}.modal-sub-hidden{display:none}.upper-third{background:#0d1e42;border-radius:8px;display:flex;align-items:stretch;justify-content:flex-start;gap:0;margin-bottom:8px;overflow:hidden;}
+.upper-third-main{flex:1;display:flex;align-items:center;padding:14px 22px;min-width:0;}
+.upper-third-county{font-family:Montserrat,sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-sep{color:rgba(255,255,255,0.4);margin:0 14px;font-size:18px;font-weight:300}.upper-third-metric{font-family:Montserrat,sans-serif;font-size:18px;font-weight:500;color:rgba(255,255,255,0.75);letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-source{font-family:Montserrat,sans-serif;font-size:12px;font-weight:400;color:rgba(255,255,255,0.45);margin-left:10px;white-space:nowrap}.upper-third-source a{color:rgba(255,255,255,0.55);text-decoration:none}.upper-third-source a:hover{color:#fff}
+.upper-third-rank-section{display:flex;align-items:center;padding:14px 20px;background:rgba(255,255,255,0.06);border-left:1px solid rgba(255,255,255,0.1);flex-shrink:0;}
+.upper-third-rank{font-family:Montserrat,sans-serif;font-size:14px;font-weight:600;color:#8fb8ff;white-space:nowrap;letter-spacing:0.02em}
+.upper-third-rank:empty{display:none}
+.upper-third-rank-section:has(.upper-third-rank:empty){display:none}
 .modal-sub{display:none}
 .attr-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .attr-chip{background:#fff;border:1px solid rgba(0,0,0,0.18);color:#222;font-size:12px;font-weight:500;padding:5px 12px;border-radius:6px;font-family:Montserrat,sans-serif;white-space:nowrap}
@@ -167,11 +173,14 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   .chart-tabs{display:none}
   #chart-metric-select-mobile{display:block;width:100%;margin-bottom:8px}
   .modal-right{flex:1;min-height:0}
-  .upper-third{font-size:11px!important;padding:8px 12px;flex-wrap:wrap;gap:2px;overflow:hidden}
+  .upper-third{font-size:11px!important;flex-wrap:wrap;overflow:hidden}
+  .upper-third-main{padding:8px 12px;flex-wrap:wrap;gap:2px}
   .upper-third-county{font-size:13px!important;white-space:normal;letter-spacing:0.02em}
   .upper-third-sep{margin:0 6px;font-size:13px}
   .upper-third-metric{font-size:12px!important;white-space:normal;letter-spacing:0.02em}
   .upper-third-source{font-size:10px!important;margin-left:4px}
+  .upper-third-rank-section{padding:8px 12px}
+  .upper-third-rank{font-size:12px!important}
   #chart-slider-wrap{padding-left:16px!important}
 }
 
@@ -474,11 +483,13 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       </div>
       <div class="modal-right">
         <div class="upper-third" id="upper-third">
-          <span class="upper-third-county" id="ut-county"></span>
-          <span class="upper-third-sep">·</span>
-          <span class="upper-third-metric" id="ut-metric"></span>
-          <span class="upper-third-source" id="ut-source"></span>
-          <span class="upper-third-rank" id="ut-rank"></span>
+          <div class="upper-third-main">
+            <span class="upper-third-county" id="ut-county"></span>
+            <span class="upper-third-sep">·</span>
+            <span class="upper-third-metric" id="ut-metric"></span>
+            <span class="upper-third-source" id="ut-source"></span>
+          </div>
+          <div class="upper-third-rank-section"><span class="upper-third-rank" id="ut-rank"></span></div>
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><button id="btn-record-high" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">RECORD HIGH</button></div>
@@ -706,8 +717,11 @@ function computeRank(list, metric, targetVal) {
 
 function renderRankBadge(mode, id, metric) {
   const el = document.getElementById('ut-rank');
+  const section = document.querySelector('.upper-third-rank-section');
   if (!el) return;
-  if (!RANKABLE_METRICS.has(metric)) { el.textContent = ''; return; }
+  const hide = () => { el.textContent = ''; if (section) section.style.display = 'none'; };
+  const show = () => { if (section) section.style.display = 'flex'; };
+  if (!RANKABLE_METRICS.has(metric)) { hide(); return; }
 
   const label = (METRICS[metric] && METRICS[metric].label) || metric;
   const hiWord = (METRICS[metric] && METRICS[metric].hi) || 'Highest';
@@ -726,12 +740,13 @@ function renderRankBadge(mode, id, metric) {
         if (d.county === id) targetVal = v;
       }
     });
-    if (targetVal == null || !vals.length) { el.textContent = ''; return; }
+    if (targetVal == null || !vals.length) { hide(); return; }
     const {rank, total} = computeRank(vals, metric, targetVal);
+    show();
     el.innerHTML = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total} counties · ${label}`;
   } else if (mode === 'zip') {
     // Permits aren't tracked at zip level — skip.
-    if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { el.textContent = ''; return; }
+    if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { hide(); return; }
     const vals = [];
     let targetVal = null;
     ZIP_DATA.forEach(z => {
@@ -741,12 +756,13 @@ function renderRankBadge(mode, id, metric) {
         if (z.zip === id) targetVal = v;
       }
     });
-    if (targetVal == null || vals.length < 20) { el.textContent = ''; return; }
+    if (targetVal == null || vals.length < 20) { hide(); return; }
     const {rank, total} = computeRank(vals, metric, targetVal);
     const pct = Math.max(1, Math.round((rank / total) * 100));
+    show();
     el.innerHTML = `Top ${pct}% of ${total} ZIPs · ${label}`;
   } else if (mode === 'metro') {
-    if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { el.textContent = ''; return; }
+    if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { hide(); return; }
     const vals = [];
     let targetVal = null;
     METRO_DATA.forEach(m => {
@@ -756,11 +772,12 @@ function renderRankBadge(mode, id, metric) {
         if (m.region_id === id) targetVal = v;
       }
     });
-    if (targetVal == null || !vals.length) { el.textContent = ''; return; }
+    if (targetVal == null || !vals.length) { hide(); return; }
     const {rank, total} = computeRank(vals, metric, targetVal);
+    show();
     el.innerHTML = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total} metros · ${label}`;
   } else {
-    el.textContent = '';
+    hide();
   }
 }
 
@@ -1207,7 +1224,7 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
     if (uts) uts.innerHTML = sourceForMetric(cm);
     if (mapMode === 'zip' && selectedZip) renderRankBadge('zip', selectedZip, cm);
     else if (mapMode === 'metro' && selectedMetro) renderRankBadge('metro', selectedMetro, cm);
-    else if (mapMode === 'state') { const r = document.getElementById('ut-rank'); if (r) r.textContent = ''; }
+    else if (mapMode === 'state') { const r = document.getElementById('ut-rank'); if (r) r.textContent = ''; const s = document.querySelector('.upper-third-rank-section'); if (s) s.style.display = 'none'; }
     else if (selectedCounty) renderRankBadge('county', selectedCounty, cm);
   });
 });
@@ -2795,7 +2812,7 @@ function openStateModal() {
   (document.getElementById('s-ptax')||{}).textContent = '—';
   (document.getElementById('s-ptaxrate')||{}).textContent = '—';
   (document.getElementById('s-rank')||{}).textContent = 'Statewide';
-  (document.getElementById('ut-rank')||{textContent:''}).textContent = '';
+  (document.getElementById('ut-rank')||{textContent:''}).textContent = ''; { const s = document.querySelector('.upper-third-rank-section'); if (s) s.style.display = 'none'; }
   setPendingRatioBadge(l.pending_ratio);
   document.getElementById('modal-overlay').classList.add('visible');
   setTimeout(() => {
