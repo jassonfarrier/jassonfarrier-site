@@ -265,6 +265,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 <div id="mobile-metric-bar">
   <select id="metric-select-mobile">
     <option value="zhvi">SFH Home Value</option>
+    <option value="median_list_price">Median List Price</option>
     <option value="zhvi_yoy">SFH Home Value YOY %</option>
     <option value="zhvi_condo">Condo Home Value</option>
     <option value="zhvi_condo_yoy">Condo Home Value YOY %</option>
@@ -296,6 +297,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <div class="sidebar-scroll">
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Prices</div>
     <button class="metric-btn active" data-metric="zhvi"><span class="mn">SFH Home Value</span><span class="md">Zillow ZHVI single-family</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="median_list_price"><span class="mn">Median List Price</span><span class="md">Realtor.com asking price</span><a class="metric-help" href="/ohio-housing-data-methodology#median-list-price" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="zhvi_yoy"><span class="mn">SFH Home Value YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="zhvi_condo"><span class="mn">Condo Home Value</span><span class="md">Zillow ZHVI condo/co-op</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="zhvi_condo_yoy"><span class="mn">Condo Home Value YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
@@ -393,6 +395,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
         <div class="chart-label">Chart Type</div>
         <select id="chart-metric-select-mobile" style="display:none;width:100%;margin-bottom:8px;padding:9px 14px;font-family:Montserrat,sans-serif;font-size:13px;font-weight:600;color:#0d1e42;background:#fff;border:1.5px solid #0d1e42;border-radius:8px;-webkit-appearance:none;appearance:none">
           <option value="zhvi">SFH Home Value</option>
+          <option value="median_list_price">Median List Price</option>
           <option value="zhvi_yoy">SFH Home Value YOY %</option>
           <option value="zhvi_condo">Condo Home Value</option>
           <option value="zhvi_condo_yoy">Condo Home Value YOY %</option>
@@ -448,6 +451,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
         <div class="modal-left-scroll"><div class="chart-tabs" id="chart-tabs">
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Prices</div>
           <button class="metric-btn chart-tab active" data-cmetric="zhvi"><span class="mn">SFH Home Value</span><span class="md">Zillow ZHVI single-family</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="median_list_price"><span class="mn">Median List Price</span><span class="md">Realtor.com asking price</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_yoy"><span class="mn">SFH Home Value YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="zhvi_condo"><span class="mn">Condo Home Value</span><span class="md">Zillow ZHVI condo/co-op</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_condo_yoy"><span class="mn">Condo Home Value YOY %</span><span class="md">Year-over-year change</span></button>
@@ -520,6 +524,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiamFzc29uZmFy'
 
 const METRICS = {
   zhvi:             {label:'SFH Home Value',      fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower',    hi:'Higher'},
+  median_list_price:{label:'Median List Price', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower',    hi:'Higher'},
   zhvi_yoy:         {label:'SFH Home Value YOY %',fmt:v=>v.toFixed(1)+'%',                   lo:'Declining',hi:'Growing'},
   zhvi_condo:       {label:'Condo Home Value',    fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower',    hi:'Higher'},
   zhvi_condo_yoy:   {label:'Condo Home Value YOY %',fmt:v=>v.toFixed(1)+'%',                lo:'Declining',hi:'Growing'},
@@ -1337,7 +1342,7 @@ function renderChart(county, cmetric) {
         }
       });
     }
-  } else if (cmetric === 'zhvi' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct') {
+  } else if (cmetric === 'zhvi' || cmetric === 'median_list_price' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct') {
     drawAnnualLineChart(county, cmetric);
   } else {
     drawMonthlyBarChart(county, cmetric);
@@ -2462,6 +2467,7 @@ let tableSortCol = null, tableSortDir = 1;
 
 const TABLE_COLS = [
   {key:'zhvi',           label:'SFH Home Value',     fmt:v=>v!=null?'$'+Math.round(v).toLocaleString():null},
+  {key:'median_list_price',label:'Median List Price', fmt:v=>v!=null?'$'+Math.round(v).toLocaleString():null},
   {key:'zhvi_yoy',       label:'SFH HV YOY %',       fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
   {key:'zhvi_condo',     label:'Condo Home Value',   fmt:v=>v!=null?'$'+Math.round(v).toLocaleString():null},
   {key:'zhvi_condo_yoy', label:'Condo HV YOY %',     fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
