@@ -82,7 +82,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;gap:24px}.attr-chips{display:none}
 .modal-header-left{flex:1;min-width:0}
 .modal-header-right{text-align:right;flex-shrink:0}
-.modal-county{display:none}.modal-sub-hidden{display:none}.upper-third{background:#0d1e42;border-radius:8px;padding:12px 20px;display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:8px;}.upper-third-county{font-family:Montserrat,sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-sep{color:rgba(255,255,255,0.4);margin:0 14px;font-size:18px;font-weight:300}.upper-third-metric{font-family:Montserrat,sans-serif;font-size:18px;font-weight:500;color:rgba(255,255,255,0.75);letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-source{font-family:Montserrat,sans-serif;font-size:12px;font-weight:400;color:rgba(255,255,255,0.45);margin-left:10px;white-space:nowrap}.upper-third-source a{color:rgba(255,255,255,0.55);text-decoration:none}.upper-third-source a:hover{color:#fff}
+.modal-county{display:none}.modal-sub-hidden{display:none}.upper-third{background:#0d1e42;border-radius:8px;padding:12px 20px;display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:8px;}.upper-third-county{font-family:Montserrat,sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-sep{color:rgba(255,255,255,0.4);margin:0 14px;font-size:18px;font-weight:300}.upper-third-metric{font-family:Montserrat,sans-serif;font-size:18px;font-weight:500;color:rgba(255,255,255,0.75);letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-source{font-family:Montserrat,sans-serif;font-size:12px;font-weight:400;color:rgba(255,255,255,0.45);margin-left:10px;white-space:nowrap}.upper-third-source a{color:rgba(255,255,255,0.55);text-decoration:none}.upper-third-source a:hover{color:#fff}.upper-third-rank{font-family:Montserrat,sans-serif;font-size:11px;font-weight:600;color:#8fb8ff;margin-left:10px;white-space:nowrap;letter-spacing:0.02em}
 .modal-sub{display:none}
 .attr-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .attr-chip{background:#fff;border:1px solid rgba(0,0,0,0.18);color:#222;font-size:12px;font-weight:500;padding:5px 12px;border-radius:6px;font-family:Montserrat,sans-serif;white-space:nowrap}
@@ -478,6 +478,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <span class="upper-third-sep">·</span>
           <span class="upper-third-metric" id="ut-metric"></span>
           <span class="upper-third-source" id="ut-source"></span>
+          <span class="upper-third-rank" id="ut-rank"></span>
         </div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><button id="btn-record-high" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">RECORD HIGH</button></div>
@@ -685,6 +686,90 @@ function getMetricVal(d, metric) {
     return last[metric] != null ? Number(last[metric]) : null;
   }
   return d.latest && d.latest[metric] != null ? Number(d.latest[metric]) : null;
+}
+
+// --- Rank Badge ---
+// Only metrics where relative position is a meaningful, citable fact get ranked.
+// Neutral framing throughout: "Highest"/"Lowest" describes direction, never "best"/"worst".
+const RANKABLE_METRICS = new Set(['zhvi','zhvi_condo','days_on_market','price_reduced_pct','cancellation_pct','pending_ratio','property_tax_rate','median_property_tax','sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k']);
+
+function computeRank(list, metric, targetVal) {
+  // list: array of numeric values (already non-null) for every record that has this metric.
+  // Returns {rank, total} where rank=1 means highest value.
+  const sorted = [...list].sort((a,b) => b - a);
+  const total = sorted.length;
+  // handle ties by finding first index where value <= targetVal
+  let rank = sorted.findIndex(v => v <= targetVal) + 1;
+  if (rank <= 0) rank = total;
+  return {rank, total};
+}
+
+function renderRankBadge(mode, id, metric) {
+  const el = document.getElementById('ut-rank');
+  if (!el) return;
+  if (!RANKABLE_METRICS.has(metric)) { el.textContent = ''; return; }
+
+  const label = (METRICS[metric] && METRICS[metric].label) || metric;
+  const hiWord = (METRICS[metric] && METRICS[metric].hi) || 'Highest';
+  const loWord = (METRICS[metric] && METRICS[metric].lo) || 'Lowest';
+
+  if (mode === 'county') {
+    if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') {
+      // permits are county-only
+    }
+    const vals = [];
+    let targetVal = null;
+    DATA.forEach(d => {
+      const v = getMetricVal(d, metric);
+      if (v != null && !isNaN(v)) {
+        vals.push(v);
+        if (d.county === id) targetVal = v;
+      }
+    });
+    if (targetVal == null || !vals.length) { el.textContent = ''; return; }
+    const {rank, total} = computeRank(vals, metric, targetVal);
+    el.innerHTML = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total} counties · ${label}`;
+  } else if (mode === 'zip') {
+    // Permits aren't tracked at zip level — skip.
+    if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { el.textContent = ''; return; }
+    const vals = [];
+    let targetVal = null;
+    ZIP_DATA.forEach(z => {
+      const v = getMetricVal(z, metric);
+      if (v != null && !isNaN(v)) {
+        vals.push(v);
+        if (z.zip === id) targetVal = v;
+      }
+    });
+    if (targetVal == null || vals.length < 20) { el.textContent = ''; return; }
+    const {rank, total} = computeRank(vals, metric, targetVal);
+    const pct = Math.max(1, Math.round((rank / total) * 100));
+    el.innerHTML = `Top ${pct}% of ${total} ZIPs · ${label}`;
+  } else if (mode === 'metro') {
+    if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { el.textContent = ''; return; }
+    const vals = [];
+    let targetVal = null;
+    METRO_DATA.forEach(m => {
+      const v = getMetricVal(m, metric);
+      if (v != null && !isNaN(v)) {
+        vals.push(v);
+        if (m.region_id === id) targetVal = v;
+      }
+    });
+    if (targetVal == null || !vals.length) { el.textContent = ''; return; }
+    const {rank, total} = computeRank(vals, metric, targetVal);
+    el.innerHTML = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total} metros · ${label}`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+function _ordSuffix(n) {
+  const j = n % 10, k = n % 100;
+  if (j === 1 && k !== 11) return 'st';
+  if (j === 2 && k !== 12) return 'nd';
+  if (j === 3 && k !== 13) return 'rd';
+  return 'th';
 }
 
 const LAYER_CONFIG = {
@@ -915,6 +1000,7 @@ function openModal(county) {
   setPendingRatioBadge(l.pending_ratio);
   // Default chart to current map metric
   const defaultMetric = mapMetric;
+  renderRankBadge('county', county, defaultMetric);
   document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
   const activeTab = document.querySelector(`.chart-tab[data-cmetric="${defaultMetric}"]`);
   if (activeTab) activeTab.classList.add('active');
@@ -1119,6 +1205,10 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
     if (src) src.innerHTML = `Source: <span class="attr-source-name">${sourceForMetric(cm)}</span>`;
     const uts = document.getElementById('ut-source');
     if (uts) uts.innerHTML = sourceForMetric(cm);
+    if (mapMode === 'zip' && selectedZip) renderRankBadge('zip', selectedZip, cm);
+    else if (mapMode === 'metro' && selectedMetro) renderRankBadge('metro', selectedMetro, cm);
+    else if (mapMode === 'state') { const r = document.getElementById('ut-rank'); if (r) r.textContent = ''; }
+    else if (selectedCounty) renderRankBadge('county', selectedCounty, cm);
   });
 });
 
@@ -2608,6 +2698,7 @@ function openMetroModal(rid) {
     const rank = sorted.findIndex(x=>x.region_id===rid)+1;
     return rank > 0 ? '#'+rank+' of '+sorted.length : '—';
   })();
+  renderRankBadge('metro', rid, mapMetric);
   setPendingRatioBadge(l.pending_ratio);
   document.getElementById('modal-overlay').classList.add('visible');
   setTimeout(() => {
@@ -2704,6 +2795,7 @@ function openStateModal() {
   (document.getElementById('s-ptax')||{}).textContent = '—';
   (document.getElementById('s-ptaxrate')||{}).textContent = '—';
   (document.getElementById('s-rank')||{}).textContent = 'Statewide';
+  (document.getElementById('ut-rank')||{textContent:''}).textContent = '';
   setPendingRatioBadge(l.pending_ratio);
   document.getElementById('modal-overlay').classList.add('visible');
   setTimeout(() => {
@@ -2839,6 +2931,7 @@ function openZipModal(zip) {
 
   // Chart tabs
   const defaultMetric = mapMetric==='median_property_tax'||mapMetric==='property_tax_rate' ? 'zhvi' : mapMetric;
+  renderRankBadge('zip', zip, defaultMetric);
   document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
   const at = document.querySelector(`.chart-tab[data-cmetric="${defaultMetric}"]`);
   if (at) at.classList.add('active');
