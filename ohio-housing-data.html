@@ -1674,6 +1674,20 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
         'text-halo-width':1.5
       }});
 
+      // County outline overlay — shown in ZIP mode so county boundaries stay visible
+      // while browsing zip codes. Uses the existing ohio-counties source.
+      map.addLayer({
+        id: 'counties-outline-zipmode',
+        type: 'line',
+        source: 'ohio-counties',
+        layout: { visibility: 'none' },
+        paint: {
+          'line-color': '#0D1E42',
+          'line-width': ['interpolate',['linear'],['zoom'], 5,1.8, 8,2.6, 11,3.4],
+          'line-dasharray': [2, 1],
+        }
+      });
+
       // ZIP hover
       map.on('mousemove','zips-fill', e => {
         if (mapMode !== 'zip' || !e.features.length) return;
@@ -2639,7 +2653,7 @@ function setMode(mode) {
   document.getElementById('search-results').style.display='none';
 
   const countyLayers = ['counties-fill','counties-border','counties-border-hover','counties-border-selected','counties-labels'];
-  const zipLayers = ['zips-fill','zips-border','zips-border-hover','zips-border-selected','zips-labels'];
+  const zipLayers = ['zips-fill','zips-border','zips-border-hover','zips-border-selected','zips-labels','counties-outline-zipmode'];
   const metroLayers = ['metros-fill','metros-border','metros-border-hover','metros-border-selected','metros-labels'];
   const stateLayers = ['state-fill','state-border','state-border-hover'];
 
