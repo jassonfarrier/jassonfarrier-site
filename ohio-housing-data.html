@@ -2691,10 +2691,27 @@ function loadMetroData() {
     fetch('/ohio-metros.geojson').then(r=>r.json()),
     fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_metros?select=region_id,metro,latest,yoy_latest', {
       headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
+    }).then(r=>r.json()),
+    // yoy_latest in ohio_metros is a stale stored column (only refreshed manually, and only
+    // for zhvi/zhvi_condo historically) — compute every YOY metric fresh instead, every load,
+    // via the ohio_metros_yoy Postgres view which reads straight from history.
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_metros_yoy?select=*', {
+      headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
     }).then(r=>r.json())
-  ]).then(([geojson, metros]) => {
+  ]).then(([geojson, metros, metrosYoy]) => {
+    const yoyByRid = {};
+    metrosYoy.forEach(row => { yoyByRid[row.region_id] = row; });
     METRO_DATA = metros;
-    METRO_DATA.forEach(d => { metroDataMap[d.region_id] = d; d.yoy_latest = d.yoy_latest || {}; });
+    METRO_DATA.forEach(d => {
+      d.yoy_latest = d.yoy_latest || {};
+      const fresh = yoyByRid[d.region_id];
+      if (fresh) {
+        for (const [k, v] of Object.entries(fresh)) {
+          if (k !== 'region_id' && k !== 'latest_date' && v !== null) d.yoy_latest[k] = v;
+        }
+      }
+      metroDataMap[d.region_id] = d;
+    });
     metroDataLoaded = true;
     geojson.features.forEach(f => {
       const rid = f.properties && f.properties.region_id;
@@ -2934,30 +2951,33 @@ function loadZipData() {
       ]);
       return pages.flat();
     })(),
-    // days_on_market_yoy is computed fresh in Postgres on every query (ohio_zips_dom_yoy view)
-    // instead of read from the stale yoy_latest column — see fix notes below.
+    // yoy_latest in ohio_zips is a stale stored column (only refreshed manually per metric,
+    // per month — easy to miss a field or a cycle). Compute every YOY metric fresh instead,
+    // every load, via the ohio_zips_yoy Postgres view which reads straight from history.
     (async () => {
       const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY, 'Range-Unit': 'items'};
-      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips_dom_yoy?select=zip,days_on_market_yoy';
+      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips_yoy?select=*';
       const pages = await Promise.all([
         fetch(base+'&limit=1000&offset=0', {headers}).then(r=>r.json()),
         fetch(base+'&limit=1000&offset=1000', {headers}).then(r=>r.json()),
       ]);
-      const domYoyByZip = {};
-      pages.flat().forEach(row => { domYoyByZip[row.zip] = row.days_on_market_yoy; });
-      return domYoyByZip;
+      const yoyByZip = {};
+      pages.flat().forEach(row => { yoyByZip[row.zip] = row; });
+      return yoyByZip;
     })()
-  ]).then(([geojson, zips, domYoyMap]) => {
+  ]).then(([geojson, zips, zipsYoyMap]) => {
     ZIP_DATA = zips;
     ZIP_DATA.forEach(d => {
-      // yoy_latest comes pre-computed from DB — use directly
       d.yoy_latest = d.yoy_latest || {};
-      // FIX: days_on_market_yoy in the DB's stored yoy_latest column can go stale (it isn't
-      // recomputed every time `latest` advances to a new month). Overwrite it here with a
-      // value computed fresh, every load, straight from history via the ohio_zips_dom_yoy
-      // Postgres view — this field can never go stale again because nothing is cached.
-      // All other yoy_latest fields are untouched and still come from the stored column.
-      if (domYoyMap[d.zip] !== undefined) d.yoy_latest.days_on_market_yoy = domYoyMap[d.zip];
+      // FIX: overwrite every field from the stale stored yoy_latest column with a value
+      // computed fresh, every load, straight from history via the ohio_zips_yoy view —
+      // these can never go stale again because nothing is cached.
+      const fresh = zipsYoyMap[d.zip];
+      if (fresh) {
+        for (const [k, v] of Object.entries(fresh)) {
+          if (k !== 'zip' && k !== 'latest_date' && v !== null) d.yoy_latest[k] = v;
+        }
+      }
       d.yoy_history = {};
       zipDataMap[d.zip] = d;
     });
