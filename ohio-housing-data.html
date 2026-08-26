@@ -2716,7 +2716,21 @@ function openMetroModal(rid) {
     fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_metros?select=region_id,history&region_id=eq.'+rid, {
       headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
     }).then(r=>r.json()).then(rows => {
-      if (rows[0]) { d.history = rows[0].history; attachYOY(d); }
+      // NOTE: do NOT call attachYOY() here — it recomputes yoy_latest client-side from
+      // this lazily-fetched history, which can be incomplete or lag the current month.
+      // yoy_latest is already correct: it comes precomputed from the ohio_metros.yoy_latest
+      // column when metros first load and must not be overwritten.
+      if (rows[0]) {
+        d.history = rows[0].history;
+        d.yoy_history = {};
+        for (const [yoyKey, base] of Object.entries(YOY_BASE)) {
+          if (TAX_YOY.has(yoyKey)) {
+            d.yoy_history[yoyKey] = computeYOYHistoryAnnual(d.prop_tax_history || [], base);
+          } else {
+            d.yoy_history[yoyKey] = computeYOYHistory(d.history || [], base);
+          }
+        }
+      }
       openMetroModal(rid);
     });
     return;
@@ -3007,10 +3021,23 @@ function fetchZipHistory(zip) {
       row.history = Object.values(merged).sort((a, b) => a.date < b.date ? -1 : 1);
     }
     // Merge into zipDataMap entry
+    // NOTE: do NOT call attachYOY() here — it recomputes yoy_latest client-side from
+    // this lazily-fetched history, which can be incomplete or lag the current month.
+    // yoy_latest is already correct: it comes precomputed from the ohio_zips.yoy_latest
+    // column in the initial loadZipData() fetch and must not be overwritten.
     if (zipDataMap[zip]) {
       zipDataMap[zip].history = row.history;
       zipDataMap[zip].prop_tax_history = row.prop_tax_history;
-      attachYOY(zipDataMap[zip]);
+      // yoy_history (used only for chart rendering) is still derived from history,
+      // but yoy_latest (used for hover/color) is left untouched.
+      zipDataMap[zip].yoy_history = {};
+      for (const [yoyKey, base] of Object.entries(YOY_BASE)) {
+        if (TAX_YOY.has(yoyKey)) {
+          zipDataMap[zip].yoy_history[yoyKey] = computeYOYHistoryAnnual(zipDataMap[zip].prop_tax_history || [], base);
+        } else {
+          zipDataMap[zip].yoy_history[yoyKey] = computeYOYHistory(zipDataMap[zip].history || [], base);
+        }
+      }
     }
     zipHistoryCache[zip] = row;
     return row;
