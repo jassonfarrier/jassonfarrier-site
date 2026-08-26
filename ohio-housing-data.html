@@ -2933,12 +2933,31 @@ function loadZipData() {
         fetch(base+'&limit=1000&offset=1000', {headers}).then(r=>r.json()),
       ]);
       return pages.flat();
+    })(),
+    // days_on_market_yoy is computed fresh in Postgres on every query (ohio_zips_dom_yoy view)
+    // instead of read from the stale yoy_latest column — see fix notes below.
+    (async () => {
+      const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY, 'Range-Unit': 'items'};
+      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips_dom_yoy?select=zip,days_on_market_yoy';
+      const pages = await Promise.all([
+        fetch(base+'&limit=1000&offset=0', {headers}).then(r=>r.json()),
+        fetch(base+'&limit=1000&offset=1000', {headers}).then(r=>r.json()),
+      ]);
+      const domYoyByZip = {};
+      pages.flat().forEach(row => { domYoyByZip[row.zip] = row.days_on_market_yoy; });
+      return domYoyByZip;
     })()
-  ]).then(([geojson, zips]) => {
+  ]).then(([geojson, zips, domYoyMap]) => {
     ZIP_DATA = zips;
     ZIP_DATA.forEach(d => {
       // yoy_latest comes pre-computed from DB — use directly
       d.yoy_latest = d.yoy_latest || {};
+      // FIX: days_on_market_yoy in the DB's stored yoy_latest column can go stale (it isn't
+      // recomputed every time `latest` advances to a new month). Overwrite it here with a
+      // value computed fresh, every load, straight from history via the ohio_zips_dom_yoy
+      // Postgres view — this field can never go stale again because nothing is cached.
+      // All other yoy_latest fields are untouched and still come from the stored column.
+      if (domYoyMap[d.zip] !== undefined) d.yoy_latest.days_on_market_yoy = domYoyMap[d.zip];
       d.yoy_history = {};
       zipDataMap[d.zip] = d;
     });
