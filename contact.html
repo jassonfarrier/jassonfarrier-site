@@ -241,24 +241,27 @@ footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padd
       const interestVal = document.getElementById('interest').value;
       const messageVal = document.getElementById('message').value.trim();
 
-      // Send to Kit
-      const kitForm = document.createElement('form');
-      kitForm.action = 'https://app.kit.com/forms/9195650/subscriptions';
-      kitForm.method = 'post';
-      kitForm.target = 'kit-frame';
-      kitForm.style.display = 'none';
-      const fnField = document.createElement('input');
-      fnField.name = 'fields[first_name]'; fnField.value = firstName;
-      const emailField = document.createElement('input');
-      emailField.name = 'email_address'; emailField.value = email;
-      kitForm.appendChild(fnField);
-      kitForm.appendChild(emailField);
-      document.body.appendChild(kitForm);
-      const iframe = document.createElement('iframe');
-      iframe.name = 'kit-frame';
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
-      kitForm.submit();
+      // Send to Kit — only if the visitor left the newsletter opt-in checked
+      const wantsNewsletter = document.getElementById('newsletter-opt').checked;
+      if (wantsNewsletter) {
+        const kitForm = document.createElement('form');
+        kitForm.action = 'https://app.kit.com/forms/9195650/subscriptions';
+        kitForm.method = 'post';
+        kitForm.target = 'kit-frame';
+        kitForm.style.display = 'none';
+        const fnField = document.createElement('input');
+        fnField.name = 'fields[first_name]'; fnField.value = firstName;
+        const emailField = document.createElement('input');
+        emailField.name = 'email_address'; emailField.value = email;
+        kitForm.appendChild(fnField);
+        kitForm.appendChild(emailField);
+        document.body.appendChild(kitForm);
+        const iframe = document.createElement('iframe');
+        iframe.name = 'kit-frame';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        kitForm.submit();
+      }
 
       // Build notes
       const noteLines = [];
