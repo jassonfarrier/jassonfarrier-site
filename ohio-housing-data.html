@@ -1309,7 +1309,12 @@ function renderChart(county, cmetric) {
       const rows = dh
         .map(r => {
           const [yr, mo] = r.month.split('-');
-          return {label: MNAMES[parseInt(mo)-1]+' '+yr, val: r[cmetric]};
+          let val = r[cmetric];
+          if (val == null && DERIVED_DISTRESS_PCT[cmetric]) {
+            const base = DERIVED_DISTRESS_PCT[cmetric];
+            val = (r[base] != null && r.total_properties) ? +(Number(r[base]) / Number(r.total_properties) * 100).toFixed(3) : null;
+          }
+          return {label: MNAMES[parseInt(mo)-1]+' '+yr, val};
         })
         .filter(r => r.val != null);
       if (!rows.length) return;
@@ -2916,7 +2921,15 @@ function renderStateChart(name, cmetric, d) {
     if (sliderWrap) sliderWrap.style.display = 'none';
     const MNAMES = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const rows = dh
-      .map(r => { const [yr,mo]=r.month.split('-'); return {label:MNAMES[parseInt(mo)-1]+' '+yr, val:r[cmetric]}; })
+      .map(r => {
+        const [yr,mo]=r.month.split('-');
+        let val = r[cmetric];
+        if (val == null && DERIVED_DISTRESS_PCT[cmetric]) {
+          const base = DERIVED_DISTRESS_PCT[cmetric];
+          val = (r[base] != null && r.total_properties) ? +(Number(r[base]) / Number(r.total_properties) * 100).toFixed(3) : null;
+        }
+        return {label:MNAMES[parseInt(mo)-1]+' '+yr, val};
+      })
       .filter(r => r.val != null);
     if (!rows.length) return;
     document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — Ohio';
