@@ -267,6 +267,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="zhvi">SFH Home Value</option>
     <option value="median_list_price">Median List Price</option>
     <option value="zhvi_yoy">SFH Home Value YOY %</option>
+    <option value="zhvi_growth_5y">SFH Value 5-Yr Growth</option>
+    <option value="zhvi_growth_10y">SFH Value 10-Yr Growth</option>
     <option value="zhvi_condo">Condo Home Value</option>
     <option value="zhvi_condo_yoy">Condo Home Value YOY %</option>
     <option value="active_listings">Active Listings</option>
@@ -299,6 +301,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn active" data-metric="zhvi"><span class="mn">SFH Home Value</span><span class="md">Zillow ZHVI single-family</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="median_list_price"><span class="mn">Median List Price</span><span class="md">Realtor.com asking price</span><a class="metric-help" href="/ohio-housing-data-methodology#median-list-price" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="zhvi_yoy"><span class="mn">SFH Home Value YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn yoy-btn" data-metric="zhvi_growth_5y"><span class="mn">SFH Value 5-Yr Growth</span><span class="md">% change over 5 years</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-growth" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn yoy-btn" data-metric="zhvi_growth_10y"><span class="mn">SFH Value 10-Yr Growth</span><span class="md">% change over 10 years</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-growth" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="zhvi_condo"><span class="mn">Condo Home Value</span><span class="md">Zillow ZHVI condo/co-op</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="zhvi_condo_yoy"><span class="mn">Condo Home Value YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Supply</div>
@@ -400,6 +404,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="zhvi">SFH Home Value</option>
           <option value="median_list_price">Median List Price</option>
           <option value="zhvi_yoy">SFH Home Value YOY %</option>
+    <option value="zhvi_growth_5y">SFH Value 5-Yr Growth</option>
+    <option value="zhvi_growth_10y">SFH Value 10-Yr Growth</option>
           <option value="zhvi_condo">Condo Home Value</option>
           <option value="zhvi_condo_yoy">Condo Home Value YOY %</option>
           <option value="active_listings">Active Listings</option>
@@ -459,6 +465,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab active" data-cmetric="zhvi"><span class="mn">SFH Home Value</span><span class="md">Zillow ZHVI single-family</span></button>
           <button class="metric-btn chart-tab" data-cmetric="median_list_price"><span class="mn">Median List Price</span><span class="md">Realtor.com asking price</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_yoy"><span class="mn">SFH Home Value YOY %</span><span class="md">Year-over-year change</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_growth_5y"><span class="mn">SFH Value 5-Yr Growth</span><span class="md">% change over 5 years</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_growth_10y"><span class="mn">SFH Value 10-Yr Growth</span><span class="md">% change over 10 years</span></button>
           <button class="metric-btn chart-tab" data-cmetric="zhvi_condo"><span class="mn">Condo Home Value</span><span class="md">Zillow ZHVI condo/co-op</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_condo_yoy"><span class="mn">Condo Home Value YOY %</span><span class="md">Year-over-year change</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Supply</div>
@@ -535,6 +543,8 @@ const METRICS = {
   zhvi:             {label:'SFH Home Value',      fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower',    hi:'Higher'},
   median_list_price:{label:'Median List Price', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower',    hi:'Higher'},
   zhvi_yoy:         {label:'SFH Home Value YOY %',fmt:v=>v.toFixed(1)+'%',                   lo:'Declining',hi:'Growing'},
+  zhvi_growth_5y:   {label:'SFH Value 5-Yr Growth',fmt:v=>(v>0?'+':'')+v.toFixed(1)+'%',      lo:'Slower',   hi:'Faster'},
+  zhvi_growth_10y:  {label:'SFH Value 10-Yr Growth',fmt:v=>(v>0?'+':'')+v.toFixed(1)+'%',     lo:'Slower',   hi:'Faster'},
   zhvi_condo:       {label:'Condo Home Value',    fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower',    hi:'Higher'},
   zhvi_condo_yoy:   {label:'Condo Home Value YOY %',fmt:v=>v.toFixed(1)+'%',                lo:'Declining',hi:'Growing'},
   median_list_price:{label:'Listing Price',   fmt:v=>'$'+v.toLocaleString(),             lo:'Lower',    hi:'Higher'},
@@ -566,7 +576,7 @@ const METRICS = {
   cancellation_pct_yoy:         {label:'Cancellation Rate YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   delisted_pct:                 {label:'Delisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
 };
-const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy']);
+const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','zhvi_growth_5y','zhvi_growth_10y']);
 const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct']);
@@ -616,6 +626,25 @@ function computeYOYHistoryAnnual(history, baseMetric) {
   return result;
 }
 
+function computeGrowthLatest(history, baseMetric, yearsBack) {
+  // Multi-year growth % as of the most recent history entry — same math as
+  // computeYOYHistory, just with a configurable lookback instead of a fixed 1 year.
+  if (!history || !history.length) return null;
+  const byDate = {};
+  history.forEach(r => { byDate[r.date] = r; });
+  const dates = history.map(r => r.date).filter(dt => dt != null).sort();
+  if (!dates.length) return null;
+  const latestDate = dates[dates.length - 1];
+  const latest = byDate[latestDate];
+  if (!latest || latest[baseMetric] == null) return null;
+  const [yr, mo] = latestDate.split('-').map(Number);
+  const priorDate = `${yr - yearsBack}-${String(mo).padStart(2,'0')}`;
+  const prior = byDate[priorDate];
+  if (!prior || prior[baseMetric] == null || prior[baseMetric] === 0) return null;
+  const pct = (latest[baseMetric] - prior[baseMetric]) / Math.abs(prior[baseMetric]) * 100;
+  return parseFloat(pct.toFixed(2));
+}
+
 function attachYOY(d) {
   // Attach .yoy_latest and .yoy_history to a data record
   d.yoy_latest = {};
@@ -632,6 +661,10 @@ function attachYOY(d) {
       d.yoy_latest[yoyKey] = hist.length ? hist[hist.length-1].value : null;
     }
   }
+  // 5yr/10yr SFH price growth — single latest value, not a monthly time series,
+  // so it's stored in yoy_latest but intentionally has no yoy_history entry.
+  d.yoy_latest.zhvi_growth_5y = computeGrowthLatest(d.history || [], 'zhvi', 5);
+  d.yoy_latest.zhvi_growth_10y = computeGrowthLatest(d.history || [], 'zhvi', 10);
 }
 
 const PALETTE_NORM  = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d1e5f0','#92c5de','#4393c3','#2166ac'];
@@ -1253,7 +1286,9 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
     } else if (mapMode === 'metro' && selectedMetro) {
       const d = metroDataMap[selectedMetro];
       if (d) {
-        if (YOY_METRICS.has(cm)) {
+        if (GROWTH_METRICS.has(cm)) {
+          renderGrowthChart(d.metro, cm, d, true);
+        } else if (YOY_METRICS.has(cm)) {
           drawMonthlyBarChart(d.metro, cm, getYOYRows(d, cm), true);
         } else if (cm === 'median_property_tax' || cm === 'property_tax_rate') {
           drawAnnualBarChart(d.metro, cm, [], true);
@@ -1291,8 +1326,40 @@ function getYOYRows(d, metric) {
 }
 
 
+const GROWTH_METRICS = new Set(['zhvi_growth_5y','zhvi_growth_10y']);
+const GROWTH_YEARS = {zhvi_growth_5y: 5, zhvi_growth_10y: 10};
+
+// Shared renderer for the 5yr/10yr growth chart tabs across all 4 geography layers.
+// These are single point-in-time % values, not monthly series — show the actual ZHVI
+// trend over the lookback window so the growth number has visual context.
+// `d` is the data record (dataMap[county] / STATE_DATA / metroDataMap[rid] / zipDataMap[zip]);
+// `name` is the display name; `isZip` controls the ' County' suffix like the rest of the file.
+function renderGrowthChart(name, cmetric, d, isZip) {
+  const yearsBack = GROWTH_YEARS[cmetric];
+  const hist = (d && d.history) || [];
+  if (!hist.length) return;
+  const dates = hist.map(r => r.date).filter(Boolean).sort();
+  const latestDate = dates[dates.length - 1];
+  if (!latestDate) return;
+  const [yr] = latestDate.split('-').map(Number);
+  const cutoffYr = yr - yearsBack;
+  const windowed = hist.filter(r => {
+    if (r.zhvi == null || !r.date) return false;
+    const [ry] = r.date.split('-').map(Number);
+    return ry >= cutoffYr;
+  });
+  drawAnnualLineChart(name, 'zhvi', windowed, isZip);
+  const growthVal = getMetricVal(d, cmetric);
+  if (growthVal != null) {
+    const suffix = isZip ? '' : ' County';
+    const lbl = document.getElementById('chart-label');
+    if (lbl) lbl.textContent = METRICS[cmetric].label + ' — ' + name + suffix + ` (${(growthVal>0?'+':'')}${growthVal.toFixed(1)}% since ${cutoffYr})`;
+  }
+}
+
 function renderChart(county, cmetric) {
   const d = dataMap[county];
+  if (GROWTH_METRICS.has(cmetric)) { renderGrowthChart(county, cmetric, d, false); return; }
   if (TAX_YOY.has(cmetric)) {
     // Annual ACS-based YOY — use annual bar chart with YOY rows
     const yoyRows = getYOYRows(d, cmetric).map(r => ({...r, date: r.date || ''}));
@@ -2842,7 +2909,9 @@ function openMetroModal(rid) {
   setTimeout(() => {
     document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
     document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
-    if (YOY_METRICS.has(mapMetric)) {
+    if (GROWTH_METRICS.has(mapMetric)) {
+      renderGrowthChart(d.metro, mapMetric, d, true);
+    } else if (YOY_METRICS.has(mapMetric)) {
       drawMonthlyBarChart(d.metro, mapMetric, getYOYRows(d, mapMetric), true);
     } else if (mapMetric === 'median_property_tax' || mapMetric === 'property_tax_rate') {
       drawAnnualBarChart(d.metro, mapMetric, [], true);
@@ -2948,6 +3017,7 @@ function openStateModal() {
 }
 
 function renderStateChart(name, cmetric, d) {
+  if (GROWTH_METRICS.has(cmetric)) { renderGrowthChart(name, cmetric, d, true); return; }
   if (YOY_METRICS.has(cmetric)) {
     drawMonthlyBarChart(name, cmetric, getYOYRows(d, cmetric), true);
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
@@ -3182,6 +3252,7 @@ function renderZipChart(zip, cmetric) {
 function _doRenderZipChart(zip, cmetric) {
   const d = zipDataMap[zip];
   if (!d) return;
+  if (GROWTH_METRICS.has(cmetric)) { renderGrowthChart(zip, cmetric, d, true); return; }
   if (TAX_YOY.has(cmetric)) {
     const yoyRows = getYOYRows(d, cmetric).map(r => ({...r, date: r.date || ''}));
     drawAnnualBarChart(zip, cmetric, yoyRows, true);
