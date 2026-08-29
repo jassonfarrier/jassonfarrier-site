@@ -713,17 +713,28 @@ function drawLegend(vals, palette) {
 // Single source of truth for ALL layer × metric combinations.
 // Add a new layer: add one entry to LAYER_CONFIG. Nothing else changes.
 const DERIVED_DISTRESS_PCT = {pre_fc_pct: 'pre_fc', upside_down_pct: 'upside_down'};
+// Sanity ceiling for distress percentage metrics — PropStream source data occasionally has a bad
+// county/month with an implausible tax_delinquent (or other) count relative to total_properties.
+// Above this ceiling, treat it as bad data and show N/A rather than plot a false spike.
+// Also guards against a broken total_properties (e.g. a stray "1") producing a fake 100% reading.
+const DISTRESS_PCT_SANITY_CEILING = 50; // percent
+const DISTRESS_PCT_METRICS = new Set(['tax_del_pct','pre_fc_pct','upside_down_pct']);
 function getMetricVal(d, metric) {
   if (YOY_METRICS.has(metric)) return d.yoy_latest && d.yoy_latest[metric] != null ? Number(d.yoy_latest[metric]) : null;
   if (DISTRESS_METRICS.has(metric)) {
     if (!d.distress_history || !d.distress_history.length) return null;
     const last = d.distress_history[d.distress_history.length - 1];
+    if (DISTRESS_PCT_METRICS.has(metric) && (!last.total_properties || last.total_properties < 100)) return null;
+    let val;
     if (DERIVED_DISTRESS_PCT[metric]) {
       const base = DERIVED_DISTRESS_PCT[metric];
       if (last[base] == null || !last.total_properties) return null;
-      return +(Number(last[base]) / Number(last.total_properties) * 100).toFixed(3);
+      val = +(Number(last[base]) / Number(last.total_properties) * 100).toFixed(3);
+    } else {
+      val = last[metric] != null ? Number(last[metric]) : null;
     }
-    return last[metric] != null ? Number(last[metric]) : null;
+    if (DISTRESS_PCT_METRICS.has(metric) && val != null && val > DISTRESS_PCT_SANITY_CEILING) return null;
+    return val;
   }
   return d.latest && d.latest[metric] != null ? Number(d.latest[metric]) : null;
 }
