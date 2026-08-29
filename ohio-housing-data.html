@@ -1485,6 +1485,8 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
 
 
       // County label layer — county name + value shown on map when zoomed in
+      // text-allow-overlap is true so every county label renders even in dense clusters (e.g. NE Ohio) —
+      // this is a data map meant for full-state screenshots, not a nav map, so completeness beats tidiness.
       map.addLayer({
         id: 'counties-labels',
         type: 'symbol',
@@ -1492,11 +1494,13 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
         minzoom: 5.5,
         layout: {
           'text-field': ['concat', ['get','county'], '\n', ['coalesce',['get','__label'],'']],
-          'text-size': ['interpolate',['linear'],['zoom'], 5.5,13.6, 6.8,16.5, 9,22.3, 11,26.2],
+          'text-size': ['interpolate',['linear'],['zoom'], 5.5,15, 6.8,20, 9,24, 11,26.2],
           'text-font': ['DIN Pro Bold','Arial Unicode MS Bold'],
           'text-anchor': 'center',
-          'text-max-width': 10,
-          'text-line-height': 1.4,
+          'text-max-width': 7,
+          'text-line-height': 1.2,
+          'text-allow-overlap': true,
+          'text-ignore-placement': true,
         },
         paint: {
           'text-color': '#111',
