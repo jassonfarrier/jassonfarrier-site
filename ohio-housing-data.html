@@ -1484,23 +1484,25 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
       });
 
 
-      // County label layer — county name + value shown on map when zoomed in
-      // text-allow-overlap is true so every county label renders even in dense clusters (e.g. NE Ohio) —
-      // this is a data map meant for full-state screenshots, not a nav map, so completeness beats tidiness.
+      // County label layer — county name + value shown on map when zoomed in.
+      // minzoom 6.6 roughly matches "Ohio fills the frame" — below that, 88 counties genuinely
+      // can't fit readable labels regardless of font size, so labels simply don't render yet.
+      // Real collision detection (allow-overlap OFF) so crowded NE-Ohio counties hide cleanly
+      // instead of stacking into illegible overlapping text.
       map.addLayer({
         id: 'counties-labels',
         type: 'symbol',
         source: 'ohio-counties',
-        minzoom: 5.5,
+        minzoom: 6.6,
         layout: {
           'text-field': ['concat', ['get','county'], '\n', ['coalesce',['get','__label'],'']],
-          'text-size': ['interpolate',['linear'],['zoom'], 5.5,15, 6.8,20, 9,24, 11,26.2],
+          'text-size': ['interpolate',['linear'],['zoom'], 6.6,15, 7.5,18, 9,22, 11,26],
           'text-font': ['DIN Pro Bold','Arial Unicode MS Bold'],
           'text-anchor': 'center',
           'text-max-width': 7,
           'text-line-height': 1.2,
-          'text-allow-overlap': true,
-          'text-ignore-placement': true,
+          'text-allow-overlap': false,
+          'text-ignore-placement': false,
         },
         paint: {
           'text-color': '#111',
