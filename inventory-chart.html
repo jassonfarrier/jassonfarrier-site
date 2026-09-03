@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Inventory</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;background:#000}
+body{font-family:'Montserrat',sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 36px;min-height:100vh}
+
+.chart-shell{width:100%;max-width:1760px;}
+
+.upper-third{background:#0d1e42;border-radius:8px;display:flex;align-items:stretch;justify-content:space-between;overflow:hidden;margin-bottom:10px;}
+.upper-third-main{flex:1;display:flex;align-items:center;padding:14px 22px;min-width:0;}
+.upper-third-county{font-size:18px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}
+.upper-third-sep{color:rgba(255,255,255,0.4);margin:0 14px;font-size:18px;font-weight:300}
+.upper-third-metric{font-size:18px;font-weight:500;color:rgba(255,255,255,0.75);letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}
+.upper-third-source{font-size:12px;font-weight:400;color:rgba(255,255,255,0.45);margin-left:10px;white-space:nowrap}
+
+.series-toggle{display:flex;align-items:center;gap:10px;padding:0 22px;flex-shrink:0;}
+.toggle-btn{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:20px;padding:8px 16px;cursor:pointer;transition:all .15s ease;}
+.toggle-btn.off{opacity:0.4;}
+.toggle-btn .dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
+.toggle-btn .lbl{font-size:13px;font-weight:700;color:#fff;white-space:nowrap;}
+
+.chart-wrap{background:#000;border-radius:10px;position:relative;}
+svg#line-chart{width:100%;height:72vh;display:block;overflow:visible}
+
+.controls{max-width:1760px;width:100%;margin-top:20px;padding:0 4px;}
+.range-slider{position:relative;height:40px;}
+.range-slider input[type=range]{position:absolute;top:10px;left:0;width:100%;-webkit-appearance:none;height:6px;background:transparent;pointer-events:none;margin:0;}
+.range-slider input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:#4a9eff;border:2px solid #000;cursor:pointer;pointer-events:auto;margin-top:-7px;}
+.range-slider input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:#4a9eff;border:2px solid #000;cursor:pointer;pointer-events:auto;}
+.track-bg{position:absolute;top:17px;left:0;width:100%;height:6px;border-radius:4px;background:#2a2e35;}
+.track-fill{position:absolute;top:17px;height:6px;border-radius:4px;background:#4a9eff;}
+.range-labels{display:flex;justify-content:space-between;margin-top:8px;}
+.range-labels .yr-min,.range-labels .yr-max{font-size:26px;font-weight:800;color:#fff;}
+
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+@keyframes hoverBarPulse{
+  0%,100%{opacity:0.22;}
+  50%{opacity:0.5;}
+}
+.hover-bar{animation:hoverBarPulse 1.1s ease-in-out infinite;}
+</style>
+</head>
+<body>
+
+<h2 class="sr-only">Line chart comparing U.S. existing-home inventory and new construction homes for sale, 2000 to 2025/2026, with adjustable date range.</h2>
+
+<div class="chart-shell">
+  <div class="upper-third">
+    <div class="upper-third-main">
+      <span class="upper-third-county">UNITED STATES</span>
+      <span class="upper-third-sep">&middot;</span>
+      <span class="upper-third-metric" id="upperMetric">HOUSING INVENTORY</span>
+      <span class="upper-third-source" id="upperSource">NAR, Census Bureau &amp; Zillow ZHVI</span>
+    </div>
+    <div class="series-toggle" id="seriesToggle">
+      <div class="toggle-btn" id="toggleExisting" data-series="existing">
+        <span class="dot" style="background:#4a9eff"></span>
+        <span class="lbl">Existing-Home Inventory</span>
+      </div>
+      <div class="toggle-btn off" id="toggleNew" data-series="new">
+        <span class="dot" style="background:#f5a623"></span>
+        <span class="lbl">New Construction For Sale</span>
+      </div>
+      <div class="toggle-btn off" id="toggleCombined" data-series="combined">
+        <span class="dot" style="background:#ffffff"></span>
+        <span class="lbl">Combined Total</span>
+      </div>
+      <div class="toggle-btn off" id="togglePrice" data-price="1">
+        <span class="dot" style="background:#e34c8a"></span>
+        <span class="lbl">Median Home Value</span>
+      </div>
+    </div>
+  </div>
+  <div class="chart-wrap">
+    <svg id="line-chart"></svg>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="range-slider">
+    <div class="track-bg"></div>
+    <div class="track-fill" id="trackFill"></div>
+    <input type="range" id="minSlider" min="0" max="25" value="0" step="1" aria-label="Start year">
+    <input type="range" id="maxSlider" min="0" max="25" value="25" step="1" aria-label="End year">
+  </div>
+  <div class="range-labels">
+    <div class="yr-min" id="yrMinLabel">2000</div>
+    <div class="yr-max" id="yrMaxLabel">2025</div>
+  </div>
+</div>
+
+<script>
+// Existing-home inventory (NAR via ycharts), millions of units
+const existingData = [
+  {year:'2000', val:1.87},{year:'2001', val:1.89},{year:'2002', val:2.14},{year:'2003', val:2.27},
+  {year:'2004', val:2.24},{year:'2005', val:2.85},{year:'2006', val:3.45},{year:'2007', val:3.52},
+  {year:'2008', val:3.13},{year:'2009', val:2.74},{year:'2010', val:3.02},{year:'2011', val:2.32},
+  {year:'2012', val:1.83},{year:'2013', val:1.86},{year:'2014', val:1.86},{year:'2015', val:1.76},
+  {year:'2016', val:1.65},{year:'2017', val:1.46},{year:'2018', val:1.53},{year:'2019', val:1.39},
+  {year:'2020', val:1.06},{year:'2021', val:0.88},{year:'2022', val:0.96},{year:'2023', val:0.99},
+  {year:'2024', val:1.14},{year:'2025', val:1.23},
+  // 2026 estimate: NAR has not published a year-end 2026 figure yet. Estimated by applying the YoY
+  // change in Realtor.com national active-listing counts (July 2026 vs July 2025, +2.13%) to the
+  // 2025 NAR baseline (1.23M) — same methodology used elsewhere in this workbook to bridge partial years.
+  {year:'2026', val:1.26, partial:true},
+];
+
+// New construction homes for sale (FRED HNFSEPUSSA — Census Bureau, New Residential Sales, single-family),
+// annual average of monthly seasonally-adjusted values, thousands -> converted to millions for shared axis.
+// 2026 is not yet a complete FRED annual figure — shown as the most recent month FRED has released (July 2026, 488K).
+const newConstructionData = [
+  {year:'2000', val:0.304},{year:'2001', val:0.302},{year:'2002', val:0.328},{year:'2003', val:0.348},
+  {year:'2004', val:0.395},{year:'2005', val:0.468},{year:'2006', val:0.553},{year:'2007', val:0.531},
+  {year:'2008', val:0.426},{year:'2009', val:0.279},{year:'2010', val:0.211},{year:'2011', val:0.167},
+  {year:'2012', val:0.146},{year:'2013', val:0.169},{year:'2014', val:0.200},{year:'2015', val:0.216},
+  {year:'2016', val:0.243},{year:'2017', val:0.275},{year:'2018', val:0.314},{year:'2019', val:0.330},
+  {year:'2020', val:0.304},{year:'2021', val:0.350},{year:'2022', val:0.440},{year:'2023', val:0.436},
+  {year:'2024', val:0.471},{year:'2025', val:0.495},{year:'2026', val:0.488, partial:true},
+];
+
+// Combined = existing + new construction, summed per year (only years present in both series)
+const combinedData = existingData.map(e => {
+  const nc = newConstructionData.find(n => n.year === e.year);
+  if (!nc) return null;
+  return { year: e.year, val: e.val + nc.val, partial: !!(e.partial || nc.partial) };
+}).filter(Boolean);
+
+// Median home value — Zillow ZHVI, national ("United States" country row), July-anchored annual reads, 2000-2026.
+const pricesData = [
+  {year:'2000', val:128396},{year:'2001', val:137683},{year:'2002', val:146778},{year:'2003', val:157648},
+  {year:'2004', val:172309},{year:'2005', val:192105},{year:'2006', val:209119},{year:'2007', val:210595},
+  {year:'2008', val:197521},{year:'2009', val:179113},{year:'2010', val:175282},{year:'2011', val:164739},
+  {year:'2012', val:164278},{year:'2013', val:175057},{year:'2014', val:186505},{year:'2015', val:195747},
+  {year:'2016', val:207827},{year:'2017', val:220430},{year:'2018', val:234562},{year:'2019', val:246072},
+  {year:'2020', val:259210},{year:'2021', val:306586},{year:'2022', val:355586},{year:'2023', val:355927},
+  {year:'2024', val:368195},{year:'2025', val:369943},{year:'2026', val:374045, partial:true},
+];
+
+const INVENTORY_SERIES = {
+  existing: { label: 'EXISTING-HOME INVENTORY', shortLabel: 'Existing Homes', color: '#4a9eff', data: existingData },
+  new:      { label: 'NEW CONSTRUCTION FOR SALE', shortLabel: 'New Homes', color: '#f5a623', data: newConstructionData },
+  combined: { label: 'COMBINED TOTAL INVENTORY', shortLabel: 'All Homes', color: '#ffffff', data: combinedData },
+};
+const PRICE_SERIES = { label: 'MEDIAN HOME VALUE', shortLabel: 'Home Value', color: '#e34c8a', data: pricesData };
+
+// Inventory toggle is radio-style (exactly one of existing/new/combined always on).
+// Price toggle is independent — can be on or off regardless of which inventory series is selected.
+let selectedSeries = 'existing';
+let priceOn = false;
+
+const minSlider = document.getElementById('minSlider');
+const maxSlider = document.getElementById('maxSlider');
+const trackFill = document.getElementById('trackFill');
+const yrMinLabel = document.getElementById('yrMinLabel');
+const yrMaxLabel = document.getElementById('yrMaxLabel');
+const toggleExisting = document.getElementById('toggleExisting');
+const toggleNew = document.getElementById('toggleNew');
+const toggleCombined = document.getElementById('toggleCombined');
+const togglePrice = document.getElementById('togglePrice');
+
+let allYearsMaster = [];
+let nMaster = 0;
+
+function fmtInv(v) { return v.toFixed(2) + 'M'; }
+function fmtPrice(v) { return '$' + Math.round(v/1000) + 'K'; }
+
+const invToggleButtons = { existing: toggleExisting, new: toggleNew, combined: toggleCombined };
+
+function selectSeries(key) {
+  selectedSeries = key;
+  Object.keys(invToggleButtons).forEach(k => invToggleButtons[k].classList.toggle('off', k !== key));
+  rebuildYearRange();
+  render();
+}
+
+function togglePriceOn() {
+  priceOn = !priceOn;
+  togglePrice.classList.toggle('off', !priceOn);
+  rebuildYearRange();
+  render();
+}
+
+Object.keys(invToggleButtons).forEach(key => {
+  invToggleButtons[key].addEventListener('click', () => selectSeries(key));
+});
+togglePrice.addEventListener('click', togglePriceOn);
+
+function rebuildYearRange() {
+  let allData = INVENTORY_SERIES[selectedSeries].data.map(d => d.year);
+  if (priceOn) allData = allData.concat(pricesData.map(d => d.year));
+  allYearsMaster = [...new Set(allData)].sort();
+  nMaster = allYearsMaster.length;
+  minSlider.max = nMaster - 1;
+  maxSlider.max = nMaster - 1;
+  minSlider.value = 0;
+  maxSlider.value = nMaster - 1;
+}
+
+rebuildYearRange();
+
+const PARTIAL_NOTE_INV = {
+  existing: '* 2026 estimated — projected from Realtor.com YoY trend',
+  new: '* 2026 = latest month available, July (FRED, HNFSEPUSSA)',
+  combined: '* 2026 = latest month available for each series (see toggle notes)',
+};
+const PARTIAL_NOTE_PRICE = '* 2026 = latest month available, July (Zillow ZHVI)';
+
+function render() {
+  let lo = parseInt(minSlider.value, 10);
+  let hi = parseInt(maxSlider.value, 10);
+  if (lo > hi) { [lo, hi] = [hi, lo]; }
+
+  const loYear = allYearsMaster[lo];
+  const hiYear = allYearsMaster[hi];
+  yrMinLabel.textContent = loYear;
+  yrMaxLabel.textContent = hiYear;
+
+  const fillLeft = (lo / (nMaster-1)) * 100;
+  const fillRight = (hi / (nMaster-1)) * 100;
+  trackFill.style.left = fillLeft + '%';
+  trackFill.style.width = (fillRight - fillLeft) + '%';
+
+  const visibleYears = allYearsMaster.filter(y => y >= loYear && y <= hiYear);
+
+  const lsvg = d3.select('#line-chart');
+  lsvg.selectAll('*').remove();
+
+  const invMeta = INVENTORY_SERIES[selectedSeries];
+  const invRows = invMeta.data.filter(d => visibleYears.includes(d.year));
+  const priceRows = priceOn ? pricesData.filter(d => visibleYears.includes(d.year)) : [];
+  if (!invRows.length) return;
+
+  const W = lsvg.node().getBoundingClientRect().width || 1760;
+  const H = lsvg.node().getBoundingClientRect().height || 600;
+  const m = {top:50, right: priceOn ? 110 : 60, bottom:50, left:110};
+  const iw = W - m.left - m.right, ih = H - m.top - m.bottom;
+  const g = lsvg.attr('viewBox', `0 0 ${W} ${H}`).append('g').attr('transform', `translate(${m.left},${m.top})`);
+
+  // x-axis: when price is on, restrict to years present in both series so points line up;
+  // when price is off, use the full inventory series range.
+  const xYears = priceOn ? invRows.map(r=>r.year).filter(yr => priceRows.some(p=>p.year===yr)) : invRows.map(r=>r.year);
+  const x = d3.scalePoint().domain(xYears).range([0, iw]).padding(0.1);
+  const invPts = invRows.filter(r => xYears.includes(r.year));
+  const pricePts = priceRows.filter(r => xYears.includes(r.year));
+
+  const invMin = d3.min(invPts, r=>r.val), invMax = d3.max(invPts, r=>r.val);
+  const invPad = Math.max((invMax - invMin) * 0.22, 0.06);
+  const yInv = d3.scaleLinear().domain([Math.max(0, invMin - invPad), invMax + invPad]).range([ih, 0]);
+
+  // grid, based on inventory axis
+  yInv.ticks(5).forEach(t => {
+    g.append('line').attr('x1',0).attr('x2',iw).attr('y1',yInv(t)).attr('y2',yInv(t))
+      .attr('stroke','rgba(255,255,255,0.08)').attr('stroke-width',1);
+  });
+
+  // Pulsing vertical bar that tracks whatever year the mouse is nearest to — shown behind the
+  // line(s), hidden until the first mousemove, hidden again on mouseleave.
+  const hoverBarW = Math.max(x.step() * 0.6, 10);
+  const hoverBar = g.append('rect').attr('class','hover-bar')
+    .attr('y',0).attr('width',hoverBarW).attr('height',ih)
+    .attr('fill','#ffffff').style('opacity',0).style('pointer-events','none');
+
+  const defs = lsvg.append('defs');
+  const invGrad = defs.append('linearGradient').attr('id','grad-'+selectedSeries).attr('x1','0').attr('y1','0').attr('x2','0').attr('y2','1');
+  invGrad.append('stop').attr('offset','0%').attr('stop-color',invMeta.color).attr('stop-opacity',0.35);
+  invGrad.append('stop').attr('offset','100%').attr('stop-color',invMeta.color).attr('stop-opacity',0);
+
+  const invArea = d3.area().x(r=>x(r.year)).y0(ih).y1(r=>yInv(r.val)).curve(d3.curveMonotoneX);
+  g.append('path').datum(invPts).attr('d',invArea).attr('fill','url(#grad-'+selectedSeries+')').attr('stroke','none');
+
+  const invLine = d3.line().x(r=>x(r.year)).y(r=>yInv(r.val)).curve(d3.curveMonotoneX);
+  g.append('path').datum(invPts).attr('d',invLine).attr('fill','none').attr('stroke',invMeta.color).attr('stroke-width',4);
+
+  // dashed segment for inventory's partial 2026 point
+  const invPartialIdx = invPts.findIndex(r => r.partial);
+  if (invPartialIdx > 0) {
+    const seg = invPts.slice(invPartialIdx - 1, invPartialIdx + 1);
+    const dashLine = d3.line().x(r=>x(r.year)).y(r=>yInv(r.val)).curve(d3.curveMonotoneX);
+    g.append('path').datum(seg).attr('d',dashLine).attr('fill','none').attr('stroke',invMeta.color)
+      .attr('stroke-width',4).attr('stroke-dasharray','8,6');
+  }
+
+  let yPrice = null;
+  if (priceOn && pricePts.length) {
+    const priceMin = d3.min(pricePts, r=>r.val), priceMax = d3.max(pricePts, r=>r.val);
+    const pricePad = Math.max((priceMax - priceMin) * 0.22, priceMax * 0.02);
+    yPrice = d3.scaleLinear().domain([Math.max(0, priceMin - pricePad), priceMax + pricePad]).range([ih, 0]);
+
+    const priceLine = d3.line().x(r=>x(r.year)).y(r=>yPrice(r.val)).curve(d3.curveMonotoneX);
+    g.append('path').datum(pricePts).attr('d',priceLine).attr('fill','none').attr('stroke',PRICE_SERIES.color).attr('stroke-width',4);
+
+    const pricePartialIdx = pricePts.findIndex(r => r.partial);
+    if (pricePartialIdx > 0) {
+      const seg = pricePts.slice(pricePartialIdx - 1, pricePartialIdx + 1);
+      const dashLine = d3.line().x(r=>x(r.year)).y(r=>yPrice(r.val)).curve(d3.curveMonotoneX);
+      g.append('path').datum(seg).attr('d',dashLine).attr('fill','none').attr('stroke',PRICE_SERIES.color)
+        .attr('stroke-width',4).attr('stroke-dasharray','8,6');
+    }
+
+    g.selectAll('.pt-dot-price').data(pricePts).join('circle').attr('class','pt-dot-price')
+      .attr('cx', r=>x(r.year)).attr('cy', r=>yPrice(r.val))
+      .attr('r', r => r.partial ? 8 : 6).attr('fill', r => r.partial ? '#000' : '#fff')
+      .attr('stroke', PRICE_SERIES.color).attr('stroke-width', r => r.partial ? 3 : 2.5);
+
+    // right axis = price
+    g.append('g').attr('transform',`translate(${iw},0)`).call(d3.axisRight(yPrice).ticks(5).tickSize(0).tickFormat(v=>fmtPrice(v)))
+      .call(ax=>ax.select('.domain').remove())
+      .selectAll('text').attr('fill',PRICE_SERIES.color).attr('font-size','16px')
+      .attr('font-family','Montserrat').attr('font-weight','700').attr('dx','8');
+
+    // legend (only needed when both lines are showing)
+    const legend = g.append('g').attr('transform', `translate(0,-30)`);
+    legend.append('circle').attr('cx',6).attr('cy',0).attr('r',6).attr('fill',invMeta.color);
+    legend.append('text').attr('x',18).attr('y',5).attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700')
+      .attr('fill','#fff').text(invMeta.shortLabel);
+    legend.append('circle').attr('cx',180).attr('cy',0).attr('r',6).attr('fill',PRICE_SERIES.color);
+    legend.append('text').attr('x',192).attr('y',5).attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700')
+      .attr('fill','#fff').text('Median Home Value');
+  }
+
+  const invDotStroke = invMeta.color === '#ffffff' ? '#0d1e42' : invMeta.color;
+  g.selectAll('.pt-dot-inv').data(invPts).join('circle').attr('class','pt-dot-inv')
+    .attr('cx', r=>x(r.year)).attr('cy', r=>yInv(r.val))
+    .attr('r', r => r.partial ? 8 : 6).attr('fill', r => r.partial ? '#000' : '#fff')
+    .attr('stroke', invDotStroke).attr('stroke-width', r => r.partial ? 3 : 2.5)
+    .style('cursor','pointer');
+
+  // x axis — always every other year, anchored to the newest year
+  const xTicks = [];
+  for (let i = xYears.length - 1; i >= 0; i -= 2) xTicks.unshift(xYears[i]);
+  g.append('g').attr('transform',`translate(0,${ih})`)
+    .call(d3.axisBottom(x).tickValues(xTicks).tickSize(0))
+    .call(ax=>ax.select('.domain').remove())
+    .selectAll('text').attr('fill','#9DA6AB').attr('font-size','18px')
+    .attr('font-family','Montserrat').attr('font-weight','700');
+
+  // left axis = inventory
+  g.append('g').call(d3.axisLeft(yInv).ticks(5).tickSize(0).tickFormat(v=>fmtInv(v)))
+    .call(ax=>ax.select('.domain').remove())
+    .selectAll('text').attr('fill', priceOn ? (invMeta.color === '#ffffff' ? '#9DA6AB' : invMeta.color) : '#9DA6AB').attr('font-size','18px')
+    .attr('font-family','Montserrat').attr('font-weight','700').attr('dx','-8');
+
+  // footnotes for partial 2026 points
+  const notes = [];
+  if (invPts.some(r => r.partial)) notes.push(PARTIAL_NOTE_INV[selectedSeries]);
+  if (priceOn && pricePts.some(r => r.partial)) notes.push(PARTIAL_NOTE_PRICE);
+  notes.forEach((note, i) => {
+    g.append('text').attr('x',iw).attr('y',-24 - i*18).attr('text-anchor','end')
+      .attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','600')
+      .attr('fill','#9DA6AB')
+      .text(note);
+  });
+
+  // Click-to-pin + hover — single-metric tooltip only. When both lines are showing, whichever
+  // line the cursor is nearer to (by pixel distance) is the one the tooltip tracks; pinning
+  // remembers which line was pinned so the delta never compares across inventory vs. price.
+  let clickedYear = null;
+  let clickedLine = null; // 'inv' or 'price'
+  const cardW = 190, cardH = 96;
+
+  const clickCard = g.append('g').style('opacity',0);
+  const clickRect = clickCard.append('rect').attr('rx',10).attr('fill','rgba(13,30,66,0.95)')
+    .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1.5)
+    .style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.55))');
+  const clickConnector = clickCard.insert('line', ':first-child').attr('stroke','rgba(255,255,255,0.35)').attr('stroke-width',1.5);
+  const clickAnchorDot = clickCard.insert('circle', ':first-child').attr('r',3.5).attr('fill','#fff');
+  const clickYearTxt = clickCard.append('text').attr('font-size','12.6px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','rgba(255,255,255,0.7)').attr('text-anchor','middle');
+  const clickValTxt  = clickCard.append('text').attr('font-size','26.2px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#fff').attr('text-anchor','middle');
+  const clickLblTxt  = clickCard.append('text').attr('font-size','12.6px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','rgba(255,255,255,0.7)').attr('text-anchor','middle');
+  const clickHintTxt = clickCard.append('text').attr('font-size','9.5px').attr('font-family','Montserrat').attr('font-weight','600').attr('fill','rgba(255,255,255,0.45)').attr('text-anchor','middle').text('HOVER ANOTHER POINT TO COMPARE');
+
+  function dismissPin() {
+    clickCard.style('opacity',0);
+    clickedYear = null;
+    clickedLine = null;
+  }
+  lsvg.on('click', dismissPin);
+
+  const hoverDotInv = g.append('circle').attr('r',6).attr('fill',invMeta.color).attr('stroke', invMeta.color === '#ffffff' ? '#0d1e42' : '#fff').attr('stroke-width',2.5)
+    .style('opacity',0).style('pointer-events','none');
+  const hoverDotPrice = priceOn ? g.append('circle').attr('r',6).attr('fill',PRICE_SERIES.color).attr('stroke','#fff').attr('stroke-width',2.5)
+    .style('opacity',0).style('pointer-events','none') : null;
+  const hoverCard = g.append('g').style('opacity',0).style('pointer-events','none');
+  const hoverRect = hoverCard.append('rect').attr('rx',10).attr('fill','#fff')
+    .attr('stroke','rgba(0,0,0,0.1)').attr('stroke-width',1.5)
+    .style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.35))');
+  const hoverConnector = hoverCard.insert('line', ':first-child').attr('stroke','rgba(0,0,0,0.25)').attr('stroke-width',1.5);
+  const hoverAnchorDot = hoverCard.insert('circle', ':first-child').attr('r',3.5).attr('fill','#0d1e42');
+  const hoverYearTxt = hoverCard.append('text').attr('font-size','12.6px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888').attr('text-anchor','middle');
+  const hoverValTxt  = hoverCard.append('text').attr('font-size','26.2px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42').attr('text-anchor','middle');
+  const hoverLblTxt  = hoverCard.append('text').attr('font-size','12.6px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444').attr('text-anchor','middle');
+  const hoverDeltaTxt= hoverCard.append('text').attr('font-size','12.6px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill',invMeta.color).attr('text-anchor','middle').style('opacity',0);
+
+  // Given a mouse position, find the nearest point on EITHER line (by combined x+y pixel distance
+  // when both lines are on; by x distance alone when only inventory is showing).
+  function findNearest(mx, my) {
+    let best = null, bestDist = Infinity, bestLine = 'inv';
+    xYears.forEach(yr => {
+      const invR = invPts.find(r=>r.year===yr);
+      if (invR) {
+        const dx = x(yr) - mx, dy = yInv(invR.val) - my;
+        const dist = priceOn ? Math.hypot(dx, dy) : Math.abs(dx);
+        if (dist < bestDist) { bestDist = dist; best = invR; bestLine = 'inv'; }
+      }
+      if (priceOn) {
+        const priceR = pricePts.find(r=>r.year===yr);
+        if (priceR) {
+          const dx = x(yr) - mx, dy = yPrice(priceR.val) - my;
+          const dist = Math.hypot(dx, dy);
+          if (dist < bestDist) { bestDist = dist; best = priceR; bestLine = 'price'; }
+        }
+      }
+    });
+    return { row: best, line: bestLine };
+  }
+
+  function lineMeta(line) {
+    return line === 'price'
+      ? { color: PRICE_SERIES.color, shortLabel: PRICE_SERIES.shortLabel, fmt: fmtPrice, yScale: yPrice }
+      : { color: invMeta.color, shortLabel: invMeta.shortLabel, fmt: fmtInv, yScale: yInv };
+  }
+
+  g.append('rect').attr('width',iw).attr('height',ih).attr('fill','transparent')
+    .on('click', function(event) {
+      event.stopPropagation();
+      const [mx, my] = d3.pointer(event);
+      const { row: nearest, line } = findNearest(mx, my);
+      if (!nearest) return;
+      clickedYear = nearest.year;
+      clickedLine = line;
+      const meta = lineMeta(line);
+      const cx = x(nearest.year), cy = meta.yScale(nearest.val);
+      const clickH = 104;
+      const gap = 34; // clears the card away from the dot/line so it doesn't sit on top of the chart
+      const goRight = cx + gap + cardW + 10 <= iw;
+      const cardX = goRight ? cx + gap : cx - gap - cardW;
+      const cardY = Math.max(0, Math.min(cy - clickH/2, ih - clickH));
+      clickRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',clickH);
+      clickAnchorDot.attr('cx',cx).attr('cy',cy);
+      clickConnector.attr('x1',cx).attr('y1',cy).attr('x2', goRight ? cardX : cardX+cardW).attr('y2', cardY + clickH/2);
+      const midX = cardX + cardW/2;
+      clickYearTxt.attr('x',midX).attr('y',cardY+20).text(nearest.year);
+      clickValTxt.attr('x',midX).attr('y',cardY+50).attr('fill', meta.color === '#ffffff' ? '#fff' : meta.color).text(meta.fmt(nearest.val) + (nearest.partial ? '*' : ''));
+      clickLblTxt.attr('x',midX).attr('y',cardY+70).text(meta.shortLabel);
+      clickHintTxt.attr('x',midX).attr('y',cardY+94);
+      clickCard.raise().style('opacity',1);
+    })
+    .on('mousemove', function(event) {
+      const [mx, my] = d3.pointer(event);
+      const { row: nearest, line } = findNearest(mx, my);
+      if (!nearest) return;
+      const meta = lineMeta(line);
+      const cx = x(nearest.year), cy = meta.yScale(nearest.val);
+
+      hoverBar.attr('x', cx - hoverBarW/2).style('opacity',null); // opacity driven by CSS pulse once shown
+
+      let deltaText = null;
+      if (clickedYear && clickedLine === line && clickedYear !== nearest.year) {
+        const pinnedRow = (line === 'price' ? pricePts : invPts).find(r => r.year === clickedYear);
+        if (pinnedRow && pinnedRow.val !== 0) {
+          const pct = ((nearest.val - pinnedRow.val) / Math.abs(pinnedRow.val)) * 100;
+          deltaText = (pct >= 0 ? '▲ ' : '▼ ') + Math.abs(pct).toFixed(1) + '% from ' + clickedYear;
+        }
+      }
+      const curCardH = deltaText ? cardH + 28 : cardH;
+      const gap = 34; // clears the card away from the dot/line so it doesn't sit on top of the chart
+      const goRight = cx + gap + cardW + 10 <= iw;
+      const cardX = goRight ? cx + gap : cx - gap - cardW;
+      const cardY = Math.max(0, Math.min(cy - curCardH/2, ih - curCardH));
+      const midX = cardX + cardW/2;
+
+      hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',curCardH);
+      hoverAnchorDot.attr('cx',cx).attr('cy',cy);
+      hoverConnector.attr('x1',cx).attr('y1',cy).attr('x2', goRight ? cardX : cardX+cardW).attr('y2', cardY + curCardH/2);
+      hoverYearTxt.attr('x',midX).attr('y',cardY+20).text(nearest.year);
+      hoverValTxt.attr('x',midX).attr('y',cardY+50).text(meta.fmt(nearest.val) + (nearest.partial ? '*' : ''));
+      hoverLblTxt.attr('x',midX).attr('y',cardY+70).text(meta.shortLabel);
+      if (deltaText) {
+        const isNeg = deltaText.startsWith('▼');
+        hoverDeltaTxt.attr('x',midX).attr('y',cardY+94).text(deltaText)
+          .attr('fill', isNeg ? '#c0392b' : meta.color === '#ffffff' ? '#0d1e42' : meta.color)
+          .style('opacity',1);
+      } else {
+        hoverDeltaTxt.style('opacity',0);
+      }
+      hoverDotInv.style('opacity', line === 'inv' ? 1 : 0);
+      if (line === 'inv') hoverDotInv.attr('cx',cx).attr('cy',cy);
+      if (hoverDotPrice) {
+        hoverDotPrice.style('opacity', line === 'price' ? 1 : 0);
+        if (line === 'price') hoverDotPrice.attr('cx',cx).attr('cy',cy);
+      }
+      hoverCard.raise().style('opacity',1);
+    })
+    .on('mouseleave', function() {
+      hoverCard.style('opacity',0);
+      hoverDotInv.style('opacity',0);
+      if (hoverDotPrice) hoverDotPrice.style('opacity',0);
+      hoverBar.style('opacity',0);
+    });
+}
+
+minSlider.addEventListener('input', () => {
+  if (parseInt(minSlider.value,10) > parseInt(maxSlider.value,10)) { maxSlider.value = minSlider.value; }
+  render();
+});
+maxSlider.addEventListener('input', () => {
+  if (parseInt(maxSlider.value,10) < parseInt(minSlider.value,10)) { minSlider.value = maxSlider.value; }
+  render();
+});
+window.addEventListener('resize', render);
+
+render();
+</script>
+
+</body>
+</html>
