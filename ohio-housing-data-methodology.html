@@ -291,16 +291,44 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 
     <div class="metric-card" id="tax-rate">
       <div class="metric-name">Effective Tax Rate</div>
-      <div class="metric-tag">Annual · Derived: ACS ÷ Zillow ZHVI</div>
-      <p class="metric-provider-def">Median annual property tax (ACS 5-year estimate) divided by the Zillow Home Value Index for that county, expressed as a percentage. This is a derived metric — not published directly by either source.</p>
-      <div class="metric-plain"><strong>In plain terms:</strong> The actual tax burden as a share of home value — lets you compare tax load across Ohio counties regardless of price level.</div>
+      <div class="metric-tag">Annual · Derived: ACS Median Tax ÷ ACS Median Home Value</div>
+      <p class="metric-provider-def">Median annual property tax (ACS 5-year estimate, table B25103) divided by median home value (ACS 5-year estimate, table B25077) for that same geography and year, expressed as a percentage. Both figures come from the same Census ACS release — this is not compared against Zillow ZHVI. Covers Ohio counties (2009–2024) and Ohio zip codes (2011–2024, where ACS ZCTA-level data is available).</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> The actual tax burden as a share of home value — lets you compare tax load across Ohio counties and zip codes regardless of price level.</div>
     </div>
 
     <div class="metric-card yoy" id="tax-rate-yoy">
       <div class="metric-name">Tax Rate YOY %</div>
       <div class="metric-tag">Annual · Year-over-Year Change</div>
-      <p class="metric-provider-def">Year-over-year percent change in the effective tax rate (ACS median tax ÷ ZHVI) compared to the prior annual period.</p>
+      <p class="metric-provider-def">Year-over-year percent change in the effective tax rate (ACS median tax ÷ ACS median home value) compared to the prior annual period.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> Whether the tax burden relative to home value in this Ohio county went up or down compared to last year.</div>
+    </div>
+  </div>
+
+  <!-- ESTIMATED PAYMENT — DERIVED FROM MULTIPLE SOURCES -->
+  <div class="source-section">
+    <div class="source-header">
+      <span class="source-badge" style="background:#4a6fa5;">Derived — Multiple Sources</span>
+    </div>
+
+    <div class="metric-card" id="est-payment">
+      <div class="metric-name">Est. Payment (20% Down / 3.5% Down)</div>
+      <div class="metric-tag">Calculated Live In-Browser · Never Stored</div>
+      <p class="metric-provider-def">A standard 30-year fixed monthly mortgage payment estimate, calculated fresh every time the page loads — never stored, since home values and rates change monthly. Principal &amp; interest is calculated using the standard amortization formula on the home's Zillow ZHVI, financed at either 80% (20% down) or 96.5% (3.5% down) of value. The 3.5%-down estimate adds PMI at 0.55%/year on the financed amount, standard for FHA-style low-down-payment loans. Where county or zip-level property tax data is available (Census ACS, see above), monthly tax is added; Ohio metro areas and the statewide figure have no property tax source, so those payment estimates are principal, interest, and insurance only, clearly noted on the chart.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> What a monthly mortgage payment might realistically look like on a typical home in this area today, assuming a standard 30-year fixed loan.</div>
+    </div>
+
+    <div class="metric-card" id="est-payment-current-inputs">
+      <div class="metric-name">Current Rate &amp; Insurance Inputs</div>
+      <div class="metric-tag">Updated Periodically · Mortgage News Daily &amp; National Average</div>
+      <p class="metric-provider-def">The current-value Est. Payment figures use a national average 30-year fixed mortgage rate (sourced from Mortgage News Daily's daily index) and a flat national average monthly homeowners insurance estimate. These are shared inputs applied uniformly across every Ohio county, zip code, and metro — not location-specific rate quotes or insurance premiums.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> The rate and insurance numbers behind today's payment estimate are national averages, not what you'd personally be quoted — your actual rate depends on your credit, lender, and loan type, and your actual insurance depends on your specific home and coverage.</div>
+    </div>
+
+    <div class="metric-card" id="est-payment-historical">
+      <div class="metric-name">Historical Est. Payment Chart</div>
+      <div class="metric-tag">Annual · 2007–2024 · Freddie Mac &amp; NAR</div>
+      <p class="metric-provider-def">The historical Est. Payment chart recalculates the same formula for each year using that year's actual national average 30-year fixed mortgage rate (Freddie Mac Primary Mortgage Market Survey annual average) and that year's actual national average homeowners insurance premium (National Association of Realtors / industry annual estimate), combined with that year's actual Zillow home value and, for counties and zips, that year's actual Census ACS property tax figures. Coverage: counties 2009–2024, zip codes 2011–2024 (varies by zip, see Property Tax above), state and metro areas 2007–2024 (principal, interest &amp; insurance only — no tax data source at those geography levels).</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How the estimated monthly cost of owning a home in this area has actually changed over time — driven by rising home values, swinging mortgage rates, and climbing insurance and tax costs, not just one of those factors in isolation.</div>
     </div>
   </div>
 
@@ -406,7 +434,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   <div class="footer-disclaimer">
     <img src="/fair-housing.webp" alt="Equal Housing Opportunity">
     <p>Jasson Farrier · Kiger Realty · Realtor · License #2018004483<br>
-    Equal Housing Opportunity · Information deemed reliable but not guaranteed.</p>
+    Equal Housing Opportunity · Information deemed reliable but not guaranteed.<br>
+    Est. Payment figures are estimates only. Consult a mortgage professional before making a purchase or investment decision.</p>
   </div>
 </footer>
 
