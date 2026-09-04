@@ -1125,7 +1125,7 @@ function sourceForMetric(m) {
   return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
 }
 function paymentDisclaimer(m) {
-  return PAYMENT_METRICS.has(m) ? ' &nbsp;·&nbsp; <span style="color:#888;">Estimate only. Consult a mortgage professional before making a purchase or investment decision.</span>' : '';
+  return PAYMENT_METRICS.has(m) ? ' &nbsp;·&nbsp; <span style="color:#888;">Estimate only. Consult a mortgage professional before making a purchase or investment decision. 2025\u201326 property tax rate carried forward from latest available (2024) Census data.</span>' : '';
 }
 function setAttrHeader(chips, metric) {
   (document.getElementById('attr-chips')||{innerHTML:''}).innerHTML = chips.map(c=>`<span class="attr-chip">${c}</span>`).join('');
@@ -1375,11 +1375,11 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
             (d && d.history || []).forEach(r => {
               if (r.zhvi == null || !r.date) return;
               const [yr, mo] = r.date.split('-');
-              if (!zhviByYear[yr] || mo === '06') zhviByYear[yr] = r.zhvi;
+              if (!zhviByYear[yr] || mo === '07') zhviByYear[yr] = r.zhvi;
             });
             // Metros have no property tax data source — payment is P&I + insurance only
             const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
-              date: yr + '-06',
+              date: yr + '-07',
               [cm]: computeEstPaymentForYear(zhviByYear[yr], null, downPct, yr)
             })).filter(r => r[cm] != null);
             drawAnnualBarChart(d.metro, cm, paymentHist, true);
@@ -1472,13 +1472,13 @@ function renderChart(county, cmetric) {
     (d && d.history || []).forEach(r => {
       if (r.zhvi == null || !r.date) return;
       const [yr, mo] = r.date.split('-');
-      if (!zhviByYear[yr] || mo === '06') zhviByYear[yr] = r.zhvi;
+      if (!zhviByYear[yr] || mo === '07') zhviByYear[yr] = r.zhvi;
     });
     const taxRateByYear = {};
     (d && d.prop_tax_history || []).forEach(r => { taxRateByYear[r.year] = r.property_tax_rate; });
     const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
-      date: yr + '-06',
-      [cmetric]: computeEstPaymentForYear(zhviByYear[yr], taxRateByYear[yr] != null ? taxRateByYear[yr] : null, downPct, yr)
+      date: yr + '-07',
+      [cmetric]: computeEstPaymentForYear(zhviByYear[yr], taxRateForYear(taxRateByYear, yr), downPct, yr)
     })).filter(r => r[cmetric] != null);
     drawAnnualBarChart(county, cmetric, paymentHist, false);
   } else if (cmetric === 'sf_permits_per_1k' || cmetric === 'mf_permits_per_1k' || cmetric === 'total_permits_per_1k') {
@@ -3100,13 +3100,25 @@ function loadStateData() {
 function loadNationalRates() {
   if (nationalRatesLoaded) { return; }
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
-  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/national_rates_history?select=year,mortgage_rate_avg,insurance_avg&order=year', {
+  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/national_rates_history?select=year,mortgage_rate_july,insurance_avg&order=year', {
     headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
   }).then(r=>r.json()).then(rows => {
     NATIONAL_RATES = {};
-    (rows || []).forEach(r => { NATIONAL_RATES[r.year] = {rate: Number(r.mortgage_rate_avg), insurance: Number(r.insurance_avg)}; });
+    // rate is a real July-specific FRED weekly average (Freddie Mac MORTGAGE30US), not an
+    // annual average. insurance is null for 2000-2006 (no source data exists that far back) —
+    // those years correctly produce no Est. Payment point rather than a fabricated number.
+    (rows || []).forEach(r => { NATIONAL_RATES[r.year] = {rate: r.mortgage_rate_july != null ? Number(r.mortgage_rate_july) : null, insurance: r.insurance_avg != null ? Number(r.insurance_avg) : null}; });
     nationalRatesLoaded = true;
   }).catch(err => console.error('National rates load error:', err));
+}
+
+// Finds the tax rate for a given year, falling back to the most recent year with real
+// Census ACS data if the requested year has none yet (e.g. current year, before the next
+// ACS 5-year release is published). Returns null only if there's no tax data at all.
+function taxRateForYear(taxRateByYear, year) {
+  if (taxRateByYear[year] != null) return taxRateByYear[year];
+  const years = Object.keys(taxRateByYear).map(Number).filter(y => y <= Number(year)).sort((a,b) => b-a);
+  return years.length ? taxRateByYear[years[0]] : null;
 }
 
 // Historical Est. Payment for a given year — uses that year's national avg mortgage rate
@@ -3115,8 +3127,9 @@ function loadNationalRates() {
 function computeEstPaymentForYear(zhvi, propertyTaxRatePct, downPct, year) {
   if (zhvi == null || !NATIONAL_RATES || !NATIONAL_RATES[year]) return null;
   const rateAnnual = NATIONAL_RATES[year].rate;
-  const insuranceMonthly = NATIONAL_RATES[year].insurance / 12;
-  if (rateAnnual == null || insuranceMonthly == null) return null;
+  const insuranceAnnual = NATIONAL_RATES[year].insurance;
+  if (rateAnnual == null || insuranceAnnual == null) return null;
+  const insuranceMonthly = insuranceAnnual / 12;
 
   const financed = zhvi * (1 - downPct);
   const r = (rateAnnual / 100) / 12;
@@ -3176,11 +3189,11 @@ function renderStateChart(name, cmetric, d) {
     (d && d.history || []).forEach(r => {
       if (r.zhvi == null || !r.date) return;
       const [yr, mo] = r.date.split('-');
-      if (!zhviByYear[yr] || mo === '06') zhviByYear[yr] = r.zhvi;
+      if (!zhviByYear[yr] || mo === '07') zhviByYear[yr] = r.zhvi;
     });
     // Ohio state has no property tax data source — payment is P&I + insurance only
     const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
-      date: yr + '-06',
+      date: yr + '-07',
       [cmetric]: computeEstPaymentForYear(zhviByYear[yr], null, downPct, yr)
     })).filter(r => r[cmetric] != null);
     drawAnnualBarChart(name, cmetric, paymentHist, true);
@@ -3434,13 +3447,13 @@ function _doRenderZipChart(zip, cmetric) {
     (d && d.history || []).forEach(r => {
       if (r.zhvi == null || !r.date) return;
       const [yr, mo] = r.date.split('-');
-      if (!zhviByYear[yr] || mo === '06') zhviByYear[yr] = r.zhvi;
+      if (!zhviByYear[yr] || mo === '07') zhviByYear[yr] = r.zhvi;
     });
     const taxRateByYear = {};
     (d && d.prop_tax_history || []).forEach(r => { taxRateByYear[r.year] = r.property_tax_rate; });
     const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
-      date: yr + '-06',
-      [cmetric]: computeEstPaymentForYear(zhviByYear[yr], taxRateByYear[yr] != null ? taxRateByYear[yr] : null, downPct, yr)
+      date: yr + '-07',
+      [cmetric]: computeEstPaymentForYear(zhviByYear[yr], taxRateForYear(taxRateByYear, yr), downPct, yr)
     })).filter(r => r[cmetric] != null);
     drawAnnualBarChart(zip, cmetric, paymentHist, true);
   } else if (cmetric === 'pending_ratio') {
