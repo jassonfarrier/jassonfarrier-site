@@ -1378,10 +1378,7 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
               if (!zhviByYear[yr] || mo === '07') zhviByYear[yr] = r.zhvi;
             });
             // Metros have no property tax data source — payment is P&I + insurance only
-            const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
-              date: yr + '-07',
-              [cm]: computeEstPaymentForYear(zhviByYear[yr], null, downPct, yr)
-            })).filter(r => r[cm] != null);
+            const paymentHist = buildPaymentHist(zhviByYear, null, downPct, cm);
             drawAnnualBarChart(d.metro, cm, paymentHist, true);
           }
         } else if (cm === 'pending_ratio') {
@@ -1476,10 +1473,7 @@ function renderChart(county, cmetric) {
     });
     const taxRateByYear = {};
     (d && d.prop_tax_history || []).forEach(r => { taxRateByYear[r.year] = r.property_tax_rate; });
-    const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
-      date: yr + '-07',
-      [cmetric]: computeEstPaymentForYear(zhviByYear[yr], taxRateForYear(taxRateByYear, yr), downPct, yr)
-    })).filter(r => r[cmetric] != null);
+    const paymentHist = buildPaymentHist(zhviByYear, taxRateByYear, downPct, cmetric);
     drawAnnualBarChart(county, cmetric, paymentHist, false);
   } else if (cmetric === 'sf_permits_per_1k' || cmetric === 'mf_permits_per_1k' || cmetric === 'total_permits_per_1k') {
     const field = cmetric === 'sf_permits_per_1k' ? 'sf_per_1k' : cmetric === 'mf_permits_per_1k' ? 'mf_per_1k' : 'total_per_1k';
@@ -3141,6 +3135,23 @@ function computeEstPaymentForYear(zhvi, propertyTaxRatePct, downPct, year) {
   return pAndI + taxMonthly + insuranceMonthly;
 }
 
+// Builds the historical Est. Payment bar series for a set of {year: zhvi} points.
+// The current calendar year is NOT a July snapshot — it uses the exact same live,
+// real-time inputs as the map hover (computeEstPayment: today's current rate, today's
+// most recent zhvi passed in via zhviByYear, today's insurance), so the chart's last
+// bar always matches what the hover shows right now, not a frozen July reading.
+// Every prior (fully closed) year still uses its real July-specific FRED rate.
+function buildPaymentHist(zhviByYear, taxRateByYear, downPct, cmetric) {
+  const currentYear = String(new Date().getFullYear());
+  return Object.keys(zhviByYear).filter(yr => yr === currentYear || NATIONAL_RATES[yr]).map(yr => {
+    const taxRate = taxRateByYear ? taxRateForYear(taxRateByYear, yr) : null;
+    const val = yr === currentYear
+      ? computeEstPayment(zhviByYear[yr], taxRate, downPct)
+      : computeEstPaymentForYear(zhviByYear[yr], taxRate, downPct, yr);
+    return { date: yr + '-07', [cmetric]: val };
+  }).filter(r => r[cmetric] != null);
+}
+
 function openStateModal() {
   if (!STATE_DATA) {
     loadStateData();
@@ -3192,10 +3203,7 @@ function renderStateChart(name, cmetric, d) {
       if (!zhviByYear[yr] || mo === '07') zhviByYear[yr] = r.zhvi;
     });
     // Ohio state has no property tax data source — payment is P&I + insurance only
-    const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
-      date: yr + '-07',
-      [cmetric]: computeEstPaymentForYear(zhviByYear[yr], null, downPct, yr)
-    })).filter(r => r[cmetric] != null);
+    const paymentHist = buildPaymentHist(zhviByYear, null, downPct, cmetric);
     drawAnnualBarChart(name, cmetric, paymentHist, true);
   } else if (DISTRESS_METRICS.has(cmetric)) {
     const dh = d.distress_history;
@@ -3451,10 +3459,7 @@ function _doRenderZipChart(zip, cmetric) {
     });
     const taxRateByYear = {};
     (d && d.prop_tax_history || []).forEach(r => { taxRateByYear[r.year] = r.property_tax_rate; });
-    const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
-      date: yr + '-07',
-      [cmetric]: computeEstPaymentForYear(zhviByYear[yr], taxRateForYear(taxRateByYear, yr), downPct, yr)
-    })).filter(r => r[cmetric] != null);
+    const paymentHist = buildPaymentHist(zhviByYear, taxRateByYear, downPct, cmetric);
     drawAnnualBarChart(zip, cmetric, paymentHist, true);
   } else if (cmetric === 'pending_ratio') {
     drawAnnualLineChart(zip, cmetric, d.history, true);
