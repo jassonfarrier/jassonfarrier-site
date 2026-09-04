@@ -56,7 +56,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   border:2px solid rgba(0,0,0,0.15)!important;
   border-radius:14px!important;
   padding:24px 28px 22px!important;
-  box-shadow:0 10px 40px rgba(0,0,0,0.25)!important;
+  box-shadow:0 14px 48px rgba(0,0,0,0.35)!important;
   font-family:'Montserrat',sans-serif!important;
   min-width:280px!important;
   width:max-content!important;
@@ -1298,7 +1298,7 @@ function drawLineChart(county, cmetric) {
   const hoverLine = g.append('line').attr('y1',0).attr('y2',ih).attr('stroke','rgba(26,82,150,0.25)').attr('stroke-width',1).attr('stroke-dasharray','4,3').style('opacity',0);
   const hoverDot = g.append('circle').attr('r',6).attr('fill','#1a3a5c').attr('stroke','#fff').attr('stroke-width',2.5).style('opacity',0);
   const hoverCard = g.append('g').style('opacity',0);
-  const hoverRect = hoverCard.append('rect').attr('rx',12).attr('fill','#fff').attr('stroke','rgba(26,82,150,0.12)').attr('stroke-width',1.5).style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.18))');
+  const hoverRect = hoverCard.append('rect').attr('rx',12).attr('fill','#fff').attr('stroke','rgba(26,82,150,0.12)').attr('stroke-width',1.5).style('filter','drop-shadow(0 8px 28px rgba(0,0,0,0.3))');
   const hoverDateTxt = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888').attr('letter-spacing','0.06em');
   const hoverValTxt = hoverCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
   const hoverLabelTxt = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
@@ -2231,7 +2231,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   lsvg.on('click', function(event) {
     if (!event.target.classList.contains('mbar')) { _dismissClickCard(); }
   });
-  const clickRect = clickCard.append('rect').attr('rx',12).attr('fill','#fff').attr('stroke','rgba(26,82,150,0.12)').attr('stroke-width',1.5).style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.18))')
+  const clickRect = clickCard.append('rect').attr('rx',12).attr('fill','#fff').attr('stroke','rgba(26,82,150,0.12)').attr('stroke-width',1.5).style('filter','drop-shadow(0 8px 28px rgba(0,0,0,0.3))')
     .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1.5)
     .style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.55))');
   const clickDateTxt = clickCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
@@ -2295,7 +2295,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const hoverCard = g.append('g').style('opacity',0);
   const hoverRect = hoverCard.append('rect').attr('rx',12).attr('fill','#fff').attr('stroke','rgba(26,82,150,0.12)').attr('stroke-width',1.5)
     .attr('stroke','rgba(26,82,150,0.18)').attr('stroke-width',1.5)
-    .style('filter','drop-shadow(0 4px 12px rgba(0,0,0,0.13))');
+    .style('filter','drop-shadow(0 6px 18px rgba(0,0,0,0.22))');
   const hoverDateTxt = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
   const hoverValTxt  = hoverCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
   const hoverLabelTxt= hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
@@ -2488,7 +2488,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
   const hoverCard = g.append('g').style('opacity',0).style('pointer-events','none');
   const hoverRect = hoverCard.append('rect').attr('rx',11).attr('fill','#fff')
     .attr('stroke','rgba(26,82,150,0.18)').attr('stroke-width',1.5)
-    .style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.18))');
+    .style('filter','drop-shadow(0 8px 28px rgba(0,0,0,0.3))');
   const hoverYear = hoverCard.append('text').attr('font-size','13px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
   const hoverVal  = hoverCard.append('text').attr('font-size','32px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
   const hoverLbl  = hoverCard.append('text').attr('font-size','13px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
@@ -2647,7 +2647,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
   const annHoverCard = g.append('g').style('opacity',0).style('pointer-events','none');
   const annHoverRect = annHoverCard.append('rect').attr('rx',12).attr('fill','#fff')
     .attr('stroke','rgba(26,82,150,0.18)').attr('stroke-width',1.5)
-    .style('filter','drop-shadow(0 4px 12px rgba(0,0,0,0.13))');
+    .style('filter','drop-shadow(0 6px 18px rgba(0,0,0,0.22))');
   const annHoverYear = annHoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
   const annHoverVal  = annHoverCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
   const annHoverLbl  = annHoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
