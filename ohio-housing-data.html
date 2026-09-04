@@ -491,6 +491,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Affordability</div>
+          <button class="metric-btn chart-tab" data-cmetric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">Historical · county/zip tax + national avg rate &amp; insurance</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="est_payment_35"><span class="mn">Est. Payment (3.5% Down)</span><span class="md">Historical · county/zip tax + national avg rate &amp; insurance</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Taxes</div>
           <button class="metric-btn chart-tab" data-cmetric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span></button>
@@ -622,6 +625,7 @@ let chartSliderStartYr = null, chartSliderEndYr = null, _chartHistoryFull = null
 let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, zipHistoryCache = {}, selectedZip = null, zipHoveredId = null;
 let METRO_DATA = [], metroDataMap = {}, metroDataLoaded = false, metroGeoJSON = null, selectedMetro = null, metroHoveredId = null;
 let STATE_DATA = null, stateDataLoaded = false, selectedState = null;
+let NATIONAL_RATES = null, nationalRatesLoaded = false;
 let _dismissClickCard = null; // set by active chart to vanish pinned tooltip
 
 // Diverging peach→sage→blue (matches reference map exactly)
@@ -1352,6 +1356,25 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
           drawMonthlyBarChart(d.metro, cm, getYOYRows(d, cm), true);
         } else if (cm === 'median_property_tax' || cm === 'property_tax_rate') {
           drawAnnualBarChart(d.metro, cm, [], true);
+        } else if (PAYMENT_METRICS.has(cm)) {
+          if (!nationalRatesLoaded) {
+            loadNationalRates();
+            const wait = setInterval(() => { if (nationalRatesLoaded) { clearInterval(wait); tab.click(); } }, 200);
+          } else {
+            const downPct = cm === 'est_payment_20' ? 0.20 : 0.035;
+            const zhviByYear = {};
+            (d && d.history || []).forEach(r => {
+              if (r.zhvi == null || !r.date) return;
+              const [yr, mo] = r.date.split('-');
+              if (!zhviByYear[yr] || mo === '06') zhviByYear[yr] = r.zhvi;
+            });
+            // Metros have no property tax data source — payment is P&I + insurance only
+            const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
+              date: yr + '-06',
+              [cm]: computeEstPaymentForYear(zhviByYear[yr], null, downPct, yr)
+            })).filter(r => r[cm] != null);
+            drawAnnualBarChart(d.metro, cm, paymentHist, true);
+          }
         } else if (cm === 'pending_ratio') {
           drawAnnualLineChart(d.metro, cm, d.history, true);
         } else {
@@ -1429,6 +1452,26 @@ function renderChart(county, cmetric) {
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
     const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
     drawAnnualBarChart(county, cmetric, taxHist, false);
+  } else if (PAYMENT_METRICS.has(cmetric)) {
+    if (!nationalRatesLoaded) {
+      loadNationalRates();
+      const wait = setInterval(() => { if (nationalRatesLoaded) { clearInterval(wait); renderChart(county, cmetric); } }, 200);
+      return;
+    }
+    const downPct = cmetric === 'est_payment_20' ? 0.20 : 0.035;
+    const zhviByYear = {};
+    (d && d.history || []).forEach(r => {
+      if (r.zhvi == null || !r.date) return;
+      const [yr, mo] = r.date.split('-');
+      if (!zhviByYear[yr] || mo === '06') zhviByYear[yr] = r.zhvi;
+    });
+    const taxRateByYear = {};
+    (d && d.prop_tax_history || []).forEach(r => { taxRateByYear[r.year] = r.property_tax_rate; });
+    const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
+      date: yr + '-06',
+      [cmetric]: computeEstPaymentForYear(zhviByYear[yr], taxRateByYear[yr] != null ? taxRateByYear[yr] : null, downPct, yr)
+    })).filter(r => r[cmetric] != null);
+    drawAnnualBarChart(county, cmetric, paymentHist, false);
   } else if (cmetric === 'sf_permits_per_1k' || cmetric === 'mf_permits_per_1k' || cmetric === 'total_permits_per_1k') {
     const field = cmetric === 'sf_permits_per_1k' ? 'sf_per_1k' : cmetric === 'mf_permits_per_1k' ? 'mf_per_1k' : 'total_per_1k';
     const doRenderPermit = (ph) => {
@@ -3045,6 +3088,37 @@ function loadStateData() {
   }).catch(err => console.error('State data load error:', err));
 }
 
+function loadNationalRates() {
+  if (nationalRatesLoaded) { return; }
+  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/national_rates_history?select=year,mortgage_rate_avg,insurance_avg&order=year', {
+    headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
+  }).then(r=>r.json()).then(rows => {
+    NATIONAL_RATES = {};
+    (rows || []).forEach(r => { NATIONAL_RATES[r.year] = {rate: Number(r.mortgage_rate_avg), insurance: Number(r.insurance_avg)}; });
+    nationalRatesLoaded = true;
+  }).catch(err => console.error('National rates load error:', err));
+}
+
+// Historical Est. Payment for a given year — uses that year's national avg mortgage rate
+// and insurance (national_rates_history) plus that year's actual zhvi and property_tax_rate,
+// unlike computeEstPayment() which always uses today's current rate/insurance.
+function computeEstPaymentForYear(zhvi, propertyTaxRatePct, downPct, year) {
+  if (zhvi == null || !NATIONAL_RATES || !NATIONAL_RATES[year]) return null;
+  const rateAnnual = NATIONAL_RATES[year].rate;
+  const insuranceMonthly = NATIONAL_RATES[year].insurance / 12;
+  if (rateAnnual == null || insuranceMonthly == null) return null;
+
+  const financed = zhvi * (1 - downPct);
+  const r = (rateAnnual / 100) / 12;
+  const n = 360;
+  const pAndI = r === 0 ? financed / n : financed * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+  const pmiMonthly = downPct > 0.20 ? (financed * 0.0055) / 12 : 0;
+  const taxMonthly = propertyTaxRatePct != null ? (zhvi * (propertyTaxRatePct / 100)) / 12 : 0;
+
+  return pAndI + pmiMonthly + taxMonthly + insuranceMonthly;
+}
+
 function openStateModal() {
   if (!STATE_DATA) {
     loadStateData();
@@ -3082,6 +3156,25 @@ function renderStateChart(name, cmetric, d) {
     drawMonthlyBarChart(name, cmetric, getYOYRows(d, cmetric), true);
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
     drawAnnualBarChart(name, cmetric, [], true);
+  } else if (PAYMENT_METRICS.has(cmetric)) {
+    if (!nationalRatesLoaded) {
+      loadNationalRates();
+      const wait = setInterval(() => { if (nationalRatesLoaded) { clearInterval(wait); renderStateChart(name, cmetric, d); } }, 200);
+      return;
+    }
+    const downPct = cmetric === 'est_payment_20' ? 0.20 : 0.035;
+    const zhviByYear = {};
+    (d && d.history || []).forEach(r => {
+      if (r.zhvi == null || !r.date) return;
+      const [yr, mo] = r.date.split('-');
+      if (!zhviByYear[yr] || mo === '06') zhviByYear[yr] = r.zhvi;
+    });
+    // Ohio state has no property tax data source — payment is P&I + insurance only
+    const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
+      date: yr + '-06',
+      [cmetric]: computeEstPaymentForYear(zhviByYear[yr], null, downPct, yr)
+    })).filter(r => r[cmetric] != null);
+    drawAnnualBarChart(name, cmetric, paymentHist, true);
   } else if (DISTRESS_METRICS.has(cmetric)) {
     const dh = d.distress_history;
     if (!dh || !dh.length) { d3.select('#line-chart').selectAll('*').remove(); return; }
@@ -3321,6 +3414,26 @@ function _doRenderZipChart(zip, cmetric) {
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
     const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
     drawAnnualBarChart(zip, cmetric, taxHist, true);
+  } else if (PAYMENT_METRICS.has(cmetric)) {
+    if (!nationalRatesLoaded) {
+      loadNationalRates();
+      const wait = setInterval(() => { if (nationalRatesLoaded) { clearInterval(wait); _doRenderZipChart(zip, cmetric); } }, 200);
+      return;
+    }
+    const downPct = cmetric === 'est_payment_20' ? 0.20 : 0.035;
+    const zhviByYear = {};
+    (d && d.history || []).forEach(r => {
+      if (r.zhvi == null || !r.date) return;
+      const [yr, mo] = r.date.split('-');
+      if (!zhviByYear[yr] || mo === '06') zhviByYear[yr] = r.zhvi;
+    });
+    const taxRateByYear = {};
+    (d && d.prop_tax_history || []).forEach(r => { taxRateByYear[r.year] = r.property_tax_rate; });
+    const paymentHist = Object.keys(zhviByYear).filter(yr => NATIONAL_RATES[yr]).map(yr => ({
+      date: yr + '-06',
+      [cmetric]: computeEstPaymentForYear(zhviByYear[yr], taxRateByYear[yr] != null ? taxRateByYear[yr] : null, downPct, yr)
+    })).filter(r => r[cmetric] != null);
+    drawAnnualBarChart(zip, cmetric, paymentHist, true);
   } else if (cmetric === 'pending_ratio') {
     drawAnnualLineChart(zip, cmetric, d.history, true);
   } else {
