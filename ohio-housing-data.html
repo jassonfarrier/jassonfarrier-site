@@ -1116,12 +1116,16 @@ function sourceForMetric(m) {
   if (base==='median_property_tax'||base==='property_tax_rate') return '<a href="https://data.census.gov/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census ACS</a>';
   if (base==='sf_permits_per_1k'||base==='mf_permits_per_1k'||base==='total_permits_per_1k') return '<a href="https://www.census.gov/construction/bps/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census BPS</a>';
   if (DISTRESS_METRICS.has(base)) return '<a href="https://www.propstream.com/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">PropStream</a>';
+  if (PAYMENT_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#est-payment" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Derived Estimate</a>';
   return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
+}
+function paymentDisclaimer(m) {
+  return PAYMENT_METRICS.has(m) ? ' &nbsp;·&nbsp; <span style="color:#888;">Estimate only. Consult a mortgage professional before making a purchase or investment decision.</span>' : '';
 }
 function setAttrHeader(chips, metric) {
   (document.getElementById('attr-chips')||{innerHTML:''}).innerHTML = chips.map(c=>`<span class="attr-chip">${c}</span>`).join('');
   const src = document.querySelector('.attr-source');
-  if (src) src.innerHTML = `Source: <span class="attr-source-name">${sourceForMetric(metric)}</span>`;
+  if (src) src.innerHTML = `Source: <span class="attr-source-name">${sourceForMetric(metric)}</span>${paymentDisclaimer(metric)}`;
   const uts = document.getElementById('ut-source');
   if (uts) uts.innerHTML = sourceForMetric(metric);
 }
@@ -1388,7 +1392,7 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
       renderChart(selectedCounty, cm);
     }
     const src = document.querySelector('.attr-source');
-    if (src) src.innerHTML = `Source: <span class="attr-source-name">${sourceForMetric(cm)}</span>`;
+    if (src) src.innerHTML = `Source: <span class="attr-source-name">${sourceForMetric(cm)}</span>${paymentDisclaimer(cm)}`;
     const uts = document.getElementById('ut-source');
     if (uts) uts.innerHTML = sourceForMetric(cm);
     if (mapMode === 'zip' && selectedZip) renderRankBadge('zip', selectedZip, cm);
