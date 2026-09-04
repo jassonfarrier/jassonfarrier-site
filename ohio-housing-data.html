@@ -613,7 +613,7 @@ function computeEstPayment(zhvi, propertyTaxRatePct, downPct) {
   const pAndI = r === 0 ? financed / n : financed * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
 
   // PMI only applies below 20% down — 0.55%/yr on the financed amount, standard estimate
-  const pmiMonthly = downPct > 0.20 ? (financed * 0.0055) / 12 : 0;
+  const pmiMonthly = downPct < 0.20 ? (financed * 0.0055) / 12 : 0;
 
   const taxMonthly = propertyTaxRatePct != null ? (zhvi * (propertyTaxRatePct / 100)) / 12 : 0;
 
@@ -3123,7 +3123,7 @@ function computeEstPaymentForYear(zhvi, propertyTaxRatePct, downPct, year) {
   const r = (rateAnnual / 100) / 12;
   const n = 360;
   const pAndI = r === 0 ? financed / n : financed * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-  const pmiMonthly = downPct > 0.20 ? (financed * 0.0055) / 12 : 0;
+  const pmiMonthly = downPct < 0.20 ? (financed * 0.0055) / 12 : 0;
   const taxMonthly = propertyTaxRatePct != null ? (zhvi * (propertyTaxRatePct / 100)) / 12 : 0;
 
   return pAndI + pmiMonthly + taxMonthly + insuranceMonthly;
