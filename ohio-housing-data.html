@@ -329,7 +329,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn yoy-btn" data-metric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Affordability</div>
     <button class="metric-btn" data-metric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">P&amp;I + tax + insurance · estimate</span><a class="metric-help" href="/ohio-housing-data-methodology#est-payment" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="est_payment_35"><span class="mn">Est. Payment (3.5% Down)</span><span class="md">P&amp;I + PMI + tax + insurance · estimate</span><a class="metric-help" href="/ohio-housing-data-methodology#est-payment" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="est_payment_35"><span class="mn">Est. Payment (3.5% Down)</span><span class="md">P&amp;I + tax + insurance · estimate (excludes PMI)</span><a class="metric-help" href="/ohio-housing-data-methodology#est-payment" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Taxes</div>
     <button class="metric-btn" data-metric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
@@ -612,12 +612,11 @@ function computeEstPayment(zhvi, propertyTaxRatePct, downPct) {
   const n = 360; // 30-year fixed
   const pAndI = r === 0 ? financed / n : financed * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
 
-  // PMI only applies below 20% down — 0.55%/yr on the financed amount, standard estimate
-  const pmiMonthly = downPct < 0.20 ? (financed * 0.0055) / 12 : 0;
-
+  // PMI intentionally excluded — actual PMI rate varies too much by credit score, loan
+  // type, and lender to estimate with a single flat number without being misleading.
   const taxMonthly = propertyTaxRatePct != null ? (zhvi * (propertyTaxRatePct / 100)) / 12 : 0;
 
-  return pAndI + pmiMonthly + taxMonthly + insuranceMonthly;
+  return pAndI + taxMonthly + insuranceMonthly;
 }
 
 const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
@@ -3123,10 +3122,10 @@ function computeEstPaymentForYear(zhvi, propertyTaxRatePct, downPct, year) {
   const r = (rateAnnual / 100) / 12;
   const n = 360;
   const pAndI = r === 0 ? financed / n : financed * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-  const pmiMonthly = downPct < 0.20 ? (financed * 0.0055) / 12 : 0;
+  // PMI intentionally excluded — see computeEstPayment() above for why.
   const taxMonthly = propertyTaxRatePct != null ? (zhvi * (propertyTaxRatePct / 100)) / 12 : 0;
 
-  return pAndI + pmiMonthly + taxMonthly + insuranceMonthly;
+  return pAndI + taxMonthly + insuranceMonthly;
 }
 
 function openStateModal() {
