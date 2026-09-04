@@ -284,7 +284,6 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="price_reduced_pct">Price Cut %</option>
     <option value="price_reduced_pct_yoy">Price Cut % YOY</option>
     <option value="est_payment_20">Est. Payment (20% Down)</option>
-    <option value="est_payment_35">Est. Payment (3.5% Down)</option>
     <option value="median_property_tax">Property Tax</option>
     <option value="median_property_tax_yoy">Property Tax YOY %</option>
     <option value="property_tax_rate">Tax Rate</option>
@@ -329,7 +328,6 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn yoy-btn" data-metric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Affordability</div>
     <button class="metric-btn" data-metric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">P&amp;I + tax + insurance · illustration only</span><a class="metric-help" href="/ohio-housing-data-methodology#est-payment" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="est_payment_35"><span class="mn">Est. Payment (3.5% Down)</span><span class="md">P&amp;I + tax + insurance · illustration only, excludes PMI</span><a class="metric-help" href="/ohio-housing-data-methodology#est-payment" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Taxes</div>
     <button class="metric-btn" data-metric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
@@ -428,7 +426,6 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="cancellation_pct">Cancellation Rate %</option>
           <option value="cancellation_pct_yoy">Cancellation Rate YOY %</option>
           <option value="est_payment_20">Est. Payment (20% Down)</option>
-          <option value="est_payment_35">Est. Payment (3.5% Down)</option>
           <option value="median_property_tax">Property Tax</option>
           <option value="median_property_tax_yoy">Property Tax YOY %</option>
           <option value="property_tax_rate">Tax Rate</option>
@@ -495,7 +492,6 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Affordability</div>
           <button class="metric-btn chart-tab" data-cmetric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">Historical · illustration only</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="est_payment_35"><span class="mn">Est. Payment (3.5% Down)</span><span class="md">Historical · illustration only · excludes PMI</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Taxes</div>
           <button class="metric-btn chart-tab" data-cmetric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span></button>
@@ -588,13 +584,12 @@ const METRICS = {
   cancellation_pct_yoy:         {label:'Cancellation Rate YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   delisted_pct:                 {label:'Delisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
   est_payment_20: {label:'Est. Payment (20% Down)', fmt:v=>'$'+Math.round(v).toLocaleString()+'/mo', lo:'Lower', hi:'Higher'},
-  est_payment_35: {label:'Est. Payment (3.5% Down)', fmt:v=>'$'+Math.round(v).toLocaleString()+'/mo', lo:'Lower', hi:'Higher'},
 };
 const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','zhvi_growth_5y','zhvi_growth_10y']);
 const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct']);
-const PAYMENT_METRICS = new Set(['est_payment_20','est_payment_35']);
+const PAYMENT_METRICS = new Set(['est_payment_20']);
 
 // Estimated monthly payment — computed live in-browser, never stored. Home values and rates
 // change monthly, so a stored number would go stale immediately; instead this recalculates
@@ -798,7 +793,7 @@ function getMetricVal(d, metric) {
     const zhvi = Number(d.latest.zhvi);
     // Metros table has no property_tax_rate — payment excludes tax there, labeled separately.
     const taxRate = d.latest.property_tax_rate != null ? Number(d.latest.property_tax_rate) : null;
-    const downPct = metric === 'est_payment_20' ? 0.20 : 0.035;
+    const downPct = 0.20;
     return computeEstPayment(zhvi, taxRate, downPct);
   }
   if (DISTRESS_METRICS.has(metric)) {
@@ -822,7 +817,7 @@ function getMetricVal(d, metric) {
 // --- Rank Badge ---
 // Only metrics where relative position is a meaningful, citable fact get ranked.
 // Neutral framing throughout: "Highest"/"Lowest" describes direction, never "best"/"worst".
-const RANKABLE_METRICS = new Set(['zhvi','zhvi_condo','days_on_market','price_reduced_pct','cancellation_pct','pending_ratio','property_tax_rate','median_property_tax','sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k','est_payment_20','est_payment_35']);
+const RANKABLE_METRICS = new Set(['zhvi','zhvi_condo','days_on_market','price_reduced_pct','cancellation_pct','pending_ratio','property_tax_rate','median_property_tax','sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k','est_payment_20']);
 
 function computeRank(list, metric, targetVal) {
   // list: array of numeric values (already non-null) for every record that has this metric.
@@ -1126,15 +1121,13 @@ function sourceForMetric(m) {
 }
 function paymentDisclaimer(m) {
   if (!PAYMENT_METRICS.has(m)) return '';
-  const pmiNote = m === 'est_payment_35' ? 'Excludes PMI. ' : '';
-  return ' &nbsp;\u00b7&nbsp; <span style="color:#888;">' + pmiNote + 'For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision. 2025\u201326 property tax rate carried forward from latest available (2024) Census data.</span>';
+  return ' &nbsp;\u00b7&nbsp; <span style="color:#888;">For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision. 2025\u201326 property tax rate carried forward from latest available (2024) Census data.</span>';
 }
 function updateChartPaymentDisclaimer(m) {
   const el = document.getElementById('chart-payment-disclaimer');
   if (!el) return;
   if (!PAYMENT_METRICS.has(m)) { el.style.display = 'none'; el.textContent = ''; return; }
-  const pmiNote = m === 'est_payment_35' ? 'Excludes PMI. ' : '';
-  el.textContent = pmiNote + 'For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision.';
+  el.textContent = 'For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision.';
   el.style.display = 'block';
 }
 function setAttrHeader(chips, metric) {
@@ -1381,7 +1374,7 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
             loadNationalRates();
             const wait = setInterval(() => { if (nationalRatesLoaded) { clearInterval(wait); tab.click(); } }, 200);
           } else {
-            const downPct = cm === 'est_payment_20' ? 0.20 : 0.035;
+            const downPct = 0.20;
             const zhviByYear = {};
             (d && d.history || []).forEach(r => {
               if (r.zhvi == null || !r.date) return;
@@ -1476,7 +1469,7 @@ function renderChart(county, cmetric) {
       const wait = setInterval(() => { if (nationalRatesLoaded) { clearInterval(wait); renderChart(county, cmetric); } }, 200);
       return;
     }
-    const downPct = cmetric === 'est_payment_20' ? 0.20 : 0.035;
+    const downPct = 0.20;
     const zhviByYear = {};
     (d && d.history || []).forEach(r => {
       if (r.zhvi == null || !r.date) return;
@@ -3207,7 +3200,7 @@ function renderStateChart(name, cmetric, d) {
       const wait = setInterval(() => { if (nationalRatesLoaded) { clearInterval(wait); renderStateChart(name, cmetric, d); } }, 200);
       return;
     }
-    const downPct = cmetric === 'est_payment_20' ? 0.20 : 0.035;
+    const downPct = 0.20;
     const zhviByYear = {};
     (d && d.history || []).forEach(r => {
       if (r.zhvi == null || !r.date) return;
@@ -3462,7 +3455,7 @@ function _doRenderZipChart(zip, cmetric) {
       const wait = setInterval(() => { if (nationalRatesLoaded) { clearInterval(wait); _doRenderZipChart(zip, cmetric); } }, 200);
       return;
     }
-    const downPct = cmetric === 'est_payment_20' ? 0.20 : 0.035;
+    const downPct = 0.20;
     const zhviByYear = {};
     (d && d.history || []).forEach(r => {
       if (r.zhvi == null || !r.date) return;
