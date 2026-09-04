@@ -328,8 +328,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn" data-metric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">% of pending sales cancelled · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Affordability</div>
-    <button class="metric-btn" data-metric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">P&amp;I + tax + insurance · estimate</span><a class="metric-help" href="/ohio-housing-data-methodology#est-payment" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="est_payment_35"><span class="mn">Est. Payment (3.5% Down)</span><span class="md">P&amp;I + tax + insurance · estimate (excludes PMI)</span><a class="metric-help" href="/ohio-housing-data-methodology#est-payment" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">P&amp;I + tax + insurance · illustration only</span><a class="metric-help" href="/ohio-housing-data-methodology#est-payment" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="est_payment_35"><span class="mn">Est. Payment (3.5% Down)</span><span class="md">P&amp;I + tax + insurance · illustration only, excludes PMI</span><a class="metric-help" href="/ohio-housing-data-methodology#est-payment" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Taxes</div>
     <button class="metric-btn" data-metric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
@@ -494,8 +494,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab" data-cmetric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Affordability</div>
-          <button class="metric-btn chart-tab" data-cmetric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">Historical · county/zip tax + national avg rate &amp; insurance</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="est_payment_35"><span class="mn">Est. Payment (3.5% Down)</span><span class="md">Historical · county/zip tax + national avg rate &amp; insurance</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">Historical · illustration only</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="est_payment_35"><span class="mn">Est. Payment (3.5% Down)</span><span class="md">Historical · illustration only · excludes PMI</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Taxes</div>
           <button class="metric-btn chart-tab" data-cmetric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span></button>
@@ -1125,7 +1125,9 @@ function sourceForMetric(m) {
   return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
 }
 function paymentDisclaimer(m) {
-  return PAYMENT_METRICS.has(m) ? ' &nbsp;·&nbsp; <span style="color:#888;">Estimate only. Consult a mortgage professional before making a purchase or investment decision. 2025\u201326 property tax rate carried forward from latest available (2024) Census data.</span>' : '';
+  if (!PAYMENT_METRICS.has(m)) return '';
+  const pmiNote = m === 'est_payment_35' ? 'Excludes PMI. ' : '';
+  return ' &nbsp;\u00b7&nbsp; <span style="color:#888;">' + pmiNote + 'For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision. 2025\u201326 property tax rate carried forward from latest available (2024) Census data.</span>';
 }
 function setAttrHeader(chips, metric) {
   (document.getElementById('attr-chips')||{innerHTML:''}).innerHTML = chips.map(c=>`<span class="attr-chip">${c}</span>`).join('');
