@@ -145,7 +145,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   <a href="/ohio-housing-data" class="back-link">← Back to Ohio Housing Data</a>
   <h1 class="page-title">Ohio Housing Data Methodology</h1>
   <p class="page-subtitle">How every metric on the data page is defined, sourced, and calculated.</p>
-  <p class="intro">Every metric on the Ohio Housing Market Data page comes from a primary data provider — Zillow, Realtor.com, Redfin, PropStream, or the U.S. Census Bureau — covering all 88 Ohio counties, Ohio metro areas, and Ohio zip codes. Definitions below are sourced directly from each provider, followed by a plain-English explanation of what the number actually tells you about the Ohio housing market.</p>
+  <p class="intro">Every metric on the Ohio Housing Market Data page comes from a primary data provider — Zillow, Realtor.com, Redfin, PropStream, MLS, or the U.S. Census Bureau — covering all 88 Ohio counties, Ohio metro areas, and Ohio zip codes (some metrics, like new construction data, are limited to counties and zip codes with active coverage). Definitions below are sourced directly from each provider, followed by a plain-English explanation of what the number actually tells you about the Ohio housing market.</p>
 
   <!-- ZILLOW -->
   <div class="source-section">
@@ -420,6 +420,20 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <div class="metric-tag">Monthly · % · PropStream</div>
       <p class="metric-provider-def">Underwater property count divided by total properties in the county, from PropStream's nationwide property database.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> The share of all properties in this Ohio county with negative equity — normalizes the count so you can compare across counties of different sizes.</div>
+    </div>
+  </div>
+
+  <!-- MLS -->
+  <div class="source-section">
+    <div class="source-header">
+      <span class="source-badge" style="background:#2d6a4f;">MLS</span>
+    </div>
+
+    <div class="metric-card" id="new-construction">
+      <div class="metric-name">New Construction Median Price &amp; $/SqFt</div>
+      <div class="metric-tag">Monthly · Trailing 12-Month Closed Sales · County &amp; Zip Only</div>
+      <p class="metric-provider-def">Median sold price and median sold price per square foot for new-construction homes only, calculated from closed MLS sales over the trailing 12 months. Updated monthly as new closings occur. Coverage is limited to counties and zip codes with active new-home construction — most Ohio counties have little to no new construction activity and will show no data, which is expected and not a data gap. Zip codes with fewer than 5 closed sales in the trailing 12-month window are excluded to avoid an unreliable median from too small a sample. Not available at the metro or statewide level.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> What a newly built home is actually selling for right now in the parts of Ohio where builders are active — not what's listed, what actually closed. If a county or zip shows no data here, it doesn't mean home values are unknown there, it means there isn't enough new construction happening to report a reliable number.</div>
     </div>
   </div>
 
