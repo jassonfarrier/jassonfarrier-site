@@ -291,6 +291,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="sf_permits_per_1k">SF Permits / 1K</option>
     <option value="mf_permits_per_1k">MF Permits / 1K</option>
     <option value="total_permits_per_1k">Total Permits / 1K</option>
+    <option value="new_construction_price">New Construction Median Price</option>
+    <option value="new_construction_sqft">New Construction $/SqFt</option>
   </select>
 </div>
 <div class="main">
@@ -333,6 +335,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-rate" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-rate-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">New Construction</div>
+    <button class="metric-btn" data-metric="new_construction_price"><span class="mn">New Construction Median Price</span><span class="md">MLS closed sales, trailing 12mo · county/zip only</span><a class="metric-help" href="/ohio-housing-data-methodology#new-construction" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="new_construction_sqft"><span class="mn">New Construction $/SqFt</span><span class="md">MLS closed sales, trailing 12mo · county/zip only</span><a class="metric-help" href="/ohio-housing-data-methodology#new-construction" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Distress</div>
     <button class="metric-btn" data-metric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">Tax delinquent properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">Tax delinquent as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
@@ -433,6 +438,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="sf_permits_per_1k">SF Permits / 1K</option>
           <option value="mf_permits_per_1k">MF Permits / 1K</option>
           <option value="total_permits_per_1k">Total Permits / 1K</option>
+    <option value="new_construction_price">New Construction Median Price</option>
+    <option value="new_construction_sqft">New Construction $/SqFt</option>
           <option value="delisted_pct">Delisted %</option>
           <option value="tax_delinquent">Tax Delinquent</option>
           <option value="tax_del_pct">Tax Delinquent %</option>
@@ -584,12 +591,15 @@ const METRICS = {
   cancellation_pct_yoy:         {label:'Cancellation Rate YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   delisted_pct:                 {label:'Delisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
   est_payment_20: {label:'Est. Payment (20% Down)', fmt:v=>'$'+Math.round(v).toLocaleString()+'/mo', lo:'Lower', hi:'Higher'},
+  new_construction_price: {label:'New Construction Median Price', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
+  new_construction_sqft:  {label:'New Construction $/SqFt',       fmt:v=>'$'+v.toFixed(0)+'/sqft',            lo:'Lower', hi:'Higher'},
 };
 const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','zhvi_growth_5y','zhvi_growth_10y']);
 const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct']);
 const PAYMENT_METRICS = new Set(['est_payment_20']);
+const NEW_CONSTRUCTION_METRICS = new Set(['new_construction_price','new_construction_sqft']);
 
 // Estimated monthly payment — computed live in-browser, never stored. Home values and rates
 // change monthly, so a stored number would go stale immediately; instead this recalculates
@@ -811,6 +821,15 @@ function getMetricVal(d, metric) {
     if (DISTRESS_PCT_METRICS.has(metric) && val != null && val > DISTRESS_PCT_SANITY_CEILING) return null;
     return val;
   }
+  if (NEW_CONSTRUCTION_METRICS.has(metric)) {
+    // County/zip only -- dedicated column, not in latest. No metro/state coverage exists.
+    // Not every county/zip has new construction activity -- absence of data is expected, not an error.
+    if (!d.new_construction_history || !d.new_construction_history.length) return null;
+    const last = d.new_construction_history[d.new_construction_history.length - 1];
+    if (metric === 'new_construction_price') return last.median_price != null ? Number(last.median_price) : null;
+    if (metric === 'new_construction_sqft') return last.median_sqft != null ? Number(last.median_sqft) : null;
+    return null;
+  }
   return d.latest && d.latest[metric] != null ? Number(d.latest[metric]) : null;
 }
 
@@ -962,6 +981,7 @@ function renderColors(mode) {
                     metric === 'median_property_tax' || metric === 'property_tax_rate');
   const isDistress = DISTRESS_METRICS.has(metric);
   const isPayment = PAYMENT_METRICS.has(metric);
+  const isNewConstruction = NEW_CONSTRUCTION_METRICS.has(metric);
   // Danger metrics: higher value = real market-health warning sign → green (low) to red (high)
   const isDanger = !isYOY && DANGER_METRICS.has(metric);
   const palette = isDanger ? PALETTE_DANGER : (isDistress || isPayment || isInverse) ? PALETTE_INV : PALETTE_NORM;
@@ -1002,8 +1022,8 @@ function renderColors(mode) {
         src.setData(src._data);
       }
       try { map.setPaintProperty('counties-fill', 'fill-color', ['coalesce', ['get', '__color'], '#ccc']); } catch(e) {}
-    } else if (isDistress || isPayment) {
-      // Distress + payment metrics: values are computed/pulled from outside the plain
+    } else if (isDistress || isPayment || isNewConstruction) {
+      // Distress + payment + new construction metrics: values are computed/pulled from outside the plain
       // GeoJSON properties, so use the per-feature __color approach (same as YOY) —
       // interpolate on ['get', metric] won't work for either.
       if (src && src._data && src._data.features) {
@@ -1014,7 +1034,9 @@ function renderColors(mode) {
           f.properties.__color = colorFromStops(stops, val);
           f.properties.__label = val == null ? '' : isPayment
             ? '$'+(val/1000).toFixed(1)+'K'
-            : METRICS[metric].fmt(val);
+            : (metric === 'new_construction_price')
+              ? '$'+(val/1000).toFixed(1)+'K'
+              : METRICS[metric].fmt(val);
         });
         src.setData(src._data);
       }
@@ -1054,7 +1076,7 @@ function renderColors(mode) {
       // pre-injected property directly, same as before.
       const val = isYOY
         ? (d && d.yoy_latest && d.yoy_latest[metric] != null ? d.yoy_latest[metric] : null)
-        : (isDistress || isPayment)
+        : (isDistress || isPayment || isNewConstruction)
           ? (d ? getMetricVal(d, metric) : null)
           : (f.properties[metric] != null ? Number(f.properties[metric]) : null);
       f.properties.__color = isYOY ? yoyQuantileColor(vals, val != null ? Number(val) : null, metric) : colorFromStops(stops, val != null ? Number(val) : null);
@@ -1068,6 +1090,8 @@ function renderColors(mode) {
         f.properties.__label = n.toFixed(1)+'%';
       } else if (isPayment) {
         f.properties.__label = '$'+(n/1000).toFixed(1)+'K';
+      } else if (metric === 'new_construction_price') {
+        f.properties.__label = '$'+(n/1000).toFixed(1)+'K';
       } else {
         f.properties.__label = METRICS[metric] ? METRICS[metric].fmt(n) : String(n);
       }
@@ -1080,7 +1104,7 @@ function renderColors(mode) {
       const d = rid ? metroDataMap[rid] : null;
       const val = isYOY
         ? (d && d.yoy_latest && d.yoy_latest[metric] != null ? d.yoy_latest[metric] : null)
-        : (isDistress || isPayment)
+        : (isDistress || isPayment || isNewConstruction)
           ? (d ? getMetricVal(d, metric) : null)
           : (f.properties[metric] != null ? Number(f.properties[metric]) : null);
       f.properties.__color = isYOY ? yoyQuantileColor(vals, val != null ? Number(val) : null, metric) : colorFromStops(stops, val != null ? Number(val) : null);
@@ -1096,7 +1120,7 @@ function fmt$(v){return v?'$'+v.toLocaleString():'—';}
 function fmtN(v){return v!=null?v.toLocaleString():'—';}
 function fmtAxisCompact(cmetric) {
   return v => {
-    if (cmetric==='zhvi'||cmetric==='zhvi_condo'||cmetric==='median_list_price'||cmetric==='median_property_tax') {
+    if (cmetric==='zhvi'||cmetric==='zhvi_condo'||cmetric==='median_list_price'||cmetric==='median_property_tax'||cmetric==='new_construction_price') {
       if (Math.abs(v)>=1000) return '$'+d3.format('.2s')(v).replace('k','K').replace('G','B');
       return '$'+v;
     }
@@ -1117,6 +1141,7 @@ function sourceForMetric(m) {
   if (base==='sf_permits_per_1k'||base==='mf_permits_per_1k'||base==='total_permits_per_1k') return '<a href="https://www.census.gov/construction/bps/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census BPS</a>';
   if (DISTRESS_METRICS.has(base)) return '<a href="https://www.propstream.com/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">PropStream</a>';
   if (PAYMENT_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#est-payment" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Derived Estimate</a>';
+  if (NEW_CONSTRUCTION_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#new-construction" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">MLS</a>';
   return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
 }
 function paymentDisclaimer(m) {
@@ -1589,7 +1614,7 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
 });
 
 // Load data + init map
-fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fips,county,latest,history,prop_tax_history,distress_history&order=county', {
+fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fips,county,latest,history,prop_tax_history,distress_history,new_construction_history&order=county', {
   headers: {
     'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI',
     'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI'
@@ -2412,7 +2437,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
 
   // Compact label format
   function fmtC(val) {
-    if (cmetric==='zhvi'||cmetric==='zhvi_condo'||cmetric==='median_property_tax') {
+    if (cmetric==='zhvi'||cmetric==='zhvi_condo'||cmetric==='median_property_tax'||cmetric==='new_construction_price') {
       if (val>=1000000) return '$'+(val/1000000).toFixed(1)+'M';
       if (val>=1000) return '$'+Math.round(val/1000)+'K';
       return '$'+Math.round(val);
@@ -3278,7 +3303,7 @@ function loadZipData() {
     fetch('/ohio-zips.geojson').then(r=>r.json()),
     (async () => {
       const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY, 'Range-Unit': 'items'};
-      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,city,county,metro,latest,yoy_latest';
+      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,city,county,metro,latest,yoy_latest,new_construction_history';
       const pages = await Promise.all([
         fetch(base+'&limit=1000&offset=0', {headers}).then(r=>r.json()),
         fetch(base+'&limit=1000&offset=1000', {headers}).then(r=>r.json()),
@@ -3374,7 +3399,7 @@ function fetchZipHistory(zip) {
   if (zipHistoryCache[zip]) return Promise.resolve(zipHistoryCache[zip]);
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
   return fetch(
-    'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,history,prop_tax_history&zip=eq.'+zip,
+    'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,history,prop_tax_history,new_construction_history&zip=eq.'+zip,
     {headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}}
   ).then(r => r.json()).then(rows => {
     if (!rows || !rows.length) return null;
