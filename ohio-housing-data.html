@@ -1505,6 +1505,12 @@ function renderChart(county, cmetric) {
     (d && d.prop_tax_history || []).forEach(r => { taxRateByYear[r.year] = r.property_tax_rate; });
     const paymentHist = buildPaymentHist(zhviByYear, taxRateByYear, downPct, cmetric);
     drawAnnualBarChart(county, cmetric, paymentHist, false);
+  } else if (NEW_CONSTRUCTION_METRICS.has(cmetric)) {
+    const ncField = cmetric === 'new_construction_price' ? 'median_price' : 'median_sqft';
+    const ncHist = (d && d.new_construction_history || [])
+      .filter(r => r[ncField] != null)
+      .map(r => ({date: r.period, [cmetric]: r[ncField]}));
+    drawMonthlyBarChart(county, cmetric, ncHist, false);
   } else if (cmetric === 'sf_permits_per_1k' || cmetric === 'mf_permits_per_1k' || cmetric === 'total_permits_per_1k') {
     const field = cmetric === 'sf_permits_per_1k' ? 'sf_per_1k' : cmetric === 'mf_permits_per_1k' ? 'mf_per_1k' : 'total_per_1k';
     const doRenderPermit = (ph) => {
@@ -3474,6 +3480,12 @@ function _doRenderZipChart(zip, cmetric) {
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
     const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
     drawAnnualBarChart(zip, cmetric, taxHist, true);
+  } else if (NEW_CONSTRUCTION_METRICS.has(cmetric)) {
+    const ncField = cmetric === 'new_construction_price' ? 'median_price' : 'median_sqft';
+    const ncHist = (d && d.new_construction_history || [])
+      .filter(r => r[ncField] != null)
+      .map(r => ({date: r.period, [cmetric]: r[ncField]}));
+    drawMonthlyBarChart(zip, cmetric, ncHist, true);
   } else if (PAYMENT_METRICS.has(cmetric)) {
     if (!nationalRatesLoaded) {
       loadNationalRates();
