@@ -601,15 +601,23 @@ const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_f
 const PAYMENT_METRICS = new Set(['est_payment_20']);
 const NEW_CONSTRUCTION_METRICS = new Set(['new_construction_price','new_construction_sqft']);
 
+// Ohio-specific homeowners insurance rate, as a % of home value per year. Sourced from
+// NerdWallet's 2026 state-by-state average ($2,080/yr average Ohio premium on their $400,000
+// dwelling-coverage sample policy = 0.52% of value/yr). Scales insurance by home value instead
+// of a flat national dollar figure, so a $550K Delaware County home and a $150K rural home
+// each get a realistic premium instead of the same flat number. Applied to both the live
+// calculation and every historical chart year — see 2026-09-11 update.
+const OHIO_INSURANCE_RATE_ANNUAL = 0.0052;
+
 // Estimated monthly payment — computed live in-browser, never stored. Home values and rates
 // change monthly, so a stored number would go stale immediately; instead this recalculates
-// from each row's current zhvi (+ property_tax_rate where available) plus the two shared
-// inputs (current_mortgage_rate, monthly_insurance_est) pulled from ohio_state.latest.
+// from each row's current zhvi (+ property_tax_rate where available) plus current_mortgage_rate
+// pulled from ohio_state.latest, and insurance scaled by that same zhvi (OHIO_INSURANCE_RATE_ANNUAL).
 // This is an estimate only — actual payments vary by lender, credit, and loan program.
 function computeEstPayment(zhvi, propertyTaxRatePct, downPct) {
   if (zhvi == null || !STATE_DATA || !STATE_DATA.latest) return null;
   const rateAnnual = STATE_DATA.latest.current_mortgage_rate;
-  const insuranceMonthly = STATE_DATA.latest.monthly_insurance_est;
+  const insuranceMonthly = zhvi * OHIO_INSURANCE_RATE_ANNUAL / 12;
   if (rateAnnual == null || insuranceMonthly == null) return null;
 
   const financed = zhvi * (1 - downPct);
@@ -1146,13 +1154,27 @@ function sourceForMetric(m) {
 }
 function paymentDisclaimer(m) {
   if (!PAYMENT_METRICS.has(m)) return '';
-  return ' &nbsp;\u00b7&nbsp; <span style="color:#888;">For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision. 2025\u201326 property tax rate carried forward from latest available (2024) Census data.</span>';
+  const rateLabel = paymentRateLabel();
+  return (rateLabel ? ' &nbsp;\u00b7&nbsp; <span style="color:#0D1E42;font-weight:600;">' + rateLabel + '</span>' : '') +
+    ' &nbsp;\u00b7&nbsp; <span style="color:#888;">For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision. 2025\u201326 property tax rate carried forward from latest available (2024) Census data.</span>';
+}
+
+// Reads the exact rate driving the live Est. Payment calc, straight from STATE_DATA at
+// render time — same source computeEstPayment() uses, so this label can never drift out
+// of sync with what's actually being calculated. Returns '' if STATE_DATA hasn't loaded yet.
+function paymentRateLabel() {
+  if (!STATE_DATA || !STATE_DATA.latest || STATE_DATA.latest.current_mortgage_rate == null) return '';
+  const rate = Number(STATE_DATA.latest.current_mortgage_rate).toFixed(2) + '%';
+  const asof = STATE_DATA.latest.mortgage_rate_asof;
+  const asofLabel = asof ? ' (as of ' + asof + ')' : '';
+  return 'Rate used: ' + rate + asofLabel;
 }
 function updateChartPaymentDisclaimer(m) {
   const el = document.getElementById('chart-payment-disclaimer');
   if (!el) return;
   if (!PAYMENT_METRICS.has(m)) { el.style.display = 'none'; el.textContent = ''; return; }
-  el.textContent = 'For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision.';
+  const rateLabel = paymentRateLabel();
+  el.textContent = (rateLabel ? rateLabel + '  \u00b7  ' : '') + 'For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision.';
   el.style.display = 'block';
 }
 function setAttrHeader(chips, metric) {
@@ -3157,9 +3179,8 @@ function taxRateForYear(taxRateByYear, year) {
 function computeEstPaymentForYear(zhvi, propertyTaxRatePct, downPct, year) {
   if (zhvi == null || !NATIONAL_RATES || !NATIONAL_RATES[year]) return null;
   const rateAnnual = NATIONAL_RATES[year].rate;
-  const insuranceAnnual = NATIONAL_RATES[year].insurance;
-  if (rateAnnual == null || insuranceAnnual == null) return null;
-  const insuranceMonthly = insuranceAnnual / 12;
+  if (rateAnnual == null || zhvi == null) return null;
+  const insuranceMonthly = zhvi * OHIO_INSURANCE_RATE_ANNUAL / 12;
 
   const financed = zhvi * (1 - downPct);
   const r = (rateAnnual / 100) / 12;
