@@ -897,19 +897,33 @@ function renderRankBadge(mode, id, metric) {
     if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') {
       // permits are county-only
     }
-    const vals = [];
-    let targetVal = null;
+    const vals = [], stateVals = [];
+    let targetVal = null, targetStateId = null;
     DATA.forEach(d => {
       const v = getMetricVal(d, metric);
       if (v != null && !isNaN(v)) {
         vals.push(v);
-        if (d.fips === id) targetVal = v;
+        if (d.fips === id) { targetVal = v; targetStateId = d.state_id; }
       }
     });
     if (targetVal == null || !vals.length) { hide(); return; }
+    // State-scoped rank: DATA already holds every county nationally (unlike ZIP, which
+    // loads one state at a time), so this needs no extra fetch -- just filter by state_id.
+    if (targetStateId) {
+      DATA.forEach(d => {
+        if (d.state_id !== targetStateId) return;
+        const v = getMetricVal(d, metric);
+        if (v != null && !isNaN(v)) stateVals.push(v);
+      });
+    }
     const {rank, total} = computeRank(vals, metric, targetVal);
     show();
-    el.innerHTML = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total} counties · ${label}`;
+    let html = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total} counties nationally`;
+    if (stateVals.length > 1 && targetStateId) {
+      const {rank: sRank, total: sTotal} = computeRank(stateVals, metric, targetVal);
+      html += ` · ${sRank}<sup>${_ordSuffix(sRank)}</sup> of ${sTotal} in ${targetStateId}`;
+    }
+    el.innerHTML = html + ` · ${label}`;
   } else if (mode === 'zip') {
     // Permits aren't tracked at zip level — skip.
     if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { hide(); return; }
@@ -926,22 +940,47 @@ function renderRankBadge(mode, id, metric) {
     const {rank, total} = computeRank(vals, metric, targetVal);
     const pct = Math.max(1, Math.round((rank / total) * 100));
     show();
-    el.innerHTML = `Top ${pct}% of ${total} ZIPs · ${label}`;
+    let html = `Top ${pct}% of ${total} ZIPs in ${currentZipState || ''}`;
+    // National rank: precomputed server-side (us_zips_national_rank materialized view,
+    // merged into zipDataMap during loadZipDataForState) since we don't load all 26,268
+    // ZIPs into the browser to rank client-side the way DATA/METRO_DATA do nationally.
+    const zd = zipDataMap[id];
+    if (metric === 'zhvi' && zd && zd.national_rank != null && zd.national_total) {
+      const natPct = Math.max(1, Math.round((zd.national_rank / zd.national_total) * 100));
+      html += ` · Top ${natPct}% of ${zd.national_total.toLocaleString()} nationally`;
+    }
+    el.innerHTML = html + ` · ${label}`;
   } else if (mode === 'metro') {
     if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { hide(); return; }
-    const vals = [];
-    let targetVal = null;
+    const vals = [], stateVals = [];
+    let targetVal = null, targetStateId = null;
     METRO_DATA.forEach(m => {
       const v = getMetricVal(m, metric);
       if (v != null && !isNaN(v)) {
         vals.push(v);
-        if (m.region_id === id) targetVal = v;
+        if (m.region_id === id) { targetVal = v; targetStateId = m.state_id; }
       }
     });
     if (targetVal == null || !vals.length) { hide(); return; }
+    // State-scoped rank: METRO_DATA already holds every metro nationally, filter by state_id.
+    // Note a metro can span multiple states (e.g. "New York, NY-NJ-PA") -- state_id here is
+    // whichever single state Zillow's RegionName lists first, so this is an approximation
+    // for multi-state metros, same caveat as County's own state_id field.
+    if (targetStateId) {
+      METRO_DATA.forEach(m => {
+        if (m.state_id !== targetStateId) return;
+        const v = getMetricVal(m, metric);
+        if (v != null && !isNaN(v)) stateVals.push(v);
+      });
+    }
     const {rank, total} = computeRank(vals, metric, targetVal);
     show();
-    el.innerHTML = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total} metros · ${label}`;
+    let html = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total} metros nationally`;
+    if (stateVals.length > 1 && targetStateId) {
+      const {rank: sRank, total: sTotal} = computeRank(stateVals, metric, targetVal);
+      html += ` · ${sRank}<sup>${_ordSuffix(sRank)}</sup> of ${sTotal} in ${targetStateId}`;
+    }
+    el.innerHTML = html + ` · ${label}`;
   } else {
     hide();
   }
@@ -3633,16 +3672,24 @@ function loadZipDataForState(abbr) {
     fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,county,metro,latest&state_id=eq.'+abbr),
     // us_zips_yoy: same materialized-view pattern as us_counties_yoy/us_metros_yoy --
     // computed server-side from full history, refreshed on data update.
-    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy&state_id=eq.'+abbr)
-  ]).then(([geojson, zips, yoyRows]) => {
+    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy&state_id=eq.'+abbr),
+    // us_zips_national_rank: precomputed RANK() OVER (ORDER BY zhvi DESC) across all 26,268
+    // priced ZIPs -- lets the rank badge show a national percentile alongside the in-state
+    // one (computed client-side from ZIP_DATA below) without loading all 26k ZIPs client-side.
+    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_national_rank?select=zip,national_rank,national_total&state_id=eq.'+abbr)
+  ]).then(([geojson, zips, yoyRows, rankRows]) => {
     const yoyByZip = {};
     yoyRows.forEach(row => { yoyByZip[row.zip] = row; });
+    const rankByZip = {};
+    rankRows.forEach(row => { rankByZip[row.zip] = row; });
     ZIP_DATA = zips;
     ZIP_DATA.forEach(d => {
       d.yoy_latest = d.yoy_latest || {};
       const fresh = yoyByZip[d.zip];
       if (fresh && fresh.zhvi_yoy != null) d.yoy_latest.zhvi_yoy = Number(fresh.zhvi_yoy);
       d.yoy_history = {};
+      const nr = rankByZip[d.zip];
+      if (nr) { d.national_rank = nr.national_rank; d.national_total = nr.national_total; }
       zipDataMap[d.zip] = d;
     });
     // Merge metric properties directly into GeoJSON features
