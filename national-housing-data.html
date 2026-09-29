@@ -380,8 +380,12 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="mode-pill active" id="pill-county">County</button>
     <button class="mode-pill" id="pill-zip">ZIP Code</button>
     <button class="mode-pill" id="pill-table" style="margin-left:6px;border-left:1px solid rgba(0,0,0,0.12);padding-left:14px;">⊞ Table</button>
+    <button id="zip-back-to-states" onclick="zipBackToStatePicker()" style="display:none;margin-left:6px;border-left:1px solid rgba(0,0,0,0.12);padding-left:14px;background:none;border-top:none;border-right:none;border-bottom:none;font-family:Montserrat,sans-serif;font-size:12px;font-weight:600;color:#0D1E42;cursor:pointer;align-items:center;gap:4px;">↺ Change State</button>
   </div>
   <ul id="search-results"></ul>
+</div>
+<div id="zip-picker-banner" style="display:none;position:absolute;top:76px;left:50%;transform:translateX(-50%);z-index:500;background:#0D1E42;color:#fff;font-family:Montserrat,sans-serif;font-weight:600;font-size:13px;padding:9px 18px;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,0.25);pointer-events:none;">
+  Click a state to view its ZIP codes — or search any ZIP code above
 </div>
   <div id="legend">
     <span id="leg-lo"></span>
@@ -638,6 +642,24 @@ let FIPS_NAME = {};
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null, selectedFips = null;
 let chartSliderStartYr = null, chartSliderEndYr = null, _chartHistoryFull = null, _chartCounty = null, _chartCmetric = null, _chartIsZip = false;
 let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, zipHistoryCache = {}, selectedZip = null, zipHoveredId = null;
+// ZIP mode is state-scoped nationally: ~33,791 ZCTA boundaries is too much to hand Mapbox
+// as one GeoJSON (Census's own most-generalized file is 66MB zipped). Instead, the map
+// starts blank in ZIP mode until a state is picked (click a state, or search a ZIP directly),
+// then only that state's boundary file (~0.1-7MB) and ZIP rows load. Same UX pattern
+// ResiClub uses for the same reason. currentZipState tracks which state is active;
+// zipStatesLoaded caches which states have already been fetched so re-picking is instant.
+let currentZipState = null, zipStatesLoaded = {};
+const STATE_NAME_TO_ABBR = {
+  'Alabama':'AL','Alaska':'AK','Arizona':'AZ','Arkansas':'AR','California':'CA','Colorado':'CO',
+  'Connecticut':'CT','Delaware':'DE','District of Columbia':'DC','Florida':'FL','Georgia':'GA',
+  'Hawaii':'HI','Idaho':'ID','Illinois':'IL','Indiana':'IN','Iowa':'IA','Kansas':'KS','Kentucky':'KY',
+  'Louisiana':'LA','Maine':'ME','Maryland':'MD','Massachusetts':'MA','Michigan':'MI','Minnesota':'MN',
+  'Mississippi':'MS','Missouri':'MO','Montana':'MT','Nebraska':'NE','Nevada':'NV','New Hampshire':'NH',
+  'New Jersey':'NJ','New Mexico':'NM','New York':'NY','North Carolina':'NC','North Dakota':'ND',
+  'Ohio':'OH','Oklahoma':'OK','Oregon':'OR','Pennsylvania':'PA','Rhode Island':'RI','South Carolina':'SC',
+  'South Dakota':'SD','Tennessee':'TN','Texas':'TX','Utah':'UT','Vermont':'VT','Virginia':'VA',
+  'Washington':'WA','West Virginia':'WV','Wisconsin':'WI','Wyoming':'WY','Puerto Rico':'PR'
+};
 let METRO_DATA = [], metroDataMap = {}, metroDataLoaded = false, metroGeoJSON = null, selectedMetro = null, metroHoveredId = null;
 let STATE_DATA = null, stateDataLoaded = false, selectedState = null;
 let NATIONAL_STATES = [], nationalStatesMap = {}, nationalStatesLoaded = false, nationalStateHoveredId = null, selectedNationalState = null, nationalStateGeoJSON = null;
@@ -2061,13 +2083,20 @@ function _onCountiesLoaded(counties, yoyRows) {
 
       // National state hover + click
       map.on('mousemove','state-fill', e => {
-        if (mapMode !== 'state' || !e.features.length) return;
+        if ((mapMode !== 'state' && mapMode !== 'zip') || !e.features.length) return;
         map.getCanvas().style.cursor = 'pointer';
         if (nationalStateHoveredId !== null) map.setFeatureState({source:'us-states',id:nationalStateHoveredId},{hover:false});
         nationalStateHoveredId = e.features[0].id;
         map.setFeatureState({source:'us-states',id:nationalStateHoveredId},{hover:true});
         const sf = e.features[0];
         const sName = (sf.properties && sf.properties.name) || '';
+        if (mapMode === 'zip') {
+          popup.setLngLat(e.lngLat).setHTML(`
+            <div class="tt-county">${sName}</div>
+            <div class="tt-label">Click to view ZIP codes</div>
+          `).addTo(map);
+          return;
+        }
         const sd = sName ? nationalStatesMap[sName] : null;
         const sVal = sd ? getMetricVal(sd, mapMetric) : null;
         const sFmt = sVal != null ? METRICS[mapMetric].fmt(sVal) : 'N/A';
@@ -2085,14 +2114,24 @@ function _onCountiesLoaded(counties, yoyRows) {
         popup.remove();
       });
       map.on('click','state-fill', e => {
-        if (mapMode !== 'state' || !e.features.length) return;
+        if (!e.features.length) return;
         const sName = (e.features[0].properties && e.features[0].properties.name) || '';
         if (!sName) return;
+        // ZIP mode: state layer doubles as the state-picker while no state is active yet
+        // (see currentZipState). Picking a state here loads that state's ZIP boundaries.
+        if (mapMode === 'zip') {
+          const abbr = STATE_NAME_TO_ABBR[sName];
+          if (abbr) loadZipDataForState(abbr);
+          return;
+        }
+        if (mapMode !== 'state') return;
         selectedNationalState = sName;
         openNationalStateModal(sName);
       });
 
-      map.addSource('ohio-zips', {type:'geojson', data:'/ohio-zips.geojson', promoteId:'zip'});
+      // Starts empty -- national ZIP mode is state-scoped (see currentZipState above).
+      // loadZipDataForState() calls setData() once a state is picked.
+      map.addSource('ohio-zips', {type:'geojson', data:{type:'FeatureCollection',features:[]}, promoteId:'zip'});
 
       map.addLayer({id:'zips-fill',type:'fill',source:'ohio-zips',layout:{visibility:'none'},
         paint:{'fill-color':'#ccc','fill-opacity':0.47}});
@@ -2177,7 +2216,7 @@ function _onCountiesLoaded(counties, yoyRows) {
         if (selectedZip) map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false});
         selectedZip = z;
         map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:true});
-        openZipModal(z);
+        openZipModal(z, currentZipState);
       });
     });
   });
@@ -2974,9 +3013,15 @@ function toggleTableView() {
 
 function _ensureDataThenRenderTable() {
   if (mapMode === 'zip') {
+    if (!currentZipState) {
+      // Table view is state-scoped too, same as the map -- nothing to show nationally
+      // until a state is picked (click a state on the map, or search any ZIP code).
+      document.getElementById('table-body').innerHTML = '<tr><td colspan="99" style="padding:24px;text-align:center;color:#aaa;">Pick a state on the map (or search a ZIP code) to see its table</td></tr>';
+      return;
+    }
     if (!zipDataLoaded) {
       document.getElementById('table-body').innerHTML = '<tr><td colspan="99" style="padding:24px;text-align:center;color:#aaa;">Loading ZIP data…</td></tr>';
-      loadZipData();
+      loadZipDataForState(currentZipState);
       const wait = setInterval(() => { if (zipDataLoaded) { clearInterval(wait); renderTable(); } }, 200);
       return;
     }
@@ -3113,12 +3158,25 @@ function setMode(mode) {
   const metroLayers = ['metros-fill','metros-border','metros-border-hover','metros-border-selected','metros-labels'];
   const stateLayers = ['state-fill','state-border','state-border-hover','state-labels'];
 
-  countyLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='county'?'visible':'none')}catch(e){} });
-  zipLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='zip'?'visible':'none')}catch(e){} });
-  metroLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='metro'?'visible':'none')}catch(e){} });
-  stateLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='state'?'visible':'none')}catch(e){} });
+  // ZIP mode is state-scoped: with no state picked yet, show the state layer as a picker
+  // (dimmed choropleth hidden, plain click-to-pick) instead of the (empty) ZIP layer.
+  const zipPicking = mode === 'zip' && !currentZipState;
 
-  if (mode === 'zip') { loadZipData(); }
+  countyLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='county'?'visible':'none')}catch(e){} });
+  zipLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',(mode==='zip'&&!zipPicking)?'visible':'none')}catch(e){} });
+  metroLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='metro'?'visible':'none')}catch(e){} });
+  stateLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',(mode==='state'||zipPicking)?'visible':'none')}catch(e){} });
+  // Flatten the state picker's fill to a neutral gray/no metric shading -- it's a picker,
+  // not a choropleth, while zip mode is waiting for a state to be chosen.
+  if (zipPicking) { try{map.setPaintProperty('state-fill','fill-color','#9DA6AB'); map.setPaintProperty('state-fill','fill-opacity',0.35);}catch(e){} }
+  else { try{map.setPaintProperty('state-fill','fill-opacity',0.72);}catch(e){} }
+
+  const zipPickerBanner = document.getElementById('zip-picker-banner');
+  if (zipPickerBanner) zipPickerBanner.style.display = zipPicking ? 'block' : 'none';
+  const zipBackBtn = document.getElementById('zip-back-to-states');
+  if (zipBackBtn) zipBackBtn.style.display = (mode==='zip' && currentZipState) ? 'inline-flex' : 'none';
+
+  if (mode === 'zip') { if (currentZipState) loadZipDataForState(currentZipState); }
   else if (mode === 'metro') { loadMetroData(); }
   else if (mode === 'state') { loadNationalStatesData(); }
   else {
@@ -3130,6 +3188,12 @@ function setMode(mode) {
   selectedCounty = null;
   // Refresh table if open
   if (tableViewActive) { setTimeout(_ensureDataThenRenderTable, 100); }
+}
+
+function zipBackToStatePicker() {
+  currentZipState = null;
+  zipDataLoaded = false;
+  setMode('zip');
 }
 
 
@@ -3530,77 +3594,120 @@ function renderStateChart(name, cmetric, d) {
 }
 
 let zipGeoJSON = null;
-function loadZipData() {
-  if (zipDataLoaded) { renderColors('zip'); return; }
+const _zipStateGeoCache = {}; // abbr -> parsed geojson, so re-picking a state is instant
+
+// National ZIP mode is state-scoped (see currentZipState note above). Loads one state's
+// boundary file + us_zips rows + us_zips_yoy rows at a time. Returns a Promise so callers
+// (map click, search) can await it before zooming/opening a modal.
+function loadZipDataForState(abbr) {
+  currentZipState = abbr;
+  if (zipStatesLoaded[abbr]) {
+    zipGeoJSON = _zipStateGeoCache[abbr];
+    zipDataLoaded = true;
+    setModeLayersForZipViewing();
+    renderColors('zip');
+    return Promise.resolve();
+  }
+  zipDataLoaded = false;
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
-  Promise.all([
-    fetch('/ohio-zips.geojson').then(r=>r.json()),
-    (async () => {
-      const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY, 'Range-Unit': 'items'};
-      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,city,county,metro,latest,yoy_latest,new_construction_history';
-      const pages = await Promise.all([
-        fetch(base+'&limit=1000&offset=0', {headers}).then(r=>r.json()),
-        fetch(base+'&limit=1000&offset=1000', {headers}).then(r=>r.json()),
-      ]);
-      return pages.flat();
-    })(),
-    // yoy_latest in ohio_zips is a stale stored column (only refreshed manually per metric,
-    // per month — easy to miss a field or a cycle). Compute every YOY metric fresh instead,
-    // every load, via the ohio_zips_yoy Postgres view which reads straight from history.
-    (async () => {
-      const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY, 'Range-Unit': 'items'};
-      const base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips_yoy?select=*';
-      const pages = await Promise.all([
-        fetch(base+'&limit=1000&offset=0', {headers}).then(r=>r.json()),
-        fetch(base+'&limit=1000&offset=1000', {headers}).then(r=>r.json()),
-      ]);
-      const yoyByZip = {};
-      pages.flat().forEach(row => { yoyByZip[row.zip] = row; });
-      return yoyByZip;
-    })()
-  ]).then(([geojson, zips, zipsYoyMap]) => {
+  const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY};
+  return Promise.all([
+    fetch('/zips/'+abbr+'.geojson').then(r=>r.json()),
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,county,metro,latest&state_id=eq.'+abbr, {headers}).then(r=>r.json()),
+    // us_zips_yoy: same materialized-view pattern as us_counties_yoy/us_metros_yoy --
+    // computed server-side from full history, refreshed on data update.
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy&state_id=eq.'+abbr, {headers}).then(r=>r.json())
+  ]).then(([geojson, zips, yoyRows]) => {
+    const yoyByZip = {};
+    yoyRows.forEach(row => { yoyByZip[row.zip] = row; });
     ZIP_DATA = zips;
     ZIP_DATA.forEach(d => {
       d.yoy_latest = d.yoy_latest || {};
-      // FIX: overwrite every field from the stale stored yoy_latest column with a value
-      // computed fresh, every load, straight from history via the ohio_zips_yoy view —
-      // these can never go stale again because nothing is cached.
-      const fresh = zipsYoyMap[d.zip];
-      if (fresh) {
-        for (const [k, v] of Object.entries(fresh)) {
-          if (k !== 'zip' && k !== 'latest_date' && v !== null) d.yoy_latest[k] = v;
-        }
-      }
+      const fresh = yoyByZip[d.zip];
+      if (fresh && fresh.zhvi_yoy != null) d.yoy_latest.zhvi_yoy = Number(fresh.zhvi_yoy);
       d.yoy_history = {};
       zipDataMap[d.zip] = d;
     });
-    zipDataLoaded = true;
     // Merge metric properties directly into GeoJSON features
     geojson.features.forEach(f => {
       const zip = (f.properties && f.properties.zip) || String(f.id);
-      const d = zipDataMap[zip] || zipDataMap[String(f.id)];
+      const d = zipDataMap[zip];
       if (d && d.latest) Object.assign(f.properties, d.latest, d.yoy_latest || {}, {__zip: zip});
     });
+    _zipStateGeoCache[abbr] = geojson;
+    zipStatesLoaded[abbr] = true;
     zipGeoJSON = geojson;
+    zipDataLoaded = true;
+    setModeLayersForZipViewing();
     map.getSource('ohio-zips').setData(geojson);
     renderColors('zip');
-  }).catch(err => console.error('ZIP data load error:', err));
+  }).catch(err => console.error('ZIP data load error ('+abbr+'):', err));
+}
+
+// Once a state is picked, flip the state-picker layer off and the ZIP layer on (mirrors
+// the zipPicking logic in setMode(), called again here since currentZipState just changed).
+function setModeLayersForZipViewing() {
+  if (mapMode !== 'zip') return;
+  const stateLayers = ['state-fill','state-border','state-border-hover','state-labels'];
+  const zipLayers = ['zips-fill','zips-border','zips-border-hover','zips-border-selected','zips-labels','counties-outline-zipmode'];
+  stateLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility','none')}catch(e){} });
+  zipLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility','visible')}catch(e){} });
+  try{map.setPaintProperty('state-fill','fill-opacity',0.72);}catch(e){}
+  const zipPickerBanner = document.getElementById('zip-picker-banner');
+  if (zipPickerBanner) zipPickerBanner.style.display = 'none';
+  const zipBackBtn = document.getElementById('zip-back-to-states');
+  if (zipBackBtn) zipBackBtn.style.display = 'inline-flex';
+  // Zoom to the state's own boundary on first load into it. Read straight off the
+  // us-states map source (always loaded via addSource, independent of State mode's own
+  // data fetch) rather than nationalStateGeoJSON, which is only populated once someone
+  // has actually visited State mode.
+  const _usStatesSrc = map.getSource('us-states');
+  const _usStatesData = _usStatesSrc && _usStatesSrc._data;
+  const sfeat = _usStatesData && _usStatesData.features
+    ? _usStatesData.features.find(f => STATE_NAME_TO_ABBR[f.properties && f.properties.name] === currentZipState)
+    : null;
+  if (sfeat) {
+    const coords = [];
+    const collect = g => { if (!g) return; if (g.type==='Polygon') g.coordinates.forEach(r=>r.forEach(c=>coords.push(c))); else if (g.type==='MultiPolygon') g.coordinates.forEach(p=>p.forEach(r=>r.forEach(c=>coords.push(c)))); };
+    collect(sfeat.geometry);
+    if (coords.length) {
+      const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
+      map.fitBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]], {padding:60, maxZoom:9, duration:800});
+    }
+  }
 }
 
 
 
-function openZipModal(zip) {
+function openZipModal(zip, fallbackState) {
   const d = zipDataMap[zip];
-  if (!d) return;
   selectedCounty = null;
+  if (!d) {
+    // Honest no-data state, same pattern as County: ~7,500 of the 33,791 national ZCTA
+    // boundaries have no Zillow coverage (too small/PO-box/non-residential) -- show that
+    // plainly instead of silently doing nothing.
+    document.getElementById('modal-county').textContent = zip;
+    const _utc4n = document.getElementById('ut-county'); if (_utc4n) _utc4n.textContent = zip;
+    document.getElementById('modal-sub').textContent = 'No data available for this ZIP code';
+    setAttrHeader(['No Zillow coverage for this ZIP code'], mapMetric);
+    ['s-zhvi','s-active','s-pending','s-dom','s-pct','s-ptax','s-ptaxrate','s-rank'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = '—';
+    });
+    setPendingRatioBadge(null);
+    document.getElementById('chart-label').textContent = 'No historical data available';
+    const lsvgNo = document.getElementById('line-chart'); if (lsvgNo) lsvgNo.innerHTML = '';
+    const rb = document.getElementById('rank-badge'); if (rb) rb.style.display = 'none';
+    document.getElementById('modal-overlay').classList.add('visible');
+    return;
+  }
   const l = d.latest || {};
   document.getElementById('modal-county').textContent = zip;
   const _utc4 = document.getElementById('ut-county'); if (_utc4) _utc4.textContent = zip + (d.city ? ' · ' + d.city : '');
-  document.getElementById('modal-sub').textContent = (d.city || '') + (d.city ? ', Ohio' : 'Ohio');
+  document.getElementById('modal-sub').textContent = (d.city || '') + (d.city && d.state_id ? ', ' + d.state_id : (d.state_id || ''));
   const _chips = [];
   if (d.county) _chips.push('County: ' + d.county);
   if (d.city) _chips.push('City: ' + d.city);
-  _chips.push('State: Ohio');
+  if (d.state_id) _chips.push('State: ' + d.state_id);
   setAttrHeader(_chips, mapMetric);
 
   // Snap grid values
@@ -3632,8 +3739,11 @@ function openZipModal(zip) {
 function fetchZipHistory(zip) {
   if (zipHistoryCache[zip]) return Promise.resolve(zipHistoryCache[zip]);
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+  // us_zips (national) carries SFH price history only in this pass -- no prop_tax_history
+  // or new_construction_history yet (those stay Ohio-only for now, same "one metric at a
+  // time" discipline used for County/Metro). Guarded as undefined below, not hardcoded.
   return fetch(
-    'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_zips?select=zip,history,prop_tax_history,new_construction_history&zip=eq.'+zip,
+    'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,history&zip=eq.'+zip,
     {headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}}
   ).then(r => r.json()).then(rows => {
     if (!rows || !rows.length) return null;
@@ -3744,19 +3854,32 @@ const searchResults = document.getElementById('search-results');
 const searchClear = document.getElementById('search-clear');
 function getCountyNames() { return Object.values(FIPS_NAME).sort(); }
 
+// National ZIP search hits Supabase live rather than filtering a preloaded map: with
+// 26,268 priced ZIPs nationally (state-scoped loading, see loadZipDataForState above),
+// there's no single client-side zipDataMap to filter until a state is picked. Debounced
+// prefix search against us_zips covers any ZIP in the country, no state pick required first.
+let _zipSearchTimer = null, _zipSearchSeq = 0;
 function showZipResults(raw) {
-  searchResults.innerHTML = '';
-  const matches = Object.keys(zipDataMap).filter(z => z.startsWith(raw)).sort().slice(0, 8);
-  if (!matches.length) { searchResults.style.display='none'; return; }
-  matches.forEach(z => {
-    const li = document.createElement('li');
-    const d = zipDataMap[z];
-    const val = d && d.latest && d.latest[mapMetric] != null ? METRICS[mapMetric].fmt(Number(d.latest[mapMetric])) : '';
-    li.innerHTML = `<div>${z}${d&&d.city?' — '+d.city:''}</div><div class="sr-sub">${d&&d.county?d.county+' County':''}${val?' · '+METRICS[mapMetric].label+': '+val:''}</div>`;
-    li.addEventListener('click', () => selectZip(z));
-    searchResults.appendChild(li);
-  });
-  searchResults.style.display = 'block';
+  clearTimeout(_zipSearchTimer);
+  if (raw.length < 3) { searchResults.style.display = 'none'; return; }
+  const mySeq = ++_zipSearchSeq;
+  _zipSearchTimer = setTimeout(() => {
+    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+    const url = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,state_id,latest&zip=like.'+raw+'*&order=zip&limit=8';
+    fetch(url, {headers:{apikey:ANON_KEY,Authorization:'Bearer '+ANON_KEY}}).then(r=>r.json()).then(rows => {
+      if (mySeq !== _zipSearchSeq) return; // a newer keystroke superseded this request
+      searchResults.innerHTML = '';
+      if (!rows || !rows.length) { searchResults.style.display = 'none'; return; }
+      rows.forEach(d => {
+        const li = document.createElement('li');
+        const val = d.latest && d.latest.zhvi != null ? METRICS.zhvi.fmt(Number(d.latest.zhvi)) : '';
+        li.innerHTML = `<div>${d.zip}${d.city?' — '+d.city+', '+d.state_id:''}</div><div class="sr-sub">${val?'SFH Value: '+val:''}</div>`;
+        li.addEventListener('click', () => selectZip(d.zip, d.state_id));
+        searchResults.appendChild(li);
+      });
+      searchResults.style.display = 'block';
+    }).catch(err => console.error('ZIP search error:', err));
+  }, 200);
 }
 
 function doSearch(q) {
@@ -3764,17 +3887,9 @@ function doSearch(q) {
   searchResults.innerHTML = '';
   if (!raw) { searchResults.style.display='none'; return; }
 
-  // ZIP detection: starts with digits
+  // ZIP detection: starts with digits. Live national search -- see showZipResults above.
   if (/^\d/.test(raw)) {
-    if (!zipDataLoaded) {
-      // Load ZIP data first, then show results
-      loadZipData();
-      const wait = setInterval(() => {
-        if (zipDataLoaded) { clearInterval(wait); showZipResults(searchInput.value.trim()); }
-      }, 150);
-    } else {
-      showZipResults(raw);
-    }
+    showZipResults(raw);
     return;
   }
 
@@ -3817,37 +3932,43 @@ function doSearch(q) {
   searchResults.style.display = 'block';
 }
 
-function selectZip(zip) {
-  const d = zipDataMap[zip];
-  searchInput.value = zip + (d && d.city ? ' — ' + d.city : '');
+// zip: 5-digit code. stateId: 2-letter state abbreviation the search result already told
+// us (needed up front since, until its state is loaded, no client-side data says where a
+// given ZIP lives). Loads that state's boundaries/data first if it isn't the active one.
+function selectZip(zip, stateId) {
   searchResults.style.display = 'none';
   searchClear.style.display = 'block';
   if (!map) return;
-  // Switch to ZIP mode if needed
   if (mapMode !== 'zip') setMode('zip');
-  // Clear previous selection
-  if (selectedZip) { try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false})}catch(e){} }
-  selectedZip = zip;
-  try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:true})}catch(e){}
-  // Zoom first, open modal after animation
-  let zoomed = false;
-  if (zipGeoJSON && zipGeoJSON.features) {
-    const feat = zipGeoJSON.features.find(f => f.id === zip || (f.properties && (f.properties.zip === zip || f.properties.ZCTA5CE20 === zip)));
-    if (feat) {
-      const coords = [];
-      const collect = g => {
-        if (!g) return;
-        if (g.type==='Polygon') g.coordinates.forEach(r=>r.forEach(c=>coords.push(c)));
-        else if (g.type==='MultiPolygon') g.coordinates.forEach(p=>p.forEach(r=>r.forEach(c=>coords.push(c))));
-      };
-      collect(feat.geometry);
-      if (coords.length) {
-        const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
-        const bounds = [[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]];
-        map.fitBounds(bounds, {padding:80, maxZoom:13, duration:800});
-        zoomed = true;
+  const finishSelect = () => {
+    const d = zipDataMap[zip];
+    searchInput.value = zip + (d && d.city ? ' — ' + d.city : '');
+    if (selectedZip) { try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false})}catch(e){} }
+    selectedZip = zip;
+    try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:true})}catch(e){}
+    if (zipGeoJSON && zipGeoJSON.features) {
+      const feat = zipGeoJSON.features.find(f => f.id === zip || (f.properties && (f.properties.zip === zip || f.properties.ZCTA5CE20 === zip)));
+      if (feat) {
+        const coords = [];
+        const collect = g => {
+          if (!g) return;
+          if (g.type==='Polygon') g.coordinates.forEach(r=>r.forEach(c=>coords.push(c)));
+          else if (g.type==='MultiPolygon') g.coordinates.forEach(p=>p.forEach(r=>r.forEach(c=>coords.push(c))));
+        };
+        collect(feat.geometry);
+        if (coords.length) {
+          const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
+          const bounds = [[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]];
+          map.fitBounds(bounds, {padding:80, maxZoom:13, duration:800});
+        }
       }
     }
+    setTimeout(() => openZipModal(zip, stateId), 900);
+  };
+  if (stateId && currentZipState !== stateId) {
+    loadZipDataForState(stateId).then(finishSelect);
+  } else {
+    finishSelect();
   }
 }
 
