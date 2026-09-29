@@ -3144,11 +3144,22 @@ function loadMetroData() {
     fetch('/us-metros.geojson').then(r=>r.json()),
     fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_metros?select=region_id,metro,state_id,latest', {
       headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
+    }).then(r=>r.json()),
+    // us_metros_yoy: same materialized-view pattern as us_counties_yoy -- computed server-side
+    // from full history, refreshed on data update. Without this, d.yoy_latest is empty for
+    // every metro until that metro's history is lazily loaded by a click, which is exactly
+    // what made YOY map coloring show nothing and caused the price/YOY state to desync.
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_metros_yoy?select=region_id,zhvi_yoy', {
+      headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
     }).then(r=>r.json())
-  ]).then(([geojson, metros]) => {
+  ]).then(([geojson, metros, yoyRows]) => {
+    const yoyByRid = {};
+    yoyRows.forEach(r => { yoyByRid[r.region_id] = r; });
     METRO_DATA = metros;
     METRO_DATA.forEach(d => {
       d.yoy_latest = d.yoy_latest || {};
+      const yr = yoyByRid[d.region_id];
+      if (yr && yr.zhvi_yoy != null) d.yoy_latest.zhvi_yoy = Number(yr.zhvi_yoy);
       metroDataMap[d.region_id] = d;
     });
     metroDataLoaded = true;
