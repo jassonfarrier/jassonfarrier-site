@@ -1732,28 +1732,59 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
   // payload small (~730KB total vs ~14MB with history). History gets added back in a later
   // pass, fetched lazily per-county on click, once this base layer is confirmed working.
   const _base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,county,state,state_id,latest&order=county';
+  const _yoyBase = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties_yoy?select=fips,zhvi_yoy,active_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy&order=fips';
   const _pageSize = 1000;
   const _pageCount = 4; // 4 * 1000 = 4000, safely covers all 3,073 counties with room to grow
-  Promise.all(
-    Array.from({length: _pageCount}, (_, i) =>
-      fetch(`${_base}&limit=${_pageSize}&offset=${i * _pageSize}`, {headers: _headers}).then(r => r.json())
+  Promise.all([
+    Promise.all(
+      Array.from({length: _pageCount}, (_, i) =>
+        fetch(`${_base}&limit=${_pageSize}&offset=${i * _pageSize}`, {headers: _headers}).then(r => r.json())
+      )
+    ),
+    Promise.all(
+      Array.from({length: _pageCount}, (_, i) =>
+        fetch(`${_yoyBase}&limit=${_pageSize}&offset=${i * _pageSize}`, {headers: _headers}).then(r => r.json())
+      )
     )
-  ).then(pages => {
-    const counties = pages.flat();
+  ]).then(([countyPages, yoyPages]) => {
+    const counties = countyPages.flat();
+    const yoyRows = yoyPages.flat();
     console.log('us_counties loaded:', counties.length, '(expect 3073)');
-    _onCountiesLoaded(counties);
+    console.log('us_counties_yoy loaded:', yoyRows.length, '(expect 3073)');
+    _onCountiesLoaded(counties, yoyRows);
   }).catch(err => {
     document.getElementById('loading').innerHTML = '<div class="ld" style="color:#f87171">Error loading data</div>';
     console.error('us_counties paginated load error:', err);
   });
 })();
 
-function _onCountiesLoaded(counties) {
+function _onCountiesLoaded(counties, yoyRows) {
   DATA = counties;
   // National scale: 3,073 counties, many sharing the same plain name (e.g. dozens of
   // "Washington County"s) — dataMap and FIPS_NAME are keyed by FIPS (unique), never by
   // bare name. FIPS_NAME value carries "County, ST" for disambiguated display.
-  DATA.forEach(d => { dataMap[d.fips] = d; FIPS_NAME[d.fips] = d.county + ', ' + d.state_id; attachYOY(d); });
+  const yoyMap = {};
+  (yoyRows || []).forEach(r => { yoyMap[r.fips] = r; });
+  DATA.forEach(d => {
+    dataMap[d.fips] = d;
+    FIPS_NAME[d.fips] = d.county + ', ' + d.state_id;
+    // attachYOY computes from d.history, which isn't loaded in bulk (kept lazy, per-county,
+    // to avoid the ~14MB initial payload). On first load d.history is absent, so attachYOY
+    // alone leaves every YOY field null nationally. Bulk-fetched us_counties_yoy (a small
+    // materialized view, same pattern as ohio_zips_yoy/ohio_metros_yoy) fills that gap
+    // immediately for map coloring; a later click still lazy-loads full history and
+    // attachYOY re-runs from real history, which will match these precomputed values.
+    attachYOY(d);
+    const yr = yoyMap[d.fips];
+    if (yr) {
+      if (yr.zhvi_yoy != null) d.yoy_latest.zhvi_yoy = Number(yr.zhvi_yoy);
+      if (yr.active_listings_yoy != null) d.yoy_latest.active_listings_yoy = Number(yr.active_listings_yoy);
+      if (yr.pending_listings_yoy != null) d.yoy_latest.pending_listings_yoy = Number(yr.pending_listings_yoy);
+      if (yr.pending_ratio_yoy != null) d.yoy_latest.pending_ratio_yoy = Number(yr.pending_ratio_yoy);
+      if (yr.days_on_market_yoy != null) d.yoy_latest.days_on_market_yoy = Number(yr.days_on_market_yoy);
+      if (yr.price_reduced_pct_yoy != null) d.yoy_latest.price_reduced_pct_yoy = Number(yr.price_reduced_pct_yoy);
+    }
+  });
 
   // Inject metric values into GeoJSON properties via fetch
   fetch('/us-counties.geojson').then(r=>r.json()).then(geojson => {
