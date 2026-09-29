@@ -3611,12 +3611,29 @@ function loadZipDataForState(abbr) {
   zipDataLoaded = false;
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
   const headers = {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY};
+  // PostgREST caps any unpaginated fetch at 1000 rows. OH (1,024 priced zips) happened to
+  // slip under that on the boundary and masked this in initial testing; TX/CA/NY/PA/IL all
+  // exceed it (NY alone has 1,561), which silently truncated ZIP_DATA/zipDataMap to the
+  // first 1000 -- the "of 1000 ZIPs" rank badge and the patchy N/A tiles on the NY map were
+  // both this same bug. Page through in blocks of 1000 like County/Metro's bulk fetches do.
+  function fetchAllPages(baseUrl) {
+    return (async () => {
+      let all = [], offset = 0;
+      while (true) {
+        const page = await fetch(baseUrl + '&limit=1000&offset=' + offset, {headers}).then(r=>r.json());
+        all = all.concat(page);
+        if (page.length < 1000) break;
+        offset += 1000;
+      }
+      return all;
+    })();
+  }
   return Promise.all([
     fetch('/zips/'+abbr+'.geojson').then(r=>r.json()),
-    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,county,metro,latest&state_id=eq.'+abbr, {headers}).then(r=>r.json()),
+    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,county,metro,latest&state_id=eq.'+abbr),
     // us_zips_yoy: same materialized-view pattern as us_counties_yoy/us_metros_yoy --
     // computed server-side from full history, refreshed on data update.
-    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy&state_id=eq.'+abbr, {headers}).then(r=>r.json())
+    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy&state_id=eq.'+abbr)
   ]).then(([geojson, zips, yoyRows]) => {
     const yoyByZip = {};
     yoyRows.forEach(row => { yoyByZip[row.zip] = row; });
