@@ -1245,7 +1245,7 @@ function openModal(fips) {
   if (!d) return;
   selectedCounty = fips;
   const l = d.latest || {};
-  const displayName = d.county + ' County, ' + d.state_id;
+  const displayName = d.county + ', ' + d.state_id;
   document.getElementById('modal-county').textContent = displayName;
   const _utc1 = document.getElementById('ut-county'); if (_utc1) _utc1.textContent = displayName;
   document.getElementById('modal-sub').textContent = '';
@@ -1680,12 +1680,32 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
 });
 
 // Load data + init map
-fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,county,state,state_id,latest,history&order=county', {
-  headers: {
+// us_counties has 3,073 rows — PostgREST caps a single request at 1,000, so this must be
+// paginated (same pattern already used below for ohio_zips' 1,054 rows). Fetch enough pages
+// to safely cover all counties, in parallel, then flatten and verify the count.
+(() => {
+  const _headers = {
     'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI',
     'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI'
-  }
-}).then(r=>r.json()).then(counties => {
+  };
+  const _base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,county,state,state_id,latest,history&order=county';
+  const _pageSize = 1000;
+  const _pageCount = 4; // 4 * 1000 = 4000, safely covers all 3,073 counties with room to grow
+  Promise.all(
+    Array.from({length: _pageCount}, (_, i) =>
+      fetch(`${_base}&limit=${_pageSize}&offset=${i * _pageSize}`, {headers: _headers}).then(r => r.json())
+    )
+  ).then(pages => {
+    const counties = pages.flat();
+    console.log('us_counties loaded:', counties.length, '(expect 3073)');
+    _onCountiesLoaded(counties);
+  }).catch(err => {
+    document.getElementById('loading').innerHTML = '<div class="ld" style="color:#f87171">Error loading data</div>';
+    console.error('us_counties paginated load error:', err);
+  });
+})();
+
+function _onCountiesLoaded(counties) {
   DATA = counties;
   // National scale: 3,073 counties, many sharing the same plain name (e.g. dozens of
   // "Washington County"s) — dataMap and FIPS_NAME are keyed by FIPS (unique), never by
@@ -1850,7 +1870,7 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,
         const _cColor = _cRaw != null && _cRaw < 0 ? '#c0392b' : '#111';
         if (map.getLayer('dc-circles') && map.queryRenderedFeatures(e.point,{layers:['dc-circles']}).length) return;
         popup.setLngLat(e.lngLat).setHTML(`
-          <div class="tt-county">${cd ? cd.county+' County, '+cd.state_id : ''}</div>
+          <div class="tt-county">${cd ? cd.county+', '+cd.state_id : ''}</div>
           <div class="tt-val" style="color:${_cColor}">${fmtVal}</div>
           <div class="tt-label">${METRICS[mapMetric].label}</div>
         `).addTo(map);
@@ -2087,10 +2107,7 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,
       });
     });
   });
-}).catch(err => {
-  document.getElementById('loading').innerHTML = '<div class="ld" style="color:#f87171">Error loading data</div>';
-  console.error(err);
-});
+}
 function paletteForMetric(metric) {
   const isYOY = YOY_METRICS.has(metric);
   if (!isYOY && DANGER_METRICS.has(metric)) return PALETTE_DANGER;
@@ -2922,7 +2939,7 @@ function getTableRows() {
     return Object.values(metroDataMap).map(d => _tableRowFromD(d, d.metro, d.region_id));
   }
   if (mapMode === 'county') {
-    return DATA.map(d => _tableRowFromD(d, d.county + ' County, ' + d.state_id, d.fips));
+    return DATA.map(d => _tableRowFromD(d, d.county + ', ' + d.state_id, d.fips));
   }
   if (mapMode === 'zip') {
     return ZIP_DATA.map(d => _tableRowFromD(d, d.zip + (d.city ? ' — ' + d.city : ''), d.zip));
@@ -3715,7 +3732,7 @@ function doSearch(q) {
     const fips = Object.keys(FIPS_NAME).find(k => FIPS_NAME[k] === name);
     const d = fips ? dataMap[fips] : null;
     const val = d && d.latest && d.latest[mapMetric] != null ? METRICS[mapMetric].fmt(Number(d.latest[mapMetric])) : '';
-    li.innerHTML = `<div>${d ? d.county+' County, '+d.state_id : name}</div><div class="sr-sub">${METRICS[mapMetric].label}${val?' — '+val:''}</div>`;
+    li.innerHTML = `<div>${d ? d.county+', '+d.state_id : name}</div><div class="sr-sub">${METRICS[mapMetric].label}${val?' — '+val:''}</div>`;
     li.addEventListener('click', () => selectCounty(name));
     searchResults.appendChild(li);
   });
@@ -3788,7 +3805,7 @@ function selectMetro(rid) {
 }
 
 function selectCounty(name) {
-  searchInput.value = name + ' County';
+  searchInput.value = name;
   searchResults.style.display = 'none';
   searchClear.style.display = 'block';
   if (!map) return;
@@ -3886,7 +3903,7 @@ document.addEventListener('click', e => {
       Object.keys(FIPS_NAME).filter(fips => FIPS_NAME[fips].toLowerCase().includes(q))
         .slice(0,10).forEach(fips => {
           const cd = dataMap[fips];
-          hits.push({label: cd ? cd.county+' County, '+cd.state_id : FIPS_NAME[fips], action: ()=>{ openModal(fips); inp.value=''; res.style.display='none'; }});
+          hits.push({label: cd ? cd.county+', '+cd.state_id : FIPS_NAME[fips], action: ()=>{ openModal(fips); inp.value=''; res.style.display='none'; }});
         });
     } else if (mapMode === 'metro') {
       Object.values(metroDataMap).filter(d => (d.metro||'').toLowerCase().includes(q))
