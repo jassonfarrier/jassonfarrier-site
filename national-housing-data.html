@@ -1688,7 +1688,10 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
     'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI',
     'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI'
   };
-  const _base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,county,state,state_id,latest,history&order=county';
+  // Scope: current-month Zillow SFH value only for now (no history) — keeps the initial
+  // payload small (~730KB total vs ~14MB with history). History gets added back in a later
+  // pass, fetched lazily per-county on click, once this base layer is confirmed working.
+  const _base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,county,state,state_id,latest&order=county';
   const _pageSize = 1000;
   const _pageCount = 4; // 4 * 1000 = 4000, safely covers all 3,073 counties with room to grow
   Promise.all(
