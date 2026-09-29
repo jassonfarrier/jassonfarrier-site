@@ -633,7 +633,7 @@ function computeEstPayment(zhvi, propertyTaxRatePct, downPct) {
   return pAndI + taxMonthly + insuranceMonthly;
 }
 
-const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
+let FIPS_NAME = {};
 
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null, selectedFips = null;
 let chartSliderStartYr = null, chartSliderEndYr = null, _chartHistoryFull = null, _chartCounty = null, _chartCmetric = null, _chartIsZip = false;
@@ -881,7 +881,7 @@ function renderRankBadge(mode, id, metric) {
       const v = getMetricVal(d, metric);
       if (v != null && !isNaN(v)) {
         vals.push(v);
-        if (d.county === id) targetVal = v;
+        if (d.fips === id) targetVal = v;
       }
     });
     if (targetVal == null || !vals.length) { hide(); return; }
@@ -1060,8 +1060,7 @@ function renderColors(mode) {
       // YOY: set __color per feature (values not in GeoJSON properties)
       if (src && src._data && src._data.features) {
         src._data.features.forEach(f => {
-          const name = f.properties && f.properties.county;
-          const d = name ? dataMap[name] : null;
+          const d = dataMap[f.id];
           const val = d ? getMetricVal(d, metric) : null;
           f.properties.__color = yoyQuantileColor(vals, val, metric);
           f.properties.__label = val != null ? val.toFixed(1)+'%' : '';
@@ -1075,8 +1074,7 @@ function renderColors(mode) {
       // interpolate on ['get', metric] won't work for either.
       if (src && src._data && src._data.features) {
         src._data.features.forEach(f => {
-          const name = f.properties && f.properties.county;
-          const d = name ? dataMap[name] : null;
+          const d = dataMap[f.id];
           const val = d ? getMetricVal(d, metric) : null;
           f.properties.__color = colorFromStops(stops, val);
           f.properties.__label = val == null ? '' : isPayment
@@ -1242,15 +1240,16 @@ function setPendingRatioBadge(val) {
   }
 }
 
-function openModal(county) {
-  const d = dataMap[county];
+function openModal(fips) {
+  const d = dataMap[fips];
   if (!d) return;
-  selectedCounty = county;
+  selectedCounty = fips;
   const l = d.latest || {};
-  document.getElementById('modal-county').textContent = county + ' County';
-  const _utc1 = document.getElementById('ut-county'); if (_utc1) _utc1.textContent = county + ' County';
+  const displayName = d.county + ' County, ' + d.state_id;
+  document.getElementById('modal-county').textContent = displayName;
+  const _utc1 = document.getElementById('ut-county'); if (_utc1) _utc1.textContent = displayName;
   document.getElementById('modal-sub').textContent = '';
-  setAttrHeader(['County: ' + county, 'State: Ohio'], mapMetric);
+  setAttrHeader(['County: ' + d.county, 'State: ' + d.state], mapMetric);
   (document.getElementById('s-zhvi')||{}).textContent = fmt$(l.zhvi);
   (document.getElementById('s-active')||{}).textContent = fmtN(l.active_listings);
   (document.getElementById('s-pending')||{}).textContent = fmtN(l.pending_listings);
@@ -1259,19 +1258,19 @@ function openModal(county) {
   (document.getElementById('s-ptax')||{}).textContent = l.median_property_tax ? '$'+Math.round(l.median_property_tax).toLocaleString() : '—';
   (document.getElementById('s-ptaxrate')||{}).textContent = l.property_tax_rate != null ? l.property_tax_rate.toFixed(2)+'%' : '—';
     const sorted = [...DATA].filter(c=>c.latest&&c.latest.zhvi!=null).sort((a,b)=>b.latest.zhvi-a.latest.zhvi);
-  const rank = sorted.findIndex(c=>c.county===county)+1;
+  const rank = sorted.findIndex(c=>c.fips===fips)+1;
   (document.getElementById('s-rank')||{}).textContent = rank>0 ? '#'+rank+' of '+sorted.length : '—';
   setPendingRatioBadge(l.pending_ratio);
   // Default chart to current map metric
   const defaultMetric = mapMetric;
-  renderRankBadge('county', county, defaultMetric);
+  renderRankBadge('county', fips, defaultMetric);
   document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
   const activeTab = document.querySelector(`.chart-tab[data-cmetric="${defaultMetric}"]`);
   if (activeTab) activeTab.classList.add('active');
   else document.querySelector('.chart-tab[data-cmetric="zhvi"]').classList.add('active');
   chartMetric = defaultMetric;
   document.getElementById('modal-overlay').classList.add('visible');
-  setTimeout(() => renderChart(county, defaultMetric), 30);
+  setTimeout(() => renderChart(fips, defaultMetric), 30);
 }
 
 function drawLineChart(county, cmetric) {
@@ -1539,16 +1538,17 @@ function renderGrowthChart(name, cmetric, d, isZip) {
 
 function renderChart(county, cmetric) {
   const d = dataMap[county];
-  if (GROWTH_METRICS.has(cmetric)) { renderGrowthChart(county, cmetric, d, false); return; }
+  const displayName = d ? d.county + ', ' + d.state_id : county;
+  if (GROWTH_METRICS.has(cmetric)) { renderGrowthChart(displayName, cmetric, d, true); return; }
   if (TAX_YOY.has(cmetric)) {
     // Annual ACS-based YOY — use annual bar chart with YOY rows
     const yoyRows = getYOYRows(d, cmetric).map(r => ({...r, date: r.date || ''}));
-    drawAnnualBarChart(county, cmetric, yoyRows, false);
+    drawAnnualBarChart(displayName, cmetric, yoyRows, true);
   } else if (YOY_METRICS.has(cmetric)) {
-    drawMonthlyBarChart(county, cmetric, getYOYRows(d, cmetric), false);
+    drawMonthlyBarChart(displayName, cmetric, getYOYRows(d, cmetric), true);
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
     const taxHist = (d && d.prop_tax_history || []).map(r => ({...r, date: r.year + '-06'}));
-    drawAnnualBarChart(county, cmetric, taxHist, false);
+    drawAnnualBarChart(displayName, cmetric, taxHist, true);
   } else if (PAYMENT_METRICS.has(cmetric)) {
     if (!nationalRatesLoaded) {
       loadNationalRates();
@@ -1565,18 +1565,18 @@ function renderChart(county, cmetric) {
     const taxRateByYear = {};
     (d && d.prop_tax_history || []).forEach(r => { taxRateByYear[r.year] = r.property_tax_rate; });
     const paymentHist = buildPaymentHist(zhviByYear, taxRateByYear, downPct, cmetric);
-    drawAnnualBarChart(county, cmetric, paymentHist, false);
+    drawAnnualBarChart(displayName, cmetric, paymentHist, true);
   } else if (NEW_CONSTRUCTION_METRICS.has(cmetric)) {
     const ncField = cmetric === 'new_construction_price' ? 'median_price' : 'median_sqft';
     const ncHist = (d && d.new_construction_history || [])
       .filter(r => r[ncField] != null)
       .map(r => ({date: r.period, [cmetric]: r[ncField]}));
-    drawMonthlyBarChart(county, cmetric, ncHist, false);
+    drawMonthlyBarChart(displayName, cmetric, ncHist, true);
   } else if (cmetric === 'sf_permits_per_1k' || cmetric === 'mf_permits_per_1k' || cmetric === 'total_permits_per_1k') {
     const field = cmetric === 'sf_permits_per_1k' ? 'sf_per_1k' : cmetric === 'mf_permits_per_1k' ? 'mf_per_1k' : 'total_per_1k';
     const doRenderPermit = (ph) => {
       const rows = ph.map(r => ({...r, [cmetric]: r[field], date: r.year + '-06'}));
-      drawMonthlyBarChart(county, cmetric, rows, false);
+      drawMonthlyBarChart(displayName, cmetric, rows, true);
     };
     if (d.permit_history) {
       doRenderPermit(d.permit_history);
@@ -1610,8 +1610,7 @@ function renderChart(county, cmetric) {
         })
         .filter(r => r.val != null);
       if (!rows.length) return;
-      const suffix = ' County';
-      document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + suffix;
+      document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + displayName;
       const utm = document.getElementById('ut-metric'); if (utm) utm.textContent = METRICS[cmetric].label;
       const lsvg = d3.select('#line-chart');
       lsvg.selectAll('*').remove();
@@ -1664,9 +1663,9 @@ function renderChart(county, cmetric) {
       });
     }
   } else if (cmetric === 'zhvi' || cmetric === 'median_list_price' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct') {
-    drawAnnualLineChart(county, cmetric);
+    drawAnnualLineChart(displayName, cmetric, d && d.history, true);
   } else {
-    drawMonthlyBarChart(county, cmetric);
+    drawMonthlyBarChart(displayName, cmetric, d && d.history, true);
   }
 }
 
@@ -1681,25 +1680,30 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
 });
 
 // Load data + init map
-fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fips,county,latest,history,prop_tax_history,distress_history,new_construction_history&order=county', {
+fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,county,state,state_id,latest,history&order=county', {
   headers: {
     'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI',
     'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI'
   }
 }).then(r=>r.json()).then(counties => {
   DATA = counties;
-  DATA.forEach(d => { dataMap[d.county] = d; attachYOY(d); });
+  // National scale: 3,073 counties, many sharing the same plain name (e.g. dozens of
+  // "Washington County"s) — dataMap and FIPS_NAME are keyed by FIPS (unique), never by
+  // bare name. FIPS_NAME value carries "County, ST" for disambiguated display.
+  DATA.forEach(d => { dataMap[d.fips] = d; FIPS_NAME[d.fips] = d.county + ', ' + d.state_id; attachYOY(d); });
 
   // Inject metric values into GeoJSON properties via fetch
-  fetch('/ohio-counties.json').then(r=>r.json()).then(geojson => {
-    // Attach all metric values to each feature
+  fetch('/us-counties.geojson').then(r=>r.json()).then(geojson => {
+    // Attach all metric values to each feature. f.id is the FIPS code (from the geojson
+    // itself) — the only lookup key used here; f.properties.county stays the plain short
+    // name purely for the on-map text label (duplicate label text across the country is
+    // fine, it's positioned per-polygon).
     geojson.features.forEach(f => {
-      const name = FIPS_NAME[f.id];
-      const d = name && dataMap[name];
+      const d = dataMap[f.id];
       if (d && d.latest) {
         const zhvi = d.latest.zhvi;
         const lbl = zhvi >= 1000000 ? '$'+(zhvi/1000000).toFixed(1)+'M' : zhvi >= 1000 ? '$'+Math.round(zhvi/1000)+'K' : zhvi ? '$'+Math.round(zhvi) : '';
-        Object.assign(f.properties, d.latest, d.yoy_latest || {}, {county: name, __label: lbl});
+        Object.assign(f.properties, d.latest, d.yoy_latest || {}, {county: d.county, __label: lbl});
       }
     });
 
@@ -1793,33 +1797,8 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
       });
       renderColors('county');
 
-      // Outside-Ohio dark overlay — inverse mask using world bbox
-
-
-      fetch('/ohio-state.geojson').then(r=>r.json()).then(ohioGeo => {
-        // Build inverse: world rectangle with Ohio as a hole
-        const ohioCoords = ohioGeo.features[0].geometry.coordinates;
-        const worldRing = [[-180,-90],[180,-90],[180,90],[-180,90],[-180,-90]];
-        map.addSource('outside-ohio', {
-          type: 'geojson',
-          data: {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [worldRing, ...ohioCoords]
-            }
-          }
-        });
-        map.addLayer({
-          id: 'outside-ohio-mask',
-          type: 'fill',
-          source: 'outside-ohio',
-          paint: {
-            'fill-color': '#1a1a2e',
-            'fill-opacity': 0.45
-          }
-        }, 'counties-fill');  // insert BELOW data layers so mouse events pass through
-      });
+      // No "outside Ohio" dark mask on this page — County mode is national now,
+      // every state has real county data, nothing outside it to grey out.
 
       document.getElementById('loading').style.display='none';
       // ---- DATA CENTERS ----
@@ -1859,9 +1838,10 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
         if (hoveredId !== null) map.setFeatureState({source:'ohio-counties',id:hoveredId},{hover:false});
         hoveredId = f.id;
         map.setFeatureState({source:'ohio-counties',id:hoveredId},{hover:true});
-        const name = f.properties.county;
+        const fips = f.id;
+        const cd = dataMap[fips];
         let fmtVal;
-        const _cRaw = getMetricVal(dataMap[name], mapMetric);
+        const _cRaw = getMetricVal(cd, mapMetric);
         if (YOY_METRICS.has(mapMetric)) {
           fmtVal = f.properties.__label || 'N/A';
         } else {
@@ -1870,7 +1850,7 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
         const _cColor = _cRaw != null && _cRaw < 0 ? '#c0392b' : '#111';
         if (map.getLayer('dc-circles') && map.queryRenderedFeatures(e.point,{layers:['dc-circles']}).length) return;
         popup.setLngLat(e.lngLat).setHTML(`
-          <div class="tt-county">${name} County</div>
+          <div class="tt-county">${cd ? cd.county+' County, '+cd.state_id : ''}</div>
           <div class="tt-val" style="color:${_cColor}">${fmtVal}</div>
           <div class="tt-label">${METRICS[mapMetric].label}</div>
         `).addTo(map);
@@ -1888,12 +1868,12 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
         if (mapMode !== 'county') return;
         if (!e.features.length) return;
         const f = e.features[0];
-        const name = f.properties.county;
-        if (!name) return;
+        const fips = f.id;
+        if (!fips) return;
         if (selectedFips) map.setFeatureState({source:'ohio-counties',id:selectedFips},{selected:false});
-        selectedFips = f.id;
+        selectedFips = fips;
         map.setFeatureState({source:'ohio-counties',id:selectedFips},{selected:true});
-        openModal(name);
+        openModal(fips);
       });
 
       // --- ZIP layers (hidden until ZIP mode) ---
@@ -2699,7 +2679,8 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
   });
   const rows = Object.keys(byYear).sort().map(yr => ({year: yr, val: byYear[yr][cmetric]}));
 
-  document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + ' County (Annual · June)';
+  const _abSuffix = isZip ? '' : ' County';
+  document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + _abSuffix + ' (Annual · June)';
   const _utm3 = document.getElementById('ut-metric'); if (_utm3) _utm3.textContent = METRICS[cmetric].label;
 
   const lsvg = d3.select('#line-chart');
@@ -2941,7 +2922,7 @@ function getTableRows() {
     return Object.values(metroDataMap).map(d => _tableRowFromD(d, d.metro, d.region_id));
   }
   if (mapMode === 'county') {
-    return Object.entries(dataMap).map(([county, d]) => _tableRowFromD(d, county + ' County', county));
+    return DATA.map(d => _tableRowFromD(d, d.county + ' County, ' + d.state_id, d.fips));
   }
   if (mapMode === 'zip') {
     return ZIP_DATA.map(d => _tableRowFromD(d, d.zip + (d.city ? ' — ' + d.city : ''), d.zip));
@@ -2951,7 +2932,7 @@ function getTableRows() {
 
 function renderTable() {
   const modeLabel = {state:'State', metro:'Metros', county:'Counties', zip:'ZIP Codes'};
-  const titlePrefix = mapMode === 'state' ? 'US ' : 'Ohio ';
+  const titlePrefix = (mapMode === 'state' || mapMode === 'county') ? 'US ' : 'Ohio ';
   document.getElementById('table-title').textContent =
     titlePrefix + (modeLabel[mapMode]||'') + ' — All Metrics (Current Month)  ·  Click a row to open detail';
 
@@ -3666,7 +3647,7 @@ function _doRenderZipChart(zip, cmetric) {
 const searchInput = document.getElementById('search-input');
 const searchResults = document.getElementById('search-results');
 const searchClear = document.getElementById('search-clear');
-const COUNTY_NAMES = Object.values(FIPS_NAME).sort();
+function getCountyNames() { return Object.values(FIPS_NAME).sort(); }
 
 function showZipResults(raw) {
   searchResults.innerHTML = '';
@@ -3724,15 +3705,17 @@ function doSearch(q) {
 
   // County search (no mode switch until selection)
   const ql = raw.toLowerCase();
+  const COUNTY_NAMES = getCountyNames();
   const matches = COUNTY_NAMES.filter(n => n.toLowerCase().startsWith(ql))
     .concat(COUNTY_NAMES.filter(n => !n.toLowerCase().startsWith(ql) && n.toLowerCase().includes(ql)))
     .slice(0, 8);
   if (!matches.length) { searchResults.style.display='none'; return; }
   matches.forEach(name => {
     const li = document.createElement('li');
-    const d = dataMap[name];
+    const fips = Object.keys(FIPS_NAME).find(k => FIPS_NAME[k] === name);
+    const d = fips ? dataMap[fips] : null;
     const val = d && d.latest && d.latest[mapMetric] != null ? METRICS[mapMetric].fmt(Number(d.latest[mapMetric])) : '';
-    li.innerHTML = `<div>${name} County</div><div class="sr-sub">${METRICS[mapMetric].label}${val?' — '+val:''}</div>`;
+    li.innerHTML = `<div>${d ? d.county+' County, '+d.state_id : name}</div><div class="sr-sub">${METRICS[mapMetric].label}${val?' — '+val:''}</div>`;
     li.addEventListener('click', () => selectCounty(name));
     searchResults.appendChild(li);
   });
@@ -3900,9 +3883,10 @@ document.addEventListener('click', e => {
         hits.push({label: d.zip + (d.city ? ' — '+d.city : ''), action: ()=>{ openZipModal(d.zip); updateMapSelection('zip', d.zip); inp.value=''; res.style.display='none'; }});
       });
     } else if (mapMode === 'county') {
-      Object.keys(dataMap).filter(c => c.toLowerCase().includes(q))
-        .slice(0,10).forEach(c => {
-          hits.push({label: c+' County', action: ()=>{ openModal(c); inp.value=''; res.style.display='none'; }});
+      Object.keys(FIPS_NAME).filter(fips => FIPS_NAME[fips].toLowerCase().includes(q))
+        .slice(0,10).forEach(fips => {
+          const cd = dataMap[fips];
+          hits.push({label: cd ? cd.county+' County, '+cd.state_id : FIPS_NAME[fips], action: ()=>{ openModal(fips); inp.value=''; res.style.display='none'; }});
         });
     } else if (mapMode === 'metro') {
       Object.values(metroDataMap).filter(d => (d.metro||'').toLowerCase().includes(q))
