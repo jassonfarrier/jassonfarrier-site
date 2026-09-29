@@ -1538,6 +1538,27 @@ function renderGrowthChart(name, cmetric, d, isZip) {
 
 function renderChart(county, cmetric) {
   const d = dataMap[county];
+  // County history is intentionally NOT in the initial national fetch (all 3,073 counties'
+  // full history would be ~14MB — that's what broke the page before). Instead it's fetched
+  // lazily, per-county, only when that county's chart is actually opened — same pattern
+  // already used below for permit_history / distress_history.
+  if (d && !d.history && !d._historyLoading) {
+    d._historyLoading = true;
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,history&fips=eq.' + d.fips, {
+      headers: {
+        'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI',
+        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI'
+      }
+    }).then(r => r.json()).then(rows => {
+      d._historyLoading = false;
+      if (rows[0] && rows[0].history) {
+        d.history = rows[0].history;
+        attachYOY(d);
+      }
+      renderChart(county, cmetric);
+    }).catch(err => { d._historyLoading = false; console.error('County history load error:', err); });
+    return;
+  }
   const displayName = d ? d.county + ', ' + d.state_id : county;
   if (GROWTH_METRICS.has(cmetric)) { renderGrowthChart(displayName, cmetric, d, true); return; }
   if (TAX_YOY.has(cmetric)) {
