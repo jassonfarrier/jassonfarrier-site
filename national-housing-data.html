@@ -1002,7 +1002,9 @@ function renderColors(mode) {
 
   if (mode === 'state') {
     if (!nationalStatesLoaded) { loadNationalStatesData(); return; }
-    if (metric !== 'zhvi' || !NATIONAL_STATES.length) {
+    if (!NATIONAL_STATES.length) { drawLegend([], palette); return; }
+    const nVals = NATIONAL_STATES.map(d => getMetricVal(d, metric)).filter(v => v != null).sort((a,b)=>a-b);
+    if (!nVals.length) {
       try { map.setPaintProperty('state-fill', 'fill-color', '#ccc'); } catch(e) {}
       if (nationalStateGeoJSON) {
         nationalStateGeoJSON.features.forEach(f => { f.properties.__color = '#ccc'; f.properties.__label = ''; });
@@ -1011,16 +1013,28 @@ function renderColors(mode) {
       drawLegend([], palette);
       return;
     }
-    const nVals = NATIONAL_STATES.map(d => d.latest && d.latest.zhvi != null ? Number(d.latest.zhvi) : null).filter(v => v != null).sort((a,b)=>a-b);
-    if (!nVals.length) return;
     const nStops = quantileStops(nVals, palette);
     if (nationalStateGeoJSON) {
       nationalStateGeoJSON.features.forEach(f => {
         const name = f.properties && f.properties.name;
         const d = name ? nationalStatesMap[name] : null;
-        const val = d && d.latest && d.latest.zhvi != null ? Number(d.latest.zhvi) : null;
-        f.properties.__color = colorFromStops(nStops, val);
-        f.properties.__label = val == null ? '' : (val >= 1000000 ? '$'+(val/1000000).toFixed(1)+'M' : '$'+Math.round(val/1000)+'K');
+        const val = d ? getMetricVal(d, metric) : null;
+        f.properties.__color = isYOY ? yoyQuantileColor(nVals, val, metric) : colorFromStops(nStops, val);
+        if (val == null) { f.properties.__label = ''; return; }
+        const n = Number(val);
+        if (metric === 'zhvi' || metric === 'zhvi_condo' || metric === 'median_list_price' || metric === 'median_property_tax') {
+          f.properties.__label = n >= 1000000 ? '$'+(n/1000000).toFixed(1)+'M' : '$'+Math.round(n/1000)+'K';
+        } else if (isYOY) {
+          f.properties.__label = n.toFixed(1)+'%';
+        } else if (metric === 'pending_ratio') {
+          f.properties.__label = (n*100).toFixed(1)+'%';
+        } else if (metric === 'property_tax_rate' || metric === 'price_reduced_pct') {
+          f.properties.__label = n.toFixed(1)+'%';
+        } else if (isPayment) {
+          f.properties.__label = '$'+(n/1000).toFixed(1)+'K';
+        } else {
+          f.properties.__label = METRICS[metric] ? METRICS[metric].fmt(n) : String(n);
+        }
       });
       map.getSource('us-states').setData(nationalStateGeoJSON);
       try { map.setPaintProperty('state-fill', 'fill-color', ['coalesce', ['get', '__color'], '#ccc']); } catch(e) {}
@@ -1981,12 +1995,13 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
         const sf = e.features[0];
         const sName = (sf.properties && sf.properties.name) || '';
         const sd = sName ? nationalStatesMap[sName] : null;
-        const sVal = sd && sd.latest && sd.latest.zhvi != null ? Number(sd.latest.zhvi) : null;
-        const sFmt = sVal != null ? fmt$(sVal) : 'N/A';
+        const sVal = sd ? getMetricVal(sd, mapMetric) : null;
+        const sFmt = sVal != null ? METRICS[mapMetric].fmt(sVal) : 'N/A';
+        const _sColor = sVal != null && sVal < 0 ? '#c0392b' : '#111';
         popup.setLngLat(e.lngLat).setHTML(`
           <div class="tt-county">${sName}</div>
-          <div class="tt-val" style="color:#111">${sFmt}</div>
-          <div class="tt-label">SFH Home Value</div>
+          <div class="tt-val" style="color:${_sColor}">${sFmt}</div>
+          <div class="tt-label">${METRICS[mapMetric].label}</div>
         `).addTo(map);
       });
       map.on('mouseleave','state-fill', () => {
@@ -3205,7 +3220,7 @@ function loadNationalStatesData() {
     nationalStateGeoJSON = geojson;
     NATIONAL_STATES = rows || [];
     nationalStatesMap = {};
-    NATIONAL_STATES.forEach(d => { nationalStatesMap[d.state] = d; });
+    NATIONAL_STATES.forEach(d => { attachYOY(d); nationalStatesMap[d.state] = d; });
     nationalStatesLoaded = true;
     renderColors('state');
   }).catch(err => console.error('National states data load error:', err));
@@ -3308,20 +3323,20 @@ function openNationalStateModal(name) {
   document.getElementById('modal-sub').textContent = '';
   setAttrHeader(['State: ' + name], 'zhvi');
   (document.getElementById('s-zhvi')||{}).textContent = l.zhvi ? fmt$(l.zhvi) : '—';
-  (document.getElementById('s-active')||{}).textContent = '—';
-  (document.getElementById('s-pending')||{}).textContent = '—';
-  (document.getElementById('s-dom')||{}).textContent = '—';
-  (document.getElementById('s-pct')||{}).textContent = '—';
+  (document.getElementById('s-active')||{}).textContent = l.active_listings ? fmtN(l.active_listings) : '—';
+  (document.getElementById('s-pending')||{}).textContent = l.pending_listings ? fmtN(l.pending_listings) : '—';
+  (document.getElementById('s-dom')||{}).textContent = l.days_on_market != null ? l.days_on_market+'d' : '—';
+  (document.getElementById('s-pct')||{}).textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
   (document.getElementById('s-ptax')||{}).textContent = '—';
   (document.getElementById('s-ptaxrate')||{}).textContent = '—';
   (document.getElementById('s-rank')||{}).textContent = 'Statewide';
   { const s = document.querySelector('.upper-third-rank-section'); if (s) s.style.display = 'none'; }
-  setPendingRatioBadge(null);
+  setPendingRatioBadge(l.pending_ratio);
   document.getElementById('modal-overlay').classList.add('visible');
   setTimeout(() => {
     document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
-    document.querySelector('.chart-tab[data-cmetric="zhvi"]')?.classList.add('active');
-    renderStateChart(name, 'zhvi', d);
+    document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
+    renderStateChart(name, mapMetric, d);
   }, 30);
 }
 
