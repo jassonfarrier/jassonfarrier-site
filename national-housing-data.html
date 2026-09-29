@@ -1784,7 +1784,7 @@ function _onCountiesLoaded(counties) {
     map.on('load', () => {
       // Outside-Ohio dark overlay — added after all Ohio layers at end of load
 
-      map.addSource('ohio-counties', { type:'geojson', data: geojson });
+      map.addSource('ohio-counties', { type:'geojson', data: geojson, promoteId: 'fips' });
 
       const vals = DATA.map(d=>d.latest&&d.latest.zhvi).filter(v=>v!=null).sort((a,b)=>a-b);
       const mn = vals[0], mx = vals[vals.length-1];
