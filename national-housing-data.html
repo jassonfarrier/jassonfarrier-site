@@ -1240,9 +1240,28 @@ function setPendingRatioBadge(val) {
   }
 }
 
-function openModal(fips) {
+function openModal(fips, fallbackName) {
   const d = dataMap[fips];
-  if (!d) return;
+  if (!d) {
+    // County exists on the map but has no Zillow/Realtor.com data (mostly very rural
+    // counties, unorganized AK boroughs/census areas, and Puerto Rico municipios).
+    // Show an honest "no data" state instead of silently doing nothing.
+    selectedCounty = fips;
+    const noDataName = fallbackName || fips;
+    document.getElementById('modal-county').textContent = noDataName;
+    const _utcNo = document.getElementById('ut-county'); if (_utcNo) _utcNo.textContent = noDataName;
+    document.getElementById('modal-sub').textContent = 'No data available for this county';
+    setAttrHeader(['No Zillow/Realtor.com coverage for this county'], mapMetric);
+    ['s-zhvi','s-active','s-pending','s-dom','s-pct','s-ptax','s-ptaxrate','s-rank'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = '—';
+    });
+    setPendingRatioBadge(null);
+    document.getElementById('chart-label').textContent = 'No historical data available';
+    const lsvgNo = document.getElementById('line-chart'); if (lsvgNo) lsvgNo.innerHTML = '';
+    const rb = document.getElementById('rank-badge'); if (rb) rb.style.display = 'none';
+    document.getElementById('modal-overlay').classList.add('visible');
+    return;
+  }
   selectedCounty = fips;
   const l = d.latest || {};
   const displayName = d.county + ', ' + d.state_id;
@@ -1917,7 +1936,7 @@ function _onCountiesLoaded(counties) {
         if (selectedFips) map.setFeatureState({source:'ohio-counties',id:selectedFips},{selected:false});
         selectedFips = fips;
         map.setFeatureState({source:'ohio-counties',id:selectedFips},{selected:true});
-        openModal(fips);
+        openModal(fips, f.properties && f.properties.name);
       });
 
       // --- ZIP layers (hidden until ZIP mode) ---
