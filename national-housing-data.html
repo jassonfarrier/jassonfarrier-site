@@ -1004,6 +1004,10 @@ function renderColors(mode) {
     if (!nationalStatesLoaded) { loadNationalStatesData(); return; }
     if (metric !== 'zhvi' || !NATIONAL_STATES.length) {
       try { map.setPaintProperty('state-fill', 'fill-color', '#ccc'); } catch(e) {}
+      if (nationalStateGeoJSON) {
+        nationalStateGeoJSON.features.forEach(f => { f.properties.__color = '#ccc'; f.properties.__label = ''; });
+        map.getSource('us-states').setData(nationalStateGeoJSON);
+      }
       drawLegend([], palette);
       return;
     }
@@ -1941,6 +1945,31 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
         paint:{'line-color':'rgba(0,0,0,0.4)','line-width':1.2}});
       map.addLayer({id:'state-border-hover',type:'line',source:'us-states',layout:{visibility:'none'},
         paint:{'line-color':'#000','line-width':['case',['boolean',['feature-state','hover'],false],3,0]}});
+
+      // National state label — name + metric value, centered in each state. No minzoom
+      // restriction (unlike county labels): states are large enough to read at any zoom,
+      // and the whole point of this view is seeing every state's value at once.
+      map.addLayer({
+        id: 'state-labels',
+        type: 'symbol',
+        source: 'us-states',
+        layout: {
+          visibility: 'none',
+          'text-field': ['concat', ['get','name'], '\n', ['coalesce',['get','__label'],'']],
+          'text-size': ['interpolate',['linear'],['zoom'], 3,10, 5,14, 7,20, 9,26],
+          'text-font': ['DIN Pro Bold','Arial Unicode MS Bold'],
+          'text-anchor': 'center',
+          'text-max-width': 7,
+          'text-line-height': 1.2,
+          'text-allow-overlap': false,
+          'text-ignore-placement': false,
+        },
+        paint: {
+          'text-color': '#111',
+          'text-halo-color': 'rgba(255,255,255,0.85)',
+          'text-halo-width': 2,
+        }
+      });
 
       // National state hover + click
       map.on('mousemove','state-fill', e => {
@@ -2995,7 +3024,7 @@ function setMode(mode) {
   const countyLayers = ['counties-fill','counties-border','counties-border-hover','counties-border-selected','counties-labels'];
   const zipLayers = ['zips-fill','zips-border','zips-border-hover','zips-border-selected','zips-labels','counties-outline-zipmode'];
   const metroLayers = ['metros-fill','metros-border','metros-border-hover','metros-border-selected','metros-labels'];
-  const stateLayers = ['state-fill','state-border','state-border-hover'];
+  const stateLayers = ['state-fill','state-border','state-border-hover','state-labels'];
 
   countyLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='county'?'visible':'none')}catch(e){} });
   zipLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='zip'?'visible':'none')}catch(e){} });
