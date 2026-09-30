@@ -270,12 +270,11 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="zhvi">SFH Home Value</option>
     <option value="median_list_price">Median List Price</option>
     <option value="zhvi_yoy">SFH Home Value YOY %</option>
-    <option value="zhvi_growth_5y">SFH Value 5-Yr Growth</option>
-    <option value="zhvi_growth_10y">SFH Value 10-Yr Growth</option>
     <option value="zhvi_condo">Condo Home Value</option>
     <option value="zhvi_condo_yoy">Condo Home Value YOY %</option>
     <option value="active_listings">Active Listings</option>
     <option value="active_listings_yoy">Active Listings YOY %</option>
+    <option value="new_listings">New Listings</option>
     <option value="pending_listings">Pending Sales</option>
     <option value="pending_listings_yoy">Pending Sales YOY %</option>
     <option value="pending_ratio">Pending Ratio</option>
@@ -284,16 +283,6 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="days_on_market_yoy">Days on Market YOY %</option>
     <option value="price_reduced_pct">Price Cut %</option>
     <option value="price_reduced_pct_yoy">Price Cut % YOY</option>
-    <option value="est_payment_20">Est. Payment (20% Down)</option>
-    <option value="median_property_tax">Property Tax</option>
-    <option value="median_property_tax_yoy">Property Tax YOY %</option>
-    <option value="property_tax_rate">Tax Rate</option>
-    <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
-    <option value="sf_permits_per_1k">SF Permits / 1K</option>
-    <option value="mf_permits_per_1k">MF Permits / 1K</option>
-    <option value="total_permits_per_1k">Total Permits / 1K</option>
-    <option value="new_construction_price">New Construction Median Price</option>
-    <option value="new_construction_sqft">New Construction $/SqFt</option>
   </select>
 </div>
 <div class="main">
@@ -307,16 +296,12 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn active" data-metric="zhvi"><span class="mn">SFH Home Value</span><span class="md">Zillow ZHVI single-family</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="median_list_price"><span class="mn">Median List Price</span><span class="md">Realtor.com asking price</span><a class="metric-help" href="/ohio-housing-data-methodology#median-list-price" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="zhvi_yoy"><span class="mn">SFH Home Value YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="zhvi_growth_5y"><span class="mn">SFH Value 5-Yr Growth</span><span class="md">% change over 5 years</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-growth" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="zhvi_growth_10y"><span class="mn">SFH Value 10-Yr Growth</span><span class="md">% change over 10 years</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-growth" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="zhvi_condo"><span class="mn">Condo Home Value</span><span class="md">Zillow ZHVI condo/co-op</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="zhvi_condo_yoy"><span class="mn">Condo Home Value YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Supply</div>
     <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Single-family permits per 1,000 residents</span></button>
-    <button class="metric-btn" data-metric="mf_permits_per_1k"><span class="mn">MF Permits / 1K</span><span class="md">Multifamily permits per 1,000 residents</span></button>
-    <button class="metric-btn" data-metric="total_permits_per_1k"><span class="mn">Total Permits / 1K</span><span class="md">All permits per 1,000 residents</span></button>
+    <button class="metric-btn" data-metric="new_listings"><span class="mn">New Listings</span><span class="md">New listings this month · Realtor.com</span></button>
     <button class="metric-btn" data-metric="delisted_pct"><span class="mn">Delisted %</span><span class="md">% of listings pulled off market · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#delisted-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Demand</div>
     <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-sales" target="_blank" onclick="event.stopPropagation()">?</a></button>
@@ -329,25 +314,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn yoy-btn" data-metric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#price-cut-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">% of pending sales cancelled · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Affordability</div>
-    <button class="metric-btn" data-metric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">P&amp;I + tax + insurance · illustration only</span><a class="metric-help" href="/ohio-housing-data-methodology#est-payment" target="_blank" onclick="event.stopPropagation()">?</a></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Taxes</div>
-    <button class="metric-btn" data-metric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-rate" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-rate-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">New Construction</div>
-    <button class="metric-btn" data-metric="new_construction_price"><span class="mn">New Construction Median Price</span><span class="md">MLS closed sales, trailing 12mo · county/zip only</span><a class="metric-help" href="/ohio-housing-data-methodology#new-construction" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="new_construction_sqft"><span class="mn">New Construction $/SqFt</span><span class="md">MLS closed sales, trailing 12mo · county/zip only</span><a class="metric-help" href="/ohio-housing-data-methodology#new-construction" target="_blank" onclick="event.stopPropagation()">?</a></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Distress</div>
-    <button class="metric-btn" data-metric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">Tax delinquent properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">Tax delinquent as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="pre_fc"><span class="mn">Pre-Foreclosure</span><span class="md">Properties in pre-foreclosure</span><a class="metric-help" href="/ohio-housing-data-methodology#pre-foreclosure" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="pre_fc_pct"><span class="mn">Pre-Foreclosure %</span><span class="md">Pre-foreclosure as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#pre-foreclosure-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="upside_down"><span class="mn">Underwater</span><span class="md">Properties with negative equity</span><a class="metric-help" href="/ohio-housing-data-methodology#underwater" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="upside_down_pct"><span class="mn">Underwater %</span><span class="md">Underwater as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#underwater-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <hr>
-    <div style="padding:6px 3px 0;"><label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;font-family:Montserrat,sans-serif"><input type="checkbox" id="dc-toggle" style="cursor:pointer;accent-color:#0d1e42"> Data Centers</label></div>
 
     <div class="src" style="margin-top:auto;font-size:9px;color:rgba(0,0,0,0.35);line-height:1.6;padding-top:12px;border-top:1px solid rgba(0,0,0,0.07)">
       <img src="/fair-housing.webp" alt="Equal Housing Opportunity" style="width:24px;height:auto;opacity:0.5;filter:invert(0.4);display:block;margin-bottom:6px;">
@@ -419,12 +386,11 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="zhvi">SFH Home Value</option>
           <option value="median_list_price">Median List Price</option>
           <option value="zhvi_yoy">SFH Home Value YOY %</option>
-    <option value="zhvi_growth_5y">SFH Value 5-Yr Growth</option>
-    <option value="zhvi_growth_10y">SFH Value 10-Yr Growth</option>
           <option value="zhvi_condo">Condo Home Value</option>
           <option value="zhvi_condo_yoy">Condo Home Value YOY %</option>
           <option value="active_listings">Active Listings</option>
           <option value="active_listings_yoy">Active Listings YOY %</option>
+          <option value="new_listings">New Listings</option>
           <option value="pending_listings">Pending Sales</option>
           <option value="pending_listings_yoy">Pending Sales YOY %</option>
           <option value="pending_ratio">Pending Ratio</option>
@@ -435,23 +401,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="price_reduced_pct_yoy">Price Cut % YOY</option>
           <option value="cancellation_pct">Cancellation Rate %</option>
           <option value="cancellation_pct_yoy">Cancellation Rate YOY %</option>
-          <option value="est_payment_20">Est. Payment (20% Down)</option>
-          <option value="median_property_tax">Property Tax</option>
-          <option value="median_property_tax_yoy">Property Tax YOY %</option>
-          <option value="property_tax_rate">Tax Rate</option>
-          <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
-          <option value="sf_permits_per_1k">SF Permits / 1K</option>
-          <option value="mf_permits_per_1k">MF Permits / 1K</option>
-          <option value="total_permits_per_1k">Total Permits / 1K</option>
-    <option value="new_construction_price">New Construction Median Price</option>
-    <option value="new_construction_sqft">New Construction $/SqFt</option>
           <option value="delisted_pct">Delisted %</option>
-          <option value="tax_delinquent">Tax Delinquent</option>
-          <option value="tax_del_pct">Tax Delinquent %</option>
-          <option value="pre_fc">Pre-Foreclosure</option>
-          <option value="pre_fc_pct">Pre-Foreclosure %</option>
-          <option value="upside_down">Underwater</option>
-          <option value="upside_down_pct">Underwater %</option>
         </select>
         <div class="modal-left-sticky"><div id="pending-ratio-badge" style="display:none;font-family:Montserrat,sans-serif;background:#edf2fb;border-radius:12px;padding:16px 12px 16px;margin-bottom:12px;">
           <svg viewBox="5 5 190 118" style="width:100%;display:block;margin:0 auto 8px;">
@@ -483,16 +433,12 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab active" data-cmetric="zhvi"><span class="mn">SFH Home Value</span><span class="md">Zillow ZHVI single-family</span></button>
           <button class="metric-btn chart-tab" data-cmetric="median_list_price"><span class="mn">Median List Price</span><span class="md">Realtor.com asking price</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_yoy"><span class="mn">SFH Home Value YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_growth_5y"><span class="mn">SFH Value 5-Yr Growth</span><span class="md">% change over 5 years</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_growth_10y"><span class="mn">SFH Value 10-Yr Growth</span><span class="md">% change over 10 years</span></button>
           <button class="metric-btn chart-tab" data-cmetric="zhvi_condo"><span class="mn">Condo Home Value</span><span class="md">Zillow ZHVI condo/co-op</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_condo_yoy"><span class="mn">Condo Home Value YOY %</span><span class="md">Year-over-year change</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Supply</div>
           <button class="metric-btn chart-tab" data-cmetric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 1990–2025</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="mf_permits_per_1k"><span class="mn">MF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 1990–2025</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="total_permits_per_1k"><span class="mn">Total Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 1990–2025</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="new_listings"><span class="mn">New Listings</span><span class="md">New listings this month · Realtor.com</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Demand</div>
           <button class="metric-btn chart-tab" data-cmetric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
@@ -502,20 +448,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Affordability</div>
-          <button class="metric-btn chart-tab" data-cmetric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">Historical · illustration only</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Taxes</div>
-          <button class="metric-btn chart-tab" data-cmetric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Distress</div>
-          <button class="metric-btn chart-tab" data-cmetric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="pre_fc"><span class="mn">Pre-Foreclosure</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="pre_fc_pct"><span class="mn">Pre-Foreclosure %</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="upside_down"><span class="mn">Underwater</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="upside_down_pct"><span class="mn">Underwater %</span><span class="md">PropStream</span></button>
           <button class="metric-btn chart-tab" data-cmetric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">Redfin · Apr 2015–Jul 2026</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="delisted_pct"><span class="mn">Delisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
