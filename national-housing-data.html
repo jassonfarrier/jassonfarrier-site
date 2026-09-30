@@ -1797,7 +1797,7 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
   // payload small (~730KB total vs ~14MB with history). History gets added back in a later
   // pass, fetched lazily per-county on click, once this base layer is confirmed working.
   const _base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,county,state,state_id,latest&order=county';
-  const _yoyBase = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties_yoy?select=fips,zhvi_yoy,active_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy&order=fips';
+  const _yoyBase = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties_yoy?select=fips,zhvi_yoy,zhvi_condo_yoy,active_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy&order=fips';
   const _pageSize = 1000;
   const _pageCount = 4; // 4 * 1000 = 4000, safely covers all 3,073 counties with room to grow
   Promise.all([
@@ -1868,6 +1868,7 @@ function _onCountiesLoaded(counties, yoyRows) {
     const yr = yoyMap[d.fips];
     if (yr) {
       if (yr.zhvi_yoy != null) d.yoy_latest.zhvi_yoy = Number(yr.zhvi_yoy);
+      if (yr.zhvi_condo_yoy != null) d.yoy_latest.zhvi_condo_yoy = Number(yr.zhvi_condo_yoy);
       if (yr.active_listings_yoy != null) d.yoy_latest.active_listings_yoy = Number(yr.active_listings_yoy);
       if (yr.pending_listings_yoy != null) d.yoy_latest.pending_listings_yoy = Number(yr.pending_listings_yoy);
       if (yr.pending_ratio_yoy != null) d.yoy_latest.pending_ratio_yoy = Number(yr.pending_ratio_yoy);
