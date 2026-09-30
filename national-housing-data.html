@@ -152,6 +152,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   /* Sidebar: hidden on mobile — replaced by #mobile-metric-bar */
   .sidebar{display:none}
   #map{height:65vw;min-height:270px;width:100%}
+  #national-stat-overlay{left:0}
+  #national-stat-value{font-size:40px}
+  #national-stat-label{font-size:12px}
   .snap-grid{grid-template-columns:repeat(2,1fr)}
   .snap-val{font-size:15px}
   #line-chart{height:220px}
@@ -327,6 +330,11 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     </div><!-- end sidebar-scroll -->
   </div>
 <div id="map"></div>
+<div id="national-stat-overlay" style="display:none;position:absolute;top:50%;left:220px;right:0;transform:translateY(-50%);z-index:400;text-align:center;pointer-events:none;font-family:Montserrat,sans-serif;">
+  <div id="national-stat-value" style="font-size:64px;font-weight:900;color:#0D1E42;text-shadow:0 2px 24px rgba(255,255,255,0.9),0 0 6px rgba(255,255,255,0.9);line-height:1;"></div>
+  <div id="national-stat-label" style="font-size:16px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(13,30,66,0.65);margin-top:8px;text-shadow:0 2px 12px rgba(255,255,255,0.9);"></div>
+  <div style="font-size:12px;font-weight:600;color:rgba(13,30,66,0.45);margin-top:14px;pointer-events:auto;">Click map for full history</div>
+</div>
 <div id="table-view" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:#f7f8fa;z-index:10;overflow:auto;padding:80px 24px 24px;">
   <div id="table-inner" style="max-width:1400px;margin:0 auto;">
     <div id="table-title" style="font-size:13px;font-weight:700;font-family:Montserrat;color:#0d1e42;margin-bottom:12px;letter-spacing:0.5px;"></div>
@@ -344,6 +352,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   <button id="search-clear" style="display:none">✕</button>
   <div style="width:1px;height:18px;background:rgba(0,0,0,0.12);flex-shrink:0"></div>
   <div class="mode-pills">
+    <button class="mode-pill" id="pill-national">National</button>
     <button class="mode-pill" id="pill-state">State</button>
     <button class="mode-pill" id="pill-metro">Metro</button>
     <button class="mode-pill active" id="pill-county">County</button>
@@ -580,6 +589,7 @@ let FIPS_NAME = {};
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null, selectedFips = null;
 let chartSliderStartYr = null, chartSliderEndYr = null, _chartHistoryFull = null, _chartCounty = null, _chartCmetric = null, _chartIsZip = false;
 let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, zipHistoryCache = {}, selectedZip = null, zipHoveredId = null;
+let NATIONAL_DATA = null, nationalDataLoaded = false;
 // ZIP mode is state-scoped nationally: ~33,791 ZCTA boundaries is too much to hand Mapbox
 // as one GeoJSON (Census's own most-generalized file is 66MB zipped). Instead, the map
 // starts blank in ZIP mode until a state is picked (click a state, or search a ZIP directly),
@@ -1002,6 +1012,31 @@ function renderColors(mode) {
   // Always update legend labels when metric changes
   document.getElementById('leg-lo').textContent = METRICS[metric].lo;
   document.getElementById('leg-hi').textContent = METRICS[metric].hi;
+
+  if (mode === 'national') {
+    const overlay = document.getElementById('national-stat-overlay');
+    if (!nationalDataLoaded) { loadNationalData(); return; }
+    if (!nationalStatesLoaded) { loadNationalStatesData(); return; }
+    if (overlay) overlay.style.display = 'block';
+    const val = NATIONAL_DATA ? getMetricVal(NATIONAL_DATA, metric) : null;
+    const nVals = NATIONAL_STATES.map(d => getMetricVal(d, metric)).filter(v => v != null).sort((a,b)=>a-b);
+    let color = '#9DA6AB';
+    if (val != null && nVals.length) {
+      const nStops = quantileStops(nVals, palette);
+      color = isYOY ? yoyQuantileColor(nVals, val, metric) : colorFromStops(nStops, val);
+    }
+    try {
+      map.setPaintProperty('state-fill', 'fill-color', color);
+      map.setPaintProperty('state-fill', 'fill-opacity', 0.55);
+    } catch(e) {}
+    const valEl = document.getElementById('national-stat-value');
+    const lblEl = document.getElementById('national-stat-label');
+    if (valEl) valEl.textContent = val != null ? METRICS[metric].fmt(val) : 'N/A';
+    if (lblEl) lblEl.textContent = 'United States — ' + METRICS[metric].label;
+    if (valEl) valEl.style.color = color === '#9DA6AB' ? '#0D1E42' : color;
+    drawLegend(nVals, palette);
+    return;
+  }
 
   if (mode === 'state') {
     if (!nationalStatesLoaded) { loadNationalStatesData(); return; }
@@ -1442,6 +1477,7 @@ document.getElementById('close-btn').addEventListener('click', () => { document.
 document.getElementById('modal-overlay').addEventListener('click', e => { if(e.target===document.getElementById('modal-overlay')){ document.getElementById('modal-overlay').classList.remove('visible'); selectedCounty=null; if(_dismissClickCard) _dismissClickCard(); }});
 
 // Chart tabs
+document.getElementById('pill-national').addEventListener('click', () => setMode('national'));
 document.getElementById('pill-state').addEventListener('click', () => setMode('state'));
 document.getElementById('pill-metro').addEventListener('click', () => setMode('metro'));
 document.getElementById('pill-county').addEventListener('click', () => setMode('county'));
@@ -2122,6 +2158,7 @@ function _onCountiesLoaded(counties, yoyRows) {
         popup.remove();
       });
       map.on('click','state-fill', e => {
+        if (mapMode === 'national') { openNationalModal(); return; }
         if (!e.features.length) return;
         const sName = (e.features[0].properties && e.features[0].properties.name) || '';
         if (!sName) return;
@@ -3154,9 +3191,11 @@ const _origSetMode = setMode;
 
 function setMode(mode) {
   mapMode = mode;
-  ['state','metro','county','zip'].forEach(m => {
+  ['national','state','metro','county','zip'].forEach(m => {
     document.getElementById('pill-'+m).classList.toggle('active', mode===m);
   });
+  const nationalOverlay = document.getElementById('national-stat-overlay');
+  if (nationalOverlay) nationalOverlay.style.display = mode === 'national' ? 'block' : 'none';
   // Search is universal now (state, metro, county, or ZIP -- all at once, regardless of
   // mode), so one placeholder covers every mode rather than a stale per-mode "Ohio" label.
   document.getElementById('search-input').placeholder = 'Search state, metro, county, or ZIP…';
@@ -3174,7 +3213,7 @@ function setMode(mode) {
   countyLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='county'?'visible':'none')}catch(e){} });
   zipLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',(mode==='zip'&&!zipPicking)?'visible':'none')}catch(e){} });
   metroLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='metro'?'visible':'none')}catch(e){} });
-  stateLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',(mode==='state'||zipPicking)?'visible':'none')}catch(e){} });
+  stateLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',(mode==='state'||mode==='national'||zipPicking)?'visible':'none')}catch(e){} });
   // Flatten the state picker's fill to a neutral gray/no metric shading -- it's a picker,
   // not a choropleth, while zip mode is waiting for a state to be chosen.
   if (zipPicking) { try{map.setPaintProperty('state-fill','fill-color','#9DA6AB'); map.setPaintProperty('state-fill','fill-opacity',0.35);}catch(e){} }
@@ -3188,6 +3227,7 @@ function setMode(mode) {
   if (mode === 'zip') { if (currentZipState) loadZipDataForState(currentZipState); }
   else if (mode === 'metro') { loadMetroData(); }
   else if (mode === 'state') { loadNationalStatesData(); }
+  else if (mode === 'national') { loadNationalStatesData(); loadNationalData(); }
   else {
     if (selectedZip) { try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false})}catch(e){} selectedZip=null; }
     if (selectedMetro) { try{map.setFeatureState({source:'ohio-metros',id:selectedMetro},{selected:false})}catch(e){} selectedMetro=null; }
@@ -3375,6 +3415,19 @@ function loadNationalStatesData() {
   }).catch(err => console.error('National states data load error:', err));
 }
 
+function loadNationalData() {
+  if (nationalDataLoaded) { renderColors('national'); return; }
+  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_national?select=id,latest,history', {
+    headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
+  }).then(r=>r.json()).then(rows => {
+    NATIONAL_DATA = rows[0] || null;
+    if (NATIONAL_DATA) attachYOY(NATIONAL_DATA);
+    nationalDataLoaded = true;
+    renderColors('national');
+  }).catch(err => console.error('National data load error:', err));
+}
+
 function loadStateData() {
   if (stateDataLoaded) { return; }
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
@@ -3457,6 +3510,33 @@ function buildPaymentHist(zhviByYear, taxRateByYear, downPct, cmetric) {
       : computeEstPaymentForYear(zhviByYear[yr], taxRate, downPct, yr);
     return { date: yr + '-07', [cmetric]: val };
   }).filter(r => r[cmetric] != null);
+}
+
+function openNationalModal() {
+  if (!NATIONAL_DATA) { loadNationalData(); setTimeout(openNationalModal, 600); return; }
+  const d = NATIONAL_DATA;
+  const l = d.latest || {};
+  selectedCounty = null; selectedZip = null; selectedMetro = null; selectedNationalState = null;
+  document.getElementById('modal-county').textContent = 'United States';
+  const _utcN = document.getElementById('ut-county'); if (_utcN) _utcN.textContent = 'United States';
+  document.getElementById('modal-sub').textContent = '';
+  setAttrHeader(['United States'], mapMetric);
+  (document.getElementById('s-zhvi')||{}).textContent = l.zhvi ? fmt$(l.zhvi) : '—';
+  (document.getElementById('s-active')||{}).textContent = l.active_listings ? fmtN(l.active_listings) : '—';
+  (document.getElementById('s-pending')||{}).textContent = l.pending_listings ? fmtN(l.pending_listings) : '—';
+  (document.getElementById('s-dom')||{}).textContent = l.days_on_market != null ? l.days_on_market+'d' : '—';
+  (document.getElementById('s-pct')||{}).textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
+  (document.getElementById('s-ptax')||{}).textContent = '—';
+  (document.getElementById('s-ptaxrate')||{}).textContent = '—';
+  (document.getElementById('s-rank')||{}).textContent = 'Nationwide';
+  { const s = document.querySelector('.upper-third-rank-section'); if (s) s.style.display = 'none'; }
+  setPendingRatioBadge(l.pending_ratio);
+  document.getElementById('modal-overlay').classList.add('visible');
+  setTimeout(() => {
+    document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
+    document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
+    renderStateChart('United States', mapMetric, d);
+  }, 30);
 }
 
 function openNationalStateModal(name) {
