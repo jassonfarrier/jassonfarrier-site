@@ -1033,7 +1033,7 @@ function renderColors(mode) {
     const lblEl = document.getElementById('national-stat-label');
     if (valEl) valEl.textContent = val != null ? METRICS[metric].fmt(val) : 'N/A';
     if (lblEl) lblEl.textContent = 'United States — ' + METRICS[metric].label;
-    if (valEl) valEl.style.color = color === '#9DA6AB' ? '#0D1E42' : color;
+    if (valEl) valEl.style.color = '#0D1E42';
     drawLegend(nVals, palette);
     return;
   }
