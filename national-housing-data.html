@@ -1965,7 +1965,7 @@ function _onCountiesLoaded(counties, yoyRows) {
         minzoom: 6.6,
         layout: {
           'text-field': ['concat', ['get','county'], '\n', ['coalesce',['get','__label'],'']],
-          'text-size': ['interpolate',['linear'],['zoom'], 6.6,15, 7.5,18, 9,22, 11,26],
+          'text-size': ['interpolate',['linear'],['zoom'], 6.6,19, 7.5,23, 9,27, 11,32],
           'text-font': ['DIN Pro Bold','Arial Unicode MS Bold'],
           'text-anchor': 'center',
           'text-max-width': 7,
@@ -2075,7 +2075,7 @@ function _onCountiesLoaded(counties, yoyRows) {
         visibility:'none',
         'text-field':['get','name'],
         'text-font':['DIN Offc Pro Medium','Arial Unicode MS Regular'],
-        'text-size':['interpolate',['linear'],['zoom'],5,9,8,12],
+        'text-size':['interpolate',['linear'],['zoom'],5,12,8,17],
         'text-allow-overlap':false,'symbol-avoid-edges':true
       },paint:{'text-color':'#111','text-halo-color':'rgba(255,255,255,0.85)','text-halo-width':1.5}});
 
@@ -2134,7 +2134,7 @@ function _onCountiesLoaded(counties, yoyRows) {
         layout: {
           visibility: 'none',
           'text-field': ['concat', ['get','name'], '\n', ['coalesce',['get','__label'],'']],
-          'text-size': ['interpolate',['linear'],['zoom'], 3,10, 5,14, 7,20, 9,26],
+          'text-size': ['interpolate',['linear'],['zoom'], 3,13, 5,18, 7,25, 9,32],
           'text-font': ['DIN Pro Bold','Arial Unicode MS Bold'],
           'text-anchor': 'center',
           'text-max-width': 7,
@@ -2224,7 +2224,7 @@ function _onCountiesLoaded(counties, yoyRows) {
           ['coalesce',['get','__label'],''], {'text-color':'#0d1e42','font-scale':1.35}
         ],
         'text-font':['DIN Pro Bold','Arial Unicode MS Bold'],
-        'text-size':['interpolate',['linear'],['zoom'], 7,10, 9,13, 11,16],
+        'text-size':['interpolate',['linear'],['zoom'], 7,13, 9,17, 11,21],
         'text-line-height':1.15,
         'text-anchor':'center',
         'text-allow-overlap':false,
