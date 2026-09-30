@@ -86,7 +86,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .modal-header-left{flex:1;min-width:0}
 .modal-header-right{text-align:right;flex-shrink:0}
 .modal-county{display:none}.modal-sub-hidden{display:none}.upper-third{background:#0d1e42;border-radius:8px;display:flex;align-items:stretch;justify-content:flex-start;gap:0;margin-bottom:8px;overflow:hidden;}
-.upper-third-main{flex:1;display:flex;align-items:center;padding:14px 22px;min-width:0;}
+.upper-third-main{flex:1;display:flex;align-items:center;padding:14px 22px;min-width:0;overflow:hidden;}
 .upper-third-county{font-family:Montserrat,sans-serif;font-size:18px;font-weight:800;color:#fff;letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-sep{color:rgba(255,255,255,0.4);margin:0 14px;font-size:18px;font-weight:300}.upper-third-metric{font-family:Montserrat,sans-serif;font-size:18px;font-weight:500;color:rgba(255,255,255,0.75);letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap}.upper-third-source{font-family:Montserrat,sans-serif;font-size:12px;font-weight:400;color:rgba(255,255,255,0.45);margin-left:10px;white-space:nowrap}.upper-third-source a{color:rgba(255,255,255,0.55);text-decoration:none}.upper-third-source a:hover{color:#fff}
 .upper-third-rank-section{display:flex;align-items:center;padding:14px 20px;background:rgba(255,255,255,0.06);border-left:1px solid rgba(255,255,255,0.1);flex-shrink:0;}
 .upper-third-rank{font-family:Montserrat,sans-serif;font-size:14px;font-weight:600;color:#8fb8ff;white-space:nowrap;letter-spacing:0.02em}
@@ -1841,6 +1841,12 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
     setTimeout(_waitForMapThenEagerLoad, 100);
   }
 })();
+
+// Eagerly kick off the national ZIP search index too (doesn't depend on the map at all --
+// it's a plain REST fetch into a JS array, not a map source) so ZIP search has zero delay
+// on the very first keystroke instead of waiting on a ~1-2MB fetch that only started once
+// someone typed a digit.
+if (typeof loadNationalZipIndex === 'function') loadNationalZipIndex();
 
 function _onCountiesLoaded(counties, yoyRows) {
   DATA = counties;
@@ -3960,14 +3966,20 @@ function loadNationalZipIndex() {
   if (nationalZipIndexLoading) return nationalZipIndexLoading;
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
   const headers = {apikey: ANON_KEY, Authorization: 'Bearer ' + ANON_KEY};
+  // Was a sequential while-loop (one await per page, ~27 pages for 26,268 zips) -- each
+  // round trip waited for the last to finish before starting the next, taking 5-8+ seconds
+  // before the very first search could show anything. Looked exactly like "search is
+  // broken" to a real user who types and gives up before it resolves. Fixed by firing all
+  // pages in parallel (Promise.all), same pattern County/Metro already use -- 30 pages is
+  // a safe fixed count above the known ~26,268 total; empty trailing pages are harmless.
   nationalZipIndexLoading = (async () => {
-    let all = [], offset = 0;
-    while (true) {
-      const page = await fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,state_id,latest->zhvi&limit=1000&offset='+offset, {headers}).then(r=>r.json());
-      all = all.concat(page);
-      if (page.length < 1000) break;
-      offset += 1000;
-    }
+    const _pageSize = 1000, _pageCount = 30;
+    const pages = await Promise.all(
+      Array.from({length: _pageCount}, (_, i) =>
+        fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,state_id,latest->zhvi&limit='+_pageSize+'&offset='+(i*_pageSize), {headers}).then(r=>r.json())
+      )
+    );
+    const all = pages.flat();
     nationalZipIndex = all;
     all.forEach(d => { nationalZipIndexMap[d.zip] = d; });
     nationalZipIndexLoaded = true;
