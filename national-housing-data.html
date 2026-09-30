@@ -190,7 +190,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   #chart-slider-wrap{padding-left:16px!important}
 }
 
-#search-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:20;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.13);box-shadow:0 4px 20px rgba(0,0,0,0.13);display:flex;align-items:center;padding:0 12px;gap:8px;min-width:420px}.mode-pills{display:flex;gap:4px;margin-left:6px;flex-shrink:0}.mode-pill{background:transparent;border:1px solid rgba(0,0,0,0.15);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;font-family:Montserrat,sans-serif;color:rgba(0,0,0,0.4);cursor:pointer;transition:all .2s;white-space:nowrap}.mode-pill.active{background:#1a5296;color:#fff;border-color:#0D1E42}.mode-pill:hover:not(.active){background:#edf2fb;color:#0D1E42;border-color:rgba(26,82,150,0.3)}
+#search-bar{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:20;background:#fff;border-radius:10px;border:1px solid rgba(0,0,0,0.13);box-shadow:0 4px 20px rgba(0,0,0,0.13);display:flex;align-items:center;padding:0 12px;gap:8px;min-width:420px}.mode-pills{display:flex;gap:4px;margin-left:6px;flex-shrink:0}.mode-pill{background:transparent;border:1px solid rgba(0,0,0,0.15);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:600;font-family:Montserrat,sans-serif;color:rgba(0,0,0,0.4);cursor:pointer;transition:all .2s;white-space:nowrap}.mode-pill.active{background:#1a5296;color:#fff;border-color:#0D1E42}.mode-pill:hover:not(.active){background:#edf2fb;color:#0D1E42;border-color:rgba(26,82,150,0.3)}.mode-pill.unavailable:not(.active){opacity:0.32;filter:grayscale(1)}
 #search-input{flex:1;border:none;outline:none;font-family:'Montserrat',sans-serif;font-size:13px;font-weight:500;color:#0D1E42;padding:12px 0;background:transparent}
 #search-input::placeholder{color:rgba(0,0,0,0.3)}
 #search-clear{background:none;border:none;cursor:pointer;color:rgba(0,0,0,0.3);font-size:14px;padding:4px;line-height:1}
@@ -630,6 +630,28 @@ const METRICS = {
 const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','new_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','zhvi_growth_5y','zhvi_growth_10y','luxury_median_sale_price_yoy','luxury_median_dom_yoy','luxury_active_listings_yoy','luxury_pending_sales_yoy']);
 const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', new_listings_yoy:'new_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct', luxury_median_sale_price_yoy:'luxury_median_sale_price', luxury_median_dom_yoy:'luxury_median_dom', luxury_active_listings_yoy:'luxury_active_listings', luxury_pending_sales_yoy:'luxury_pending_sales'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
+// Which geography levels each metric actually has real data for. Metrics not listed here
+// are assumed available at all five levels (the common case). Built strictly from what was
+// actually loaded into Supabase for each Redfin dataset -- never guessed or assumed.
+const METRIC_MODES = {
+  cash_pct: ['national','metro'], down_payment_pct: ['national','metro'],
+  fha_pct: ['national','metro'], va_pct: ['national','metro'],
+  investor_purchases: ['national','metro'], investor_market_share: ['national','metro'],
+  luxury_median_sale_price: ['national','state','metro'], luxury_median_sale_price_yoy: ['national','state','metro'],
+  luxury_median_dom: ['national','state','metro'], luxury_median_dom_yoy: ['national','state','metro'],
+  luxury_active_listings: ['national','state','metro'], luxury_active_listings_yoy: ['national','state','metro'],
+  luxury_pending_sales: ['national','state','metro'], luxury_pending_sales_yoy: ['national','state','metro'],
+};
+function updateModePillAvailability(metric) {
+  const modes = METRIC_MODES[metric] || ['national','state','metro','county','zip'];
+  const pillIds = {national:'pill-national', state:'pill-state', metro:'pill-metro', county:'pill-county', zip:'pill-zip'};
+  Object.entries(pillIds).forEach(([mode, id]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('unavailable', !modes.includes(mode));
+    el.title = modes.includes(mode) ? '' : METRICS[metric].label + ' has no data at this level';
+  });
+}
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct']);
 const PAYMENT_METRICS = new Set(['est_payment_20']);
 const NEW_CONSTRUCTION_METRICS = new Set(['new_construction_price','new_construction_sqft']);
@@ -1855,6 +1877,7 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
     document.querySelectorAll('.metric-btn[data-metric]').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
     mapMetric = btn.dataset.metric;
+    updateModePillAvailability(mapMetric);
     renderColors(mapMode);
   });
 });
