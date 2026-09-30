@@ -371,7 +371,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 </div>
 <div id="search-bar">
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.35)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-  <input id="search-input" type="text" placeholder="Search counties or ZIP codes…" autocomplete="off" style="flex:1;min-width:160px">
+  <input id="search-input" type="text" placeholder="Search state, metro, county, or ZIP…" autocomplete="off" style="flex:1;min-width:160px">
   <button id="search-clear" style="display:none">✕</button>
   <div style="width:1px;height:18px;background:rgba(0,0,0,0.12);flex-shrink:0"></div>
   <div class="mode-pills">
@@ -1828,7 +1828,19 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
 // (State/Metro/County/ZIP-index) ready regardless of which mode the page opens into or
 // which mode the user is currently sitting in, matching how County already loads eagerly
 // above. Fire-and-forget; each function is itself idempotent/re-entrant safe.
-setTimeout(() => { loadMetroData(); loadNationalStatesData(); }, 50);
+// IMPORTANT: `map` doesn't exist yet at this point in the file -- it's only created after
+// the /us-counties.geojson fetch above resolves, and the 'ohio-metros'/'us-states' sources
+// aren't added until inside that map's 'load' handler. A blind setTimeout fired too early
+// crashes (map.getSource(...) undefined -> .setData() throws). Poll until both sources
+// actually exist before calling.
+(function _waitForMapThenEagerLoad() {
+  if (typeof map !== 'undefined' && map && map.getSource && map.getSource('ohio-metros') && map.getSource('us-states')) {
+    loadMetroData();
+    loadNationalStatesData();
+  } else {
+    setTimeout(_waitForMapThenEagerLoad, 100);
+  }
+})();
 
 function _onCountiesLoaded(counties, yoyRows) {
   DATA = counties;
