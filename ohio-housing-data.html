@@ -274,6 +274,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="zhvi_condo">Condo Home Value</option>
     <option value="zhvi_condo_yoy">Condo Home Value YOY %</option>
     <option value="active_listings">Active Listings</option>
+    <option value="new_listings">New Listings</option>
     <option value="active_listings_yoy">Active Listings YOY %</option>
     <option value="pending_listings">Pending Sales</option>
     <option value="pending_listings_yoy">Pending Sales YOY %</option>
@@ -312,6 +313,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn yoy-btn" data-metric="zhvi_condo_yoy"><span class="mn">Condo Home Value YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Supply</div>
     <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="new_listings"><span class="mn">New Listings</span><span class="md">New listings this month</span></button>
     <button class="metric-btn yoy-btn" data-metric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Single-family permits per 1,000 residents</span></button>
     <button class="metric-btn" data-metric="mf_permits_per_1k"><span class="mn">MF Permits / 1K</span><span class="md">Multifamily permits per 1,000 residents</span></button>
@@ -419,6 +421,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="zhvi_condo">Condo Home Value</option>
           <option value="zhvi_condo_yoy">Condo Home Value YOY %</option>
           <option value="active_listings">Active Listings</option>
+          <option value="new_listings">New Listings</option>
           <option value="active_listings_yoy">Active Listings YOY %</option>
           <option value="pending_listings">Pending Sales</option>
           <option value="pending_listings_yoy">Pending Sales YOY %</option>
@@ -484,6 +487,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_condo_yoy"><span class="mn">Condo Home Value YOY %</span><span class="md">Year-over-year change</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Supply</div>
           <button class="metric-btn chart-tab" data-cmetric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="new_listings"><span class="mn">New Listings</span><span class="md">New listings this month</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 1990–2025</span></button>
           <button class="metric-btn chart-tab" data-cmetric="mf_permits_per_1k"><span class="mn">MF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 1990–2025</span></button>
@@ -1624,7 +1628,7 @@ function renderChart(county, cmetric) {
         }
       });
     }
-  } else if (cmetric === 'zhvi' || cmetric === 'median_list_price' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct') {
+  } else if (cmetric === 'zhvi' || cmetric === 'median_list_price' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'new_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct') {
     drawAnnualLineChart(county, cmetric);
   } else {
     drawMonthlyBarChart(county, cmetric);
@@ -2151,7 +2155,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const x = d3.scaleTime()
     .domain(d3.extent(rows, r=>parseDate(r.date)))
     .range([0, iw]);
-  const isZeroBased = !YOY_METRICS.has(cmetric) && (cmetric==='active_listings'||cmetric==='pending_listings'||cmetric==='pending_ratio'||cmetric==='price_reduced_pct'||cmetric==='property_tax_rate'||cmetric==='sf_permits_per_1k'||cmetric==='mf_permits_per_1k'||cmetric==='total_permits_per_1k'||DISTRESS_METRICS.has(cmetric));
+  const isZeroBased = !YOY_METRICS.has(cmetric) && (cmetric==='active_listings'||cmetric==='new_listings'||cmetric==='pending_listings'||cmetric==='pending_ratio'||cmetric==='price_reduced_pct'||cmetric==='property_tax_rate'||cmetric==='sf_permits_per_1k'||cmetric==='mf_permits_per_1k'||cmetric==='total_permits_per_1k'||DISTRESS_METRICS.has(cmetric));
   const _isYOY = YOY_METRICS.has(cmetric);
   const _minVal = d3.min(rows, r=>r[cmetric]);
   const _maxVal = d3.max(rows, r=>r[cmetric]);
@@ -2470,7 +2474,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
       if (val>=1000) return '$'+Math.round(val/1000)+'K';
       return '$'+Math.round(val);
     }
-    if (cmetric==='active_listings'||cmetric==='pending_listings') {
+    if (cmetric==='active_listings'||cmetric==='new_listings'||cmetric==='pending_listings') {
       if (val>=1000) return (val/1000).toFixed(1)+'K';
       return Math.round(val)+'';
     }
@@ -2784,6 +2788,7 @@ const TABLE_COLS = [
   {key:'zhvi_condo',     label:'Condo Home Value',   fmt:v=>v!=null?'$'+Math.round(v).toLocaleString():null},
   {key:'zhvi_condo_yoy', label:'Condo HV YOY %',     fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
   {key:'active_listings',label:'Active Listings',    fmt:v=>v!=null?Math.round(v).toLocaleString():null},
+  {key:'new_listings',label:'New Listings',          fmt:v=>v!=null?Math.round(v).toLocaleString():null},
   {key:'active_listings_yoy',label:'AL YOY %',       fmt:v=>v!=null?v.toFixed(1)+'%':null, yoy:true},
   {key:'sf_permits_per_1k',label:'SF Permits/1K',    fmt:v=>v!=null?v.toFixed(2):null},
   {key:'mf_permits_per_1k',label:'MF Permits/1K',    fmt:v=>v!=null?v.toFixed(2):null},
