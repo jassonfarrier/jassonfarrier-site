@@ -649,6 +649,10 @@ let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, z
 // ResiClub uses for the same reason. currentZipState tracks which state is active;
 // zipStatesLoaded caches which states have already been fetched so re-picking is instant.
 let currentZipState = null, zipStatesLoaded = {};
+// Lightweight national ZIP search index: zip/city/state/price only, no boundaries or full
+// history (~5MB for all 26,268 priced ZIPs) -- loaded once so ZIP search feels exactly like
+// Ohio's (instant, filtered in-memory as you type), while the map itself stays state-scoped.
+let nationalZipIndex = [], nationalZipIndexMap = {}, nationalZipIndexLoaded = false, nationalZipIndexLoading = null;
 const STATE_NAME_TO_ABBR = {
   'Alabama':'AL','Alaska':'AK','Arizona':'AZ','Arkansas':'AR','California':'CA','Colorado':'CO',
   'Connecticut':'CT','Delaware':'DE','District of Columbia':'DC','Florida':'FL','Georgia':'GA',
@@ -1818,6 +1822,13 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
     console.error('us_counties paginated load error:', err);
   });
 })();
+
+// Eagerly kick off Metro and State data too (both were previously lazy -- only loaded the
+// first time someone switched into that mode). Universal search needs all four datasets
+// (State/Metro/County/ZIP-index) ready regardless of which mode the page opens into or
+// which mode the user is currently sitting in, matching how County already loads eagerly
+// above. Fire-and-forget; each function is itself idempotent/re-entrant safe.
+setTimeout(() => { loadMetroData(); loadNationalStatesData(); }, 50);
 
 function _onCountiesLoaded(counties, yoyRows) {
   DATA = counties;
@@ -3188,8 +3199,9 @@ function setMode(mode) {
   ['state','metro','county','zip'].forEach(m => {
     document.getElementById('pill-'+m).classList.toggle('active', mode===m);
   });
-  const placeholders = {state:'Search US states…', metro:'Search Ohio metros…', county:'Search Ohio counties…', zip:'Search ZIP codes…'};
-  document.getElementById('search-input').placeholder = placeholders[mode] || 'Search…';
+  // Search is universal now (state, metro, county, or ZIP -- all at once, regardless of
+  // mode), so one placeholder covers every mode rather than a stale per-mode "Ohio" label.
+  document.getElementById('search-input').placeholder = 'Search state, metro, county, or ZIP…';
   document.getElementById('search-results').style.display='none';
 
   const countyLayers = ['counties-fill','counties-border','counties-border-hover','counties-border-selected','counties-labels'];
@@ -3924,32 +3936,52 @@ const searchResults = document.getElementById('search-results');
 const searchClear = document.getElementById('search-clear');
 function getCountyNames() { return Object.values(FIPS_NAME).sort(); }
 
-// National ZIP search hits Supabase live rather than filtering a preloaded map: with
-// 26,268 priced ZIPs nationally (state-scoped loading, see loadZipDataForState above),
-// there's no single client-side zipDataMap to filter until a state is picked. Debounced
-// prefix search against us_zips covers any ZIP in the country, no state pick required first.
-let _zipSearchTimer = null, _zipSearchSeq = 0;
+// National ZIP search filters the lightweight nationalZipIndex in memory (see
+// loadNationalZipIndex above) -- same instant, no-network-per-keystroke feel as Ohio's
+// original search, just backed by a one-time deferred index load instead of the full
+// per-ZIP dataset being baked into the initial page load.
+// Paginated one-time load of the lightweight national ZIP index (zip/city/state/price only).
+// Returns a Promise; safe to call repeatedly -- subsequent calls reuse the in-flight or
+// completed load rather than re-fetching.
+function loadNationalZipIndex() {
+  if (nationalZipIndexLoaded) return Promise.resolve();
+  if (nationalZipIndexLoading) return nationalZipIndexLoading;
+  const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+  const headers = {apikey: ANON_KEY, Authorization: 'Bearer ' + ANON_KEY};
+  nationalZipIndexLoading = (async () => {
+    let all = [], offset = 0;
+    while (true) {
+      const page = await fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,state_id,latest->zhvi&limit=1000&offset='+offset, {headers}).then(r=>r.json());
+      all = all.concat(page);
+      if (page.length < 1000) break;
+      offset += 1000;
+    }
+    nationalZipIndex = all;
+    all.forEach(d => { nationalZipIndexMap[d.zip] = d; });
+    nationalZipIndexLoaded = true;
+  })();
+  return nationalZipIndexLoading;
+}
+
 function showZipResults(raw) {
-  clearTimeout(_zipSearchTimer);
-  if (raw.length < 3) { searchResults.style.display = 'none'; return; }
-  const mySeq = ++_zipSearchSeq;
-  _zipSearchTimer = setTimeout(() => {
-    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
-    const url = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,state_id,latest&zip=like.'+raw+'*&order=zip&limit=8';
-    fetch(url, {headers:{apikey:ANON_KEY,Authorization:'Bearer '+ANON_KEY}}).then(r=>r.json()).then(rows => {
-      if (mySeq !== _zipSearchSeq) return; // a newer keystroke superseded this request
-      searchResults.innerHTML = '';
-      if (!rows || !rows.length) { searchResults.style.display = 'none'; return; }
-      rows.forEach(d => {
-        const li = document.createElement('li');
-        const val = d.latest && d.latest.zhvi != null ? METRICS.zhvi.fmt(Number(d.latest.zhvi)) : '';
-        li.innerHTML = `<div>${d.zip}${d.city?' — '+d.city+', '+d.state_id:''}</div><div class="sr-sub">${val?'SFH Value: '+val:''}</div>`;
-        li.addEventListener('click', () => selectZip(d.zip, d.state_id));
-        searchResults.appendChild(li);
-      });
-      searchResults.style.display = 'block';
-    }).catch(err => console.error('ZIP search error:', err));
-  }, 200);
+  // Kick the index load off the first time it's needed; render once it lands. On every
+  // later call it's already loaded, so this resolves (and re-renders) instantly -- same
+  // feel as Ohio's in-memory filter, just with one deferred first load instead of it being
+  // baked into the initial page load (26k ZIPs nationally vs. 1,233 for Ohio alone).
+  loadNationalZipIndex().then(() => {
+    searchResults.innerHTML = '';
+    if (raw.length < 1) { searchResults.style.display = 'none'; return; }
+    const matches = nationalZipIndex.filter(d => d.zip.startsWith(raw)).slice(0, 8);
+    if (!matches.length) { searchResults.style.display = 'none'; return; }
+    matches.forEach(d => {
+      const li = document.createElement('li');
+      const val = d.zhvi != null ? METRICS.zhvi.fmt(Number(d.zhvi)) : '';
+      li.innerHTML = `<div>${d.zip}${d.city?' — '+d.city+', '+d.state_id:''}</div><div class="sr-sub">${val?'SFH Value: '+val:''}</div>`;
+      li.addEventListener('click', () => selectZip(d.zip, d.state_id));
+      searchResults.appendChild(li);
+    });
+    searchResults.style.display = 'block';
+  });
 }
 
 function doSearch(q) {
@@ -3963,40 +3995,60 @@ function doSearch(q) {
     return;
   }
 
-  // Metro search
-  if (mapMode === 'metro') {
-    const ql = raw.toLowerCase();
-    const metroNames = METRO_DATA.map(d => d.metro);
-    const matches = metroNames.filter(n => n.toLowerCase().startsWith(ql))
-      .concat(metroNames.filter(n => !n.toLowerCase().startsWith(ql) && n.toLowerCase().includes(ql)))
-      .slice(0, 8);
-    if (!matches.length) { searchResults.style.display='none'; return; }
-    matches.forEach(name => {
-      const li = document.createElement('li');
-      const d = METRO_DATA.find(x => x.metro === name);
-      const val = d && d.latest && d.latest[mapMetric] != null ? METRICS[mapMetric].fmt(Number(d.latest[mapMetric])) : '';
-      li.innerHTML = `<div>${name}</div><div class="sr-sub">Metro · ${METRICS[mapMetric].label}${val?' — '+val:''}</div>`;
-      li.addEventListener('click', () => selectMetro(d.region_id));
-      searchResults.appendChild(li);
-    });
-    searchResults.style.display = 'block';
-    return;
-  }
-
-  // County search (no mode switch until selection)
+  // Universal search: State, Metro, and County are all searched together regardless of
+  // which mode is currently active (previously Metro only matched while already in Metro
+  // mode, and County was the unconditional fallback for everything else -- neither let you
+  // search a county while sitting in ZIP mode, for example). Each candidate is tagged with
+  // its type so results stay unambiguous when names collide (e.g. "Columbus" is both a
+  // metro and, separately, a place many counties are named after).
   const ql = raw.toLowerCase();
-  const COUNTY_NAMES = getCountyNames();
-  const matches = COUNTY_NAMES.filter(n => n.toLowerCase().startsWith(ql))
-    .concat(COUNTY_NAMES.filter(n => !n.toLowerCase().startsWith(ql) && n.toLowerCase().includes(ql)))
-    .slice(0, 8);
-  if (!matches.length) { searchResults.style.display='none'; return; }
-  matches.forEach(name => {
+  const candidates = [];
+
+  Object.keys(STATE_NAME_TO_ABBR).forEach(name => {
+    if (name.toLowerCase().includes(ql)) {
+      candidates.push({
+        type: 'State', label: name, sub: 'State',
+        startsWith: name.toLowerCase().startsWith(ql),
+        action: () => selectNationalState(name)
+      });
+    }
+  });
+
+  METRO_DATA.forEach(d => {
+    if (!d.metro || !d.metro.toLowerCase().includes(ql)) return;
+    const val = d.latest && d.latest.zhvi != null ? METRICS.zhvi.fmt(Number(d.latest.zhvi)) : '';
+    candidates.push({
+      type: 'Metro', label: d.metro, sub: 'Metro' + (val ? ' · SFH Value: ' + val : ''),
+      startsWith: d.metro.toLowerCase().startsWith(ql),
+      action: () => selectMetro(d.region_id)
+    });
+  });
+
+  Object.entries(FIPS_NAME).forEach(([fips, name]) => {
+    if (!name.toLowerCase().includes(ql)) return;
+    const d = dataMap[fips];
+    const val = d && d.latest && d.latest.zhvi != null ? METRICS.zhvi.fmt(Number(d.latest.zhvi)) : '';
+    candidates.push({
+      type: 'County', label: d ? d.county + ', ' + d.state_id : name, sub: 'County' + (val ? ' · SFH Value: ' + val : ''),
+      startsWith: name.toLowerCase().startsWith(ql),
+      action: () => selectCounty(name)
+    });
+  });
+
+  // Prefix matches first (across all three types together), then substring matches, each
+  // group alphabetical -- so typing "Colu" surfaces Colorado/Columbus-the-metro/Columbiana
+  // County ahead of anything that merely contains "colu" mid-word.
+  candidates.sort((a, b) => {
+    if (a.startsWith !== b.startsWith) return a.startsWith ? -1 : 1;
+    return a.label.localeCompare(b.label);
+  });
+  const matches = candidates.slice(0, 10);
+
+  if (!matches.length) { searchResults.style.display = 'none'; return; }
+  matches.forEach(m => {
     const li = document.createElement('li');
-    const fips = Object.keys(FIPS_NAME).find(k => FIPS_NAME[k] === name);
-    const d = fips ? dataMap[fips] : null;
-    const val = d && d.latest && d.latest[mapMetric] != null ? METRICS[mapMetric].fmt(Number(d.latest[mapMetric])) : '';
-    li.innerHTML = `<div>${d ? d.county+', '+d.state_id : name}</div><div class="sr-sub">${METRICS[mapMetric].label}${val?' — '+val:''}</div>`;
-    li.addEventListener('click', () => selectCounty(name));
+    li.innerHTML = `<div>${m.label}</div><div class="sr-sub">${m.sub}</div>`;
+    li.addEventListener('click', m.action);
     searchResults.appendChild(li);
   });
   searchResults.style.display = 'block';
@@ -4078,6 +4130,10 @@ function selectCounty(name) {
   searchResults.style.display = 'none';
   searchClear.style.display = 'block';
   if (!map) return;
+  // Universal search means this can now be called from any mode (previously only ever
+  // called while already in County mode, since Ohio's search only offered county results
+  // while in county mode) -- switch modes first so the county layer is actually visible.
+  if (mapMode !== 'county') setMode('county');
 
   const fips = Object.keys(FIPS_NAME).find(k => FIPS_NAME[k] === name);
   if (!fips) return;
@@ -4127,6 +4183,38 @@ function selectCounty(name) {
       }
     }
   }
+}
+
+// Mirrors selectMetro's pattern: switch mode, highlight, zoom to bounds, open modal once
+// the zoom animation lands. Didn't exist before -- national State search is new (Ohio's
+// page has no equivalent, since it was Ohio-only and had no separate State mode to jump to).
+function selectNationalState(name) {
+  searchInput.value = name;
+  searchResults.style.display = 'none';
+  searchClear.style.display = 'block';
+  if (!map) return;
+  if (mapMode !== 'state') setMode('state');
+  if (selectedNationalState) { try{map.setFeatureState({source:'us-states',id:selectedNationalState},{hover:false})}catch(e){} }
+  selectedNationalState = name;
+  const src = map.getSource('us-states');
+  const geojsonData = src && src._data;
+  if (geojsonData && geojsonData.features) {
+    const feature = geojsonData.features.find(f => f.properties && f.properties.name === name);
+    if (feature) {
+      const coords = [];
+      const collect = g => {
+        if (!g) return;
+        if (g.type==='Polygon') g.coordinates.forEach(r=>r.forEach(c=>coords.push(c)));
+        else if (g.type==='MultiPolygon') g.coordinates.forEach(p=>p.forEach(r=>r.forEach(c=>coords.push(c))));
+      };
+      collect(feature.geometry);
+      if (coords.length) {
+        const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
+        map.fitBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]], {padding:60, maxZoom:8, duration:800});
+      }
+    }
+  }
+  setTimeout(() => openNationalStateModal(name), 900);
 }
 
 searchInput.addEventListener('input', e => {
