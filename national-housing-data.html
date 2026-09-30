@@ -3214,6 +3214,9 @@ function setMode(mode) {
   zipLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',(mode==='zip'&&!zipPicking)?'visible':'none')}catch(e){} });
   metroLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',mode==='metro'?'visible':'none')}catch(e){} });
   stateLayers.forEach(l => { try{map.setLayoutProperty(l,'visibility',(mode==='state'||mode==='national'||zipPicking)?'visible':'none')}catch(e){} });
+  // National mode: whole-country flat color + centered big number, so per-state text labels
+  // (leftover from State mode's choropleth) would visually collide with that centered overlay.
+  try{map.setLayoutProperty('state-labels','visibility',mode==='national'?'none':(mode==='state'||zipPicking)?'visible':'none')}catch(e){}
   // Flatten the state picker's fill to a neutral gray/no metric shading -- it's a picker,
   // not a choropleth, while zip mode is waiting for a state to be chosen.
   if (zipPicking) { try{map.setPaintProperty('state-fill','fill-color','#9DA6AB'); map.setPaintProperty('state-fill','fill-opacity',0.35);}catch(e){} }
