@@ -3773,7 +3773,7 @@ function setModeLayersForZipViewing() {
     collect(sfeat.geometry);
     if (coords.length) {
       const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
-      map.fitBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]], {padding:60, maxZoom:9, duration:800});
+      map.fitBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]], {padding:60, maxZoom:9, duration:800, pitch:map.getPitch(), bearing:map.getBearing()});
     }
   }
 }
@@ -4106,7 +4106,7 @@ function selectZip(zip, stateId) {
         if (coords.length) {
           const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
           const bounds = [[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]];
-          map.fitBounds(bounds, {padding:80, maxZoom:13, duration:800});
+          map.fitBounds(bounds, {padding:80, maxZoom:13, duration:800, pitch:map.getPitch(), bearing:map.getBearing()});
         }
       }
     }
@@ -4147,7 +4147,7 @@ function selectMetro(rid) {
       if (coords.length) {
         const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
         const bounds = [[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]];
-        map.fitBounds(bounds, {padding:80, maxZoom:11, duration:800});
+        map.fitBounds(bounds, {padding:80, maxZoom:11, duration:800, pitch:map.getPitch(), bearing:map.getBearing()});
       }
     }
   }
@@ -4192,7 +4192,7 @@ function selectCounty(name) {
         const lons = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
         map.fitBounds(
           [[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]],
-          {padding: 120, maxZoom: 11, duration: 700}
+          {padding: 120, maxZoom: 11, duration: 700, pitch: map.getPitch(), bearing: map.getBearing()}
         );
         boundsFound = true;
       }
@@ -4207,7 +4207,7 @@ function selectCounty(name) {
       collect(features[0].geometry);
       if (coords.length) {
         const lons = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
-        map.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]], {padding:120, maxZoom:11, duration:700});
+        map.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]], {padding:120, maxZoom:11, duration:700, pitch:map.getPitch(), bearing:map.getBearing()});
         boundsFound = true;
       }
     }
@@ -4239,7 +4239,7 @@ function selectNationalState(name) {
       collect(feature.geometry);
       if (coords.length) {
         const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
-        map.fitBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]], {padding:60, maxZoom:8, duration:800});
+        map.fitBounds([[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]], {padding:60, maxZoom:8, duration:800, pitch:map.getPitch(), bearing:map.getBearing()});
       }
     }
   }
