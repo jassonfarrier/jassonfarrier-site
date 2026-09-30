@@ -1473,8 +1473,8 @@ function drawLineChart(county, cmetric) {
 }
 
 // Modal close
-document.getElementById('close-btn').addEventListener('click', () => { document.getElementById('modal-overlay').classList.remove('visible'); selectedCounty=null; if(_dismissClickCard) _dismissClickCard(); if(selectedZip&&map){try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false})}catch(e){}} selectedZip=null; });
-document.getElementById('modal-overlay').addEventListener('click', e => { if(e.target===document.getElementById('modal-overlay')){ document.getElementById('modal-overlay').classList.remove('visible'); selectedCounty=null; if(_dismissClickCard) _dismissClickCard(); }});
+document.getElementById('close-btn').addEventListener('click', () => { document.getElementById('modal-overlay').classList.remove('visible'); selectedCounty=null; if(_dismissClickCard) _dismissClickCard(); if(selectedZip&&map){try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false})}catch(e){}} selectedZip=null; if (mapMode==='national') { const _o=document.getElementById('national-stat-overlay'); if(_o) _o.style.display='block'; } });
+document.getElementById('modal-overlay').addEventListener('click', e => { if(e.target===document.getElementById('modal-overlay')){ document.getElementById('modal-overlay').classList.remove('visible'); selectedCounty=null; if(_dismissClickCard) _dismissClickCard(); if (mapMode==='national') { const _o=document.getElementById('national-stat-overlay'); if(_o) _o.style.display='block'; } }});
 
 // Chart tabs
 document.getElementById('pill-national').addEventListener('click', () => setMode('national'));
@@ -3520,6 +3520,7 @@ function buildPaymentHist(zhviByYear, taxRateByYear, downPct, cmetric) {
 
 function openNationalModal() {
   if (!NATIONAL_DATA) { loadNationalData(); setTimeout(openNationalModal, 600); return; }
+  const _nOverlay = document.getElementById('national-stat-overlay'); if (_nOverlay) _nOverlay.style.display = 'none';
   const d = NATIONAL_DATA;
   const l = d.latest || {};
   selectedCounty = null; selectedZip = null; selectedMetro = null; selectedNationalState = null;
