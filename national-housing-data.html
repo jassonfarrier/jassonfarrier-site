@@ -3808,11 +3808,6 @@ function renderStateChart(name, cmetric, d) {
       .text(r=>METRICS[cmetric].fmt(r.val));
   } else if (cmetric === 'pending_ratio') {
     drawAnnualLineChart(name, cmetric, d.history, true);
-  } else if (name === 'United States' && SHORT_NATIONAL_METRICS.has(cmetric)) {
-    // National-only Redfin datasets (Cash Sales) currently span under 12 months -- the
-    // "Annual" chart samples one point per calendar year, which collapses to a single dot
-    // when all the data sits inside one year. Use the real monthly points instead.
-    drawMonthlyBarChart(name, cmetric, d.history, true);
   } else {
     drawAnnualLineChart(name, cmetric, d.history, true);
   }
