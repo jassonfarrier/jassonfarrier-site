@@ -3671,8 +3671,10 @@ function loadZipDataForState(abbr) {
     fetch('/zips/'+abbr+'.geojson').then(r=>r.json()),
     fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,county,metro,latest&state_id=eq.'+abbr),
     // us_zips_yoy: same materialized-view pattern as us_counties_yoy/us_metros_yoy --
-    // computed server-side from full history, refreshed on data update.
-    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy&state_id=eq.'+abbr),
+    // computed server-side from full history, refreshed on data update. Now covers the
+    // Realtor.com fields too (active_listings, pending_listings, pending_ratio,
+    // days_on_market, price_reduced_pct), not just zhvi.
+    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy,active_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy&state_id=eq.'+abbr),
     // us_zips_national_rank: precomputed RANK() OVER (ORDER BY zhvi DESC) across all 26,268
     // priced ZIPs -- lets the rank badge show a national percentile alongside the in-state
     // one (computed client-side from ZIP_DATA below) without loading all 26k ZIPs client-side.
@@ -3686,7 +3688,11 @@ function loadZipDataForState(abbr) {
     ZIP_DATA.forEach(d => {
       d.yoy_latest = d.yoy_latest || {};
       const fresh = yoyByZip[d.zip];
-      if (fresh && fresh.zhvi_yoy != null) d.yoy_latest.zhvi_yoy = Number(fresh.zhvi_yoy);
+      if (fresh) {
+        for (const [k, v] of Object.entries(fresh)) {
+          if (k !== 'zip' && v != null) d.yoy_latest[k] = Number(v);
+        }
+      }
       d.yoy_history = {};
       const nr = rankByZip[d.zip];
       if (nr) { d.national_rank = nr.national_rank; d.national_total = nr.national_total; }
