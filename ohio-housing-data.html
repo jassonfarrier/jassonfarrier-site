@@ -3640,7 +3640,7 @@ function selectZip(zip) {
       if (coords.length) {
         const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
         const bounds = [[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]];
-        map.fitBounds(bounds, {padding:80, maxZoom:13, duration:800});
+        map.fitBounds(bounds, {padding:80, maxZoom:13, duration:800, bearing: map.getBearing(), pitch: map.getPitch()});
         zoomed = true;
       }
     }
@@ -3671,7 +3671,7 @@ function selectMetro(rid) {
       if (coords.length) {
         const lngs = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
         const bounds = [[Math.min(...lngs),Math.min(...lats)],[Math.max(...lngs),Math.max(...lats)]];
-        map.fitBounds(bounds, {padding:80, maxZoom:11, duration:800});
+        map.fitBounds(bounds, {padding:80, maxZoom:11, duration:800, bearing: map.getBearing(), pitch: map.getPitch()});
       }
     }
   }
@@ -3712,7 +3712,7 @@ function selectCounty(name) {
         const lons = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
         map.fitBounds(
           [[Math.min(...lons), Math.min(...lats)], [Math.max(...lons), Math.max(...lats)]],
-          {padding: 120, maxZoom: 11, duration: 700}
+          {padding: 120, maxZoom: 11, duration: 700, bearing: map.getBearing(), pitch: map.getPitch()}
         );
         boundsFound = true;
       }
@@ -3727,7 +3727,7 @@ function selectCounty(name) {
       collect(features[0].geometry);
       if (coords.length) {
         const lons = coords.map(c=>c[0]), lats = coords.map(c=>c[1]);
-        map.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]], {padding:120, maxZoom:11, duration:700});
+        map.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]], {padding:120, maxZoom:11, duration:700, bearing: map.getBearing(), pitch: map.getPitch()});
         boundsFound = true;
       }
     }
