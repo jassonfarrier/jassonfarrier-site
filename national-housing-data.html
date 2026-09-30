@@ -1537,6 +1537,8 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
     } else if (mapMode === 'state' && selectedNationalState && nationalStatesMap[selectedNationalState]) {
       const d = nationalStatesMap[selectedNationalState];
       renderStateChart(selectedNationalState, cm, d);
+    } else if (mapMode === 'national' && NATIONAL_DATA) {
+      renderStateChart('United States', cm, NATIONAL_DATA);
     } else if (selectedCounty) {
       renderChart(selectedCounty, cm);
     }
@@ -1548,6 +1550,7 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
     if (mapMode === 'zip' && selectedZip) renderRankBadge('zip', selectedZip, cm);
     else if (mapMode === 'metro' && selectedMetro) renderRankBadge('metro', selectedMetro, cm);
     else if (mapMode === 'state') { const r = document.getElementById('ut-rank'); if (r) r.textContent = ''; const s = document.querySelector('.upper-third-rank-section'); if (s) s.style.display = 'none'; }
+    else if (mapMode === 'national') { const r = document.getElementById('ut-rank'); if (r) r.textContent = ''; const s = document.querySelector('.upper-third-rank-section'); if (s) s.style.display = 'none'; }
     else if (selectedCounty) renderRankBadge('county', selectedCounty, cm);
   });
 });
