@@ -275,6 +275,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="active_listings">Active Listings</option>
     <option value="active_listings_yoy">Active Listings YOY %</option>
     <option value="new_listings">New Listings</option>
+    <option value="new_listings_yoy">New Listings YOY %</option>
     <option value="pending_listings">Pending Sales</option>
     <option value="pending_listings_yoy">Pending Sales YOY %</option>
     <option value="pending_ratio">Pending Ratio</option>
@@ -302,6 +303,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="new_listings"><span class="mn">New Listings</span><span class="md">New listings this month · Realtor.com</span></button>
+    <button class="metric-btn yoy-btn" data-metric="new_listings_yoy"><span class="mn">New Listings YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="delisted_pct"><span class="mn">Delisted %</span><span class="md">% of listings pulled off market · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#delisted-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Demand</div>
     <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-sales" target="_blank" onclick="event.stopPropagation()">?</a></button>
@@ -391,6 +393,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="active_listings">Active Listings</option>
           <option value="active_listings_yoy">Active Listings YOY %</option>
           <option value="new_listings">New Listings</option>
+          <option value="new_listings_yoy">New Listings YOY %</option>
           <option value="pending_listings">Pending Sales</option>
           <option value="pending_listings_yoy">Pending Sales YOY %</option>
           <option value="pending_ratio">Pending Ratio</option>
@@ -439,6 +442,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab" data-cmetric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="new_listings"><span class="mn">New Listings</span><span class="md">New listings this month · Realtor.com</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="new_listings_yoy"><span class="mn">New Listings YOY %</span><span class="md">Year-over-year change</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Demand</div>
           <button class="metric-btn chart-tab" data-cmetric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
@@ -504,6 +508,7 @@ const METRICS = {
   active_listings:  {label:'Active Listings', fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
   active_listings_yoy:{label:'Active Listings YOY %',fmt:v=>v.toFixed(1)+'%',           lo:'Declining',hi:'Growing'},
   new_listings:     {label:'New Listings',    fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
+  new_listings_yoy: {label:'New Listings YOY %', fmt:v=>v.toFixed(1)+'%',              lo:'Declining',hi:'Growing'},
   pending_listings: {label:'Pending Sales',   fmt:v=>v.toLocaleString(),                 lo:'Few',      hi:'Many'},
   pending_listings_yoy:{label:'Pending Sales YOY %',fmt:v=>v.toFixed(1)+'%',            lo:'Declining',hi:'Growing'},
   pending_ratio:    {label:'Pending Ratio',     fmt:v=>v.toFixed(2),                               lo:'Low Demand',hi:'High Demand'},
@@ -532,8 +537,8 @@ const METRICS = {
   new_construction_price: {label:'New Construction Median Price', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
   new_construction_sqft:  {label:'New Construction $/SqFt',       fmt:v=>'$'+v.toFixed(0)+'/sqft',            lo:'Lower', hi:'Higher'},
 };
-const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','zhvi_growth_5y','zhvi_growth_10y']);
-const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct'};
+const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','new_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','zhvi_growth_5y','zhvi_growth_10y']);
+const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', new_listings_yoy:'new_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct']);
 const PAYMENT_METRICS = new Set(['est_payment_20']);
@@ -1700,7 +1705,7 @@ function renderChart(county, cmetric) {
         }
       });
     }
-  } else if (cmetric === 'zhvi' || cmetric === 'median_list_price' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct') {
+  } else if (cmetric === 'zhvi' || cmetric === 'median_list_price' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'new_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct') {
     drawAnnualLineChart(displayName, cmetric, d && d.history, true);
   } else {
     drawMonthlyBarChart(displayName, cmetric, d && d.history, true);
@@ -1730,7 +1735,7 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
   // payload small (~730KB total vs ~14MB with history). History gets added back in a later
   // pass, fetched lazily per-county on click, once this base layer is confirmed working.
   const _base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,county,state,state_id,latest&order=county';
-  const _yoyBase = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties_yoy?select=fips,zhvi_yoy,zhvi_condo_yoy,active_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy&order=fips';
+  const _yoyBase = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties_yoy?select=fips,zhvi_yoy,zhvi_condo_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy&order=fips';
   const _pageSize = 1000;
   const _pageCount = 4; // 4 * 1000 = 4000, safely covers all 3,073 counties with room to grow
   Promise.all([
@@ -1803,6 +1808,7 @@ function _onCountiesLoaded(counties, yoyRows) {
       if (yr.zhvi_yoy != null) d.yoy_latest.zhvi_yoy = Number(yr.zhvi_yoy);
       if (yr.zhvi_condo_yoy != null) d.yoy_latest.zhvi_condo_yoy = Number(yr.zhvi_condo_yoy);
       if (yr.active_listings_yoy != null) d.yoy_latest.active_listings_yoy = Number(yr.active_listings_yoy);
+      if (yr.new_listings_yoy != null) d.yoy_latest.new_listings_yoy = Number(yr.new_listings_yoy);
       if (yr.pending_listings_yoy != null) d.yoy_latest.pending_listings_yoy = Number(yr.pending_listings_yoy);
       if (yr.pending_ratio_yoy != null) d.yoy_latest.pending_ratio_yoy = Number(yr.pending_ratio_yoy);
       if (yr.days_on_market_yoy != null) d.yoy_latest.days_on_market_yoy = Number(yr.days_on_market_yoy);
@@ -3216,7 +3222,7 @@ function loadMetroData() {
     // from full history, refreshed on data update. Without this, d.yoy_latest is empty for
     // every metro until that metro's history is lazily loaded by a click, which is exactly
     // what made YOY map coloring show nothing and caused the price/YOY state to desync.
-    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_metros_yoy?select=region_id,zhvi_yoy,zhvi_condo_yoy,active_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy', {
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_metros_yoy?select=region_id,zhvi_yoy,zhvi_condo_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy', {
       headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
     }).then(r=>r.json())
   ]).then(([geojson, metros, yoyRows]) => {
@@ -3638,7 +3644,7 @@ function loadZipDataForState(abbr) {
     // computed server-side from full history, refreshed on data update. Now covers the
     // Realtor.com fields too (active_listings, pending_listings, pending_ratio,
     // days_on_market, price_reduced_pct), not just zhvi.
-    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy,active_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy&state_id=eq.'+abbr),
+    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy&state_id=eq.'+abbr),
     // us_zips_national_rank: precomputed RANK() OVER (ORDER BY zhvi DESC) across all 26,268
     // priced ZIPs -- lets the rank badge show a national percentile alongside the in-state
     // one (computed client-side from ZIP_DATA below) without loading all 26k ZIPs client-side.
