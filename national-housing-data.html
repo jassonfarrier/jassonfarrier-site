@@ -630,6 +630,9 @@ const METRICS = {
 const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','new_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','zhvi_growth_5y','zhvi_growth_10y','luxury_median_sale_price_yoy','luxury_median_dom_yoy','luxury_active_listings_yoy','luxury_pending_sales_yoy']);
 const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', new_listings_yoy:'new_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct', luxury_median_sale_price_yoy:'luxury_median_sale_price', luxury_median_dom_yoy:'luxury_median_dom', luxury_active_listings_yoy:'luxury_active_listings', luxury_pending_sales_yoy:'luxury_pending_sales'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
+// Metrics where the NATIONAL series alone is short (currently under a year), so the
+// Annual chart (one point per calendar year) would collapse to a single dot -- use monthly instead.
+const SHORT_NATIONAL_METRICS = new Set(['cash_pct','down_payment_pct','fha_pct','va_pct']);
 // Which geography levels each metric actually has real data for. Metrics not listed here
 // are assumed available at all five levels (the common case). Built strictly from what was
 // actually loaded into Supabase for each Redfin dataset -- never guessed or assumed.
@@ -3805,6 +3808,11 @@ function renderStateChart(name, cmetric, d) {
       .text(r=>METRICS[cmetric].fmt(r.val));
   } else if (cmetric === 'pending_ratio') {
     drawAnnualLineChart(name, cmetric, d.history, true);
+  } else if (name === 'United States' && SHORT_NATIONAL_METRICS.has(cmetric)) {
+    // National-only Redfin datasets (Cash Sales) currently span under 12 months -- the
+    // "Annual" chart samples one point per calendar year, which collapses to a single dot
+    // when all the data sits inside one year. Use the real monthly points instead.
+    drawMonthlyBarChart(name, cmetric, d.history, true);
   } else {
     drawAnnualLineChart(name, cmetric, d.history, true);
   }
