@@ -287,6 +287,21 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="days_on_market_yoy">Days on Market YOY %</option>
     <option value="price_reduced_pct">Price Cut %</option>
     <option value="price_reduced_pct_yoy">Price Cut % YOY</option>
+    <option value="cancellation_pct">Cancellation Rate %</option>
+    <option value="cancellation_pct_yoy">Cancellation Rate YOY %</option>
+    <option value="delisted_pct">Delisted %</option>
+    <option value="relisted_pct">Relisted %</option>
+    <option value="cash_pct">All-Cash Sales %</option>
+    <option value="down_payment_pct">Median Down Payment %</option>
+    <option value="fha_pct">FHA Loan %</option>
+    <option value="va_pct">VA Loan %</option>
+    <option value="investor_purchases">Investor Purchases</option>
+    <option value="investor_market_share">Investor Market Share %</option>
+    <option value="luxury_median_sale_price">Luxury Median Sale Price</option>
+    <option value="luxury_median_sale_price_yoy">Luxury Median Sale Price YOY %</option>
+    <option value="luxury_median_dom">Luxury Days on Market</option>
+    <option value="luxury_active_listings">Luxury Active Listings</option>
+    <option value="luxury_pending_sales">Luxury Pending Sales</option>
   </select>
 </div>
 <div class="main">
@@ -308,6 +323,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn" data-metric="new_listings"><span class="mn">New Listings</span><span class="md">New listings this month · Realtor.com</span></button>
     <button class="metric-btn yoy-btn" data-metric="new_listings_yoy"><span class="mn">New Listings YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="delisted_pct"><span class="mn">Delisted %</span><span class="md">% of listings pulled off market · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#delisted-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="relisted_pct"><span class="mn">Relisted %</span><span class="md">% of delisted homes put back up · Redfin</span></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Demand</div>
     <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-sales" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-sales-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
@@ -319,6 +335,23 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn yoy-btn" data-metric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#price-cut-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">% of pending sales cancelled · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Financing</div>
+    <button class="metric-btn" data-metric="cash_pct"><span class="mn">All-Cash Sales %</span><span class="md">Redfin · Metro &amp; National only</span></button>
+    <button class="metric-btn" data-metric="down_payment_pct"><span class="mn">Median Down Payment %</span><span class="md">Redfin · Metro &amp; National only</span></button>
+    <button class="metric-btn" data-metric="fha_pct"><span class="mn">FHA Loan %</span><span class="md">Redfin · Metro &amp; National only</span></button>
+    <button class="metric-btn" data-metric="va_pct"><span class="mn">VA Loan %</span><span class="md">Redfin · Metro &amp; National only</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Investor Activity</div>
+    <button class="metric-btn" data-metric="investor_purchases"><span class="mn">Investor Purchases</span><span class="md">Redfin · Metro &amp; National only</span></button>
+    <button class="metric-btn" data-metric="investor_market_share"><span class="mn">Investor Market Share %</span><span class="md">Redfin · Metro &amp; National only</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Luxury Market</div>
+    <button class="metric-btn" data-metric="luxury_median_sale_price"><span class="mn">Luxury Median Sale Price</span><span class="md">Redfin · Top 5% tier · State, Metro &amp; National</span></button>
+    <button class="metric-btn yoy-btn" data-metric="luxury_median_sale_price_yoy"><span class="mn">Luxury Median Sale Price YOY %</span><span class="md">Year-over-year change</span></button>
+    <button class="metric-btn" data-metric="luxury_median_dom"><span class="mn">Luxury Days on Market</span><span class="md">Redfin · Top 5% tier</span></button>
+    <button class="metric-btn yoy-btn" data-metric="luxury_median_dom_yoy"><span class="mn">Luxury Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
+    <button class="metric-btn" data-metric="luxury_active_listings"><span class="mn">Luxury Active Listings</span><span class="md">Redfin · Top 5% tier</span></button>
+    <button class="metric-btn yoy-btn" data-metric="luxury_active_listings_yoy"><span class="mn">Luxury Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
+    <button class="metric-btn" data-metric="luxury_pending_sales"><span class="mn">Luxury Pending Sales</span><span class="md">Redfin · Top 5% tier</span></button>
+    <button class="metric-btn yoy-btn" data-metric="luxury_pending_sales_yoy"><span class="mn">Luxury Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
     <hr>
 
     <div class="src" style="margin-top:auto;font-size:9px;color:rgba(0,0,0,0.35);line-height:1.6;padding-top:12px;border-top:1px solid rgba(0,0,0,0.07)">
@@ -414,6 +447,21 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="cancellation_pct">Cancellation Rate %</option>
           <option value="cancellation_pct_yoy">Cancellation Rate YOY %</option>
           <option value="delisted_pct">Delisted %</option>
+          <option value="relisted_pct">Relisted %</option>
+          <option value="cash_pct">All-Cash Sales %</option>
+          <option value="down_payment_pct">Median Down Payment %</option>
+          <option value="fha_pct">FHA Loan %</option>
+          <option value="va_pct">VA Loan %</option>
+          <option value="investor_purchases">Investor Purchases</option>
+          <option value="investor_market_share">Investor Market Share %</option>
+          <option value="luxury_median_sale_price">Luxury Median Sale Price</option>
+          <option value="luxury_median_sale_price_yoy">Luxury Median Sale Price YOY %</option>
+          <option value="luxury_median_dom">Luxury Days on Market</option>
+          <option value="luxury_median_dom_yoy">Luxury Days on Market YOY %</option>
+          <option value="luxury_active_listings">Luxury Active Listings</option>
+          <option value="luxury_active_listings_yoy">Luxury Active Listings YOY %</option>
+          <option value="luxury_pending_sales">Luxury Pending Sales</option>
+          <option value="luxury_pending_sales_yoy">Luxury Pending Sales YOY %</option>
         </select>
         <div class="modal-left-sticky"><div id="pending-ratio-badge" style="display:none;font-family:Montserrat,sans-serif;background:#edf2fb;border-radius:12px;padding:16px 12px 16px;margin-bottom:12px;">
           <svg viewBox="5 5 190 118" style="width:100%;display:block;margin:0 auto 8px;">
@@ -465,6 +513,24 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab" data-cmetric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">Redfin · Apr 2015–Jul 2026</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="delisted_pct"><span class="mn">Delisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="relisted_pct"><span class="mn">Relisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Financing</div>
+          <button class="metric-btn chart-tab" data-cmetric="cash_pct"><span class="mn">All-Cash Sales %</span><span class="md">Redfin · Metro &amp; National only</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="down_payment_pct"><span class="mn">Median Down Payment %</span><span class="md">Redfin · Metro &amp; National only</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="fha_pct"><span class="mn">FHA Loan %</span><span class="md">Redfin · Metro &amp; National only</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="va_pct"><span class="mn">VA Loan %</span><span class="md">Redfin · Metro &amp; National only</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Investor Activity</div>
+          <button class="metric-btn chart-tab" data-cmetric="investor_purchases"><span class="mn">Investor Purchases</span><span class="md">Redfin · Metro &amp; National only</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="investor_market_share"><span class="mn">Investor Market Share %</span><span class="md">Redfin · Metro &amp; National only</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Luxury Market</div>
+          <button class="metric-btn chart-tab" data-cmetric="luxury_median_sale_price"><span class="mn">Luxury Median Sale Price</span><span class="md">Redfin · Top 5% tier · Mar 2013–present</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="luxury_median_sale_price_yoy"><span class="mn">Luxury Median Sale Price YOY %</span><span class="md">Year-over-year change</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="luxury_median_dom"><span class="mn">Luxury Days on Market</span><span class="md">Redfin · Top 5% tier</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="luxury_median_dom_yoy"><span class="mn">Luxury Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="luxury_active_listings"><span class="mn">Luxury Active Listings</span><span class="md">Redfin · Top 5% tier</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="luxury_active_listings_yoy"><span class="mn">Luxury Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="luxury_pending_sales"><span class="mn">Luxury Pending Sales</span><span class="md">Redfin · Top 5% tier</span></button>
+          <button class="metric-btn yoy-btn chart-tab" data-cmetric="luxury_pending_sales_yoy"><span class="mn">Luxury Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
 
         </div></div><!-- end modal-left-scroll -->
       </div>
@@ -542,12 +608,27 @@ const METRICS = {
   cancellation_pct:            {label:'Cancellation Rate %',    fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
   cancellation_pct_yoy:         {label:'Cancellation Rate YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   delisted_pct:                 {label:'Delisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
+  relisted_pct:                 {label:'Relisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
+  cash_pct:            {label:'All-Cash Sales %',       fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
+  down_payment_pct:    {label:'Median Down Payment %',  fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
+  fha_pct:             {label:'FHA Loan %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
+  va_pct:              {label:'VA Loan %',              fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
+  investor_purchases:  {label:'Investor Purchases',     fmt:v=>v.toLocaleString(), lo:'Fewer', hi:'More'},
+  investor_market_share:{label:'Investor Market Share %',fmt:v=>v.toFixed(1)+'%',  lo:'Lower', hi:'Higher'},
+  luxury_median_sale_price: {label:'Luxury Median Sale Price', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
+  luxury_median_sale_price_yoy: {label:'Luxury Median Sale Price YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  luxury_median_dom:   {label:'Luxury Days on Market',  fmt:v=>v+'d',              lo:'Fast',  hi:'Slow'},
+  luxury_median_dom_yoy: {label:'Luxury Days on Market YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  luxury_active_listings: {label:'Luxury Active Listings', fmt:v=>v.toLocaleString(), lo:'Few', hi:'Many'},
+  luxury_active_listings_yoy: {label:'Luxury Active Listings YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  luxury_pending_sales: {label:'Luxury Pending Sales',  fmt:v=>v.toLocaleString(), lo:'Few', hi:'Many'},
+  luxury_pending_sales_yoy: {label:'Luxury Pending Sales YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   est_payment_20: {label:'Est. Payment (20% Down)', fmt:v=>'$'+Math.round(v).toLocaleString()+'/mo', lo:'Lower', hi:'Higher'},
   new_construction_price: {label:'New Construction Median Price', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
   new_construction_sqft:  {label:'New Construction $/SqFt',       fmt:v=>'$'+v.toFixed(0)+'/sqft',            lo:'Lower', hi:'Higher'},
 };
-const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','new_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','zhvi_growth_5y','zhvi_growth_10y']);
-const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', new_listings_yoy:'new_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct'};
+const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','new_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','zhvi_growth_5y','zhvi_growth_10y','luxury_median_sale_price_yoy','luxury_median_dom_yoy','luxury_active_listings_yoy','luxury_pending_sales_yoy']);
+const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', new_listings_yoy:'new_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct', luxury_median_sale_price_yoy:'luxury_median_sale_price', luxury_median_dom_yoy:'luxury_median_dom', luxury_active_listings_yoy:'luxury_active_listings', luxury_pending_sales_yoy:'luxury_pending_sales'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct']);
 const PAYMENT_METRICS = new Set(['est_payment_20']);
@@ -820,7 +901,7 @@ function getMetricVal(d, metric) {
 // --- Rank Badge ---
 // Only metrics where relative position is a meaningful, citable fact get ranked.
 // Neutral framing throughout: "Highest"/"Lowest" describes direction, never "best"/"worst".
-const RANKABLE_METRICS = new Set(['zhvi','zhvi_condo','days_on_market','price_reduced_pct','cancellation_pct','pending_ratio','property_tax_rate','median_property_tax','sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k','est_payment_20']);
+const RANKABLE_METRICS = new Set(['zhvi','zhvi_condo','days_on_market','price_reduced_pct','cancellation_pct','pending_ratio','property_tax_rate','median_property_tax','sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k','est_payment_20','luxury_median_sale_price']);
 
 function computeRank(list, metric, targetVal) {
   // list: array of numeric values (already non-null) for every record that has this metric.
@@ -1744,7 +1825,7 @@ function renderChart(county, cmetric) {
         }
       });
     }
-  } else if (cmetric === 'zhvi' || cmetric === 'median_list_price' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'new_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct') {
+  } else if (cmetric === 'zhvi' || cmetric === 'median_list_price' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'new_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct' || cmetric === 'relisted_pct' || cmetric === 'cash_pct' || cmetric === 'down_payment_pct' || cmetric === 'fha_pct' || cmetric === 'va_pct' || cmetric === 'investor_purchases' || cmetric === 'investor_market_share' || cmetric === 'luxury_median_sale_price' || cmetric === 'luxury_median_dom' || cmetric === 'luxury_active_listings' || cmetric === 'luxury_pending_sales') {
     drawAnnualLineChart(displayName, cmetric, d && d.history, true);
   } else {
     drawMonthlyBarChart(displayName, cmetric, d && d.history, true);
@@ -3268,7 +3349,7 @@ function loadMetroData() {
     // from full history, refreshed on data update. Without this, d.yoy_latest is empty for
     // every metro until that metro's history is lazily loaded by a click, which is exactly
     // what made YOY map coloring show nothing and caused the price/YOY state to desync.
-    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_metros_yoy?select=region_id,zhvi_yoy,zhvi_condo_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy', {
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_metros_yoy?select=region_id,zhvi_yoy,zhvi_condo_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy,cancellation_pct_yoy,delisted_pct_yoy,relisted_pct_yoy,cash_pct_yoy,down_payment_pct_yoy,fha_pct_yoy,va_pct_yoy,investor_purchases_yoy,investor_market_share_yoy,luxury_median_sale_price_yoy,luxury_median_dom_yoy,luxury_active_listings_yoy,luxury_pending_sales_yoy', {
       headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
     }).then(r=>r.json())
   ]).then(([geojson, metros, yoyRows]) => {
