@@ -4109,7 +4109,11 @@ function selectZip(zip, stateId) {
         }
       }
     }
-    setTimeout(() => openZipModal(zip, stateId), 900);
+    // Zoom-only on search-select, matching County's search behavior -- don't auto-open the
+    // chart modal. The modal used to pop up 900ms after selecting, covering the map before
+    // the zoom was even visible; now the map stays visible, zoomed and highlighted on the
+    // picked ZIP, and the user clicks the polygon themselves (same map-click handler as
+    // ever) if they want the chart.
   };
   if (stateId && currentZipState !== stateId) {
     loadZipDataForState(stateId).then(finishSelect);
