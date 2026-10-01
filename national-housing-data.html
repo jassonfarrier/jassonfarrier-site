@@ -658,6 +658,7 @@ function updateModePillAvailability(metric) {
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct']);
 const PAYMENT_METRICS = new Set(['est_payment_20']);
 const NEW_CONSTRUCTION_METRICS = new Set(['new_construction_price','new_construction_sqft']);
+const REDFIN_METRICS = new Set(['cancellation_pct','delisted_pct','relisted_pct','cash_pct','down_payment_pct','fha_pct','va_pct','investor_purchases','investor_market_share','luxury_median_sale_price','luxury_median_dom','luxury_active_listings','luxury_pending_sales']);
 
 // Ohio-specific homeowners insurance rate, as a % of home value per year. Sourced from
 // NerdWallet's 2026 state-by-state average ($2,080/yr average Ohio premium on their $400,000
@@ -1348,6 +1349,7 @@ function sourceForMetric(m) {
   if (DISTRESS_METRICS.has(base)) return '<a href="https://www.propstream.com/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">PropStream</a>';
   if (PAYMENT_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#est-payment" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Derived Estimate</a>';
   if (NEW_CONSTRUCTION_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#new-construction" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">MLS</a>';
+  if (REDFIN_METRICS.has(base)) return '<a href="https://www.redfin.com/news/data-center/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Redfin</a>';
   return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
 }
 function paymentDisclaimer(m) {
