@@ -3855,7 +3855,7 @@ function loadZipDataForState(abbr) {
     // computed server-side from full history, refreshed on data update. Now covers the
     // Realtor.com fields too (active_listings, pending_listings, pending_ratio,
     // days_on_market, price_reduced_pct), not just zhvi.
-    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy&state_id=eq.'+abbr),
+    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy,cancellation_pct_yoy&state_id=eq.'+abbr),
     // us_zips_national_rank: precomputed RANK() OVER (ORDER BY zhvi DESC) across all 26,268
     // priced ZIPs -- lets the rank badge show a national percentile alongside the in-state
     // one (computed client-side from ZIP_DATA below) without loading all 26k ZIPs client-side.
@@ -4522,6 +4522,7 @@ document.addEventListener('change', function(e){
 })();
 
 </script>
+
 
 
 
