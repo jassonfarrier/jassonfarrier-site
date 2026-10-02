@@ -314,6 +314,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn yoy-btn" data-metric="zhvi_condo_yoy"><span class="mn">Condo Home Value YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Supply</div>
     <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="mls_active_listings"><span class="mn">Active Listings (Central Ohio MLS)</span><span class="md">Annual, August snapshot · Central Ohio only</span><a class="metric-help" href="/ohio-housing-data-methodology#mls-active-listings" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="new_listings"><span class="mn">New Listings</span><span class="md">New listings this month</span></button>
     <button class="metric-btn yoy-btn" data-metric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn yoy-btn" data-metric="new_listings_yoy"><span class="mn">New Listings YOY %</span><span class="md">Year-over-year change</span></button>
@@ -602,6 +603,7 @@ const METRICS = {
   est_payment_20: {label:'Est. Payment (20% Down)', fmt:v=>'$'+Math.round(v).toLocaleString()+'/mo', lo:'Lower', hi:'Higher'},
   new_construction_price: {label:'New Construction Median Price', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
   new_construction_sqft:  {label:'New Construction $/SqFt',       fmt:v=>'$'+v.toFixed(0)+'/sqft',            lo:'Lower', hi:'Higher'},
+  mls_active_listings: {label:'Active Listings (Central Ohio MLS)', fmt:v=>v.toLocaleString(), lo:'Few', hi:'Many'},
 };
 const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','new_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','zhvi_growth_5y','zhvi_growth_10y']);
 const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', new_listings_yoy:'new_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct'};
@@ -609,6 +611,7 @@ const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct']);
 const PAYMENT_METRICS = new Set(['est_payment_20']);
 const NEW_CONSTRUCTION_METRICS = new Set(['new_construction_price','new_construction_sqft']);
+const MLS_METRICS = new Set(['mls_active_listings']);
 
 // Ohio-specific homeowners insurance rate, as a % of home value per year. Sourced from
 // NerdWallet's 2026 state-by-state average ($2,080/yr average Ohio premium on their $400,000
@@ -1159,6 +1162,7 @@ function sourceForMetric(m) {
   if (DISTRESS_METRICS.has(base)) return '<a href="https://www.propstream.com/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">PropStream</a>';
   if (PAYMENT_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#est-payment" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Derived Estimate</a>';
   if (NEW_CONSTRUCTION_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#new-construction" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">MLS</a>';
+  if (MLS_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#mls-active-listings" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Central Ohio MLS</a>';
   return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
 }
 function paymentDisclaimer(m) {
@@ -1507,8 +1511,24 @@ function renderGrowthChart(name, cmetric, d, isZip) {
   }
 }
 
+function showStatewideOnlyMessage(cmetric) {
+  const sliderWrap = document.getElementById('chart-slider-wrap');
+  if (sliderWrap) sliderWrap.style.display = 'none';
+  document.getElementById('chart-label').textContent = (METRICS[cmetric] ? METRICS[cmetric].label : cmetric) + ' — Statewide only';
+  const utm = document.getElementById('ut-metric'); if (utm) utm.textContent = METRICS[cmetric] ? METRICS[cmetric].label : cmetric;
+  const lsvg = d3.select('#line-chart');
+  lsvg.selectAll('*').remove(); lsvg.on('click', null);
+  const W = lsvg.node().getBoundingClientRect().width || 760;
+  const H = lsvg.node().clientHeight || 300;
+  lsvg.attr('viewBox', `0 0 ${W} ${H}`).append('text')
+    .attr('x', W/2).attr('y', H/2).attr('text-anchor', 'middle')
+    .attr('font-family', 'Montserrat').attr('font-size', '13px').attr('fill', 'rgba(0,0,0,0.45)')
+    .text('This metric is Central Ohio MLS data — switch to the Ohio statewide tab to view it.');
+}
+
 function renderChart(county, cmetric) {
   const d = dataMap[county];
+  if (MLS_METRICS.has(cmetric)) { showStatewideOnlyMessage(cmetric); return; }
   if (GROWTH_METRICS.has(cmetric)) { renderGrowthChart(county, cmetric, d, false); return; }
   if (TAX_YOY.has(cmetric)) {
     // Annual ACS-based YOY — use annual bar chart with YOY rows
@@ -3084,7 +3104,9 @@ function openMetroModal(rid) {
   setTimeout(() => {
     document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
     document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
-    if (GROWTH_METRICS.has(mapMetric)) {
+    if (MLS_METRICS.has(mapMetric)) {
+      showStatewideOnlyMessage(mapMetric);
+    } else if (GROWTH_METRICS.has(mapMetric)) {
       renderGrowthChart(d.metro, mapMetric, d, true);
     } else if (YOY_METRICS.has(mapMetric)) {
       drawMonthlyBarChart(d.metro, mapMetric, getYOYRows(d, mapMetric), true);
@@ -3139,7 +3161,7 @@ function _applyAggregatedStateDistress() {
 function loadStateData() {
   if (stateDataLoaded) { return; }
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
-  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_state?select=region_id,name,latest,history,distress_history', {
+  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_state?select=region_id,name,latest,history,distress_history,mls_active_listings_history', {
     headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
   }).then(r=>r.json()).then(rows => {
     STATE_DATA = rows[0] || null;
@@ -3326,6 +3348,51 @@ function renderStateChart(name, cmetric, d) {
       .attr('font-family','Montserrat').attr('fill','#1a1a2e')
       .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','3px').style('stroke-linejoin','round')
       .text(r=>METRICS[cmetric].fmt(r.val));
+  } else if (MLS_METRICS.has(cmetric)) {
+    const mh = d.mls_active_listings_history;
+    if (!mh || !mh.length) { d3.select('#line-chart').selectAll('*').remove(); return; }
+    const sliderWrap = document.getElementById('chart-slider-wrap');
+    if (sliderWrap) sliderWrap.style.display = 'none';
+    const rows = mh
+      .map(r => ({label: String(r.year), val: r.active_listings}))
+      .filter(r => r.val != null)
+      .sort((a,b) => a.label < b.label ? -1 : 1);
+    if (!rows.length) return;
+    document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' (August each year)';
+    const utm = document.getElementById('ut-metric'); if (utm) utm.textContent = METRICS[cmetric].label;
+    const lsvg = d3.select('#line-chart');
+    lsvg.selectAll('*').remove(); lsvg.on('click', null);
+    const W = lsvg.node().getBoundingClientRect().width || 760;
+    const H = lsvg.node().clientHeight || 600;
+    const m = {top:40,right:48,bottom:44,left:90};
+    const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
+    const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
+    const x = d3.scaleBand().domain(rows.map(r=>r.label)).range([0,iw]).padding(0.3);
+    const maxV = d3.max(rows,r=>r.val);
+    const y = d3.scaleLinear().domain([0,maxV*1.15]).range([ih,0]);
+    y.ticks(5).forEach(t=>{
+      g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t))
+        .attr('stroke','rgba(0,0,0,0.1)').attr('stroke-width',1);
+    });
+    g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(v=>METRICS[cmetric].fmt(v)))
+      .call(ax=>ax.select('.domain').remove())
+      .call(ax=>ax.selectAll('.tick line').remove())
+      .call(ax=>ax.selectAll('text').attr('font-family','Montserrat').attr('font-size','11px').attr('fill','rgba(0,0,0,0.45)'));
+    g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).tickSize(0))
+      .call(ax=>ax.select('.domain').remove())
+      .call(ax=>ax.selectAll('text').attr('font-family','Montserrat').attr('font-size','10px').attr('font-weight','700').attr('fill','#0d1e42').attr('dy','1.2em'));
+    const barColors = rows.map((_,i)=>i===rows.length-1?'#0d1e42':'rgba(13,30,66,0.22)');
+    g.selectAll('.bar').data(rows).join('rect').attr('class','bar')
+      .attr('x',r=>x(r.label)).attr('y',r=>y(r.val))
+      .attr('width',x.bandwidth()).attr('height',r=>ih-y(r.val))
+      .attr('rx',3).attr('fill',(_,i)=>barColors[i])
+      .attr('stroke','#fff').attr('stroke-width',1);
+    g.selectAll('.barlbl').data(rows).join('text').attr('class','barlbl')
+      .attr('x',r=>x(r.label)+x.bandwidth()/2).attr('y',r=>y(r.val)-8)
+      .attr('text-anchor','middle').attr('font-size','10px').attr('font-weight','900')
+      .attr('font-family','Montserrat').attr('fill','#1a1a2e')
+      .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','3px').style('stroke-linejoin','round')
+      .text(r=>METRICS[cmetric].fmt(r.val));
   } else if (cmetric === 'pending_ratio') {
     drawAnnualLineChart(name, cmetric, d.history, true);
   } else {
@@ -3503,6 +3570,7 @@ function renderZipChart(zip, cmetric) {
 function _doRenderZipChart(zip, cmetric) {
   const d = zipDataMap[zip];
   if (!d) return;
+  if (MLS_METRICS.has(cmetric)) { showStatewideOnlyMessage(cmetric); return; }
   if (GROWTH_METRICS.has(cmetric)) { renderGrowthChart(zip, cmetric, d, true); return; }
   if (TAX_YOY.has(cmetric)) {
     const yoyRows = getYOYRows(d, cmetric).map(r => ({...r, date: r.date || ''}));
