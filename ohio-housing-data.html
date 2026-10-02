@@ -3349,50 +3349,12 @@ function renderStateChart(name, cmetric, d) {
       .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','3px').style('stroke-linejoin','round')
       .text(r=>METRICS[cmetric].fmt(r.val));
   } else if (MLS_METRICS.has(cmetric)) {
-    const mh = d.mls_active_listings_history;
-    if (!mh || !mh.length) { d3.select('#line-chart').selectAll('*').remove(); return; }
-    const sliderWrap = document.getElementById('chart-slider-wrap');
-    if (sliderWrap) sliderWrap.style.display = 'none';
-    const rows = mh
-      .map(r => ({label: String(r.year), val: r.active_listings}))
-      .filter(r => r.val != null)
-      .sort((a,b) => a.label < b.label ? -1 : 1);
-    if (!rows.length) return;
-    document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' (August each year)';
-    const utm = document.getElementById('ut-metric'); if (utm) utm.textContent = METRICS[cmetric].label;
-    const lsvg = d3.select('#line-chart');
-    lsvg.selectAll('*').remove(); lsvg.on('click', null);
-    const W = lsvg.node().getBoundingClientRect().width || 760;
-    const H = lsvg.node().clientHeight || 600;
-    const m = {top:40,right:48,bottom:44,left:90};
-    const iw = W-m.left-m.right, ih = H-m.top-m.bottom;
-    const g = lsvg.attr('viewBox',`0 0 ${W} ${H}`).append('g').attr('transform',`translate(${m.left},${m.top})`);
-    const x = d3.scaleBand().domain(rows.map(r=>r.label)).range([0,iw]).padding(0.3);
-    const maxV = d3.max(rows,r=>r.val);
-    const y = d3.scaleLinear().domain([0,maxV*1.15]).range([ih,0]);
-    y.ticks(5).forEach(t=>{
-      g.append('line').attr('x1',0).attr('x2',iw).attr('y1',y(t)).attr('y2',y(t))
-        .attr('stroke','rgba(0,0,0,0.1)').attr('stroke-width',1);
-    });
-    g.append('g').call(d3.axisLeft(y).ticks(5).tickFormat(v=>METRICS[cmetric].fmt(v)))
-      .call(ax=>ax.select('.domain').remove())
-      .call(ax=>ax.selectAll('.tick line').remove())
-      .call(ax=>ax.selectAll('text').attr('font-family','Montserrat').attr('font-size','11px').attr('fill','rgba(0,0,0,0.45)'));
-    g.append('g').attr('transform',`translate(0,${ih})`).call(d3.axisBottom(x).tickSize(0))
-      .call(ax=>ax.select('.domain').remove())
-      .call(ax=>ax.selectAll('text').attr('font-family','Montserrat').attr('font-size','10px').attr('font-weight','700').attr('fill','#0d1e42').attr('dy','1.2em'));
-    const barColors = rows.map((_,i)=>i===rows.length-1?'#0d1e42':'rgba(13,30,66,0.22)');
-    g.selectAll('.bar').data(rows).join('rect').attr('class','bar')
-      .attr('x',r=>x(r.label)).attr('y',r=>y(r.val))
-      .attr('width',x.bandwidth()).attr('height',r=>ih-y(r.val))
-      .attr('rx',3).attr('fill',(_,i)=>barColors[i])
-      .attr('stroke','#fff').attr('stroke-width',1);
-    g.selectAll('.barlbl').data(rows).join('text').attr('class','barlbl')
-      .attr('x',r=>x(r.label)+x.bandwidth()/2).attr('y',r=>y(r.val)-8)
-      .attr('text-anchor','middle').attr('font-size','10px').attr('font-weight','900')
-      .attr('font-family','Montserrat').attr('fill','#1a1a2e')
-      .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','3px').style('stroke-linejoin','round')
-      .text(r=>METRICS[cmetric].fmt(r.val));
+    // Identical rendering path to active_listings below — drawAnnualLineChart — just fed
+    // a reshaped history array so it's pixel-for-pixel the same chart, same tooltips, same
+    // hover behavior as every other annual metric on this page.
+    const mh = d.mls_active_listings_history || [];
+    const fakeHist = mh.map(r => ({date: r.year + '-08', [cmetric]: r.active_listings}));
+    drawAnnualLineChart(name, cmetric, fakeHist, true);
   } else if (cmetric === 'pending_ratio') {
     drawAnnualLineChart(name, cmetric, d.history, true);
   } else {
