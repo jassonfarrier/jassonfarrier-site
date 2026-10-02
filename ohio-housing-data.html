@@ -537,7 +537,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <div class="upper-third-rank-section"><span class="upper-third-rank" id="ut-rank"></span></div>
         </div>
 
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><div style="display:flex;gap:8px;"><button id="btn-trend-line" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">TREND LINE</button><button id="btn-record-high" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">RECORD HIGH</button></div></div><div id="chart-payment-disclaimer" style="display:none;font-size:11px;font-weight:600;color:#c0392b;margin-bottom:8px;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><div style="display:flex;gap:8px;"><button id="btn-trend-line" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">TREND LINE</button></div></div><div id="chart-payment-disclaimer" style="display:none;font-size:11px;font-weight:600;color:#c0392b;margin-bottom:8px;"></div>
         <svg id="line-chart"></svg>
         <div id="chart-slider-wrap" style="display:none;padding:10px 0 0 90px;box-sizing:border-box;">
           <div style="display:flex;align-items:center;gap:10px;position:relative;">
@@ -647,7 +647,7 @@ function computeEstPayment(zhvi, propertyTaxRatePct, downPct) {
 const FIPS_NAME = {"39001":"Adams","39003":"Allen","39005":"Ashland","39007":"Ashtabula","39009":"Athens","39011":"Auglaize","39013":"Belmont","39015":"Brown","39017":"Butler","39019":"Carroll","39021":"Champaign","39023":"Clark","39025":"Clermont","39027":"Clinton","39029":"Columbiana","39031":"Coshocton","39033":"Crawford","39035":"Cuyahoga","39037":"Darke","39039":"Defiance","39041":"Delaware","39043":"Erie","39045":"Fairfield","39047":"Fayette","39049":"Franklin","39051":"Fulton","39053":"Gallia","39055":"Geauga","39057":"Greene","39059":"Guernsey","39061":"Hamilton","39063":"Hancock","39065":"Hardin","39067":"Harrison","39069":"Henry","39071":"Highland","39073":"Hocking","39075":"Holmes","39077":"Huron","39079":"Jackson","39081":"Jefferson","39083":"Knox","39085":"Lake","39087":"Lawrence","39089":"Licking","39091":"Logan","39093":"Lorain","39095":"Lucas","39097":"Madison","39099":"Mahoning","39101":"Marion","39103":"Medina","39105":"Meigs","39107":"Mercer","39109":"Miami","39111":"Monroe","39113":"Montgomery","39115":"Morgan","39117":"Morrow","39119":"Muskingum","39121":"Noble","39123":"Ottawa","39125":"Paulding","39127":"Perry","39129":"Pickaway","39131":"Pike","39133":"Portage","39135":"Preble","39137":"Putnam","39139":"Richland","39141":"Ross","39143":"Sandusky","39145":"Scioto","39147":"Seneca","39149":"Shelby","39151":"Stark","39153":"Summit","39155":"Trumbull","39157":"Tuscarawas","39159":"Union","39161":"Van Wert","39163":"Vinton","39165":"Warren","39167":"Washington","39169":"Wayne","39171":"Williams","39173":"Wood","39175":"Wyandot"};
 
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null, selectedFips = null;
-let chartSliderStartYr = null, chartSliderEndYr = null, _chartHistoryFull = null, _chartCounty = null, _chartCmetric = null, _chartIsZip = false;
+let chartSliderStartYr = null, chartSliderEndYr = null, _chartHistoryFull = null, _chartCounty = null, _chartCmetric = null, _chartIsZip = false, _chartRenderMode = 'monthly';
 let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, zipHistoryCache = {}, selectedZip = null, zipHoveredId = null;
 let METRO_DATA = [], metroDataMap = {}, metroDataLoaded = false, metroGeoJSON = null, selectedMetro = null, metroHoveredId = null;
 let STATE_DATA = null, stateDataLoaded = false, selectedState = null;
@@ -1402,17 +1402,6 @@ document.getElementById('pill-county').addEventListener('click', () => setMode('
 document.getElementById('pill-zip').addEventListener('click', () => setMode('zip'));
 document.getElementById('pill-table').addEventListener('click', toggleTableView);
 
-function _updateRecordHighBtn(cm) {
-  const rhb = document.getElementById('btn-record-high');
-  if (!rhb) return;
-  const isYOY = cm && cm.endsWith('_yoy');
-  if (isYOY) {
-    rhb.style.display = 'none';
-    rhb.classList.remove('active');
-  } else {
-    rhb.style.display = 'inline-block';
-  }
-}
 // Hides TREND LINE by default on every metric switch — only the three chart-drawing
 // functions that actually call wireTrendLineButton() re-show it. Prevents a stale button
 // (with a click handler bound to an already-removed chart) lingering on chart types that
@@ -1428,7 +1417,6 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
     document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     const cm = tab.dataset.cmetric;
-    _updateRecordHighBtn(cm);
     _resetTrendLineBtn();
     if (mapMode === 'zip' && selectedZip) {
       renderZipChart(selectedZip, cm);
@@ -1501,6 +1489,8 @@ const GROWTH_YEARS = {zhvi_growth_5y: 5, zhvi_growth_10y: 10};
 // `d` is the data record (dataMap[county] / STATE_DATA / metroDataMap[rid] / zipDataMap[zip]);
 // `name` is the display name; `isZip` controls the ' County' suffix like the rest of the file.
 function renderGrowthChart(name, cmetric, d, isZip) {
+  const sliderWrap = document.getElementById('chart-slider-wrap');
+  if (sliderWrap) sliderWrap.style.display = 'none';
   const yearsBack = GROWTH_YEARS[cmetric];
   const hist = (d && d.history) || [];
   if (!hist.length) return;
@@ -2128,8 +2118,13 @@ function _initChartSlider(allRows) {
     document.getElementById('slider-range').style.left = pct1 + '%';
     document.getElementById('slider-range').style.width = (pct2 - pct1) + '%';
     if (_chartHistoryFull) {
-      drawMonthlyBarChart(_chartCounty, _chartCmetric,
-        _chartHistoryFull, _chartIsZip, true);
+      if (_chartRenderMode === 'annualLine') {
+        drawAnnualLineChart(_chartCounty, _chartCmetric, _chartHistoryFull, _chartIsZip, true);
+      } else if (_chartRenderMode === 'annualBar') {
+        drawAnnualBarChart(_chartCounty, _chartCmetric, _chartHistoryFull, _chartIsZip, true);
+      } else {
+        drawMonthlyBarChart(_chartCounty, _chartCmetric, _chartHistoryFull, _chartIsZip, true);
+      }
     }
   }
   ns.addEventListener('input', redraw);
@@ -2208,10 +2203,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
     _chartCounty = county;
     _chartCmetric = cmetric;
     _chartIsZip = isZip;
-    // Reset record high button when metric/county changes
-    const _rhBtnReset = document.getElementById('btn-record-high');
-    if (_rhBtnReset) { _rhBtnReset.classList.remove('active'); }
-    _updateRecordHighBtn(cmetric);
+    _chartRenderMode = 'monthly';
     // Reset slider range to full
     const allRows = d.history.filter(r => r[cmetric] != null);
     allRows.forEach(r => { if (r.date && r.date.length > 7) r.date = r.date.slice(0, 7); });
@@ -2301,76 +2293,6 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const clickCard = g.append('g').style('opacity',0);
   _dismissClickCard = () => { clickCard.style('opacity',0); clickedDate = null; if(bars){bars.attr('fill', d=>barColor(d)).attr('fill-opacity',1.0).attr('stroke','#fff').attr('stroke-width',0.8);} };
 
-  // ── RECORD HIGH CALLOUT ─────────────────────────────────────────────
-  // Add glow filter to SVG defs (once)
-  let _rhDefs = lsvg.select('defs.rh-defs');
-  if (_rhDefs.empty()) {
-    _rhDefs = lsvg.append('defs').attr('class','rh-defs');
-    const glowFilter = _rhDefs.append('filter').attr('id','rh-glow-filter').attr('x','-50%').attr('y','-50%').attr('width','200%').attr('height','200%');
-    glowFilter.append('feColorMatrix').attr('type','matrix').attr('values','1 0 0 0 0.75  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0').attr('result','redOnly');
-    glowFilter.append('feGaussianBlur').attr('in','redOnly').attr('stdDeviation','6').attr('result','blur');
-    const feMerge = glowFilter.append('feMerge');
-    feMerge.append('feMergeNode').attr('in','blur');
-    feMerge.append('feMergeNode').attr('in','SourceGraphic');
-  }
-
-  g.selectAll('.rh-callout').remove();
-  const rhGroup  = g.append('g').attr('class','rh-callout').style('opacity',0);
-  const rhRect   = rhGroup.append('rect').attr('rx',12).attr('fill','#c0392b')
-    .style('filter','drop-shadow(0 4px 20px rgba(192,57,43,0.7))');
-  const rhLbl    = rhGroup.append('text').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','rgba(255,255,255,0.9)').attr('letter-spacing','0.1em').attr('text-anchor','middle').attr('font-size','11px').text('RECORD HIGH');
-  const rhVal    = rhGroup.append('text').attr('font-family','Montserrat').attr('font-weight','900').attr('fill','#fff').attr('text-anchor','middle').attr('font-size','42px');
-
-  let _rhPeakDate = null; // track which bar is highlighted
-
-  function _showRecordHigh() {
-    // Use only the VISIBLE rows (current slider range) — record high = peak of what you're looking at
-    const visRows = rows.filter(r => r[cmetric] != null);
-    if (!visRows.length) return;
-    const peakRow = visRows.reduce((a,b) => (b[cmetric] > a[cmetric] ? b : a));
-    _rhPeakDate = peakRow.date;
-    // Highlight the peak bar — glow red
-    g.selectAll('.mbar').each(function(r) {
-      if (r.date === _rhPeakDate) {
-        d3.select(this)
-          .attr('fill','#c0392b')
-          .style('filter','url(#rh-glow-filter)');
-      }
-    });
-    // Floating label above the peak bar
-    const cx = x(parseDate(peakRow.date));
-    const cy = y(peakRow[cmetric]);
-    const boxW = 250, boxH = 88;
-    const boxX = Math.max(4, Math.min(cx - boxW/2, iw - boxW - 4));
-    const boxY = Math.max(4, cy - boxH - 16);
-    rhRect.attr('x',boxX).attr('y',boxY).attr('width',boxW).attr('height',boxH);
-    rhLbl.attr('x',boxX+boxW/2).attr('y',boxY+22);
-    rhVal.attr('x',boxX+boxW/2).attr('y',boxY+58).text(METRICS[cmetric].fmt(peakRow[cmetric]));
-    rhGroup.style('pointer-events','none');
-    lsvg.node().appendChild(rhGroup.node());
-    rhGroup.transition().duration(200).style('opacity',1);
-  }
-
-  function _hideRecordHigh() {
-    // Restore bar colors
-    g.selectAll('.mbar').attr('fill', r => barColor(r)).style('filter', null);
-    _rhPeakDate = null;
-    rhGroup.transition().duration(150).style('opacity',0);
-  }
-
-  // Wire Record High button for this chart instance
-  const _rhBtnEl = document.getElementById('btn-record-high');
-  if (_rhBtnEl) {
-    const _newRhBtn = _rhBtnEl.cloneNode(true);
-    _rhBtnEl.parentNode.replaceChild(_newRhBtn, _rhBtnEl);
-    _newRhBtn.addEventListener('click', () => {
-      const isOn = _newRhBtn.classList.toggle('active');
-      if (isOn) _showRecordHigh();
-      else _hideRecordHigh();
-    });
-    if (_newRhBtn.classList.contains('active')) _showRecordHigh();
-  }
-  // ─────────────────────────────────────────────────────────────────────
   // Clicking anywhere on SVG outside a bar vanishes the pinned card
   lsvg.on('click', function(event) {
     if (!event.target.classList.contains('mbar')) { _dismissClickCard(); }
@@ -2502,9 +2424,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
 }
 
 
-function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
-  const sliderWrap = document.getElementById('chart-slider-wrap');
-  if (sliderWrap) sliderWrap.style.display = 'none';
+function drawAnnualLineChart(county, cmetric, histOverride, isZip, _sliderFilter) {
   const d = histOverride != null ? {history: histOverride} : dataMap[county];
   if (!d || !d.history) return;
   chartMetric = cmetric;
@@ -2519,7 +2439,23 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
     const [yr, mo] = r.date.split('-');
     if (mo === anchorMonth) byYear[yr] = r;
   });
-  const rows = Object.keys(byYear).sort().map(yr => byYear[yr]);
+  const allYearRows = Object.keys(byYear).sort().map(yr => byYear[yr]);
+  if (!allYearRows.length) return;
+
+  // Universal date-range slider — reset to full range on a fresh render (not a
+  // slider-drag re-render), always defaults to full range per Jasson's instruction.
+  if (!_sliderFilter) {
+    _chartHistoryFull = histOverride != null ? histOverride : d.history;
+    _chartCounty = county;
+    _chartCmetric = cmetric;
+    _chartIsZip = isZip;
+    _chartRenderMode = 'annualLine';
+    _initChartSlider(allYearRows);
+  }
+  const rows = allYearRows.filter(r => {
+    const yr = parseInt(r.date.slice(0,4));
+    return yr >= chartSliderStartYr && yr <= chartSliderEndYr;
+  });
   if (!rows.length) return;
 
   const suffix = isZip ? '' : ' County';
@@ -2527,8 +2463,6 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
   const moName = moNames[parseInt(anchorMonth,10)-1];
   document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + suffix + ` (Annual · ${moName} each year)`;
   const _utm = document.getElementById('ut-metric'); if (_utm) _utm.textContent = METRICS[cmetric].label;
-  const _rhBtn = document.getElementById('btn-record-high');
-  if (_rhBtn) { _rhBtn.style.display = 'none'; _rhBtn.classList.remove('active'); }
 
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
@@ -2729,9 +2663,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
     .on('mouseleave', function() { hoverCard.style('opacity',0); hoverDot.style('opacity',0); });
 }
 
-function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
-  const sliderWrap = document.getElementById('chart-slider-wrap');
-  if (sliderWrap) sliderWrap.style.display = 'none';
+function drawAnnualBarChart(county, cmetric, histOverride, isZip, _sliderFilter) {
   const d = histOverride != null ? {history: histOverride} : dataMap[county];
   if (!d || !d.history) return;
   chartMetric = cmetric;
@@ -2742,7 +2674,28 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
     const [yr, mo] = r.date.split('-');
     if (!byYear[yr] || mo === '06') byYear[yr] = r;
   });
-  const rows = Object.keys(byYear).sort().map(yr => ({year: yr, val: byYear[yr][cmetric]}));
+  const allYearRows = Object.keys(byYear).sort().map(yr => ({year: yr, val: byYear[yr][cmetric], date: yr + '-06'}));
+
+  // Universal date-range slider — defaults to full range on a fresh render, same as every
+  // other chart type on this page.
+  if (!allYearRows.length) {
+    const sliderWrap = document.getElementById('chart-slider-wrap');
+    if (sliderWrap) sliderWrap.style.display = 'none';
+    return;
+  }
+  if (!_sliderFilter) {
+    _chartHistoryFull = histOverride != null ? histOverride : d.history;
+    _chartCounty = county;
+    _chartCmetric = cmetric;
+    _chartIsZip = isZip;
+    _chartRenderMode = 'annualBar';
+    _initChartSlider(allYearRows);
+  }
+  const rows = allYearRows.filter(r => {
+    const yr = parseInt(r.date.slice(0,4));
+    return yr >= chartSliderStartYr && yr <= chartSliderEndYr;
+  });
+  if (!rows.length) return;
 
   document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + ' County (Annual · June)';
   const _utm3 = document.getElementById('ut-metric'); if (_utm3) _utm3.textContent = METRICS[cmetric].label;
