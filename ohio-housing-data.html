@@ -2492,6 +2492,21 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
   const line = d3.line().x(r=>x(r.date.slice(0,4))).y(r=>y(r[cmetric])).curve(d3.curveMonotoneX);
   g.append('path').datum(rows).attr('d',line).attr('fill','none').attr('stroke','#1a5296').attr('stroke-width',2.5);
 
+  // Dashed average line — scoped to MLS Active Listings only, per Jasson's request. Not
+  // applied to any other metric on this chart function.
+  if (MLS_METRICS.has(cmetric)) {
+    const avgVal = d3.mean(rows, r => r[cmetric]);
+    if (avgVal != null) {
+      g.append('line').attr('class','alc-avg-line')
+        .attr('x1',0).attr('x2',iw).attr('y1',y(avgVal)).attr('y2',y(avgVal))
+        .attr('stroke','#c0392b').attr('stroke-width',1.5).attr('stroke-dasharray','6,4');
+      g.append('text').attr('x',iw).attr('y',y(avgVal)-6)
+        .attr('text-anchor','end').attr('font-size','11px').attr('font-weight','700')
+        .attr('font-family','Montserrat').attr('fill','#c0392b')
+        .text('Avg: ' + METRICS[cmetric].fmt(Math.round(avgVal)));
+    }
+  }
+
   // Compact label format
   function fmtC(val) {
     if (cmetric==='zhvi'||cmetric==='zhvi_condo'||cmetric==='median_property_tax'||cmetric==='new_construction_price') {
