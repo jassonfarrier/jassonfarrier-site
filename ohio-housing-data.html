@@ -3263,7 +3263,7 @@ function _applyAggregatedStateDistress() {
 function loadStateData() {
   if (stateDataLoaded) { return; }
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
-  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_state?select=region_id,name,latest,history,distress_history,mls_active_listings_history', {
+  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_state?select=region_id,name,latest,history,distress_history,mls_active_listings_history,prop_tax_history', {
     headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
   }).then(r=>r.json()).then(rows => {
     STATE_DATA = rows[0] || null;
@@ -3362,8 +3362,8 @@ function openStateModal() {
   (document.getElementById('s-pending')||{}).textContent = l.pending_listings ? fmtN(l.pending_listings) : '—';
   (document.getElementById('s-dom')||{}).textContent = l.days_on_market != null ? l.days_on_market+'d' : '—';
   (document.getElementById('s-pct')||{}).textContent = l.price_reduced_pct != null ? l.price_reduced_pct.toFixed(1)+'%' : '—';
-  (document.getElementById('s-ptax')||{}).textContent = '—';
-  (document.getElementById('s-ptaxrate')||{}).textContent = '—';
+  (document.getElementById('s-ptax')||{}).textContent = l.median_property_tax ? '$'+Math.round(l.median_property_tax).toLocaleString() : '—';
+  (document.getElementById('s-ptaxrate')||{}).textContent = l.property_tax_rate != null ? l.property_tax_rate.toFixed(2)+'%' : '—';
   (document.getElementById('s-rank')||{}).textContent = 'Statewide';
   (document.getElementById('ut-rank')||{textContent:''}).textContent = ''; { const s = document.querySelector('.upper-third-rank-section'); if (s) s.style.display = 'none'; }
   setPendingRatioBadge(l.pending_ratio);
@@ -3395,8 +3395,11 @@ function renderStateChart(name, cmetric, d) {
       const [yr, mo] = r.date.split('-');
       if (!zhviByYear[yr] || mo === '07') zhviByYear[yr] = r.zhvi;
     });
-    // Ohio state has no property tax data source — payment is P&I + insurance only
-    const paymentHist = buildPaymentHist(zhviByYear, null, downPct, cmetric);
+    // State-level property tax rate — value-weighted aggregate of all 88 counties' ACS
+    // rates (prop_tax_history), computed and backfilled 2026-10-02. One entry per year.
+    const taxRateByYear = {};
+    (d && d.prop_tax_history || []).forEach(r => { if (r.property_tax_rate != null) taxRateByYear[r.year] = r.property_tax_rate; });
+    const paymentHist = buildPaymentHist(zhviByYear, taxRateByYear, downPct, cmetric);
     drawAnnualBarChart(name, cmetric, paymentHist, true);
   } else if (DISTRESS_METRICS.has(cmetric)) {
     const dh = d.distress_history;
