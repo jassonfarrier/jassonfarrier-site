@@ -537,7 +537,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <div class="upper-third-rank-section"><span class="upper-third-rank" id="ut-rank"></span></div>
         </div>
 
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><button id="btn-record-high" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">RECORD HIGH</button></div><div id="chart-payment-disclaimer" style="display:none;font-size:11px;font-weight:600;color:#c0392b;margin-bottom:8px;"></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="chart-label" id="chart-label" style="margin-bottom:0">Historical Trend</div><div style="display:flex;gap:8px;"><button id="btn-trend-line" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">TREND LINE</button><button id="btn-record-high" style="display:none;background:transparent;border:1px solid #ccc;color:#bbb;border-radius:8px;padding:5px 14px;font-size:10px;font-weight:500;font-family:Montserrat,sans-serif;cursor:pointer;letter-spacing:0.03em;">RECORD HIGH</button></div></div><div id="chart-payment-disclaimer" style="display:none;font-size:11px;font-weight:600;color:#c0392b;margin-bottom:8px;"></div>
         <svg id="line-chart"></svg>
         <div id="chart-slider-wrap" style="display:none;padding:10px 0 0 90px;box-sizing:border-box;">
           <div style="display:flex;align-items:center;gap:10px;position:relative;">
@@ -1245,6 +1245,7 @@ function openModal(county) {
   else document.querySelector('.chart-tab[data-cmetric="zhvi"]').classList.add('active');
   chartMetric = defaultMetric;
   document.getElementById('modal-overlay').classList.add('visible');
+  _resetTrendLineBtn();
   setTimeout(() => renderChart(county, defaultMetric), 30);
 }
 
@@ -1412,12 +1413,23 @@ function _updateRecordHighBtn(cm) {
     rhb.style.display = 'inline-block';
   }
 }
+// Hides TREND LINE by default on every metric switch — only the three chart-drawing
+// functions that actually call wireTrendLineButton() re-show it. Prevents a stale button
+// (with a click handler bound to an already-removed chart) lingering on chart types that
+// don't support a trend line (growth charts, distress charts, etc.).
+function _resetTrendLineBtn() {
+  const tlb = document.getElementById('btn-trend-line');
+  if (!tlb) return;
+  tlb.style.display = 'none';
+  tlb.classList.remove('active');
+}
 document.querySelectorAll('.chart-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
     tab.classList.add('active');
     const cm = tab.dataset.cmetric;
     _updateRecordHighBtn(cm);
+    _resetTrendLineBtn();
     if (mapMode === 'zip' && selectedZip) {
       renderZipChart(selectedZip, cm);
     } else if (mapMode === 'metro' && selectedMetro) {
@@ -2129,6 +2141,63 @@ function _initChartSlider(allRows) {
 }
 
 
+// Shared TREND LINE toggle — wired into every chart-drawing function (drawAnnualLineChart,
+// drawMonthlyBarChart, drawAnnualBarChart), which together render every chart on this page
+// across state/county/zip/metro. Fits a simple linear regression (index vs. value) over
+// whatever rows are currently displayed and overlays it as a dashed line.
+function wireTrendLineButton(g, rows, valFn, xPx, yScaleFn, iw) {
+  const btn = document.getElementById('btn-trend-line');
+  if (!btn) return;
+  const newBtn = btn.cloneNode(true);
+  btn.parentNode.replaceChild(newBtn, btn);
+  newBtn.style.display = 'inline-block';
+  newBtn.classList.remove('active');
+  g.selectAll('.trend-line-path').remove();
+  g.selectAll('.trend-line-lbl').remove();
+
+  function computeTrend() {
+    const pts = [];
+    rows.forEach((r, i) => { const v = valFn(r); if (v != null) pts.push({i, v}); });
+    const n = pts.length;
+    if (n < 2) return null;
+    const sumX = pts.reduce((s,p)=>s+p.i,0), sumY = pts.reduce((s,p)=>s+p.v,0);
+    const sumXY = pts.reduce((s,p)=>s+p.i*p.v,0), sumXX = pts.reduce((s,p)=>s+p.i*p.i,0);
+    const denom = (n*sumXX - sumX*sumX);
+    if (denom === 0) return null;
+    const slope = (n*sumXY - sumX*sumY) / denom;
+    const intercept = (sumY - slope*sumX) / n;
+    return {slope, intercept, pts};
+  }
+
+  function showTrend() {
+    const t = computeTrend();
+    if (!t) return;
+    const first = t.pts[0], last = t.pts[t.pts.length-1];
+    const y0 = t.intercept + t.slope*first.i;
+    const y1 = t.intercept + t.slope*last.i;
+    const x0 = xPx(rows[first.i], first.i);
+    const x1 = xPx(rows[last.i], last.i);
+    g.append('line').attr('class','trend-line-path')
+      .attr('x1',x0).attr('y1',yScaleFn(y0)).attr('x2',x1).attr('y2',yScaleFn(y1))
+      .attr('stroke','#2e8b57').attr('stroke-width',2).attr('stroke-dasharray','7,5')
+      .style('pointer-events','none');
+    const dir = t.slope > 0 ? '▲ TREND UP' : t.slope < 0 ? '▼ TREND DOWN' : '— FLAT';
+    g.append('text').attr('class','trend-line-lbl')
+      .attr('x', iw).attr('y', yScaleFn(y1) - 8)
+      .attr('text-anchor','end').attr('font-size','10px').attr('font-weight','700')
+      .attr('font-family','Montserrat').attr('fill','#2e8b57').style('pointer-events','none')
+      .text(dir);
+  }
+  function hideTrend() {
+    g.selectAll('.trend-line-path').remove();
+    g.selectAll('.trend-line-lbl').remove();
+  }
+  newBtn.addEventListener('click', () => {
+    const isOn = newBtn.classList.toggle('active');
+    if (isOn) showTrend(); else hideTrend();
+  });
+}
+
 function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter) {
   const d = histOverride != null ? {history: histOverride} : dataMap[county];
   if (!d || !d.history) return;
@@ -2356,6 +2425,9 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
       clickCard.style('opacity',1);
     });
 
+  // Trend line toggle — monthly bar chart (YOY metrics, new construction, etc.)
+  wireTrendLineButton(g, rows, (r) => r[cmetric], (r) => x(parseDate(r.date)), y, iw);
+
   // Hover interaction — use string bisect (avoids parseDate null → epoch date bug)
   function fmtMonthDate(dateStr) {
     if (!dateStr) return '';
@@ -2556,6 +2628,9 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
     .selectAll('text').attr('fill','rgba(0,0,0,0.65)').attr('font-size','12px')
     .attr('font-family','Montserrat').attr('dx','-8');
 
+  // Trend line toggle — annual line chart (state/county/zip)
+  wireTrendLineButton(g, rows, (r) => r[cmetric], (r) => x(r.date.slice(0,4)), y, iw);
+
   // Click-to-pin + delta hover
   let alcClickedYear = null;
   _dismissClickCard = () => { alcClickCard.style('opacity',0); alcClickedYear = null; g.selectAll('.alc-dot').attr('r',4.5).attr('stroke-width',2); };
@@ -2726,6 +2801,9 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
     .attr('font-family','Montserrat').attr('fill','#1a1a2e')
     .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','2px').style('stroke-linejoin','round')
     .text(r=>METRICS[cmetric].fmt(r.val));
+
+  // Trend line toggle — annual bar chart (payment, tax YOY, etc.)
+  wireTrendLineButton(g, rows, (r) => r.val, (r) => x(r.year) + x.bandwidth()/2, y, iw);
 
   // Click-to-pin + delta hover
   let annClickedYear = null;
@@ -3127,6 +3205,7 @@ function openMetroModal(rid) {
   setTimeout(() => {
     document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
     document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
+    _resetTrendLineBtn();
     if (MLS_METRICS.has(mapMetric)) {
       showStatewideOnlyMessage(mapMetric);
     } else if (GROWTH_METRICS.has(mapMetric)) {
@@ -3292,6 +3371,7 @@ function openStateModal() {
   setTimeout(() => {
     document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
     document.querySelector('.chart-tab[data-cmetric="'+mapMetric+'"]')?.classList.add('active');
+    _resetTrendLineBtn();
     renderStateChart('Ohio', mapMetric, d);
   }, 30);
 }
@@ -3482,6 +3562,7 @@ function openZipModal(zip) {
   if (at) at.classList.add('active');
   chartMetric = defaultMetric;
   document.getElementById('modal-overlay').classList.add('visible');
+  _resetTrendLineBtn();
   setTimeout(() => renderZipChart(zip, defaultMetric), 30);
 }
 
