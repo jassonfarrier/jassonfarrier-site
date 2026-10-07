@@ -302,6 +302,11 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="luxury_median_dom">Luxury Days on Market</option>
     <option value="luxury_active_listings">Luxury Active Listings</option>
     <option value="luxury_pending_sales">Luxury Pending Sales</option>
+    <option value="median_year_built">Median Year Built</option>
+    <option value="pct_pre_1960">Housing Stock by Age</option>
+    <option value="sf_permits_per_1k">SF Permits per 1K</option>
+    <option value="mf_permits_per_1k">MF Permits per 1K</option>
+    <option value="total_permits_per_1k">Total Permits per 1K</option>
   </select>
 </div>
 <div class="main">
@@ -352,6 +357,13 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn yoy-btn" data-metric="luxury_active_listings_yoy"><span class="mn">Luxury Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
     <button class="metric-btn" data-metric="luxury_pending_sales"><span class="mn">Luxury Pending Sales</span><span class="md">Redfin · Top 5% tier · 40 metros, all states &amp; National</span></button>
     <button class="metric-btn yoy-btn" data-metric="luxury_pending_sales_yoy"><span class="mn">Luxury Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Housing Stock</div>
+    <button class="metric-btn" data-metric="median_year_built"><span class="mn">Median Year Built</span><span class="md">Census ACS · States, counties &amp; National</span></button>
+    <button class="metric-btn" data-metric="pct_pre_1960"><span class="mn">Housing Stock by Age</span><span class="md">Census ACS · % built before 1960</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Building Permits</div>
+    <button class="metric-btn" data-metric="sf_permits_per_1k"><span class="mn">SF Permits per 1K</span><span class="md">Census BPS · Single-family per 1,000 residents</span></button>
+    <button class="metric-btn" data-metric="mf_permits_per_1k"><span class="mn">MF Permits per 1K</span><span class="md">Census BPS · Multi-family per 1,000 residents</span></button>
+    <button class="metric-btn" data-metric="total_permits_per_1k"><span class="mn">Total Permits per 1K</span><span class="md">Census BPS · All permits per 1,000 residents</span></button>
     <hr>
 
     <div class="src" style="margin-top:auto;font-size:9px;color:rgba(0,0,0,0.35);line-height:1.6;padding-top:12px;border-top:1px solid rgba(0,0,0,0.07)">
@@ -624,6 +636,8 @@ const METRICS = {
   est_payment_20: {label:'Est. Payment (20% Down)', fmt:v=>'$'+Math.round(v).toLocaleString()+'/mo', lo:'Lower', hi:'Higher'},
   new_construction_price: {label:'New Construction Median Price', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
   new_construction_sqft:  {label:'New Construction $/SqFt',       fmt:v=>'$'+v.toFixed(0)+'/sqft',            lo:'Lower', hi:'Higher'},
+  median_year_built:     {label:'Median Year Built',  fmt:v=>Math.round(v).toString(), lo:'Older', hi:'Newer'},
+  pct_pre_1960:          {label:'Housing Stock by Age',fmt:v=>v.toFixed(1)+'%',         lo:'Newer Stock', hi:'Older Stock'},
 };
 const YOY_METRICS = new Set(['zhvi_yoy','zhvi_condo_yoy','active_listings_yoy','new_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','luxury_median_sale_price_yoy','luxury_median_dom_yoy','luxury_active_listings_yoy','luxury_pending_sales_yoy']);
 const YOY_BASE = {zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', active_listings_yoy:'active_listings', new_listings_yoy:'new_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct', luxury_median_sale_price_yoy:'luxury_median_sale_price', luxury_median_dom_yoy:'luxury_median_dom', luxury_active_listings_yoy:'luxury_active_listings', luxury_pending_sales_yoy:'luxury_pending_sales'};
@@ -642,6 +656,8 @@ const METRIC_MODES = {
   luxury_median_dom: ['national','state','metro'], luxury_median_dom_yoy: ['national','state','metro'],
   luxury_active_listings: ['national','state','metro'], luxury_active_listings_yoy: ['national','state','metro'],
   luxury_pending_sales: ['national','state','metro'], luxury_pending_sales_yoy: ['national','state','metro'],
+  sf_permits_per_1k: ['national','state','county'], mf_permits_per_1k: ['national','state','county'], total_permits_per_1k: ['national','state','county'],
+  median_year_built: ['national','state','county'], pct_pre_1960: ['national','state','county'],
 };
 function updateModePillAvailability(metric) {
   const modes = METRIC_MODES[metric] || ['national','state','metro','county','zip'];
@@ -902,7 +918,7 @@ function getMetricVal(d, metric) {
 // --- Rank Badge ---
 // Only metrics where relative position is a meaningful, citable fact get ranked.
 // Neutral framing throughout: "Highest"/"Lowest" describes direction, never "best"/"worst".
-const RANKABLE_METRICS = new Set(['zhvi','zhvi_condo','days_on_market','price_reduced_pct','cancellation_pct','pending_ratio','property_tax_rate','median_property_tax','sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k','est_payment_20','luxury_median_sale_price']);
+const RANKABLE_METRICS = new Set(['zhvi','zhvi_condo','days_on_market','price_reduced_pct','cancellation_pct','pending_ratio','property_tax_rate','median_property_tax','sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k','median_year_built','pct_pre_1960','est_payment_20','luxury_median_sale_price']);
 
 function computeRank(list, metric, targetVal) {
   // list: array of numeric values (already non-null) for every record that has this metric.
@@ -928,9 +944,6 @@ function renderRankBadge(mode, id, metric) {
   const loWord = (METRICS[metric] && METRICS[metric].lo) || 'Lowest';
 
   if (mode === 'county') {
-    if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') {
-      // permits are county-only
-    }
     const vals = [], stateVals = [];
     let targetVal = null, targetStateId = null;
     DATA.forEach(d => {
