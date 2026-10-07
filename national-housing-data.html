@@ -543,6 +543,13 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="luxury_active_listings_yoy"><span class="mn">Luxury Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="luxury_pending_sales"><span class="mn">Luxury Pending Sales</span><span class="md">Redfin · Top 5% tier · 40 metros, all states &amp; National</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="luxury_pending_sales_yoy"><span class="mn">Luxury Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Housing Stock</div>
+          <button class="metric-btn chart-tab" data-cmetric="median_year_built"><span class="mn">Median Year Built</span><span class="md">Census ACS · Single static value</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="pct_pre_1960"><span class="mn">Housing Stock by Age</span><span class="md">Census ACS · % built before 1960</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Building Permits</div>
+          <button class="metric-btn chart-tab" data-cmetric="sf_permits_per_1k"><span class="mn">SF Permits per 1K</span><span class="md">Census BPS · per 1,000 residents</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="mf_permits_per_1k"><span class="mn">MF Permits per 1K</span><span class="md">Census BPS · per 1,000 residents</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="total_permits_per_1k"><span class="mn">Total Permits per 1K</span><span class="md">Census BPS · per 1,000 residents</span></button>
 
         </div></div><!-- end modal-left-scroll -->
       </div>
@@ -1755,7 +1762,50 @@ function renderChart(county, cmetric) {
         }
       });
     }
-  } else if (DISTRESS_METRICS.has(cmetric)) {
+  } else if (cmetric === 'median_year_built' || cmetric === 'pct_pre_1960') {
+      const val = getMetricVal(d, cmetric);
+      const svg = d3.select('#line-chart'); svg.selectAll('*').remove();
+      document.getElementById('chart-slider-wrap').style.display = 'none';
+      const w = svg.node().parentElement.clientWidth || 700;
+      if (val == null) {
+        svg.attr('viewBox','0 0 700 100');
+        svg.append('text').attr('x',350).attr('y',50).attr('text-anchor','middle')
+          .attr('font-family','Montserrat').attr('font-size','14px').attr('fill','#999').text('No data available');
+      } else if (cmetric === 'pct_pre_1960') {
+        const buckets = [
+          {label:'Pre-1960', key:'pct_pre_1960'},
+          {label:'1960\u20131979', key:'pct_1960_1979'},
+          {label:'1980\u20131999', key:'pct_1980_1999'},
+          {label:'2000\u20132019', key:'pct_2000_2019'},
+          {label:'2020+', key:'pct_2020_plus'}
+        ].map(b => ({...b, val: d.latest && d.latest[b.key] != null ? Number(d.latest[b.key]) : 0}));
+        svg.attr('viewBox', `0 0 ${w} 240`);
+        const mg = svg.append('g').attr('transform','translate(100,20)');
+        const bw = w - 160, bh = 34, gap = 8;
+        const maxV = Math.max(...buckets.map(b=>b.val), 1);
+        buckets.forEach((b,i) => {
+          const y = i * (bh + gap);
+          mg.append('text').attr('x',-8).attr('y',y+bh/2+5).attr('text-anchor','end')
+            .attr('font-family','Montserrat').attr('font-size','12px').attr('font-weight','700').attr('fill','#0D1E42').text(b.label);
+          mg.append('rect').attr('x',0).attr('y',y).attr('width', bw * (b.val / maxV)).attr('height',bh)
+            .attr('rx',4).attr('fill','#0D1E42').attr('opacity',0.75);
+          mg.append('text').attr('x', bw * (b.val / maxV) + 8).attr('y',y+bh/2+5)
+            .attr('font-family','Montserrat').attr('font-size','12px').attr('font-weight','700').attr('fill','#0D1E42')
+            .text(b.val.toFixed(1)+'%');
+        });
+        mg.append('text').attr('x', (w-160)/2).attr('y', 5*(bh+gap)+16).attr('text-anchor','middle')
+          .attr('font-family','Montserrat').attr('font-size','11px').attr('fill','rgba(13,30,66,0.4)')
+          .text('Census ACS 2022 5-Year Estimates');
+      } else {
+        svg.attr('viewBox', `0 0 ${w} 160`);
+        svg.append('text').attr('x',w/2).attr('y',60).attr('text-anchor','middle')
+          .attr('font-family','Montserrat').attr('font-size','52px').attr('font-weight','900').attr('fill','#0D1E42')
+          .text(METRICS[cmetric].fmt(val));
+        svg.append('text').attr('x',w/2).attr('y',90).attr('text-anchor','middle')
+          .attr('font-family','Montserrat').attr('font-size','13px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.45)')
+          .text('Census ACS 2022 5-Year Estimates');
+      }
+    } else if (DISTRESS_METRICS.has(cmetric)) {
     const doRenderDistress = (dh) => {
       const sliderWrap = document.getElementById('chart-slider-wrap');
       if (sliderWrap) sliderWrap.style.display = 'none';
