@@ -1754,7 +1754,7 @@ function renderChart(county, cmetric) {
     if (d.permit_history) {
       doRenderPermit(d.permit_history);
     } else {
-      fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fips,permit_history&fips=eq.' + d.fips, {
+      fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,permit_history&fips=eq.' + d.fips, {
         headers: {
           'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI',
           'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI'
@@ -3541,7 +3541,7 @@ function loadNationalStatesData() {
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
   Promise.all([
     fetch('/us-states.geojson').then(r=>r.json()),
-    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_states?select=state,state_id,latest,history', {
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_states?select=state,state_id,latest,history,permit_history', {
       headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
     }).then(r=>r.json())
   ]).then(([geojson, rows]) => {
@@ -3557,7 +3557,7 @@ function loadNationalStatesData() {
 function loadNationalData() {
   if (nationalDataLoaded) { renderColors('national'); return; }
   const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
-  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_national?select=id,latest,history', {
+  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_national?select=id,latest,history,permit_history', {
     headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
   }).then(r=>r.json()).then(rows => {
     NATIONAL_DATA = rows[0] || null;
@@ -3862,25 +3862,39 @@ function renderStateChart(name, cmetric, d) {
         .text('Census ACS 2022 5-Year Estimates');
     }
   } else if (PERMITS_METRICS && PERMITS_METRICS.has(cmetric)) {
-    const val = getMetricVal(d, cmetric);
-    const svg = d3.select('#line-chart'); svg.selectAll('*').remove();
-    const sliderWrap = document.getElementById('chart-slider-wrap');
-    if (sliderWrap) sliderWrap.style.display = 'none';
-    const W = svg.node().getBoundingClientRect().width || 760;
-    const utm = document.getElementById('ut-metric'); if (utm) utm.textContent = METRICS[cmetric].label;
-    document.getElementById('chart-label').textContent = METRICS[cmetric].label;
-    if (val == null) {
-      svg.attr('viewBox','0 0 760 100');
-      svg.append('text').attr('x',380).attr('y',50).attr('text-anchor','middle')
-        .attr('font-family','Montserrat').attr('font-size','14px').attr('fill','#999').text('No data available');
+    const field = cmetric === 'sf_permits_per_1k' ? 'sf_per_1k' : cmetric === 'mf_permits_per_1k' ? 'mf_per_1k' : 'total_per_1k';
+    const doRenderPermit = (ph) => {
+      const rows = ph.map(r => ({...r, [cmetric]: r[field], date: r.year + '-06'}));
+      drawMonthlyBarChart(name, cmetric, rows, true);
+    };
+    if (d && d.permit_history) {
+      doRenderPermit(d.permit_history);
     } else {
-      svg.attr('viewBox', `0 0 ${W} 180`);
-      svg.append('text').attr('x',W/2).attr('y',70).attr('text-anchor','middle')
-        .attr('font-family','Montserrat').attr('font-size','56px').attr('font-weight','900').attr('fill','#0D1E42')
-        .text(METRICS[cmetric].fmt(val));
-      svg.append('text').attr('x',W/2).attr('y',105).attr('text-anchor','middle')
-        .attr('font-family','Montserrat').attr('font-size','13px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.45)')
-        .text('Census BPS 2023 Annual');
+      // Determine which table to fetch from based on context
+      const ANON_KEY_PH = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+      let phUrl;
+      if (d && d.state_id && !d.fips) {
+        // State level
+        phUrl = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_states?select=state_id,permit_history&state_id=eq.' + d.state_id;
+      } else if (d && d.id === 1) {
+        // National level
+        phUrl = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_national?select=id,permit_history&id=eq.1';
+      } else {
+        // Fallback — no data
+        const svg = d3.select('#line-chart'); svg.selectAll('*').remove();
+        svg.attr('viewBox','0 0 760 100');
+        svg.append('text').attr('x',380).attr('y',50).attr('text-anchor','middle')
+          .attr('font-family','Montserrat').attr('font-size','14px').attr('fill','#999').text('No data available');
+        return;
+      }
+      fetch(phUrl, {
+        headers: {'apikey': ANON_KEY_PH, 'Authorization': 'Bearer ' + ANON_KEY_PH}
+      }).then(r => r.json()).then(rows => {
+        if (rows[0] && rows[0].permit_history) {
+          d.permit_history = rows[0].permit_history;
+          doRenderPermit(d.permit_history);
+        }
+      });
     }
   } else if (cmetric === 'pending_ratio') {
     drawAnnualLineChart(name, cmetric, d.history, true);
