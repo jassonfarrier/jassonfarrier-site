@@ -1689,27 +1689,40 @@ function getYOYRows(d, metric) {
 
 function drawHousingStockAge(name, d, svg, W) {
   const CY = new Date().getFullYear();
+  // 10 finer Census ACS B25034 buckets, oldest first
   const buckets = [
-    {key:'pct_pre_1960', ageMin: CY - 1959, label: (CY - 1959) + '+ years old'},
-    {key:'pct_1960_1979', ageMin: CY - 1979, ageMax: CY - 1960, label: (CY - 1979) + '–' + (CY - 1960) + ' years old'},
-    {key:'pct_1980_1999', ageMin: CY - 1999, ageMax: CY - 1980, label: (CY - 1999) + '–' + (CY - 1980) + ' years old'},
-    {key:'pct_2000_2019', ageMin: CY - 2019, ageMax: CY - 2000, label: (CY - 2019) + '–' + (CY - 2000) + ' years old'},
-    {key:'pct_2020_plus', ageMin: 0, ageMax: CY - 2020, label: 'Under ' + (CY - 2019) + ' years old'}
+    {key:'pct_pre_1940', endYear: 1939, label: (CY - 1939) + '+ yrs old'},
+    {key:'pct_1940_1949', endYear: 1949, startYear: 1940, label: (CY - 1949) + '–' + (CY - 1940) + ' yrs old'},
+    {key:'pct_1950_1959', endYear: 1959, startYear: 1950, label: (CY - 1959) + '–' + (CY - 1950) + ' yrs old'},
+    {key:'pct_1960_1969', endYear: 1969, startYear: 1960, label: (CY - 1969) + '–' + (CY - 1960) + ' yrs old'},
+    {key:'pct_1970_1979', endYear: 1979, startYear: 1970, label: (CY - 1979) + '–' + (CY - 1970) + ' yrs old'},
+    {key:'pct_1980_1989', endYear: 1989, startYear: 1980, label: (CY - 1989) + '–' + (CY - 1980) + ' yrs old'},
+    {key:'pct_1990_1999', endYear: 1999, startYear: 1990, label: (CY - 1999) + '–' + (CY - 1990) + ' yrs old'},
+    {key:'pct_2000_2009', endYear: 2009, startYear: 2000, label: (CY - 2009) + '–' + (CY - 2000) + ' yrs old'},
+    {key:'pct_2010_2019', endYear: 2019, startYear: 2010, label: (CY - 2019) + '–' + (CY - 2010) + ' yrs old'},
+    {key:'pct_2020_plus', startYear: 2020, label: 'Under ' + (CY - 2019) + ' yrs old'}
   ].map(b => ({...b, val: d.latest && d.latest[b.key] != null ? Number(d.latest[b.key]) : 0}));
 
-  // Oldest bucket punch stat
-  const oldestPct = buckets[0].val;
-  const oldestAge = buckets[0].ageMin;
+  // Cumulative punch line: walk from oldest, pick the threshold with highest cumulative %
+  // that is at least 40 years old — whichever boundary gives the most dramatic headline
+  let bestPct = 0, bestAge = 0, cumul = 0;
+  for (let i = 0; i < buckets.length; i++) {
+    cumul += buckets[i].val;
+    const ageFloor = buckets[i].endYear ? CY - buckets[i].endYear : CY - 1939;
+    if (ageFloor < 40) break; // stop before anything younger than 40
+    // Pick the threshold that maximizes cumulative % (most dramatic)
+    if (cumul > bestPct) { bestPct = cumul; bestAge = ageFloor; }
+  }
   const newestPct = buckets[buckets.length - 1].val;
   const newestAge = CY - 2020;
 
   const H = 520;
   svg.attr('viewBox', `0 0 ${W} ${H}`);
 
-  // Main punch statement — oldest homes
+  // Main punch statement — cumulative oldest homes
   svg.append('text').attr('x', W/2).attr('y', 50).attr('text-anchor','middle')
     .attr('font-family','Montserrat').attr('font-size','36px').attr('font-weight','900').attr('fill','#0D1E42')
-    .text(oldestPct.toFixed(0) + '% of homes are over ' + oldestAge + ' years old');
+    .text(bestPct.toFixed(0) + '% of homes are over ' + bestAge + ' years old');
 
   // Supporting line — newest homes
   svg.append('text').attr('x', W/2).attr('y', 80).attr('text-anchor','middle')
@@ -1718,7 +1731,7 @@ function drawHousingStockAge(name, d, svg, W) {
 
   // Donut chart — 50% larger
   const cx = W/2, cy = 300, outerR = 175, innerR = 95;
-  const colors = ['#0D1E42','#2a4a7f','#4a7ab5','#7bacd4','#b8d8f0'];
+  const colors = ['#0D1E42','#152d5a','#1f3d72','#2a4a7f','#3a6099','#4a7ab5','#6898c8','#7bacd4','#9fc5e2','#b8d8f0'];
   const total = buckets.reduce((s,b) => s + b.val, 0) || 1;
   let angle = -Math.PI / 2;
   const g = svg.append('g');
@@ -1737,17 +1750,17 @@ function drawHousingStockAge(name, d, svg, W) {
     const path = `M${x1},${y1} A${outerR},${outerR} 0 ${large} 1 ${x2},${y2} L${x3},${y3} A${innerR},${innerR} 0 ${large} 0 ${x4},${y4} Z`;
     g.append('path').attr('d', path).attr('fill', colors[i]);
 
-    // Label line + text
+    // Label line + text — only show for slices >= 3% to avoid overlap with 10 buckets
     const mid = angle + slice / 2;
     const lx = cx + (outerR + 20) * Math.cos(mid);
     const ly = cy + (outerR + 20) * Math.sin(mid);
     const anchor = Math.cos(mid) < -0.1 ? 'end' : Math.cos(mid) > 0.1 ? 'start' : 'middle';
-    if (b.val >= 2) {
+    if (b.val >= 3) {
       g.append('text').attr('x', lx).attr('y', ly + 5).attr('text-anchor', anchor)
-        .attr('font-family','Montserrat').attr('font-size','15px').attr('font-weight','700').attr('fill','#0D1E42')
+        .attr('font-family','Montserrat').attr('font-size','14px').attr('font-weight','700').attr('fill','#0D1E42')
         .text(b.val.toFixed(1) + '%');
-      g.append('text').attr('x', lx).attr('y', ly + 21).attr('text-anchor', anchor)
-        .attr('font-family','Montserrat').attr('font-size','12px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.55)')
+      g.append('text').attr('x', lx).attr('y', ly + 19).attr('text-anchor', anchor)
+        .attr('font-family','Montserrat').attr('font-size','10px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.55)')
         .text(b.label);
     }
     angle += slice;
