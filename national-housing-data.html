@@ -3814,6 +3814,74 @@ function renderStateChart(name, cmetric, d) {
       .attr('font-family','Montserrat').attr('fill','#1a1a2e')
       .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','3px').style('stroke-linejoin','round')
       .text(r=>METRICS[cmetric].fmt(r.val));
+  } else if (cmetric === 'median_year_built' || cmetric === 'pct_pre_1960') {
+    const val = getMetricVal(d, cmetric);
+    const svg = d3.select('#line-chart'); svg.selectAll('*').remove();
+    const sliderWrap = document.getElementById('chart-slider-wrap');
+    if (sliderWrap) sliderWrap.style.display = 'none';
+    const W = svg.node().getBoundingClientRect().width || 760;
+    const utm = document.getElementById('ut-metric'); if (utm) utm.textContent = METRICS[cmetric].label;
+    document.getElementById('chart-label').textContent = METRICS[cmetric].label;
+    if (val == null) {
+      svg.attr('viewBox','0 0 760 100');
+      svg.append('text').attr('x',380).attr('y',50).attr('text-anchor','middle')
+        .attr('font-family','Montserrat').attr('font-size','14px').attr('fill','#999').text('No data available');
+    } else if (cmetric === 'pct_pre_1960') {
+      const buckets = [
+        {label:'Pre-1960', key:'pct_pre_1960'},
+        {label:'1960\u20131979', key:'pct_1960_1979'},
+        {label:'1980\u20131999', key:'pct_1980_1999'},
+        {label:'2000\u20132019', key:'pct_2000_2019'},
+        {label:'2020+', key:'pct_2020_plus'}
+      ].map(b => ({...b, val: d.latest && d.latest[b.key] != null ? Number(d.latest[b.key]) : 0}));
+      const H = 280;
+      svg.attr('viewBox', `0 0 ${W} ${H}`);
+      const mg = svg.append('g').attr('transform','translate(110,30)');
+      const bw = W - 180, bh = 36, gap = 10;
+      const maxV = Math.max(...buckets.map(b=>b.val), 1);
+      buckets.forEach((b,i) => {
+        const y = i * (bh + gap);
+        mg.append('text').attr('x',-8).attr('y',y+bh/2+5).attr('text-anchor','end')
+          .attr('font-family','Montserrat').attr('font-size','13px').attr('font-weight','700').attr('fill','#0D1E42').text(b.label);
+        mg.append('rect').attr('x',0).attr('y',y).attr('width', bw * (b.val / maxV)).attr('height',bh)
+          .attr('rx',5).attr('fill','#0D1E42').attr('opacity', 0.75);
+        mg.append('text').attr('x', bw * (b.val / maxV) + 8).attr('y',y+bh/2+5)
+          .attr('font-family','Montserrat').attr('font-size','13px').attr('font-weight','700').attr('fill','#0D1E42')
+          .text(b.val.toFixed(1)+'%');
+      });
+      mg.append('text').attr('x', (W-180)/2).attr('y', 5*(bh+gap)+20).attr('text-anchor','middle')
+        .attr('font-family','Montserrat').attr('font-size','11px').attr('fill','rgba(13,30,66,0.4)')
+        .text('Census ACS 2022 5-Year Estimates');
+    } else {
+      svg.attr('viewBox', `0 0 ${W} 180`);
+      svg.append('text').attr('x',W/2).attr('y',70).attr('text-anchor','middle')
+        .attr('font-family','Montserrat').attr('font-size','56px').attr('font-weight','900').attr('fill','#0D1E42')
+        .text(METRICS[cmetric].fmt(val));
+      svg.append('text').attr('x',W/2).attr('y',105).attr('text-anchor','middle')
+        .attr('font-family','Montserrat').attr('font-size','13px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.45)')
+        .text('Census ACS 2022 5-Year Estimates');
+    }
+  } else if (PERMITS_METRICS && PERMITS_METRICS.has(cmetric)) {
+    const val = getMetricVal(d, cmetric);
+    const svg = d3.select('#line-chart'); svg.selectAll('*').remove();
+    const sliderWrap = document.getElementById('chart-slider-wrap');
+    if (sliderWrap) sliderWrap.style.display = 'none';
+    const W = svg.node().getBoundingClientRect().width || 760;
+    const utm = document.getElementById('ut-metric'); if (utm) utm.textContent = METRICS[cmetric].label;
+    document.getElementById('chart-label').textContent = METRICS[cmetric].label;
+    if (val == null) {
+      svg.attr('viewBox','0 0 760 100');
+      svg.append('text').attr('x',380).attr('y',50).attr('text-anchor','middle')
+        .attr('font-family','Montserrat').attr('font-size','14px').attr('fill','#999').text('No data available');
+    } else {
+      svg.attr('viewBox', `0 0 ${W} 180`);
+      svg.append('text').attr('x',W/2).attr('y',70).attr('text-anchor','middle')
+        .attr('font-family','Montserrat').attr('font-size','56px').attr('font-weight','900').attr('fill','#0D1E42')
+        .text(METRICS[cmetric].fmt(val));
+      svg.append('text').attr('x',W/2).attr('y',105).attr('text-anchor','middle')
+        .attr('font-family','Montserrat').attr('font-size','13px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.45)')
+        .text('Census BPS 2023 Annual');
+    }
   } else if (cmetric === 'pending_ratio') {
     drawAnnualLineChart(name, cmetric, d.history, true);
   } else {
