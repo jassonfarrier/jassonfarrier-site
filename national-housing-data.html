@@ -1703,21 +1703,21 @@ function drawHousingStockAge(name, d, svg, W) {
   const newestPct = buckets[buckets.length - 1].val;
   const newestAge = CY - 2020;
 
-  const H = 400;
+  const H = 520;
   svg.attr('viewBox', `0 0 ${W} ${H}`);
 
   // Main punch statement — oldest homes
-  svg.append('text').attr('x', W/2).attr('y', 36).attr('text-anchor','middle')
-    .attr('font-family','Montserrat').attr('font-size','26px').attr('font-weight','900').attr('fill','#0D1E42')
+  svg.append('text').attr('x', W/2).attr('y', 50).attr('text-anchor','middle')
+    .attr('font-family','Montserrat').attr('font-size','36px').attr('font-weight','900').attr('fill','#0D1E42')
     .text(oldestPct.toFixed(0) + '% of homes are over ' + oldestAge + ' years old');
 
   // Supporting line — newest homes
-  svg.append('text').attr('x', W/2).attr('y', 60).attr('text-anchor','middle')
-    .attr('font-family','Montserrat').attr('font-size','14px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.5)')
+  svg.append('text').attr('x', W/2).attr('y', 80).attr('text-anchor','middle')
+    .attr('font-family','Montserrat').attr('font-size','18px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.5)')
     .text('Only ' + newestPct.toFixed(1) + '% were built in the last ' + newestAge + ' years');
 
-  // Donut chart — 25% larger
-  const cx = W/2, cy = 230, outerR = 138, innerR = 75;
+  // Donut chart — 50% larger
+  const cx = W/2, cy = 300, outerR = 175, innerR = 95;
   const colors = ['#0D1E42','#2a4a7f','#4a7ab5','#7bacd4','#b8d8f0'];
   const total = buckets.reduce((s,b) => s + b.val, 0) || 1;
   let angle = -Math.PI / 2;
@@ -1739,15 +1739,15 @@ function drawHousingStockAge(name, d, svg, W) {
 
     // Label line + text
     const mid = angle + slice / 2;
-    const lx = cx + (outerR + 16) * Math.cos(mid);
-    const ly = cy + (outerR + 16) * Math.sin(mid);
+    const lx = cx + (outerR + 20) * Math.cos(mid);
+    const ly = cy + (outerR + 20) * Math.sin(mid);
     const anchor = Math.cos(mid) < -0.1 ? 'end' : Math.cos(mid) > 0.1 ? 'start' : 'middle';
     if (b.val >= 2) {
-      g.append('text').attr('x', lx).attr('y', ly + 4).attr('text-anchor', anchor)
-        .attr('font-family','Montserrat').attr('font-size','12px').attr('font-weight','700').attr('fill','#0D1E42')
+      g.append('text').attr('x', lx).attr('y', ly + 5).attr('text-anchor', anchor)
+        .attr('font-family','Montserrat').attr('font-size','15px').attr('font-weight','700').attr('fill','#0D1E42')
         .text(b.val.toFixed(1) + '%');
-      g.append('text').attr('x', lx).attr('y', ly + 16).attr('text-anchor', anchor)
-        .attr('font-family','Montserrat').attr('font-size','10px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.55)')
+      g.append('text').attr('x', lx).attr('y', ly + 21).attr('text-anchor', anchor)
+        .attr('font-family','Montserrat').attr('font-size','12px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.55)')
         .text(b.label);
     }
     angle += slice;
