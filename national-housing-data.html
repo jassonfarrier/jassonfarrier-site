@@ -679,6 +679,8 @@ function updateModePillAvailability(metric) {
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct']);
 const PAYMENT_METRICS = new Set(['est_payment_20']);
 const NEW_CONSTRUCTION_METRICS = new Set(['new_construction_price','new_construction_sqft']);
+const PERMITS_METRICS = new Set(['sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k']);
+const HOUSING_STOCK_METRICS = new Set(['median_year_built','pct_pre_1960']);
 const REDFIN_METRICS = new Set(['cancellation_pct','delisted_pct','relisted_pct','cash_pct','down_payment_pct','fha_pct','va_pct','investor_purchases','investor_market_share','luxury_median_sale_price','luxury_median_dom','luxury_active_listings','luxury_pending_sales']);
 
 // Ohio-specific homeowners insurance rate, as a % of home value per year. Sourced from
@@ -1107,6 +1109,8 @@ function renderColors(mode) {
   const isDistress = DISTRESS_METRICS.has(metric);
   const isPayment = PAYMENT_METRICS.has(metric);
   const isNewConstruction = NEW_CONSTRUCTION_METRICS.has(metric);
+  const isPermits = PERMITS_METRICS.has(metric);
+  const isHousingStock = HOUSING_STOCK_METRICS.has(metric);
   // Danger metrics: higher value = real market-health warning sign → green (low) to red (high)
   const isDanger = !isYOY && DANGER_METRICS.has(metric);
   const palette = isDanger ? PALETTE_DANGER : (isDistress || isPayment || isInverse) ? PALETTE_INV : PALETTE_NORM;
@@ -1216,7 +1220,7 @@ function renderColors(mode) {
         map.setPaintProperty('counties-fill', 'fill-color', ['coalesce', ['get', '__color'], '#ccc']);
         map.setPaintProperty('counties-fill', 'fill-opacity', ['case', ['boolean', ['get', '__nodata'], false], 0, ['boolean',['feature-state','selected'],false], 0.69, 0.49]);
       } catch(e) {}
-    } else if (isDistress || isPayment || isNewConstruction) {
+    } else if (isDistress || isPayment || isNewConstruction || isPermits || isHousingStock) {
       // Distress + payment + new construction metrics: values are computed/pulled from outside the plain
       // GeoJSON properties, so use the per-feature __color approach (same as YOY) —
       // interpolate on ['get', metric] won't work for either.
