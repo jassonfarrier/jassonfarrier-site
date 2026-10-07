@@ -1729,13 +1729,23 @@ function drawHousingStockAge(name, d, svg, W) {
     .attr('font-family','Montserrat').attr('font-size','18px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.5)')
     .text('Only ' + newestPct.toFixed(1) + '% were built in the last ' + newestAge + ' years');
 
-  // Donut chart — 50% larger
+  // Consolidate 10 data buckets into 5 visual buckets for the donut
+  const V = (k) => d.latest && d.latest[k] != null ? Number(d.latest[k]) : 0;
+  const vizBuckets = [
+    {label: (CY - 1959) + '+ yrs old', val: V('pct_pre_1940') + V('pct_1940_1949') + V('pct_1950_1959')},
+    {label: (CY - 1979) + '–' + (CY - 1960) + ' yrs old', val: V('pct_1960_1969') + V('pct_1970_1979')},
+    {label: (CY - 1999) + '–' + (CY - 1980) + ' yrs old', val: V('pct_1980_1989') + V('pct_1990_1999')},
+    {label: (CY - 2019) + '–' + (CY - 2000) + ' yrs old', val: V('pct_2000_2009') + V('pct_2010_2019')},
+    {label: 'Under ' + (CY - 2019) + ' yrs old', val: V('pct_2020_plus')}
+  ];
+
+  // Donut chart — high-contrast 5 colors
   const cx = W/2, cy = 300, outerR = 175, innerR = 95;
-  const colors = ['#0D1E42','#152d5a','#1f3d72','#2a4a7f','#3a6099','#4a7ab5','#6898c8','#7bacd4','#9fc5e2','#b8d8f0'];
-  const total = buckets.reduce((s,b) => s + b.val, 0) || 1;
+  const colors = ['#0D1E42','#2a6cb8','#5ba3d9','#9ecae1','#d4e8f7'];
+  const total = vizBuckets.reduce((s,b) => s + b.val, 0) || 1;
   let angle = -Math.PI / 2;
   const g = svg.append('g');
-  buckets.forEach((b, i) => {
+  vizBuckets.forEach((b, i) => {
     const slice = (b.val / total) * 2 * Math.PI;
     if (b.val <= 0) return;
     const x1 = cx + outerR * Math.cos(angle);
@@ -1750,17 +1760,17 @@ function drawHousingStockAge(name, d, svg, W) {
     const path = `M${x1},${y1} A${outerR},${outerR} 0 ${large} 1 ${x2},${y2} L${x3},${y3} A${innerR},${innerR} 0 ${large} 0 ${x4},${y4} Z`;
     g.append('path').attr('d', path).attr('fill', colors[i]);
 
-    // Label line + text — only show for slices >= 3% to avoid overlap with 10 buckets
+    // Label line + text
     const mid = angle + slice / 2;
     const lx = cx + (outerR + 20) * Math.cos(mid);
     const ly = cy + (outerR + 20) * Math.sin(mid);
     const anchor = Math.cos(mid) < -0.1 ? 'end' : Math.cos(mid) > 0.1 ? 'start' : 'middle';
-    if (b.val >= 3) {
+    if (b.val >= 2) {
       g.append('text').attr('x', lx).attr('y', ly + 5).attr('text-anchor', anchor)
-        .attr('font-family','Montserrat').attr('font-size','14px').attr('font-weight','700').attr('fill','#0D1E42')
+        .attr('font-family','Montserrat').attr('font-size','15px').attr('font-weight','700').attr('fill','#0D1E42')
         .text(b.val.toFixed(1) + '%');
-      g.append('text').attr('x', lx).attr('y', ly + 19).attr('text-anchor', anchor)
-        .attr('font-family','Montserrat').attr('font-size','10px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.55)')
+      g.append('text').attr('x', lx).attr('y', ly + 21).attr('text-anchor', anchor)
+        .attr('font-family','Montserrat').attr('font-size','12px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.55)')
         .text(b.label);
     }
     angle += slice;
