@@ -1687,7 +1687,77 @@ function getYOYRows(d, metric) {
   }).filter(r => r.date);
 }
 
+function drawHousingStockAge(name, d, svg, W) {
+  const CY = new Date().getFullYear();
+  const buckets = [
+    {key:'pct_pre_1960', ageMin: CY - 1959, label: (CY - 1959) + '+ years old'},
+    {key:'pct_1960_1979', ageMin: CY - 1979, ageMax: CY - 1960, label: (CY - 1979) + '–' + (CY - 1960) + ' years old'},
+    {key:'pct_1980_1999', ageMin: CY - 1999, ageMax: CY - 1980, label: (CY - 1999) + '–' + (CY - 1980) + ' years old'},
+    {key:'pct_2000_2019', ageMin: CY - 2019, ageMax: CY - 2000, label: (CY - 2019) + '–' + (CY - 2000) + ' years old'},
+    {key:'pct_2020_plus', ageMin: 0, ageMax: CY - 2020, label: 'Under ' + (CY - 2019) + ' years old'}
+  ].map(b => ({...b, val: d.latest && d.latest[b.key] != null ? Number(d.latest[b.key]) : 0}));
 
+  // Find most dramatic cumulative threshold
+  let bestPct = 0, bestAge = 0;
+  let cumul = 0;
+  for (let i = 0; i < buckets.length - 1; i++) {
+    cumul += buckets[i].val;
+    const age = buckets[i].ageMin;
+    const drama = cumul * Math.log(age + 1);
+    if (drama > bestPct * Math.log(bestAge + 1)) { bestPct = cumul; bestAge = age; }
+  }
+
+  const H = 320;
+  svg.attr('viewBox', `0 0 ${W} ${H}`);
+
+  // Punch statement
+  const displayName = name || 'here';
+  svg.append('text').attr('x', W/2).attr('y', 32).attr('text-anchor','middle')
+    .attr('font-family','Montserrat').attr('font-size','22px').attr('font-weight','900').attr('fill','#0D1E42')
+    .text(bestPct.toFixed(0) + '% of homes are over ' + bestAge + ' years old');
+
+  // Donut chart
+  const cx = W/2, cy = 185, outerR = 110, innerR = 60;
+  const colors = ['#0D1E42','#2a4a7f','#4a7ab5','#7bacd4','#b8d8f0'];
+  const total = buckets.reduce((s,b) => s + b.val, 0) || 1;
+  let angle = -Math.PI / 2;
+  const g = svg.append('g');
+  buckets.forEach((b, i) => {
+    const slice = (b.val / total) * 2 * Math.PI;
+    if (b.val <= 0) return;
+    const x1 = cx + outerR * Math.cos(angle);
+    const y1 = cy + outerR * Math.sin(angle);
+    const x2 = cx + outerR * Math.cos(angle + slice);
+    const y2 = cy + outerR * Math.sin(angle + slice);
+    const x3 = cx + innerR * Math.cos(angle + slice);
+    const y3 = cy + innerR * Math.sin(angle + slice);
+    const x4 = cx + innerR * Math.cos(angle);
+    const y4 = cy + innerR * Math.sin(angle);
+    const large = slice > Math.PI ? 1 : 0;
+    const path = `M${x1},${y1} A${outerR},${outerR} 0 ${large} 1 ${x2},${y2} L${x3},${y3} A${innerR},${innerR} 0 ${large} 0 ${x4},${y4} Z`;
+    g.append('path').attr('d', path).attr('fill', colors[i]);
+
+    // Label line + text
+    const mid = angle + slice / 2;
+    const lx = cx + (outerR + 14) * Math.cos(mid);
+    const ly = cy + (outerR + 14) * Math.sin(mid);
+    const anchor = Math.cos(mid) < -0.1 ? 'end' : Math.cos(mid) > 0.1 ? 'start' : 'middle';
+    if (b.val >= 2) {
+      g.append('text').attr('x', lx).attr('y', ly + 4).attr('text-anchor', anchor)
+        .attr('font-family','Montserrat').attr('font-size','10px').attr('font-weight','700').attr('fill','#0D1E42')
+        .text(b.val.toFixed(1) + '%');
+      g.append('text').attr('x', lx).attr('y', ly + 16).attr('text-anchor', anchor)
+        .attr('font-family','Montserrat').attr('font-size','9px').attr('font-weight','600').attr('fill','rgba(13,30,66,0.55)')
+        .text(b.label);
+    }
+    angle += slice;
+  });
+
+  // Source
+  svg.append('text').attr('x', W/2).attr('y', H - 6).attr('text-anchor','middle')
+    .attr('font-family','Montserrat').attr('font-size','11px').attr('fill','rgba(13,30,66,0.4)')
+    .text('Census ACS 2022 5-Year Estimates');
+}
 
 function renderChart(county, cmetric) {
   const d = dataMap[county];
@@ -1776,30 +1846,7 @@ function renderChart(county, cmetric) {
         svg.append('text').attr('x',350).attr('y',50).attr('text-anchor','middle')
           .attr('font-family','Montserrat').attr('font-size','14px').attr('fill','#999').text('No data available');
       } else if (cmetric === 'pct_pre_1960') {
-        const buckets = [
-          {label:'Pre-1960', key:'pct_pre_1960'},
-          {label:'1960\u20131979', key:'pct_1960_1979'},
-          {label:'1980\u20131999', key:'pct_1980_1999'},
-          {label:'2000\u20132019', key:'pct_2000_2019'},
-          {label:'2020+', key:'pct_2020_plus'}
-        ].map(b => ({...b, val: d.latest && d.latest[b.key] != null ? Number(d.latest[b.key]) : 0}));
-        svg.attr('viewBox', `0 0 ${w} 240`);
-        const mg = svg.append('g').attr('transform','translate(100,20)');
-        const bw = w - 160, bh = 34, gap = 8;
-        const maxV = Math.max(...buckets.map(b=>b.val), 1);
-        buckets.forEach((b,i) => {
-          const y = i * (bh + gap);
-          mg.append('text').attr('x',-8).attr('y',y+bh/2+5).attr('text-anchor','end')
-            .attr('font-family','Montserrat').attr('font-size','12px').attr('font-weight','700').attr('fill','#0D1E42').text(b.label);
-          mg.append('rect').attr('x',0).attr('y',y).attr('width', bw * (b.val / maxV)).attr('height',bh)
-            .attr('rx',4).attr('fill','#0D1E42').attr('opacity',0.75);
-          mg.append('text').attr('x', bw * (b.val / maxV) + 8).attr('y',y+bh/2+5)
-            .attr('font-family','Montserrat').attr('font-size','12px').attr('font-weight','700').attr('fill','#0D1E42')
-            .text(b.val.toFixed(1)+'%');
-        });
-        mg.append('text').attr('x', (w-160)/2).attr('y', 5*(bh+gap)+16).attr('text-anchor','middle')
-          .attr('font-family','Montserrat').attr('font-size','11px').attr('fill','rgba(13,30,66,0.4)')
-          .text('Census ACS 2022 5-Year Estimates');
+        drawHousingStockAge(displayName, d, svg, w);
       } else {
         svg.attr('viewBox', `0 0 ${w} 160`);
         svg.append('text').attr('x',w/2).attr('y',60).attr('text-anchor','middle')
@@ -3827,31 +3874,7 @@ function renderStateChart(name, cmetric, d) {
       svg.append('text').attr('x',380).attr('y',50).attr('text-anchor','middle')
         .attr('font-family','Montserrat').attr('font-size','14px').attr('fill','#999').text('No data available');
     } else if (cmetric === 'pct_pre_1960') {
-      const buckets = [
-        {label:'Pre-1960', key:'pct_pre_1960'},
-        {label:'1960\u20131979', key:'pct_1960_1979'},
-        {label:'1980\u20131999', key:'pct_1980_1999'},
-        {label:'2000\u20132019', key:'pct_2000_2019'},
-        {label:'2020+', key:'pct_2020_plus'}
-      ].map(b => ({...b, val: d.latest && d.latest[b.key] != null ? Number(d.latest[b.key]) : 0}));
-      const H = 280;
-      svg.attr('viewBox', `0 0 ${W} ${H}`);
-      const mg = svg.append('g').attr('transform','translate(110,30)');
-      const bw = W - 180, bh = 36, gap = 10;
-      const maxV = Math.max(...buckets.map(b=>b.val), 1);
-      buckets.forEach((b,i) => {
-        const y = i * (bh + gap);
-        mg.append('text').attr('x',-8).attr('y',y+bh/2+5).attr('text-anchor','end')
-          .attr('font-family','Montserrat').attr('font-size','13px').attr('font-weight','700').attr('fill','#0D1E42').text(b.label);
-        mg.append('rect').attr('x',0).attr('y',y).attr('width', bw * (b.val / maxV)).attr('height',bh)
-          .attr('rx',5).attr('fill','#0D1E42').attr('opacity', 0.75);
-        mg.append('text').attr('x', bw * (b.val / maxV) + 8).attr('y',y+bh/2+5)
-          .attr('font-family','Montserrat').attr('font-size','13px').attr('font-weight','700').attr('fill','#0D1E42')
-          .text(b.val.toFixed(1)+'%');
-      });
-      mg.append('text').attr('x', (W-180)/2).attr('y', 5*(bh+gap)+20).attr('text-anchor','middle')
-        .attr('font-family','Montserrat').attr('font-size','11px').attr('fill','rgba(13,30,66,0.4)')
-        .text('Census ACS 2022 5-Year Estimates');
+      drawHousingStockAge(name, d, svg, W);
     } else {
       svg.attr('viewBox', `0 0 ${W} 180`);
       svg.append('text').attr('x',W/2).attr('y',70).attr('text-anchor','middle')
