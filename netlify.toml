@@ -63,6 +63,31 @@
   to = "/housing-market-updates/ohio-spring-2026"
   status = 301
 
+[[redirects]]
+  from = "/blog"
+  to = "/housing-market-updates"
+  status = 301
+
+[[redirects]]
+  from = "/blog/2025/9/17/property-tax-showdown-ohio-mom-takes-on-politicians"
+  to = "/housing-market-updates/ohio-property-tax-appeal"
+  status = 301
+
+[[redirects]]
+  from = "/blog/2025/12/8/whats-really-happening-with-the-ohio-housing-market"
+  to = "/housing-market-updates/ohio-dec-2025"
+  status = 301
+
+[[redirects]]
+  from = "/blog/2025/9/17/have-ohio-home-prices-finally-stopped-rising"
+  to = "/housing-market-updates/ohio-home-prices-record-highs-warning-signs"
+  status = 301
+
+[[redirects]]
+  from = "/blog/2025/2/28/686-home-listings-vanish-why-its-actually-good-news"
+  to = "/housing-market-updates/ohio-feb-2026"
+  status = 301
+
 [[headers]]
   for = "/*"
   [headers.values]
