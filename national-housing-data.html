@@ -3998,7 +3998,12 @@ function loadZipDataForState(abbr) {
     return (async () => {
       let all = [], offset = 0;
       while (true) {
-        const page = await fetch(baseUrl + '&limit=1000&offset=' + offset, {headers}).then(r=>r.json());
+        let page = null;
+        for (let attempt = 0; attempt < 5 && !Array.isArray(page); attempt++) {
+          if (attempt) await new Promise(res => setTimeout(res, 400 * attempt));
+          try { page = await fetch(baseUrl + '&limit=1000&offset=' + offset, {headers}).then(r=>r.json()); } catch (e) { page = null; }
+        }
+        if (!Array.isArray(page)) throw new Error('ZIP data page failed to load');
         all = all.concat(page);
         if (page.length < 1000) break;
         offset += 1000;
@@ -4281,13 +4286,28 @@ function loadNationalZipIndex() {
   // pages in parallel (Promise.all), same pattern County/Metro already use -- 30 pages is
   // a safe fixed count above the known ~26,268 total; empty trailing pages are harmless.
   nationalZipIndexLoading = (async () => {
-    const _pageSize = 1000, _pageCount = 30;
-    const pages = await Promise.all(
-      Array.from({length: _pageCount}, (_, i) =>
-        fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,state_id,latest->zhvi&limit='+_pageSize+'&offset='+(i*_pageSize), {headers}).then(r=>r.json())
-      )
-    );
-    const all = pages.flat();
+    // Pages are fetched a few at a time (not all 30 at once) with a stable order, and any
+    // page that comes back as an error object (e.g. a Supabase statement timeout) is retried
+    // and never merged into the index. Previously a single failed page was stored as if it
+    // were ZIP rows, which made every ZIP search throw and silently show nothing.
+    const _pageSize = 1000, _pageCount = 30, _concurrency = 6;
+    const _pages = new Array(_pageCount);
+    async function _loadPage(i) {
+      for (let attempt = 0; attempt < 5; attempt++) {
+        try {
+          const r = await fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,state_id,latest->zhvi&order=zip&limit='+_pageSize+'&offset='+(i*_pageSize), {headers});
+          const j = await r.json();
+          if (Array.isArray(j)) { _pages[i] = j; return; }
+        } catch (e) {}
+        await new Promise(res => setTimeout(res, 400 * (attempt + 1)));
+      }
+      _pages[i] = [];
+    }
+    let _next = 0;
+    await Promise.all(Array.from({length: _concurrency}, async () => {
+      while (_next < _pageCount) { const i = _next++; await _loadPage(i); }
+    }));
+    const all = _pages.flat().filter(d => d && typeof d.zip === 'string');
     nationalZipIndex = all;
     all.forEach(d => { nationalZipIndexMap[d.zip] = d; });
     nationalZipIndexLoaded = true;
