@@ -712,6 +712,7 @@ function updateModePillAvailability(metric) {
   });
 }
 const REDFIN_METRICS = new Set(['cancellation_pct','delisted_pct','relisted_pct','cash_pct','down_payment_pct','fha_pct','va_pct','investor_purchases','investor_market_share','luxury_median_sale_price','luxury_median_dom','luxury_active_listings','luxury_pending_sales']);
+const PARTIAL_METRICS = new Set(['zori','relisted_pct','cash_pct','down_payment_pct','fha_pct','va_pct','investor_purchases','investor_market_share','luxury_median_sale_price','luxury_median_dom','luxury_active_listings','luxury_pending_sales']);
 const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct']);
 const PAYMENT_METRICS = new Set(['est_payment_20']);
 const NEW_CONSTRUCTION_METRICS = new Set(['new_construction_price','new_construction_sqft']);
@@ -1083,6 +1084,7 @@ function renderColors(mode) {
   const isDistress = DISTRESS_METRICS.has(metric);
   const isPayment = PAYMENT_METRICS.has(metric);
   const isNewConstruction = NEW_CONSTRUCTION_METRICS.has(metric);
+  const isPartial = PARTIAL_METRICS.has(metric);
   // Danger metrics: higher value = real market-health warning sign → green (low) to red (high)
   const isDanger = !isYOY && DANGER_METRICS.has(metric);
   const palette = isDanger ? PALETTE_DANGER : (isDistress || isPayment || isInverse) ? PALETTE_INV : PALETTE_NORM;
@@ -1123,7 +1125,7 @@ function renderColors(mode) {
         src.setData(src._data);
       }
       try { map.setPaintProperty('counties-fill', 'fill-color', ['coalesce', ['get', '__color'], '#ccc']); } catch(e) {}
-    } else if (isDistress || isPayment || isNewConstruction) {
+    } else if (isDistress || isPayment || isNewConstruction || isPartial) {
       // Distress + payment + new construction metrics: values are computed/pulled from outside the plain
       // GeoJSON properties, so use the per-feature __color approach (same as YOY) —
       // interpolate on ['get', metric] won't work for either.
