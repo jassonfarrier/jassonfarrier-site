@@ -1106,7 +1106,20 @@ function renderColors(mode) {
   if (!allData || !allData.length) return;
 
   const vals = allData.map(d => cfg.getVal(d, metric)).filter(v => v != null).sort((a, b) => a - b);
-  if (!vals.length) return;
+  if (!vals.length) {
+    // No record at this level has this metric: grey everything out and clear labels
+    // (otherwise the previous metric's colors and labels would stay on the map).
+    const srcId = {county:'ohio-counties', zip:'ohio-zips', metro:'ohio-metros'}[mode];
+    const fillId = {county:'counties-fill', zip:'zips-fill', metro:'metros-fill'}[mode];
+    const s0 = srcId && map.getSource(srcId);
+    if (s0 && s0._data && s0._data.features) {
+      s0._data.features.forEach(f => { f.properties.__color = '#ccc'; f.properties.__label = ''; });
+      s0.setData(s0._data);
+      try { map.setPaintProperty(fillId, 'fill-color', ['coalesce', ['get', '__color'], '#ccc']); } catch(e) {}
+    }
+    drawLegend([], palette);
+    return;
+  }
 
   const stops = quantileStops(vals, palette);
 
