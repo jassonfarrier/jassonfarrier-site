@@ -1749,6 +1749,11 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
     btn.classList.add('active');
     mapMetric = btn.dataset.metric;
     updateModePillAvailability(mapMetric);
+    // If this metric has no data at the current level, jump to the closest level that does
+    {
+      const _ok = METRIC_MODES[mapMetric] || ['state','metro','county','zip'];
+      if (!_ok.includes(mapMode)) { setMode(_ok.includes('metro') ? 'metro' : _ok[0]); return; }
+    }
     renderColors(mapMode);
   });
 });
