@@ -298,6 +298,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="va_pct">VA Loan %</option>
     <option value="investor_purchases">Investor Purchases</option>
     <option value="investor_market_share">Investor Market Share %</option>
+    <option value="fc_starts">Foreclosure Starts</option>
+    <option value="mortgage_dq_rate">Mortgage Delinquency Rate</option>
     <option value="luxury_median_sale_price">Luxury Median Sale Price</option>
     <option value="luxury_median_sale_price_yoy">Luxury Median Sale Price YOY %</option>
     <option value="luxury_median_dom">Luxury Days on Market</option>
@@ -374,6 +376,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn" data-metric="pre_fc_pct"><span class="mn">Pre-Foreclosure %</span><span class="md">Pre-foreclosure as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#pre-foreclosure-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="upside_down"><span class="mn">Underwater</span><span class="md">Properties with negative equity</span><a class="metric-help" href="/ohio-housing-data-methodology#underwater" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="upside_down_pct"><span class="mn">Underwater %</span><span class="md">Underwater as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#underwater-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="fc_starts"><span class="mn">Foreclosure Starts</span><span class="md">ICE McDash · National only · monthly since 2000</span></button>
+    <button class="metric-btn" data-metric="mortgage_dq_rate"><span class="mn">Mortgage Delinquency Rate</span><span class="md">ICE McDash · National only · monthly since 2002</span></button>
     <hr>
 
     <div class="src" style="margin-top:auto;font-size:9px;color:rgba(0,0,0,0.35);line-height:1.6;padding-top:12px;border-top:1px solid rgba(0,0,0,0.07)">
@@ -478,6 +482,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="pre_fc_pct">Pre-Foreclosure %</option>
           <option value="upside_down">Underwater</option>
           <option value="upside_down_pct">Underwater %</option>
+          <option value="fc_starts">Foreclosure Starts</option>
+          <option value="mortgage_dq_rate">Mortgage Delinquency Rate</option>
           <option value="cash_pct">All-Cash Sales %</option>
           <option value="down_payment_pct">Median Down Payment %</option>
           <option value="fha_pct">FHA Loan %</option>
@@ -548,6 +554,8 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab" data-cmetric="pre_fc_pct"><span class="mn">Pre-Foreclosure %</span><span class="md">PropStream</span></button>
           <button class="metric-btn chart-tab" data-cmetric="upside_down"><span class="mn">Underwater</span><span class="md">PropStream</span></button>
           <button class="metric-btn chart-tab" data-cmetric="upside_down_pct"><span class="mn">Underwater %</span><span class="md">PropStream</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="fc_starts"><span class="mn">Foreclosure Starts</span><span class="md">ICE McDash · National · since 2000</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="mortgage_dq_rate"><span class="mn">Mortgage Delinquency Rate</span><span class="md">ICE McDash · National · since 2002</span></button>
           <button class="metric-btn chart-tab" data-cmetric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">Redfin · Jan 2012–present</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="delisted_pct"><span class="mn">Delisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
@@ -650,6 +658,8 @@ const METRICS = {
   pre_fc_pct:     {label:'Pre-Foreclosure %', fmt:v=>v.toFixed(2)+'%',              lo:'Lower', hi:'Higher'},
   upside_down:    {label:'Underwater',        fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
   upside_down_pct:{label:'Underwater %',      fmt:v=>v.toFixed(2)+'%',              lo:'Lower', hi:'Higher'},
+  fc_starts:      {label:'Foreclosure Starts', fmt:v=>Math.round(v).toLocaleString(), lo:'Fewer', hi:'More'},
+  mortgage_dq_rate:{label:'Mortgage Delinquency Rate', fmt:v=>v.toFixed(2)+'%', lo:'Lower', hi:'Higher'},
   cancellation_pct:            {label:'Cancellation Rate %',    fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
   cancellation_pct_yoy:         {label:'Cancellation Rate YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   delisted_pct:                 {label:'Delisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
@@ -687,6 +697,7 @@ const METRIC_MODES = {
   cash_pct: ['national','metro'], down_payment_pct: ['national','metro'],
   fha_pct: ['national','metro'], va_pct: ['national','metro'],
   investor_purchases: ['national','metro'], investor_market_share: ['national','metro'],
+  fc_starts: ['national'], mortgage_dq_rate: ['national'],
   luxury_median_sale_price: ['national','state','metro'], luxury_median_sale_price_yoy: ['national','state','metro'],
   luxury_median_dom: ['national','state','metro'], luxury_median_dom_yoy: ['national','state','metro'],
   luxury_active_listings: ['national','state','metro'], luxury_active_listings_yoy: ['national','state','metro'],
@@ -835,7 +846,7 @@ const PALETTE_NORM  = ['#7a1420','#b5262f','#d9594f','#edb3ad','#f7f7f7','#d1e5f
 const PALETTE_INV   = ['#2166ac','#4393c3','#92c5de','#d1e5f0','#f7f7f7','#edb3ad','#d9594f','#b5262f','#7a1420'];
 const PALETTE_DANGER = ['#1a7d3c','#4ba35f','#8ec78f','#c8e5c0','#f7f7f7','#fddbc7','#f4a582','#d6604d','#b2182b'];
 // DANGER_METRICS: "high value = bad" metrics that should render green (low/healthy) → red (high/problem)
-const DANGER_METRICS = new Set(['price_reduced_pct','cancellation_pct','tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct','days_on_market_yoy']);
+const DANGER_METRICS = new Set(['fc_starts','mortgage_dq_rate','price_reduced_pct','cancellation_pct','tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct','days_on_market_yoy']);
 const INVERTED_YOY_METRICS = new Set(['days_on_market_yoy']); // positive change is BAD for these
 const PALETTE_DIST  = ['#fff5f0','#fee0d2','#fcbba1','#fc9272','#fb6a4a','#ef3b2c','#cb181d','#a50f15','#67000d'];
 
@@ -1365,7 +1376,7 @@ function fmtAxisCompact(cmetric) {
       if (Math.abs(v)>=1000) return '$'+d3.format('.2s')(v).replace('k','K').replace('G','B');
       return '$'+v;
     }
-    if (cmetric==='price_reduced_pct'||cmetric==='property_tax_rate') return v.toFixed(1)+'%';
+    if (cmetric==='price_reduced_pct'||cmetric==='property_tax_rate'||cmetric==='mortgage_dq_rate') return v.toFixed(1)+'%';
     if (cmetric==='days_on_market') return v+'d';
     if (cmetric==='sf_permits_per_1k'||cmetric==='mf_permits_per_1k'||cmetric==='total_permits_per_1k') return v.toFixed(1);
     if (Math.abs(v)>=1000) return d3.format('.2s')(v).replace('k','K');
@@ -1380,6 +1391,7 @@ function sourceForMetric(m) {
   if (base==='zhvi'||base==='zhvi_condo'||base==='zori') return '<a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Zillow</a>';
   if (base==='median_property_tax'||base==='property_tax_rate') return '<a href="https://data.census.gov/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census ACS</a>';
   if (base==='sf_permits_per_1k'||base==='mf_permits_per_1k'||base==='total_permits_per_1k') return '<a href="https://www.census.gov/construction/bps/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census BPS</a>';
+  if (base==='fc_starts'||base==='mortgage_dq_rate') return '<a href="https://www.ice.com/mortgage-technology/mortgage-monitor" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">ICE McDash</a>';
   if (DISTRESS_METRICS.has(base)) return '<a href="https://www.propstream.com/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">PropStream</a>';
   if (PAYMENT_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#est-payment" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Derived Estimate</a>';
   if (NEW_CONSTRUCTION_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#new-construction" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">MLS</a>';
