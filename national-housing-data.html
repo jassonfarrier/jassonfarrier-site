@@ -2899,9 +2899,9 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
 }
 
 
-function drawAnnualLineChart(county, cmetric, histOverride, isZip) {
+function drawAnnualLineChart(county, cmetric, histOverride, isZip, keepSlider) {
   const sliderWrap = document.getElementById('chart-slider-wrap');
-  if (sliderWrap) sliderWrap.style.display = 'none';
+  if (sliderWrap && !keepSlider) sliderWrap.style.display = 'none';
   const d = histOverride != null ? {history: histOverride} : dataMap[county];
   if (!d || !d.history) return;
   chartMetric = cmetric;
@@ -4009,8 +4009,8 @@ function renderStateChart(name, cmetric, d) {
     _initChartSlider(full);
     const draw = () => {
       const rows = sameMonth.filter(r => { const y = parseInt(r.date.slice(0,4)); return y >= chartSliderStartYr && y <= chartSliderEndYr; });
-      drawAnnualLineChart(name, cmetric, rows, true);
-      const sw = document.getElementById('chart-slider-wrap'); if (sw) sw.style.display = 'block';
+      // keepSlider = true: hiding the slider mid-drag would cancel the drag after one step
+      drawAnnualLineChart(name, cmetric, rows, true, true);
     };
     _chartSliderRedraw = draw;
     draw();
