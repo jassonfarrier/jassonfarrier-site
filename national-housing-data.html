@@ -758,6 +758,7 @@ let FIPS_NAME = {};
 
 let DATA = [], dataMap = {}, mapMetric = 'zhvi', chartMetric = 'zhvi', map, popup, selectedCounty = null, selectedFips = null;
 let chartSliderStartYr = null, chartSliderEndYr = null, _chartHistoryFull = null, _chartCounty = null, _chartCmetric = null, _chartIsZip = false;
+let _chartSliderRedraw = null; // set by charts other than the monthly bar chart that use the year slider
 let mapMode = 'county', ZIP_DATA = [], zipDataMap = {}, zipDataLoaded = false, zipHistoryCache = {}, selectedZip = null, zipHoveredId = null;
 let NATIONAL_DATA = null, nationalDataLoaded = false;
 // ZIP mode is state-scoped nationally: ~33,791 ZCTA boundaries is too much to hand Mapbox
@@ -2580,7 +2581,9 @@ function _initChartSlider(allRows) {
     const pct2 = (ev - minYr) / (maxYr - minYr) * 100;
     document.getElementById('slider-range').style.left = pct1 + '%';
     document.getElementById('slider-range').style.width = (pct2 - pct1) + '%';
-    if (_chartHistoryFull) {
+    if (_chartSliderRedraw) {
+      _chartSliderRedraw();
+    } else if (_chartHistoryFull) {
       drawMonthlyBarChart(_chartCounty, _chartCmetric,
         _chartHistoryFull, _chartIsZip, true);
     }
@@ -2601,6 +2604,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   // Store full history for slider re-renders
   if (!_sliderFilter) {
     _chartHistoryFull = d.history;
+    _chartSliderRedraw = null;
     _chartCounty = county;
     _chartCmetric = cmetric;
     _chartIsZip = isZip;
@@ -3995,6 +3999,21 @@ function renderStateChart(name, cmetric, d) {
         }
       });
     }
+  } else if (cmetric === 'fc_starts' || cmetric === 'mortgage_dq_rate') {
+    // National ICE series: same annual line chart, plus the year-range slider so a time window can be shown
+    const full = (d && d.history || []).filter(r => r[cmetric] != null && r.date);
+    if (!full.length) { drawAnnualLineChart(name, cmetric, d.history, true); return; }
+    const anchor = full[full.length-1].date.slice(5,7);
+    const sameMonth = full.filter(r => r.date.slice(5,7) === anchor);
+    _chartHistoryFull = null;
+    _initChartSlider(full);
+    const draw = () => {
+      const rows = sameMonth.filter(r => { const y = parseInt(r.date.slice(0,4)); return y >= chartSliderStartYr && y <= chartSliderEndYr; });
+      drawAnnualLineChart(name, cmetric, rows, true);
+      const sw = document.getElementById('chart-slider-wrap'); if (sw) sw.style.display = 'block';
+    };
+    _chartSliderRedraw = draw;
+    draw();
   } else if (cmetric === 'pending_ratio') {
     drawAnnualLineChart(name, cmetric, d.history, true);
   } else {
