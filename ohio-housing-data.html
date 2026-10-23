@@ -3145,6 +3145,8 @@ function setMode(mode) {
   else {
     if (selectedZip) { try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false})}catch(e){} selectedZip=null; }
     if (selectedMetro) { try{map.setFeatureState({source:'ohio-metros',id:selectedMetro},{selected:false})}catch(e){} selectedMetro=null; }
+    // Redraw county colors/labels for the current metric (the metric may have changed while in another view)
+    if (mode === 'county') { try { renderColors('county'); } catch(e) {} }
   }
   // Close modal when switching modes
   document.getElementById('modal-overlay').classList.remove('visible');
