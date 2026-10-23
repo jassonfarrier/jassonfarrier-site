@@ -311,6 +311,14 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <option value="total_permits_per_1k">Total Permits / 1K</option>
     <option value="new_construction_price">New Construction Median Price</option>
     <option value="new_construction_sqft">New Construction $/SqFt</option>
+    <option value="population">Population</option>
+    <option value="pop_change_pct">Population Change %</option>
+    <option value="net_migration">Net Migration</option>
+    <option value="intl_migration">International Migration</option>
+    <option value="domestic_migration">Domestic Migration</option>
+    <option value="moved_from_other_state">Moved From Another State</option>
+    <option value="moved_from_abroad">Moved From Abroad</option>
+    <option value="foreign_born_pct">Foreign-Born %</option>
   </select>
 </div>
 <div class="main">
@@ -384,6 +392,15 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn" data-metric="pre_fc_pct"><span class="mn">Pre-Foreclosure %</span><span class="md">Pre-foreclosure as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#pre-foreclosure-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="upside_down"><span class="mn">Underwater</span><span class="md">Properties with negative equity</span><a class="metric-help" href="/ohio-housing-data-methodology#underwater" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="upside_down_pct"><span class="mn">Underwater %</span><span class="md">Underwater as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#underwater-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Population</div>
+    <button class="metric-btn" data-metric="population"><span class="mn">Population</span><span class="md">Total residents</span></button>
+    <button class="metric-btn" data-metric="pop_change_pct"><span class="mn">Population Change %</span><span class="md">Change from the prior year</span></button>
+    <button class="metric-btn" data-metric="net_migration"><span class="mn">Net Migration</span><span class="md">People moving in minus out</span></button>
+    <button class="metric-btn" data-metric="intl_migration"><span class="mn">International Migration</span><span class="md">Net immigration from abroad</span></button>
+    <button class="metric-btn" data-metric="domestic_migration"><span class="mn">Domestic Migration</span><span class="md">Net moves from other US counties</span></button>
+    <button class="metric-btn" data-metric="moved_from_other_state"><span class="mn">Moved From Another State</span><span class="md">Residents who moved in from another state (ZIP)</span></button>
+    <button class="metric-btn" data-metric="moved_from_abroad"><span class="mn">Moved From Abroad</span><span class="md">Residents who moved in from abroad (ZIP)</span></button>
+    <button class="metric-btn" data-metric="foreign_born_pct"><span class="mn">Foreign-Born %</span><span class="md">Share of residents born outside the US (ZIP)</span></button>
     <hr>
     <div style="padding:6px 3px 0;"><label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;font-family:Montserrat,sans-serif"><input type="checkbox" id="dc-toggle" style="cursor:pointer;accent-color:#0d1e42"> Data Centers</label></div>
 
@@ -503,6 +520,14 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="pre_fc_pct">Pre-Foreclosure %</option>
           <option value="upside_down">Underwater</option>
           <option value="upside_down_pct">Underwater %</option>
+          <option value="population">Population</option>
+          <option value="pop_change_pct">Population Change %</option>
+          <option value="net_migration">Net Migration</option>
+          <option value="intl_migration">International Migration</option>
+          <option value="domestic_migration">Domestic Migration</option>
+          <option value="moved_from_other_state">Moved From Another State</option>
+          <option value="moved_from_abroad">Moved From Abroad</option>
+          <option value="foreign_born_pct">Foreign-Born %</option>
         </select>
         <div class="modal-left-sticky"><div id="pending-ratio-badge" style="display:none;font-family:Montserrat,sans-serif;background:#edf2fb;border-radius:12px;padding:16px 12px 16px;margin-bottom:12px;">
           <svg viewBox="5 5 190 118" style="width:100%;display:block;margin:0 auto 8px;">
@@ -590,6 +615,15 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="delisted_pct"><span class="mn">Delisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
           <button class="metric-btn chart-tab" data-cmetric="relisted_pct"><span class="mn">Relisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
+<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Population</div>
+          <button class="metric-btn chart-tab" data-cmetric="population"><span class="mn">Population</span><span class="md">Census · state/county/metro since 2000, ZIP 2021+</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="pop_change_pct"><span class="mn">Population Change %</span><span class="md">Census · since 2001</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="net_migration"><span class="mn">Net Migration</span><span class="md">Census · since 2011</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="intl_migration"><span class="mn">International Migration</span><span class="md">Census · since 2011</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="domestic_migration"><span class="mn">Domestic Migration</span><span class="md">Census · since 2011</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="moved_from_other_state"><span class="mn">Moved From Another State</span><span class="md">Census ACS · ZIP only · 2021+</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="moved_from_abroad"><span class="mn">Moved From Abroad</span><span class="md">Census ACS · ZIP only · 2021+</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="foreign_born_pct"><span class="mn">Foreign-Born %</span><span class="md">Census ACS · ZIP only · 2021+</span></button>
 
         </div></div><!-- end modal-left-scroll -->
       </div>
@@ -656,6 +690,14 @@ const METRICS = {
   sf_permits_per_1k:   {label:'SF Permits per 1K',    fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
   mf_permits_per_1k:   {label:'MF Permits per 1K',    fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
   total_permits_per_1k:{label:'Total Permits per 1K', fmt:v=>v.toFixed(2), lo:'Less', hi:'More'},
+  population:          {label:'Population',               fmt:v=>Math.round(v).toLocaleString(), lo:'Smaller', hi:'Larger'},
+  pop_change_pct:      {label:'Population Change %',      fmt:v=>(v>0?'+':'')+v.toFixed(2)+'%', lo:'Shrinking', hi:'Growing'},
+  net_migration:       {label:'Net Migration',            fmt:v=>(v>0?'+':'')+Math.round(v).toLocaleString(), lo:'Losing', hi:'Gaining'},
+  intl_migration:      {label:'International Migration',  fmt:v=>(v>0?'+':'')+Math.round(v).toLocaleString(), lo:'Fewer', hi:'More'},
+  domestic_migration:  {label:'Domestic Migration',       fmt:v=>(v>0?'+':'')+Math.round(v).toLocaleString(), lo:'Losing', hi:'Gaining'},
+  moved_from_other_state:{label:'Moved From Another State', fmt:v=>Math.round(v).toLocaleString(), lo:'Fewer', hi:'More'},
+  moved_from_abroad:   {label:'Moved From Abroad',        fmt:v=>Math.round(v).toLocaleString(), lo:'Fewer', hi:'More'},
+  foreign_born_pct:    {label:'Foreign-Born %',           fmt:v=>v.toFixed(1)+'%', lo:'Lower', hi:'Higher'},
   tax_delinquent: {label:'Tax Delinquent',   fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
   tax_del_pct:    {label:'Tax Delinquent %', fmt:v=>v.toFixed(1)+'%',              lo:'Lower', hi:'Higher'},
   pre_fc:         {label:'Pre-Foreclosure',   fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
@@ -938,7 +980,8 @@ function getMetricVal(d, metric) {
 // --- Rank Badge ---
 // Only metrics where relative position is a meaningful, citable fact get ranked.
 // Neutral framing throughout: "Highest"/"Lowest" describes direction, never "best"/"worst".
-const RANKABLE_METRICS = new Set(['zhvi','zhvi_condo','zori','days_on_market','price_reduced_pct','cancellation_pct','pending_ratio','property_tax_rate','median_property_tax','sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k','est_payment_20']);
+const POP_METRICS = new Set(['population','pop_change_pct','net_migration','intl_migration','domestic_migration','moved_from_other_state','moved_from_abroad','foreign_born_pct']);
+const RANKABLE_METRICS = new Set(['population','pop_change_pct','net_migration','intl_migration','domestic_migration','moved_from_other_state','moved_from_abroad','foreign_born_pct','zhvi','zhvi_condo','zori','days_on_market','price_reduced_pct','cancellation_pct','pending_ratio','property_tax_rate','median_property_tax','sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k','est_payment_20']);
 
 function computeRank(list, metric, targetVal) {
   // list: array of numeric values (already non-null) for every record that has this metric.
@@ -1244,6 +1287,7 @@ function fmtAxisCompact(cmetric) {
     if (cmetric==='relisted_pct'||cmetric==='cash_pct'||cmetric==='down_payment_pct'||cmetric==='fha_pct'||cmetric==='va_pct'||cmetric==='investor_market_share') return v.toFixed(1)+'%';
     if (cmetric==='days_on_market') return v+'d';
     if (cmetric==='sf_permits_per_1k'||cmetric==='mf_permits_per_1k'||cmetric==='total_permits_per_1k') return v.toFixed(1);
+    if (cmetric==='pop_change_pct'||cmetric==='foreign_born_pct') return v.toFixed(1)+'%';
     if (Math.abs(v)>=1000) return d3.format('.2s')(v).replace('k','K');
     return v;
   };
@@ -1255,6 +1299,8 @@ function sourceForMetric(m) {
   const base = YOY_BASE[m] || m;
   if (base==='zhvi'||base==='zhvi_condo'||base==='zori') return '<a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Zillow</a>';
   if (base==='median_property_tax'||base==='property_tax_rate') return '<a href="https://data.census.gov/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census ACS</a>';
+  if (base==='moved_from_other_state'||base==='moved_from_abroad'||base==='foreign_born_pct') return '<a href="https://www.census.gov/programs-surveys/acs" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census ACS</a>';
+  if (POP_METRICS.has(base)) return '<a href="https://www.census.gov/programs-surveys/popest.html" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census Population Estimates</a>';
   if (base==='sf_permits_per_1k'||base==='mf_permits_per_1k'||base==='total_permits_per_1k') return '<a href="https://www.census.gov/construction/bps/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census BPS</a>';
   if (DISTRESS_METRICS.has(base)) return '<a href="https://www.propstream.com/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">PropStream</a>';
   if (PAYMENT_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#est-payment" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Derived Estimate</a>';
@@ -1522,7 +1568,9 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
     } else if (mapMode === 'metro' && selectedMetro) {
       const d = metroDataMap[selectedMetro];
       if (d) {
-        if (YOY_METRICS.has(cm)) {
+        if (POP_METRICS.has(cm)) {
+          chartMetric = cm; renderPopChart(d.metro, cm, d, 'metro', true);
+        } else if (YOY_METRICS.has(cm)) {
           drawMonthlyBarChart(d.metro, cm, getYOYRows(d, cm), true);
         } else if (cm === 'median_property_tax' || cm === 'property_tax_rate') {
           drawAnnualBarChart(d.metro, cm, [], true);
@@ -1609,8 +1657,37 @@ function showStatewideOnlyMessage(cmetric) {
     .text('This metric is Central Ohio MLS data — switch to the Ohio statewide tab to view it.');
 }
 
+// --- Population (Census) — yearly history in pop_history, drawn like building permits ---
+const POP_TABLE = {county:['ohio_counties','fips'], metro:['ohio_metros','region_id'], zip:['ohio_zips','zip'], state:['ohio_state',null]};
+function renderPopChart(name, cmetric, d, level, isZip) {
+  const draw = (ph) => {
+    const rows = (ph || []).filter(r => r[cmetric] != null).map(r => ({...r, date: r.year + '-06'}));
+    if (!rows.length) {
+      const sw = document.getElementById('chart-slider-wrap'); if (sw) sw.style.display = 'none';
+      const lbl = document.getElementById('chart-label');
+      if (lbl) lbl.textContent = METRICS[cmetric].label + ' — ' + name + (isZip ? '' : ' County');
+      const svg = d3.select('#line-chart'); svg.selectAll('*').remove();
+      svg.attr('viewBox','0 0 700 100');
+      svg.append('text').attr('x',350).attr('y',50).attr('text-anchor','middle')
+        .attr('font-family','Montserrat').attr('font-size','14px').attr('fill','#999').text('No data available');
+      return;
+    }
+    drawMonthlyBarChart(name, cmetric, rows, isZip);
+  };
+  if (d && d.pop_history) { draw(d.pop_history); return; }
+  const [tbl, keyCol] = POP_TABLE[level];
+  if (!d || (keyCol && d[keyCol] == null)) { draw([]); return; }
+  const K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+  const url = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/' + tbl + '?select=pop_history' + (keyCol ? '&' + keyCol + '=eq.' + encodeURIComponent(d[keyCol]) : '');
+  fetch(url, {headers: {'apikey': K, 'Authorization': 'Bearer ' + K}}).then(r => r.json()).then(rows => {
+    d.pop_history = (rows && rows[0] && rows[0].pop_history) || [];
+    if (chartMetric === cmetric) draw(d.pop_history);
+  }).catch(() => draw([]));
+}
+
 function renderChart(county, cmetric) {
   const d = dataMap[county];
+  if (POP_METRICS.has(cmetric)) { chartMetric = cmetric; renderPopChart(county, cmetric, d, 'county', false); return; }
   if (MLS_METRICS.has(cmetric)) { showStatewideOnlyMessage(cmetric); return; }
   if (TAX_YOY.has(cmetric)) {
     // Annual ACS-based YOY — use annual bar chart with YOY rows
@@ -3254,6 +3331,8 @@ function openMetroModal(rid) {
     _resetTrendLineBtn();
     if (MLS_METRICS.has(mapMetric)) {
       showStatewideOnlyMessage(mapMetric);
+    } else if (POP_METRICS.has(mapMetric)) {
+      chartMetric = mapMetric; renderPopChart(d.metro, mapMetric, d, 'metro', true);
     } else if (YOY_METRICS.has(mapMetric)) {
       drawMonthlyBarChart(d.metro, mapMetric, getYOYRows(d, mapMetric), true);
     } else if (mapMetric === 'median_property_tax' || mapMetric === 'property_tax_rate') {
@@ -3421,6 +3500,7 @@ function openStateModal() {
 }
 
 function renderStateChart(name, cmetric, d) {
+  if (POP_METRICS.has(cmetric)) { chartMetric = cmetric; renderPopChart(name, cmetric, d, 'state', true); return; }
   if (YOY_METRICS.has(cmetric)) {
     drawMonthlyBarChart(name, cmetric, getYOYRows(d, cmetric), true);
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
@@ -3663,6 +3743,7 @@ function renderZipChart(zip, cmetric) {
   const d = zipDataMap[zip];
   if (!d) return;
   chartMetric = cmetric;
+  if (POP_METRICS.has(cmetric)) { renderPopChart(zip, cmetric, d, 'zip', true); return; }
   // If history already loaded, render immediately
   if (d.history !== undefined) {
     _doRenderZipChart(zip, cmetric);
