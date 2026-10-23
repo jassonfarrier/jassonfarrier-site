@@ -392,9 +392,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <button class="metric-btn" data-metric="pre_fc_pct"><span class="mn">Pre-Foreclosure %</span><span class="md">Pre-foreclosure as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#pre-foreclosure-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="upside_down"><span class="mn">Underwater</span><span class="md">Properties with negative equity</span><a class="metric-help" href="/ohio-housing-data-methodology#underwater" target="_blank" onclick="event.stopPropagation()">?</a></button>
     <button class="metric-btn" data-metric="upside_down_pct"><span class="mn">Underwater %</span><span class="md">Underwater as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#underwater-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="mortgage_dq_rate"><span class="mn">Mortgage Delinquency %</span><span class="md">Mortgages 30+ days past due · statewide only</span><a class="metric-help" href="/ohio-housing-data-methodology#mortgage-distress" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="mortgage_fc_rate"><span class="mn">Mortgage Foreclosure %</span><span class="md">Mortgages in active foreclosure · statewide only</span><a class="metric-help" href="/ohio-housing-data-methodology#mortgage-distress" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="mortgage_nc_rate"><span class="mn">Mortgage Non-Current %</span><span class="md">Delinquent + in foreclosure · statewide only</span><a class="metric-help" href="/ohio-housing-data-methodology#mortgage-distress" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="mortgage_30_60_pct"><span class="mn">Mortgages 30–60 Days Late %</span><span class="md">Share of Ohio mortgages 30 or 60 days past due · statewide only</span><a class="metric-help" href="/ohio-housing-data-methodology#mortgage-distress" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="mortgage_90_180_pct"><span class="mn">Mortgages 90–180 Days Late %</span><span class="md">Share of Ohio mortgages 90 to 180 days past due · statewide only</span><a class="metric-help" href="/ohio-housing-data-methodology#mortgage-distress" target="_blank" onclick="event.stopPropagation()">?</a></button>
+    <button class="metric-btn" data-metric="mortgage_fc_bk_pct"><span class="mn">Mortgage Foreclosure %</span><span class="md">Foreclosure, bankruptcy or deed-in-lieu · statewide only</span><a class="metric-help" href="/ohio-housing-data-methodology#mortgage-distress" target="_blank" onclick="event.stopPropagation()">?</a></button>
 <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Population</div>
     <button class="metric-btn" data-metric="population"><span class="mn">Population</span><span class="md">Total residents</span></button>
     <button class="metric-btn" data-metric="pop_change_pct"><span class="mn">Population Change %</span><span class="md">Change from the prior year</span></button>
@@ -523,9 +523,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <option value="pre_fc_pct">Pre-Foreclosure %</option>
           <option value="upside_down">Underwater</option>
           <option value="upside_down_pct">Underwater %</option>
-          <option value="mortgage_dq_rate">Mortgage Delinquency %</option>
-          <option value="mortgage_fc_rate">Mortgage Foreclosure %</option>
-          <option value="mortgage_nc_rate">Mortgage Non-Current %</option>
+          <option value="mortgage_30_60_pct">Mortgages 30–60 Days Late %</option>
+          <option value="mortgage_90_180_pct">Mortgages 90–180 Days Late %</option>
+          <option value="mortgage_fc_bk_pct">Mortgage Foreclosure %</option>
           <option value="population">Population</option>
           <option value="pop_change_pct">Population Change %</option>
           <option value="net_migration">Net Migration</option>
@@ -617,9 +617,9 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           <button class="metric-btn chart-tab" data-cmetric="pre_fc_pct"><span class="mn">Pre-Foreclosure %</span><span class="md">PropStream</span></button>
           <button class="metric-btn chart-tab" data-cmetric="upside_down"><span class="mn">Underwater</span><span class="md">PropStream</span></button>
           <button class="metric-btn chart-tab" data-cmetric="upside_down_pct"><span class="mn">Underwater %</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="mortgage_dq_rate"><span class="mn">Mortgage Delinquency %</span><span class="md">ICE / Black Knight · statewide only</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="mortgage_fc_rate"><span class="mn">Mortgage Foreclosure %</span><span class="md">ICE / Black Knight · statewide only</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="mortgage_nc_rate"><span class="mn">Mortgage Non-Current %</span><span class="md">ICE / Black Knight · statewide only</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="mortgage_30_60_pct"><span class="mn">Mortgages 30–60 Days Late %</span><span class="md">FHFA NMDB · statewide only</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="mortgage_90_180_pct"><span class="mn">Mortgages 90–180 Days Late %</span><span class="md">FHFA NMDB · statewide only</span></button>
+          <button class="metric-btn chart-tab" data-cmetric="mortgage_fc_bk_pct"><span class="mn">Mortgage Foreclosure %</span><span class="md">FHFA NMDB · statewide only</span></button>
           <button class="metric-btn chart-tab" data-cmetric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">Redfin · Apr 2015–Jul 2026</span></button>
           <button class="metric-btn yoy-btn chart-tab" data-cmetric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span></button>
           <button class="metric-btn chart-tab" data-cmetric="delisted_pct"><span class="mn">Delisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
@@ -713,9 +713,9 @@ const METRICS = {
   pre_fc_pct:     {label:'Pre-Foreclosure %', fmt:v=>v.toFixed(2)+'%',              lo:'Lower', hi:'Higher'},
   upside_down:    {label:'Underwater',        fmt:v=>v.toLocaleString(),            lo:'Lower', hi:'Higher'},
   upside_down_pct:{label:'Underwater %',      fmt:v=>v.toFixed(2)+'%',              lo:'Lower', hi:'Higher'},
-  mortgage_dq_rate:{label:'Mortgage Delinquency %', fmt:v=>v.toFixed(1)+'%', lo:'Lower', hi:'Higher'},
-  mortgage_fc_rate:{label:'Mortgage Foreclosure %', fmt:v=>v.toFixed(1)+'%', lo:'Lower', hi:'Higher'},
-  mortgage_nc_rate:{label:'Mortgage Non-Current %', fmt:v=>v.toFixed(1)+'%', lo:'Lower', hi:'Higher'},
+  mortgage_30_60_pct:{label:'Mortgages 30–60 Days Late %', fmt:v=>v.toFixed(1)+'%', lo:'Lower', hi:'Higher'},
+  mortgage_90_180_pct:{label:'Mortgages 90–180 Days Late %', fmt:v=>v.toFixed(1)+'%', lo:'Lower', hi:'Higher'},
+  mortgage_fc_bk_pct:{label:'Mortgage Foreclosure %', fmt:v=>v.toFixed(1)+'%', lo:'Lower', hi:'Higher'},
   cancellation_pct:            {label:'Cancellation Rate %',    fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
   cancellation_pct_yoy:         {label:'Cancellation Rate YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   delisted_pct:                 {label:'Delisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
@@ -755,7 +755,7 @@ const METRIC_MODES = {
   luxury_median_dom: ['state','metro'], luxury_median_dom_yoy: ['state','metro'],
   luxury_active_listings: ['state','metro'], luxury_active_listings_yoy: ['state','metro'],
   luxury_pending_sales: ['state','metro'], luxury_pending_sales_yoy: ['state','metro'],
-  mortgage_dq_rate: ['state'], mortgage_fc_rate: ['state'], mortgage_nc_rate: ['state'],
+  mortgage_30_60_pct: ['state'], mortgage_90_180_pct: ['state'], mortgage_fc_bk_pct: ['state'],
 };
 function updateModePillAvailability(metric) {
   const modes = METRIC_MODES[metric] || ['state','metro','county','zip'];
@@ -772,8 +772,8 @@ const DISTRESS_METRICS = new Set(['tax_delinquent','tax_del_pct','pre_fc','pre_f
 const PAYMENT_METRICS = new Set(['est_payment_20']);
 const NEW_CONSTRUCTION_METRICS = new Set(['new_construction_price','new_construction_sqft']);
 const MLS_METRICS = new Set(['mls_active_listings']);
-// ICE / Black Knight Mortgage Monitor state table — Ohio statewide monthly rates, stored in ohio_state.history.
-const MORTGAGE_DQ_METRICS = new Set(['mortgage_dq_rate','mortgage_fc_rate','mortgage_nc_rate']);
+// FHFA National Mortgage Database — Ohio statewide quarterly mortgage performance (2002 →), stored in ohio_state.history.
+const MORTGAGE_DQ_METRICS = new Set(['mortgage_30_60_pct','mortgage_90_180_pct','mortgage_fc_bk_pct']);
 
 // Ohio-specific homeowners insurance rate, as a % of home value per year. Sourced from
 // NerdWallet's 2026 state-by-state average ($2,080/yr average Ohio premium on their $400,000
@@ -874,7 +874,7 @@ const PALETTE_NORM  = ['#b2182b','#d6604d','#f4a582','#fddbc7','#f7f7f7','#d1e5f
 const PALETTE_INV   = ['#2166ac','#4393c3','#92c5de','#d1e5f0','#f7f7f7','#fddbc7','#f4a582','#d6604d','#b2182b'];
 const PALETTE_DANGER = ['#1a7d3c','#4ba35f','#8ec78f','#c8e5c0','#f7f7f7','#fddbc7','#f4a582','#d6604d','#b2182b'];
 // DANGER_METRICS: "high value = bad" metrics that should render green (low/healthy) → red (high/problem)
-const DANGER_METRICS = new Set(['price_reduced_pct','cancellation_pct','tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct','days_on_market_yoy','mortgage_dq_rate','mortgage_fc_rate','mortgage_nc_rate']);
+const DANGER_METRICS = new Set(['price_reduced_pct','cancellation_pct','tax_delinquent','tax_del_pct','pre_fc','pre_fc_pct','upside_down','upside_down_pct','days_on_market_yoy','mortgage_30_60_pct','mortgage_90_180_pct','mortgage_fc_bk_pct']);
 const INVERTED_YOY_METRICS = new Set(['days_on_market_yoy']); // positive change is BAD for these
 const PALETTE_DIST  = ['#fff5f0','#fee0d2','#fcbba1','#fc9272','#fb6a4a','#ef3b2c','#cb181d','#a50f15','#67000d'];
 
@@ -1321,7 +1321,7 @@ function sourceForMetric(m) {
   if (DISTRESS_METRICS.has(base)) return '<a href="https://www.propstream.com/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">PropStream</a>';
   if (PAYMENT_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#est-payment" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Derived Estimate</a>';
   if (NEW_CONSTRUCTION_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#new-construction" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">MLS</a>';
-  if (MORTGAGE_DQ_METRICS.has(base)) return '<a href="https://www.icemortgagetechnology.com/resources/data-reports" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none" title="Black Knight through Dec 2022, ICE from Jan 2023 — ICE counts run higher, so the Jan 2023 jump is partly a source change">ICE / Black Knight Mortgage Monitor</a>';
+  if (MORTGAGE_DQ_METRICS.has(base)) return '<a href="https://www.fhfa.gov/data/dashboard/nmdb-aggregate-statistics" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">FHFA National Mortgage Database</a>';
   if (MLS_METRICS.has(base)) return '<a href="/ohio-housing-data-methodology#mls-active-listings" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Central Ohio MLS</a>';
   if (REDFIN_METRICS.has(base)) return '<a href="https://www.redfin.com/news/data-center/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Redfin</a>';
   return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
@@ -1673,7 +1673,7 @@ function showStatewideOnlyMessage(cmetric) {
   lsvg.attr('viewBox', `0 0 ${W} ${H}`).append('text')
     .attr('x', W/2).attr('y', H/2).attr('text-anchor', 'middle')
     .attr('font-family', 'Montserrat').attr('font-size', '13px').attr('fill', 'rgba(0,0,0,0.45)')
-    .text(MORTGAGE_DQ_METRICS.has(cmetric) ? 'This metric is statewide ICE / Black Knight data — switch to the Ohio statewide tab to view it.' : 'This metric is Central Ohio MLS data — switch to the Ohio statewide tab to view it.');
+    .text(MORTGAGE_DQ_METRICS.has(cmetric) ? 'This metric is statewide FHFA data — switch to the Ohio statewide tab to view it.' : 'This metric is Central Ohio MLS data — switch to the Ohio statewide tab to view it.');
 }
 
 // --- Population (Census) — yearly history in pop_history, drawn like building permits ---
@@ -3525,7 +3525,7 @@ function openStateModal() {
 
 function renderStateChart(name, cmetric, d) {
   if (POP_METRICS.has(cmetric)) { chartMetric = cmetric; renderPopChart(name, cmetric, d, 'state', true); return; }
-  if (MORTGAGE_DQ_METRICS.has(cmetric)) { drawMonthlyBarChart(name, cmetric, d.history, true); return; }
+  if (MORTGAGE_DQ_METRICS.has(cmetric)) { drawAnnualLineChart(name, cmetric, d.history, true); return; }
   if (YOY_METRICS.has(cmetric)) {
     drawMonthlyBarChart(name, cmetric, getYOYRows(d, cmetric), true);
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
