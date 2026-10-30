@@ -1327,10 +1327,21 @@ function sourceForMetric(m) {
   if (REDFIN_METRICS.has(base)) return '<a href="https://www.redfin.com/news/data-center/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Redfin</a>';
   return '<a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Realtor.com</a>';
 }
+// Plain-English breakdown of how the Est. Payment total is built - shown wherever payments appear.
+function paymentFormulaText() {
+  const rate = (STATE_DATA && STATE_DATA.latest && STATE_DATA.latest.current_mortgage_rate != null) ? Number(STATE_DATA.latest.current_mortgage_rate).toFixed(2) + '%' : null;
+  const noTax = (typeof mapMode !== 'undefined' && mapMode === 'metro');
+  return 'How the total is calculated: principal & interest on 80% of the typical home value (Zillow) with 20% down on a 30-year fixed loan' +
+    (rate ? ' at ' + rate + ' today (past years use that July\'s average rate)' : '') +
+    (noTax ? '' : ' + property tax at the local Census rate') +
+    ' + homeowners insurance of $1,060/yr + 0.1% of the home value (based on real premiums paid in Ohio ZIP codes, U.S. Treasury 2018\u20132022). PMI not included.' +
+    (noTax ? ' Metro areas have no property tax data, so tax is not included here.' : '');
+}
 function paymentDisclaimer(m) {
   if (!PAYMENT_METRICS.has(m)) return '';
   const rateLabel = paymentRateLabel();
   return (rateLabel ? ' &nbsp;\u00b7&nbsp; <span style="color:#0D1E42;font-weight:600;">' + rateLabel + '</span>' : '') +
+    ' &nbsp;\u00b7&nbsp; <span style="color:#555;">' + paymentFormulaText() + '</span>' +
     ' &nbsp;\u00b7&nbsp; <span style="color:#888;">For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision. 2025\u201326 property tax rate carried forward from latest available (2024) Census data.</span>';
 }
 
@@ -1349,7 +1360,7 @@ function updateChartPaymentDisclaimer(m) {
   if (!el) return;
   if (!PAYMENT_METRICS.has(m)) { el.style.display = 'none'; el.textContent = ''; return; }
   const rateLabel = paymentRateLabel();
-  el.textContent = (rateLabel ? rateLabel + '  \u00b7  ' : '') + 'For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision.';
+  el.textContent = (rateLabel ? rateLabel + '  \u00b7  ' : '') + paymentFormulaText() + '  \u00b7  For illustration purposes only. Consult a mortgage professional before making a purchase or investment decision.';
   el.style.display = 'block';
 }
 function setAttrHeader(chips, metric) {
