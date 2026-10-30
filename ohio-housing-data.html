@@ -775,23 +775,24 @@ const MLS_METRICS = new Set(['mls_active_listings']);
 // FHFA National Mortgage Database — Ohio statewide quarterly mortgage performance (2002 →), stored in ohio_state.history.
 const MORTGAGE_DQ_METRICS = new Set(['mortgage_30_60_pct','mortgage_90_180_pct','mortgage_fc_bk_pct']);
 
-// Ohio-specific homeowners insurance rate, as a % of home value per year. Sourced from
-// NerdWallet's 2026 state-by-state average ($2,080/yr average Ohio premium on their $400,000
-// dwelling-coverage sample policy = 0.52% of value/yr). Scales insurance by home value instead
-// of a flat national dollar figure, so a $550K Delaware County home and a $150K rural home
-// each get a realistic premium instead of the same flat number. Applied to both the live
-// calculation and every historical chart year — see 2026-09-11 update.
-const OHIO_INSURANCE_RATE_ANNUAL = 0.0052;
+// Ohio homeowners insurance = fixed base + small % of home value, per year (2026-10-30 update).
+// Fit to real premiums paid in 998 Ohio ZIP codes (U.S. Treasury Federal Insurance Office,
+// premiums per policy 2018-2022, 2022 fit: $1,062 + 0.0966% of value). Real Ohio premiums are
+// nearly flat by home value (~$1,200/yr under $300K), so the old 0.52%-of-value rate was far
+// too low on cheap homes and too high on expensive ones. Applied to live and historical years.
+const OHIO_INSURANCE_BASE_ANNUAL = 1060;
+const OHIO_INSURANCE_RATE_ANNUAL = 0.001;
+function ohioInsuranceMonthly(zhvi) { return (OHIO_INSURANCE_BASE_ANNUAL + zhvi * OHIO_INSURANCE_RATE_ANNUAL) / 12; }
 
 // Estimated monthly payment — computed live in-browser, never stored. Home values and rates
 // change monthly, so a stored number would go stale immediately; instead this recalculates
 // from each row's current zhvi (+ property_tax_rate where available) plus current_mortgage_rate
-// pulled from ohio_state.latest, and insurance scaled by that same zhvi (OHIO_INSURANCE_RATE_ANNUAL).
+// pulled from ohio_state.latest, and insurance from ohioInsuranceMonthly(zhvi) (base + % of value).
 // This is an estimate only — actual payments vary by lender, credit, and loan program.
 function computeEstPayment(zhvi, propertyTaxRatePct, downPct) {
   if (zhvi == null || !STATE_DATA || !STATE_DATA.latest) return null;
   const rateAnnual = STATE_DATA.latest.current_mortgage_rate;
-  const insuranceMonthly = zhvi * OHIO_INSURANCE_RATE_ANNUAL / 12;
+  const insuranceMonthly = ohioInsuranceMonthly(zhvi);
   if (rateAnnual == null || insuranceMonthly == null) return null;
 
   const financed = zhvi * (1 - downPct);
@@ -3462,7 +3463,7 @@ function computeEstPaymentForYear(zhvi, propertyTaxRatePct, downPct, year) {
   if (zhvi == null || !NATIONAL_RATES || !NATIONAL_RATES[year]) return null;
   const rateAnnual = NATIONAL_RATES[year].rate;
   if (rateAnnual == null || zhvi == null) return null;
-  const insuranceMonthly = zhvi * OHIO_INSURANCE_RATE_ANNUAL / 12;
+  const insuranceMonthly = ohioInsuranceMonthly(zhvi);
 
   const financed = zhvi * (1 - downPct);
   const r = (rateAnnual / 100) / 12;
