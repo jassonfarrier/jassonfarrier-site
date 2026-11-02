@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ohio Housing Affordability: Worst Drop in America | Jasson Farrier</title>
+<meta name="description" content="Ohio had the biggest drop in housing affordability of any state. The typical Ohio mortgage payment more than doubled since 2020. See what it costs in your ZIP.">
+<link rel="canonical" href="https://jassonfarrier.com/housing-market-updates/ohio-housing-affordability-2026">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+.page-header { background: #0D1E42; padding: 80px 64px 72px; }
+.page-header-inner { max-width: 760px; margin: 0 auto; }
+.page-header h1 { font-size: clamp(24px, 3.5vw, 42px); font-weight: 700; color: #fff; line-height: 1.2; margin: 20px 0 0; }
+.back-link { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); text-decoration: none; display: block; margin-bottom: 20px; letter-spacing: 0.5px; }
+.back-link:hover { color: #fff; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #9DA6AB; display: block; margin-bottom: 12px; }
+.article-byline { font-size: 13px; color: rgba(255,255,255,0.5); margin: 10px 0 4px; }
+.article-byline a { color: rgba(255,255,255,0.65) !important; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.2); }
+.article-date { font-size: 12px; color: rgba(255,255,255,0.35); display: block; margin-top: 4px; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { overflow-x: hidden; font-family: 'Montserrat', sans-serif; background: #fff; color: #0D1E42; -webkit-font-smoothing: antialiased; }
+nav { position: sticky; top: 0; z-index: 100; background: #fff; height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 64px; border-bottom: 1px solid #f5f5f5; }
+.nav-brand { font-size: 13px; font-weight: 700; color: #0D1E42; text-decoration: none; white-space: nowrap; }
+.nav-brand span { font-weight: 700; color: #0D1E42; }
+.nav-right { display: flex; align-items: center; gap: 32px; }
+.nav-right a { font-size: 12px; font-weight: 500; color: #9DA6AB; text-decoration: none; transition: color 0.2s; }
+.nav-right a:hover, .nav-right a.active { color: #0D1E42; font-weight: 700; }
+.nav-yt { display: flex; align-items: center; }
+.nav-pill { background: #0D1E42 !important; color: #fff !important; font-size: 12px; font-weight: 600; padding: 10px 22px; border-radius: 100px; text-decoration: none; white-space: nowrap; }
+footer { background: #0D1E42; border-top: 1px solid rgba(255,255,255,0.07); padding: 48px 64px 36px; }
+.footer-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+.footer-brand { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7); }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.25); text-decoration: none; }
+.footer-links a:hover { color: rgba(255,255,255,0.6); }
+.footer-divider { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin-bottom: 24px; }
+.footer-legal { display: flex; align-items: flex-start; gap: 16px; }
+.footer-legal p { font-size: 10px; color: rgba(255,255,255,0.2); line-height: 2; }
+@media (max-width: 768px) {
+  nav { padding: 0 24px; }
+  .nav-hamburger { display: flex; }
+  .nav-right a:not(.nav-pill) { display: none; }
+  .nav-yt { display: none; }
+  footer { padding: 40px 24px 28px; }
+  .footer-top { flex-direction: column; align-items: flex-start; }
+  .hero, .page-header, .article-hero { padding: 48px 24px; }
+  section, .section { padding: 40px 20px; }
+}
+.article { max-width: 760px; margin: 0 auto; padding: 64px 40px; }
+.article h2 { font-size: 22px; font-weight: 700; color: #0D1E42; margin: 40px 0 16px; line-height: 1.3; }
+.article h3 { font-size: 17px; font-weight: 700; color: #0D1E42; margin: 32px 0 12px; }
+.article p { font-size: 16px; color: #333; line-height: 1.85; margin-bottom: 20px; }
+.article ul, .article ol { padding-left: 24px; margin-bottom: 20px; }
+.article li { font-size: 16px; color: #333; line-height: 1.8; margin-bottom: 8px; }
+.article strong { color: #0D1E42; font-weight: 700; }
+.article a { color: #0D1E42; font-weight: 600; text-decoration: underline; } .article a:hover { color: #0D1E42; }
+.stat-row { display: flex; gap: 16px; margin: 32px 0; flex-wrap: wrap; }
+.stat-box { flex: 1; min-width: 140px; background: #f7f8fa; border: 1px solid #f7f8fa; border-radius: 8px; padding: 24px 20px; text-align: center; }
+.stat-num { font-size: clamp(28px, 4vw, 40px); font-weight: 900; color: #0D1E42; line-height: 1; margin-bottom: 8px; }
+.stat-label { font-size: 11px; font-weight: 600; color: #9DA6AB; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
+.tldr { background: #f5f5f5; border-left: 3px solid #0D1E42; padding: 24px 28px; margin: 32px 0; }
+.tldr-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #9DA6AB; display: block; margin-bottom: 10px; }
+.tldr ul { margin: 0; padding-left: 20px; }
+.tldr li { font-size: 15px; font-weight: 600; color: #0D1E42; margin: 0 0 8px; line-height: 1.6; }
+.tldr li:last-child { margin-bottom: 0; }
+.article-img { width: 100%; height: auto; border-radius: 8px; margin: 8px 0; border: 1px solid #f5f5f5; }
+.img-caption { font-size: 13px; color: #9DA6AB; margin-top: -8px; margin-bottom: 32px; }
+.chart-box { background: #fff; border: 1px solid #f5f5f5; border-radius: 8px; padding: 24px 20px 12px; margin: 8px 0; }
+.chart-title { font-size: 12px; font-weight: 700; color: #9DA6AB; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; text-align: center; }
+@media (max-width: 768px) {
+  .article { padding: 48px 24px; }
+  .stat-box { min-width: 120px; }
+}
+.contact-cta { background: #f7f8fa; border-left: 3px solid #0D1E42; padding: 20px 28px; margin: 48px 0; }
+.contact-cta p { font-size: 16px; font-weight: 700; color: #0D1E42; margin: 0; }
+.contact-cta a { color: #0D1E42; text-decoration: underline; }
+.contact-cta a:hover { opacity: 0.7; }
+.subscribe-bar { background: #0D1E42; padding: 56px 40px; text-align: center; }
+.subscribe-bar h2 { font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+.subscribe-bar > p { font-size: 15px; color: rgba(255,255,255,0.65); margin-bottom: 24px; }
+.nav-hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; z-index: 200; }
+.nav-hamburger span { display: block; width: 22px; height: 2px; background: #0D1E42; border-radius: 2px; }
+.nav-mobile-menu { display: none; position: sticky; top: 68px; z-index: 99; flex-direction: column; background: #fff; border-bottom: 1px solid #f5f5f5; padding: 8px 24px 16px; }
+.nav-mobile-menu a { font-size: 14px; font-weight: 600; color: #0D1E42; text-decoration: none; padding: 13px 0; border-bottom: 1px solid #f5f5f5; display: block; }
+.nav-mobile-menu a:last-child { border-bottom: none; }
+.nav-mobile-menu.open { display: flex; }
+.email-cta-inline { background: #f7f8fa; border-radius: 8px; padding: 20px 24px; margin: 32px 0; text-align: center; }
+.video-embed { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 8px 0 32px; border-radius: 8px; }
+.video-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+.email-cta-inline p { font-size: 14px; font-weight: 700; color: #0D1E42; margin: 0; }
+</style>
+
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ohio Housing Affordability Just Had the Worst Drop in America">
+<meta property="og:description" content="Ohio had the biggest drop in housing affordability of any state. The typical Ohio mortgage payment more than doubled since 2020. See what it costs in your ZIP.">
+<meta property="og:url" content="https://jassonfarrier.com/housing-market-updates/ohio-housing-affordability-2026">
+<meta property="og:image" content="https://jassonfarrier.com/housing-market-updates/img/ohio-estimated-mortgage-payment-map.jpg">
+<meta name="author" content="Jasson Farrier">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Ohio Housing Affordability Just Had the Worst Drop in America",
+  "description": "Ohio had the biggest drop in housing affordability of any state. The typical Ohio mortgage payment more than doubled since 2020. See what it costs in your ZIP.",
+  "author": {
+    "@type": "Person",
+    "name": "Jasson Farrier",
+    "url": "https://jassonfarrier.com/bio"
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Jasson Farrier"
+  },
+  "datePublished": "2026-11-02",
+  "dateModified": "2026-11-02",
+  "image": "https://jassonfarrier.com/housing-market-updates/img/ohio-estimated-mortgage-payment-map.jpg",
+  "url": "https://jassonfarrier.com/housing-market-updates/ohio-housing-affordability-2026"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Why did Ohio rank worst for housing affordability?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ohio lost more affordability than any state from 2020 to 2025, according to the National Housing Conference. The share of Ohio jobs that could afford a typical home fell from 67% to 26%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Ohio still an affordable state to buy a house?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Compared to most of the country, yes. 26% of Ohio jobs can afford a typical home, versus 14% nationally. But Ohio lost its affordability faster than any other state."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much is the typical mortgage payment in Ohio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "About $1,700 a month for the typical Ohio home with 20% down, including property tax and insurance. In 2020, it was $827. Look up your ZIP code."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much income do you need to buy a house in Ohio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It depends on where. In Mansfield, the income needed to buy a typical home went from $28,483 in 2020 to $62,931 in 2025. In Cincinnati, it's now over $100,000."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are out-of-state buyers driving up Ohio home prices?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "They're part of it. Buyers from expensive states see Ohio prices as a bargain and pay up. But low inventory and years of underbuilding are the bigger reasons prices keep rising."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is the Ohio housing market going to crash?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No sign of it yet. A crash needs a flood of forced sellers. Ohio homeowners are mostly locked into low rates, and new listings are still below 2020 levels."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will data centers raise home values in Ohio?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Too early to know. Construction booms can push values up in small towns with few homes for sale. I've been tracking Ohio's data center land grab closely."
+      }
+    }
+  ]
+}
+</script>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KKVH0B7EZ0"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KKVH0B7EZ0');
+</script>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-brand">Jasson Farrier <span>&mdash; Kiger Realty</span></a>
+  <div class="nav-right">
+    <a href="/housing-market-updates" class="active">Market Updates</a>
+    <a href="/data">Data</a>
+    <a href="/bio">About</a>
+    <a href="/contact">Contact</a>
+    <a href="https://www.youtube.com/@OhioHousingNerd" class="nav-yt" aria-label="YouTube">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+        <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.54C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z" fill="#9DA6AB"/>
+        <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#fff"/>
+      </svg>
+    </a>
+    <button class="nav-hamburger" aria-label="Menu" onclick="document.querySelector('.nav-mobile-menu').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="nav-mobile-menu">
+  <a href="/housing-market-updates">Market Updates</a>
+  <a href="/data">Data</a>
+  <a href="/bio">About</a>
+  <a href="/contact">Contact</a>
+  <a href="https://www.youtube.com/@OhioHousingNerd">YouTube &#8599;</a>
+</div>
+
+<div class="page-header">
+  <div class="page-header-inner">
+    <a href="/housing-market-updates" class="back-link">&larr; Back to Market Updates</a>
+    <span class="tag">Ohio Market Analysis &middot; November 2026</span>
+    <p class="article-byline">By <a href="/bio">Jasson Farrier</a> &nbsp;&middot;&nbsp; Kiger Realty &nbsp;&middot;&nbsp; November 2026</p>
+    <span class="article-date">Published: November 2, 2026</span>
+    <h1>Ohio Housing Affordability Just Had the Worst Drop in America</h1>
+  </div>
+</div>
+
+<div class="article">
+
+<p>Ohio housing affordability just took the biggest hit of any state in America. In 2020, two out of three jobs in Ohio paid enough to afford a typical home. By 2025, it was one in four.</p>
+
+<p>That's not my opinion. It's from a new national study by the <a href="https://nhc.org/press-release/ohio-sees-nations-steepest-five-year-decline-in-homeownership-affordability/" target="_blank" rel="noopener">National Housing Conference</a>, and I broke it down on my <a href="https://youtube.com/live/HVTQLzfe8xQ" target="_blank" rel="noopener">latest Ohio live stream</a>. My own data backs it up. The typical Ohio mortgage payment &mdash; with taxes and insurance &mdash; went from $827 a month in 2020 to about $1,700 today. More than double. In six years.</p>
+
+<p>If you've tried to buy a house in Ohio lately, you already felt this. Before COVID, it was a completely different market. In this post I'll show you why Ohio fell the farthest, how much payments really went up, why prices still aren't crashing, and how to look up the payment in your own ZIP code.</p>
+
+<div class="video-embed">
+  <iframe src="https://www.youtube.com/embed/vDQ2aiWgA2Y" title="Ohio's Housing Market Just Got the Worst News in America" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
+<div class="tldr">
+  <span class="tldr-label">Key Takeaways</span>
+  <ul>
+    <li>Ohio had the largest drop in homeownership affordability of any state from 2020 to 2025, according to the National Housing Conference.</li>
+    <li>The share of Ohio jobs that can afford a typical home fell from 67% to 26% &mdash; a 41-point drop.</li>
+    <li>Ohio is not the least affordable state. It's still above the national 14%. It just fell the fastest.</li>
+    <li>The typical Ohio monthly payment more than doubled, from $827 in 2020 to about $1,700 today. More than half of Ohio's larger ZIP codes have seen their payment at least double.</li>
+    <li>Prices aren't crashing because nobody has to sell. Ohio is still listing about 2,000 fewer homes a month than in 2020.</li>
+  </ul>
+</div>
+
+<div class="email-cta-inline">
+  <a href="#nl-form" style="color:#0D1E42;text-decoration:none;"><p>Join the other housing nerds who get the data before the news does. &rarr;</p></a>
+</div>
+
+<h2>Why Did Ohio Rank Worst for Housing Affordability?</h2>
+<p><em>Ohio ranked worst because it lost more affordability than any other state from 2020 to 2025. In 2020, 67% of Ohio occupations could afford a typically priced home. By 2025, just 26% could. Home prices, mortgage rates, taxes and insurance all rose much faster than Ohio paychecks.</em></p>
+
+<img src="/housing-market-updates/img/nhc-ohio-steepest-decline-homeownership-affordability.png" alt="Ohio housing affordability: Ohio sees nation's steepest five-year decline in homeownership affordability (National Housing Conference)" class="article-img">
+<p class="img-caption">Source: <a href="https://nhc.org/press-release/ohio-sees-nations-steepest-five-year-decline-in-homeownership-affordability/" target="_blank" rel="noopener">National Housing Conference press release</a>, October 12, 2026.</p>
+
+<div class="stat-row">
+  <div class="stat-box"><div class="stat-num">67%</div><div class="stat-label">Ohio jobs that could afford a home, 2020</div></div>
+  <div class="stat-box"><div class="stat-num">26%</div><div class="stat-label">Ohio jobs that can afford a home, 2025</div></div>
+  <div class="stat-box"><div class="stat-num">#1</div><div class="stat-label">Biggest affordability drop of any state</div></div>
+</div>
+
+<p>The National Housing Conference looked at nearly 300 occupations across 390 metro areas. For each one, they asked a simple question: can a person working this job afford the typical home where they live? Then they compared 2020 to 2025.</p>
+
+<p>Ohio lost 40.97 percentage points. That's the largest loss in their entire national dataset. And here's the part that should bother you &mdash; this isn't just a pandemic hangover. Since 2023, Ohio dropped another 5 points. Only Illinois (10.86) and Maryland (7.10) fell more over that stretch.</p>
+
+<p>It gets worse at the city level. Five of the 25 metros with the biggest affordability losses in the country are in Ohio:</p>
+<ul>
+  <li><strong>Mansfield</strong> &mdash; #2 in the nation</li>
+  <li><strong>Cleveland</strong> &mdash; #8</li>
+  <li><strong>Springfield</strong> &mdash; #10</li>
+  <li><strong>Toledo</strong> &mdash; #13</li>
+  <li><strong>Akron</strong> &mdash; #23</li>
+</ul>
+<p>The only metro in America that fared worse than Mansfield was Syracuse, New York. You can read the full report <a href="https://nhc.org/wp-content/uploads/2026/10/NHC-P2P-Report-2026-Final-10.6.pdf" target="_blank" rel="noopener">here</a>, or <a href="https://youtube.com/live/HVTQLzfe8xQ?t=447" target="_blank" rel="noopener">watch me walk through it live</a>.</p>
+
+<h2>Ohio Isn't the Least Affordable State. It Just Fell the Fastest.</h2>
+<p>I want to be clear about this, because the headline gets twisted. Ohio is not the least affordable state in America. Not even close. Ohio's 26% is still well above the national number of 14%. California sits at 3%. Florida at 7%.</p>
+
+<div class="chart-box">
+  <div class="chart-title">Share of Jobs That Can Afford a Typical Home</div>
+  <svg viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+<rect x="0" y="0" width="680" height="340" fill="#fff"/>
+<line x1="60" y1="290" x2="660" y2="290" stroke="#9DA6AB" stroke-width="1"/>
+<rect x="100.0" y="80.6" width="120.0" height="209.4" rx="4" fill="#9DA6AB"/>
+<text x="160.0" y="70.6" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">67%</text>
+<text x="160.0" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">Ohio</text>
+<text x="160.0" y="325" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">2020</text>
+<rect x="300.0" y="208.8" width="120.0" height="81.2" rx="4" fill="#0D1E42"/>
+<text x="360.0" y="198.8" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">26%</text>
+<text x="360.0" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">Ohio</text>
+<text x="360.0" y="325" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">2025</text>
+<rect x="500.0" y="246.2" width="120.0" height="43.8" rx="4" fill="#9DA6AB"/>
+<text x="560.0" y="236.2" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">14%</text>
+<text x="560.0" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">U.S.</text>
+<text x="560.0" y="325" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">2025</text>
+</svg>
+  <p style="font-size:11px;color:#9DA6AB;text-align:center;margin:6px 0 4px;">Source: National Housing Conference, <em>Priced Out</em> (October 2026)</p>
+</div>
+
+<p>What happened is that Ohio had the most to lose. Before COVID, Ohio was one of the most affordable places in the country to buy a home. A teacher, a firefighter, a mail carrier &mdash; they could buy a house here. That's what made Ohio, Ohio. Then prices exploded, rates doubled, and a huge number of jobs crossed the line at the same time.</p>
+
+<p>There's another piece to this. One of my live viewers, E-Rock, said it well: a lot of people have moved into Ohio since COVID. He has two houses on his street that sold to buyers from Washington State. I'm seeing it all over the place too.</p>
+
+<p>It's all about perspective. If you're used to paying $600,000 for a home and you move here and see one for $300,000, you're thinking, "That's a sale. I'll take two." Paying $325,000 instead of $300,000 doesn't faze you. But for the family that's lived here for 20 years on an Ohio paycheck, that's the difference between buying and renting forever. My 14-year-old son said it best: people want to live in Ohio. It's a great place. So obviously people are going to move here. (<a href="https://youtube.com/live/HVTQLzfe8xQ?t=979" target="_blank" rel="noopener">Watch that conversation</a>)</p>
+
+<h2>How Much Has the Typical Ohio Mortgage Payment Gone Up?</h2>
+<p>Here's the typical home in Ohio, using 20% down, a 30-year fixed loan, local property taxes and homeowners insurance.</p>
+
+<div class="chart-box">
+  <div class="chart-title">Typical Ohio Monthly Payment &mdash; 2020 vs. Today</div>
+  <svg viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+<rect x="0" y="0" width="680" height="340" fill="#fff"/>
+<line x1="60" y1="290" x2="660" y2="290" stroke="#9DA6AB" stroke-width="1"/>
+<rect x="150.0" y="184.8" width="120.0" height="105.2" rx="4" fill="#0D1E42"/>
+<text x="210.0" y="174.8" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">$827/mo</text>
+<text x="210.0" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">July 2020</text>
+<text x="210.0" y="325" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">3.02% rate</text>
+<rect x="450.0" y="72.6" width="120.0" height="217.4" rx="4" fill="#0D1E42"/>
+<text x="510.0" y="62.6" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">$1,709/mo</text>
+<text x="510.0" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">Today</text>
+<text x="510.0" y="325" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">7.24% rate</text>
+</svg>
+  <p style="font-size:11px;color:#9DA6AB;text-align:center;margin:6px 0 4px;">Typical Ohio home, 20% down, 30-year fixed, property tax + insurance &middot; Source: <a href="/ohio-housing-data">Ohio Housing Data</a> (Zillow, Census, Mortgage News Daily)</p>
+</div>
+
+<table style="width:100%;border-collapse:collapse;margin:24px 0;font-size:15px;">
+  <tr style="border-bottom:2px solid #0D1E42;"><th style="text-align:left;padding:8px;"></th><th style="text-align:right;padding:8px;">July 2020</th><th style="text-align:right;padding:8px;">Today</th></tr>
+  <tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:8px;">Typical Ohio home value (Zillow)</td><td style="text-align:right;padding:8px;">$162,808</td><td style="text-align:right;padding:8px;">$249,996</td></tr>
+  <tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:8px;">30-year mortgage rate</td><td style="text-align:right;padding:8px;">3.02%</td><td style="text-align:right;padding:8px;">7.24%</td></tr>
+  <tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:8px;">Principal &amp; interest</td><td style="text-align:right;padding:8px;">$551</td><td style="text-align:right;padding:8px;">$1,363</td></tr>
+  <tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:8px;">Property tax + insurance</td><td style="text-align:right;padding:8px;">$277</td><td style="text-align:right;padding:8px;">$346</td></tr>
+  <tr style="font-weight:700;"><td style="padding:8px;">Total monthly payment</td><td style="text-align:right;padding:8px;">$827</td><td style="text-align:right;padding:8px;">$1,709</td></tr>
+</table>
+
+<p>That's an extra $880 a month to own the typical Ohio home. Over $10,000 a year. Same house. The biggest driver is the rate. In July 2020, the average 30-year mortgage rate was 3.02%, according to <a href="https://www.freddiemac.com/pmms" target="_blank" rel="noopener">Freddie Mac</a>. Today it's 7.24%, according to <a href="https://www.mortgagenewsdaily.com/mortgage-rates" target="_blank" rel="noopener">Mortgage News Daily</a>. More than double.</p>
+
+<p>And it's not just the statewide average. I pulled ZIP codes live on air, and the pattern repeats almost everywhere:</p>
+
+<table style="width:100%;border-collapse:collapse;margin:24px 0;font-size:15px;">
+  <tr style="border-bottom:2px solid #0D1E42;"><th style="text-align:left;padding:8px;">Area</th><th style="text-align:right;padding:8px;">2020 payment</th><th style="text-align:right;padding:8px;">Today</th><th style="text-align:right;padding:8px;">Change</th></tr>
+  <tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:8px;">Campbell (44405)</td><td style="text-align:right;padding:8px;">$300</td><td style="text-align:right;padding:8px;">$807</td><td style="text-align:right;padding:8px;">+169%</td></tr>
+  <tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:8px;">Centerburg (43011)</td><td style="text-align:right;padding:8px;">$1,122</td><td style="text-align:right;padding:8px;">$2,632</td><td style="text-align:right;padding:8px;">+135%</td></tr>
+  <tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:8px;">Lakeside (43440)</td><td style="text-align:right;padding:8px;">$1,130</td><td style="text-align:right;padding:8px;">$2,566</td><td style="text-align:right;padding:8px;">+127%</td></tr>
+  <tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:8px;">Trumbull County</td><td style="text-align:right;padding:8px;">$551</td><td style="text-align:right;padding:8px;">$1,211</td><td style="text-align:right;padding:8px;">+120%</td></tr>
+  <tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:8px;">Batavia (45103)</td><td style="text-align:right;padding:8px;">$1,141</td><td style="text-align:right;padding:8px;">$2,320</td><td style="text-align:right;padding:8px;">+103%</td></tr>
+  <tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:8px;">Brook Park (44142)</td><td style="text-align:right;padding:8px;">$784</td><td style="text-align:right;padding:8px;">$1,574</td><td style="text-align:right;padding:8px;">+100%</td></tr>
+  <tr style="border-bottom:1px solid #f5f5f5;"><td style="padding:8px;">Dublin (43017)</td><td style="text-align:right;padding:8px;">$2,275</td><td style="text-align:right;padding:8px;">$4,541</td><td style="text-align:right;padding:8px;">+100%</td></tr>
+  <tr><td style="padding:8px;">Centerville (45458)</td><td style="text-align:right;padding:8px;">$1,797</td><td style="text-align:right;padding:8px;">$3,351</td><td style="text-align:right;padding:8px;">+86%</td></tr>
+</table>
+<p style="font-size:13px;color:#9DA6AB;margin-top:-8px;">Estimated monthly payment, 20% down, 2020 vs. today &middot; Source: <a href="/ohio-housing-data">Ohio Housing Data</a></p>
+
+<p>Cheap ZIP codes doubled. Expensive ZIP codes doubled. In Campbell, near Youngstown, the typical payment went from about $300 to $807 &mdash; and homes there are still only around $107,000. In Dublin, the same math takes you from $2,275 to $4,541 a month. Almost 5,000 bucks. Across Ohio, 288 of the 522 ZIP codes with at least 5,000 residents have seen their estimated payment at least double since 2020. You can <a href="/ohio-housing-data">look up the payment for your ZIP code here</a>.</p>
+
+<img src="/housing-market-updates/img/ohio-zip-code-mortgage-payment-2020-vs-2026.jpg" alt="Ohio ZIP code estimated mortgage payment chart, 2000 to 2026, from the Ohio housing data page" class="article-img">
+<p class="img-caption">Every ZIP code on my <a href="/ohio-housing-data">Ohio housing data page</a> has a payment chart like this one. Centerburg, Ohio: $1,122 a month in 2020, $2,632 today.</p>
+
+<p>Look at the shape of that chart. For almost 20 years, the payment barely moved. In a lot of Ohio ZIP codes it actually went <em>down</em> from 2018 to 2020 as rates fell. Then 2020 to 2022 hit. In Centerville, the payment jumped 46% in just two years. In Batavia, 60%. Those two years wrecked the Ohio housing market. (<a href="https://youtube.com/live/HVTQLzfe8xQ?t=2356" target="_blank" rel="noopener">See it live</a>)</p>
+
+<p>Now look at Trumbull County. The typical payment in 2020 was $551 a month. That's insane. That's less than a lot of car payments. And here's the thing &mdash; a lot of Ohio homeowners are still paying something close to that. Remember that, because it explains why prices aren't falling. More on that in a minute.</p>
+
+<p>Today it's $1,211. That's up 120% since 2020. Did your paycheck go up 120%? Probably not. And that's the problem.</p>
+
+<div class="email-cta-inline">
+  <a href="#nl-form" style="color:#0D1E42;text-decoration:none;"><p>Join the other housing nerds who get the data before the news does. &rarr;</p></a>
+</div>
+
+<h2>Why Ohio Paychecks Aren't Keeping Up</h2>
+<p>Mansfield tells the whole story. In 2020, 82% of the occupations tracked there could afford the typical home. That included elementary school teachers, special ed teachers, EMTs and paramedics, firefighters, and mail carriers. By 2025, just 30% of occupations could.</p>
+
+<p>The typical Mansfield home cost $115,041 in 2020. By 2025 it was $188,863. The income needed to buy it went from $28,483 to $62,931 &mdash; a 121% increase.</p>
+
+<div class="chart-box">
+  <div class="chart-title">Mansfield, 2020&ndash;2025: Home Costs vs. Paychecks</div>
+  <svg viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+<rect x="0" y="0" width="680" height="340" fill="#fff"/>
+<line x1="60" y1="290" x2="660" y2="290" stroke="#9DA6AB" stroke-width="1"/>
+<rect x="100.0" y="73.9" width="120.0" height="216.1" rx="4" fill="#0D1E42"/>
+<text x="160.0" y="63.9" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">+121%</text>
+<text x="160.0" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">Income needed</text>
+<text x="160.0" y="325" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">to buy a home</text>
+<rect x="300.0" y="145.4" width="120.0" height="144.6" rx="4" fill="#9DA6AB"/>
+<text x="360.0" y="135.4" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">+81%</text>
+<text x="360.0" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">Biggest raise:</text>
+<text x="360.0" y="325" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">teaching assistants</text>
+<rect x="500.0" y="247.1" width="120.0" height="42.9" rx="4" fill="#9DA6AB"/>
+<text x="560.0" y="237.1" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">+24%</text>
+<text x="560.0" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">Industrial</text>
+<text x="560.0" y="325" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">machinery mechanics</text>
+</svg>
+  <p style="font-size:11px;color:#9DA6AB;text-align:center;margin:6px 0 4px;">Source: National Housing Conference, <em>Priced Out</em> (October 2026)</p>
+</div>
+
+<p>Now, I'll be honest. That $28,483 number doesn't compute in my head. I remember making 28 grand a year, and I don't see how I'd have afforded a $115,000 home. But the trend is the point. Housing costs went up 121%. The biggest raise any job got in Mansfield was teaching assistants at 81%. Industrial machinery mechanics got about 24%. Nobody's paycheck kept pace.</p>
+
+<p>Columbus is no better. In 2020, 40% of jobs there could afford a typical home. In 2025, it was 9%.</p>
+
+<p>And that's before you count the stuff that doesn't show up in the payment. Your water heater breaks. Your furnace goes out. Your roof starts leaking. As a homeowner, all of that is on you. If you're thinking about buying, I wrote about <a href="/housing-market-updates/is-it-a-good-time-to-buy-a-house-in-ohio">the five questions you should answer first</a>.</p>
+
+<h2>Property Taxes and Insurance: The Costs on Top</h2>
+<p>One of my viewers, Kara, said property taxes are killing her payment as she looks at homes. Welcome to the party.</p>
+
+<p>The median Ohio property tax bill went from $1,813 in 2020 to $2,231 in 2024, according to the <a href="https://www.census.gov/programs-surveys/acs" target="_blank" rel="noopener">U.S. Census Bureau</a>. That's up 23% in four years. The <a href="https://tax.ohio.gov/researcher/tax-analysis/tax-data-series/real-property" target="_blank" rel="noopener">Ohio Department of Taxation</a> publishes the statewide numbers on how much property tax gets charged every year, and it keeps climbing. And it's worse in a lot of places. In Lakeside, the typical tax bill went from $1,900 to $2,800 a year &mdash; up 44%. That's 2024 data. It's probably higher today. Check the property tax trend for your area on my <a href="/ohio-housing-data">Ohio housing data page</a>.</p>
+
+<p>As an investor, I see this on every deal. Every deal I look at blows up because of taxes. It used to be you'd budget a few bucks a month for a tax increase. Not anymore. I plan for the worst. If I buy a building that hasn't been reassessed in 20 years, and the new value trickles through to the county auditor, my taxes explode. I could be underwater on day one.</p>
+
+<p>You have to watch this as a homeowner too &mdash; especially on new construction. People get the tax estimate from the builder and think, "Look at this, my property taxes are nothing." Yeah. That's the tax on the dirt. Wait until the county actually values your house. Then they catch you up. Big difference in payment.</p>
+
+<p>If you think your home is overvalued, protest it. Fewer than 5% of Ohioans ever do. It's free, you don't need a lawyer, and I walk you through it step by step in <a href="/housing-market-updates/ohio-property-tax-appeal">how to appeal your Ohio property tax value</a>. I've also covered <a href="https://www.youtube.com/watch?v=4oHwJ2GBTko" target="_blank" rel="noopener">why Ohio is addicted to your property taxes</a> and what happens when people fall behind &mdash; including <a href="/housing-market-updates/ohio-property-tax-lien">how Ohio counties sell your tax lien to out-of-state investors</a>.</p>
+
+<h2>Why Ohio Home Prices Keep Rising Instead of Crashing</h2>
+<p>If affordability is this bad, why aren't prices falling? I get this question every week. Ohio home prices are still sitting at or near record highs &mdash; you can see it in the monthly <a href="https://www.ohiorealtors.org/market-data/" target="_blank" rel="noopener">Ohio REALTORS&reg; market data</a> and on my <a href="/ohio-housing-data">Ohio housing data page</a>.</p>
+
+<p>Go back to that $551 Trumbull County payment. Who's leaving that payment? Nobody. Why would you? You can't rent anything for that. So people stay put. And when people stay put, they don't list their homes.</p>
+
+<div class="chart-box">
+  <div class="chart-title">Ohio New Listings &mdash; Every September</div>
+  <svg viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+<rect x="0" y="0" width="680" height="340" fill="#fff"/>
+<line x1="60" y1="290" x2="660" y2="290" stroke="#9DA6AB" stroke-width="1"/>
+<rect x="75.0" y="82.7" width="45.0" height="207.3" rx="4" fill="#9DA6AB"/>
+<text x="97.5" y="72.7" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">14.9K</text>
+<text x="97.5" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">2019</text>
+<rect x="150.0" y="74.3" width="45.0" height="215.7" rx="4" fill="#0D1E42"/>
+<text x="172.5" y="64.3" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">15.5K</text>
+<text x="172.5" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">2020</text>
+<rect x="225.0" y="82.8" width="45.0" height="207.2" rx="4" fill="#9DA6AB"/>
+<text x="247.5" y="72.8" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">14.9K</text>
+<text x="247.5" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">2021</text>
+<rect x="300.0" y="106.9" width="45.0" height="183.1" rx="4" fill="#9DA6AB"/>
+<text x="322.5" y="96.9" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">13.2K</text>
+<text x="322.5" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">2022</text>
+<rect x="375.0" y="120.1" width="45.0" height="169.9" rx="4" fill="#9DA6AB"/>
+<text x="397.5" y="110.1" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">12.2K</text>
+<text x="397.5" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">2023</text>
+<rect x="450.0" y="118.0" width="45.0" height="172.0" rx="4" fill="#9DA6AB"/>
+<text x="472.5" y="108.0" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">12.4K</text>
+<text x="472.5" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">2024</text>
+<rect x="525.0" y="106.0" width="45.0" height="184.0" rx="4" fill="#9DA6AB"/>
+<text x="547.5" y="96.0" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">13.2K</text>
+<text x="547.5" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">2025</text>
+<rect x="600.0" y="102.7" width="45.0" height="187.3" rx="4" fill="#0D1E42"/>
+<text x="622.5" y="92.7" text-anchor="middle" font-size="16" font-weight="700" fill="#0D1E42" font-family="Montserrat, sans-serif">13.5K</text>
+<text x="622.5" y="310" text-anchor="middle" font-size="12" fill="#9DA6AB" font-family="Montserrat, sans-serif">2026</text>
+</svg>
+  <p style="font-size:11px;color:#9DA6AB;text-align:center;margin:6px 0 4px;">Source: Realtor.com via <a href="/ohio-housing-data">Ohio Housing Data</a></p>
+</div>
+
+<p>This September, about 13,500 Ohio homeowners listed a home for sale, according to <a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener">Realtor.com</a> data. In September 2020, it was 15,530. That's roughly 2,000 homes a month that never hit the market &mdash; because owners are locked into lower rates, lower prices and lower payments. (<a href="https://youtube.com/live/HVTQLzfe8xQ?t=3454" target="_blank" rel="noopener">Watch me break this down</a>)</p>
+
+<p>I'm in the same boat. If I tried to buy the house I live in today, at today's prices and rates, I don't know if it would work out.</p>
+
+<p>The second problem is that Ohio isn't building. In Clermont County, builders are putting up about three and a half homes for every 1,000 residents right now, based on the <a href="https://www.census.gov/construction/bps/" target="_blank" rel="noopener">U.S. Census Bureau's Building Permits Survey</a>. Back in 1999, it was eight. You can't just flip a switch and turn on home builders. You can see building permits for any county on my <a href="/ohio-housing-data">Ohio data page</a>. On my national live stream, I compared this across the country, and the difference is staggering. <a href="https://www.youtube.com/watch?v=49bM6kmFswk" target="_blank" rel="noopener">The South is where the building is</a> &mdash; and that's a big reason prices are falling in Texas and Florida while Ohio keeps going up.</p>
+
+<p>Can Ohio home prices crash? They absolutely have before. In Centerville, the typical home fell from $322,000 in 2006 to $239,000 in 2012 &mdash; down 26%. Batavia dropped about 11%. But crashes need one thing Ohio doesn't have right now: a flood of homes from people who <em>have</em> to sell. Distressed inventory. Job losses. Forced sales. I'm looking for it every week. I'm not seeing it. I explained this in more detail in <a href="/housing-market-updates/housing-slowdown-2026">why the housing market crashed in transactions, not prices</a>, and on my live stream about <a href="https://www.youtube.com/watch?v=smFN9ciUl6c" target="_blank" rel="noopener">why high rates haven't crashed Ohio home prices</a>.</p>
+
+<p>That doesn't mean nothing is changing. Demand has fallen in a lot of Ohio markets. In Lakeside, there are about 30 buyers for every 100 homes for sale &mdash; down from 130 buyers in 2022. That's a buyer's market. In Batavia, it's still 139 buyers for every 100 homes. Every ZIP code is different, which is why <a href="/housing-market-updates/ohio-housing-market-shifting-buyers-2026">I track where Ohio is shifting toward buyers</a>.</p>
+
+<h2>How to Check the Mortgage Payment in Your Ohio ZIP Code</h2>
+<p>I built a free tool so you can see this for yourself. Here's how:</p>
+<ol>
+  <li>Go to <a href="/data">jassonfarrier.com/data</a>.</li>
+  <li>Click <a href="/ohio-housing-data">Ohio Housing Data</a>.</li>
+  <li>In the menu on the left, under Affordability, click <strong>Est. Payment (20% Down)</strong>.</li>
+  <li>Click any ZIP code or county on the map to see its estimated payment &mdash; and the chart from 2020 to today.</li>
+</ol>
+
+<img src="/housing-market-updates/img/ohio-estimated-mortgage-payment-map.jpg" alt="Ohio housing data map showing the estimated mortgage payment by county" class="article-img">
+<p class="img-caption">The <a href="/ohio-housing-data">Ohio housing data</a> map on Est. Payment. Red is more expensive per month. Blue and green are less.</p>
+
+<p>The estimate uses the typical home value in that ZIP code, today's mortgage rate, the local property tax rate, and homeowners insurance based on real premiums paid in Ohio. You can see exactly how I calculate it on the <a href="/ohio-housing-data-methodology">methodology page</a>. If you want to compare Ohio to anywhere else in the country, my <a href="/data">national housing data</a> covers every ZIP code in the U.S.</p>
+
+<p>This is a compass, not an exact coordinate. Before you buy, talk to a mortgage professional and get a real quote. (<a href="https://youtube.com/live/HVTQLzfe8xQ?t=381" target="_blank" rel="noopener">Watch the walkthrough</a>)</p>
+
+<h2>What This Means If You're Buying or Selling in Ohio</h2>
+<p>If you're buying, here's the good news. In a lot of Ohio, you're facing less competition than you have in years. You're probably not going to be up against 20 other buyers like 2021. But don't shop on the price alone. Shop on the full monthly payment &mdash; principal, interest, taxes, insurance, and money set aside for repairs. If you're not sure where you stand, my free <a href="/free">Buy or Wait guide</a> walks you through it in ten minutes. If you're a first-time buyer, check the <a href="https://ohiohome.org/homebuyer/default.aspx" target="_blank" rel="noopener">Ohio Housing Finance Agency</a> &mdash; the state runs down payment assistance and first-time buyer loan programs that can make a real difference on that monthly number. And price cuts are real right now &mdash; I covered <a href="/housing-market-updates/buying-a-home-in-ohio-price-cuts">how to find homes with a price cut</a>.</p>
+
+<p>If you already own, check your property value every year and protest it if it's wrong. Plan for your taxes and insurance to keep climbing. And if you're thinking about selling, price it right from day one. Buyers are stretched thin. An overpriced home in this market just sits.</p>
+
+<p>As a local REALTOR&reg;, I help Ohio buyers and sellers work through exactly these numbers every week. The conversation's free. <a href="/contact">Reach out anytime</a>.</p>
+
+<h2>FAQ</h2>
+
+<h3>Why did Ohio rank worst for housing affordability?</h3>
+<p>Ohio lost more affordability than any state from 2020 to 2025, according to the National Housing Conference. The share of Ohio jobs that could afford a typical home fell from 67% to 26%.</p>
+
+<h3>Is Ohio still an affordable state to buy a house?</h3>
+<p>Compared to most of the country, yes. 26% of Ohio jobs can afford a typical home, versus 14% nationally. But Ohio lost its affordability faster than any other state.</p>
+
+<h3>How much is the typical mortgage payment in Ohio?</h3>
+<p>About $1,700 a month for the typical Ohio home with 20% down, including property tax and insurance. In 2020, it was $827. <a href="/ohio-housing-data">Look up your ZIP code</a>.</p>
+
+<h3>How much income do you need to buy a house in Ohio?</h3>
+<p>It depends on where. In Mansfield, the income needed to buy a typical home went from $28,483 in 2020 to $62,931 in 2025. In Cincinnati, it's now over $100,000.</p>
+
+<h3>Are out-of-state buyers driving up Ohio home prices?</h3>
+<p>They're part of it. Buyers from expensive states see Ohio prices as a bargain and pay up. But low inventory and years of underbuilding are the bigger reasons prices keep rising.</p>
+
+<h3>Is the Ohio housing market going to crash?</h3>
+<p>No sign of it yet. A crash needs a flood of forced sellers. Ohio homeowners are mostly locked into low rates, and new listings are still below 2020 levels.</p>
+
+<h3>Will data centers raise home values in Ohio?</h3>
+<p>Too early to know. Construction booms can push values up in small towns with few homes for sale. I've been tracking <a href="https://www.youtube.com/watch?v=uC9DaCH1Frg" target="_blank" rel="noopener">Ohio's data center land grab</a> closely.</p>
+
+<h2>Sources</h2>
+<ul>
+  <li><a href="https://nhc.org/press-release/ohio-sees-nations-steepest-five-year-decline-in-homeownership-affordability/" target="_blank" rel="noopener">National Housing Conference &mdash; Ohio Sees Nation's Steepest Five-Year Decline in Homeownership Affordability</a></li>
+  <li><a href="https://nhc.org/wp-content/uploads/2026/10/NHC-P2P-Report-2026-Final-10.6.pdf" target="_blank" rel="noopener">National Housing Conference &mdash; Priced Out: When a Good Job Isn't Enough (full report, PDF)</a></li>
+  <li><a href="https://www.mortgagenewsdaily.com/mortgage-rates" target="_blank" rel="noopener">Mortgage News Daily &mdash; Mortgage Rates</a></li>
+  <li><a href="https://www.census.gov/programs-surveys/acs" target="_blank" rel="noopener">U.S. Census Bureau American Community Survey &mdash; Property Taxes</a></li>
+  <li><a href="https://www.realtor.com/research/data/" target="_blank" rel="noopener">Realtor.com Research &mdash; New Listings, Pending Ratio</a></li>
+  <li><a href="https://www.freddiemac.com/pmms" target="_blank" rel="noopener">Freddie Mac &mdash; Primary Mortgage Market Survey</a></li>
+  <li><a href="https://www.census.gov/construction/bps/" target="_blank" rel="noopener">U.S. Census Bureau &mdash; Building Permits Survey</a></li>
+  <li><a href="https://tax.ohio.gov/researcher/tax-analysis/tax-data-series/real-property" target="_blank" rel="noopener">Ohio Department of Taxation &mdash; Real Property Tax Data</a></li>
+  <li><a href="https://ohiohome.org/homebuyer/default.aspx" target="_blank" rel="noopener">Ohio Housing Finance Agency &mdash; Homebuyer Programs</a></li>
+  <li><a href="https://www.ohiorealtors.org/market-data/" target="_blank" rel="noopener">Ohio REALTORS&reg; &mdash; Market Data</a></li>
+  <li><a href="/ohio-housing-data">Ohio Housing Data &mdash; Estimated payment, prices, taxes and permits by county and ZIP</a></li>
+</ul>
+
+<p>Watch the full breakdown: <a href="https://www.youtube.com/watch?v=vDQ2aiWgA2Y" target="_blank" rel="noopener">Ohio's Housing Market Just Got the Worst News in America</a> and the <a href="https://youtube.com/live/HVTQLzfe8xQ" target="_blank" rel="noopener">full live stream</a> on Ohio Housing Nerd.</p>
+
+<p style="margin-top:40px;font-size:14px;color:#9DA6AB;border-top:1px solid #f5f5f5;padding-top:24px;"><strong style="color:#0D1E42;">Jasson Farrier</strong> is a licensed <a href="https://www.nar.realtor/" target="_blank" rel="noopener">REALTOR&reg;</a> at Kiger Realty in Granville, Ohio (License #2018004483), and an active real estate investor. He breaks down the Ohio housing market every week on <a href="https://www.youtube.com/@ohiohousingnerd" target="_blank" rel="noopener">Ohio Housing Nerd</a>, covering all 88 Ohio counties with verified, source-linked data &mdash; see the <a href="/ohio-housing-data-methodology">data methodology</a>. Payment figures are estimates for illustration only, not lending advice.</p>
+
+</div>
+
+<div class="contact-cta">
+  <p>Buying or selling in Ohio? <a href="/contact">Let's talk.</a></p>
+</div>
+
+<div class="subscribe-bar">
+  <h2>Get the Analysis in Your Inbox</h2>
+  <p>Join the other housing nerds who get the data before the news does.</p>
+  <form id="nl-form" onsubmit="handleNL(event)" style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;max-width:480px;margin:0 auto;">
+    <input type="email" id="nl-email" placeholder="your@email.com" required style="flex:1;min-width:220px;padding:12px 16px;border:1px solid rgba(255,255,255,0.2);border-radius:2px;background:rgba(255,255,255,0.08);color:#fff;font-family:'Montserrat',sans-serif;font-size:14px;" />
+    <input type="text" id="nl-hp" name="website" style="position:absolute;left:-9999px;opacity:0;" tabindex="-1" autocomplete="off" /><button type="submit" id="nl-btn" style="padding:12px 28px;background:#fff;color:#0D1E42;border:none;border-radius:2px;font-family:'Montserrat',sans-serif;font-weight:700;font-size:13px;letter-spacing:1px;cursor:pointer;">Subscribe &rarr;</button>
+  </form>
+  <p id="nl-thanks" style="display:none;color:#fff;font-weight:700;font-size:15px;margin-top:8px;">You're in. Check your inbox.</p>
+  <script>
+  var _nlLoadTime=Date.now();async function handleNL(e){e.preventDefault();var b=document.getElementById('nl-btn');b.textContent='Subscribing...';b.disabled=true;if(document.getElementById('nl-hp').value||Date.now()-_nlLoadTime<2000){b.textContent='Subscribe \u2192';b.disabled=false;return;}var kitForm=document.createElement('form');kitForm.action='https://app.kit.com/forms/9795096/subscriptions';kitForm.method='post';kitForm.target='kit-frame-nl';kitForm.style.display='none';var ef=document.createElement('input');ef.name='email_address';ef.value=document.getElementById('nl-email').value.trim();kitForm.appendChild(ef);document.body.appendChild(kitForm);var ifr=document.createElement('iframe');ifr.name='kit-frame-nl';ifr.style.display='none';document.body.appendChild(ifr);kitForm.submit();document.getElementById('nl-form').style.display='none';document.getElementById('nl-thanks').style.display='block'}
+  </script>
+</div>
+
+<footer>
+  <div class="footer-top">
+    <span class="footer-brand">Jasson Farrier &#183; Kiger Realty</span>
+    <div class="footer-links">
+      <a href="/housing-market-updates" class="active">Market Updates</a>
+      <a href="/data">Data</a>
+      <a href="/bio">About</a>
+      <a href="/contact">Contact</a>
+    </div>
+  </div>
+  <hr class="footer-divider">
+  <div class="footer-legal">
+    <img src="/fair-housing.webp" alt="Equal Housing Opportunity" style="flex-shrink:0;width:32px;height:auto;opacity:0.6;filter:invert(1);margin-top:2px;">
+    <p>
+      Jasson Farrier &#183; Kiger Realty &#183; Realtor &#183; License #2018004483<br>
+      Equal Housing Opportunity &#183; Information deemed reliable but not guaranteed.
+    </p>
+  </div>
+</footer>
+
+
+<!--
+PUBLISHING CHECKLIST — Ohio Housing Affordability Just Had the Worst Drop in America (ohio-housing-affordability-2026)
+Content: [x] 3102 words from the Video 1032 OHN live (Oct 30 2026) [x] byline Kiger Realty, license in bio [x] date Nov 2, 2026
+SEO: [x] title 49 chars + suffix [x] meta 159 chars [x] canonical/OG/GA [x] Article + FAQPage schema (7 Q) [x] 45-word answer block
+Links: [x] 24 internal (/ohio-housing-data x12) [x] 6 YouTube videos [x] external domains: census.gov, freddiemac.com, mortgagenewsdaily.com, nar.realtor, nhc.org, ohiohome.org, ohiorealtors.org, realtor.com, tax.ohio.gov, youtube.com (all checked 200)
+Images/Charts: [x] 3 images in /housing-market-updates/img/ [x] 4 inline SVG charts, verified data
+[ ] hub top card [ ] homepage Latest Update [ ] sitemap.xml [ ] Search Console resubmit [ ] Kit broadcast draft [ ] live page verified 200
+-->
+</body>
+</html>
