@@ -371,6 +371,62 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <p class="metric-provider-def">Redfin defines "homes delisted" as the total number of unsold home listings that were removed from the market during a given time period. A home is counted as delisted when it goes off the market without selling or going under contract. Delisted % expresses this as a share of that month's active listings.</p>
       <div class="metric-plain"><strong>In plain terms:</strong> How many Ohio sellers gave up and pulled their house off the market instead of selling it or dropping the price. A rising number means more sellers in this area are choosing to wait rather than accept what buyers are offering — a sign sellers think the market will turn back in their favor, or that they can't sell at a price buyers will pay.</div>
     </div>
+
+    <div class="metric-card" id="redfin-market-data">
+      <div class="metric-name">Sales &amp; Supply · Redfin</div>
+      <div class="metric-tag">Monthly · National, States, Metros, Counties &amp; ZIP Codes · Jan 2012–present</div>
+      <p class="metric-provider-def">These six metrics come from the Redfin Data Center housing market tracker, built from MLS listing and sale records. They are labeled "(Redfin)" on the map and charts so they are not confused with the Realtor.com listing metrics above, which are counted differently and will not match exactly. National, state and metro figures are seasonally adjusted by Redfin. County figures are monthly and not seasonally adjusted. ZIP code figures are rolling 3-month numbers, which keeps small ZIP codes from swinging wildly month to month. Median sale price is never seasonally adjusted at any level. Price drop % and cancellation rate begin in each area once Redfin's coverage there is complete (for Ohio, early 2015); earlier months are left blank rather than shown with partial data.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> Realtor.com tells you what is listed and what sellers are asking. Redfin adds what actually sold, what it sold for, and how long the current supply would last.</div>
+    </div>
+
+    <div class="metric-card" id="redfin-median-sale-price">
+      <div class="metric-name">Median Sale Price (Redfin)</div>
+      <div class="metric-tag">Monthly · Closed Sales · Redfin</div>
+      <p class="metric-provider-def">The median price of homes that closed in the period. Half of sales closed above this price and half below.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> What homes actually sold for, not what sellers asked. Compare it with Median List Price to see how far asking prices sit from real sale prices.</div>
+    </div>
+
+    <div class="metric-card" id="redfin-homes-sold">
+      <div class="metric-name">Homes Sold (Redfin)</div>
+      <div class="metric-tag">Monthly · Count · Redfin</div>
+      <p class="metric-provider-def">The number of homes that closed in the period.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many sales actually happened. Falling sales with steady prices usually means buyers and sellers are stuck in a standoff.</div>
+    </div>
+
+    <div class="metric-card" id="redfin-inventory">
+      <div class="metric-name">Inventory (Redfin)</div>
+      <div class="metric-tag">Monthly · Count at Month End · Redfin</div>
+      <p class="metric-provider-def">The number of homes for sale and still active at the end of the period. Redfin's "active listings" counts every home that was for sale at any point during the month; inventory counts only the homes still for sale on the last day, which is why it is used for months of supply.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many homes a buyer could choose from at the end of the month.</div>
+    </div>
+
+    <div class="metric-card" id="redfin-months-supply">
+      <div class="metric-name">Months of Supply (Redfin)</div>
+      <div class="metric-tag">Monthly · Inventory ÷ Homes Sold · Redfin</div>
+      <p class="metric-provider-def">Inventory divided by the number of homes sold in the period. It estimates how many months it would take to sell every home currently for sale at the current pace of sales, with no new listings.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> Under about 4 months generally favors sellers, 4 to 6 months is roughly balanced, and over 6 months favors buyers.</div>
+    </div>
+
+    <div class="metric-card" id="redfin-new-listings">
+      <div class="metric-name">New Listings (Redfin)</div>
+      <div class="metric-tag">Monthly · Count · Redfin</div>
+      <p class="metric-provider-def">The number of homes newly listed for sale in the period.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many sellers are putting homes on the market. Rising new listings with flat sales means supply is building.</div>
+    </div>
+
+    <div class="metric-card" id="redfin-price-drops">
+      <div class="metric-name">Price Drop % (Redfin)</div>
+      <div class="metric-tag">Monthly · Share of Active Listings · Redfin</div>
+      <p class="metric-provider-def">The share of active listings that had a price drop during the period.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> How many sellers had to cut their price to attract buyers. It is similar to Price Cut % from Realtor.com but measured from Redfin's own listing data.</div>
+    </div>
+
+    <div class="metric-card yoy" id="redfin-yoy">
+      <div class="metric-name">Redfin YOY %</div>
+      <div class="metric-tag">Monthly · Year-over-Year Change</div>
+      <p class="metric-provider-def">Each Redfin metric above also has a YOY % version: the percent change from the same month one year earlier.</p>
+      <div class="metric-plain"><strong>In plain terms:</strong> Whether each number is higher or lower than it was a year ago, which removes normal seasonal swings.</div>
+    </div>
   </div>
 
   <!-- PROPSTREAM -->
