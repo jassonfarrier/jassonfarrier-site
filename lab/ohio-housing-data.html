@@ -536,7 +536,16 @@ const METRIC_MENU = [{"name": "Prices", "items": [{"m": "zhvi", "html": "<span c
 // Both menus are built from METRIC_MENU so they always show the same metrics, order and look.
 // YOY versions are not separate rows: the "Current | YOY change" switch flips every row.
 (function buildMetricMenus() {
-  const OPEN_BY_DEFAULT = new Set(['Prices', 'Supply', 'Demand']);
+  const OPEN_BY_DEFAULT = new Set(['Popular']);
+  // Popular: the key metrics up top; they also stay in their normal groups below
+  (function addPopular() {
+    const POPULAR = ['zhvi', 'active_listings', 'pending_ratio', 'delisted_pct', 'days_on_market',
+                     'rf_months_supply', 'rf_median_sale_price', 'price_reduced_pct'];
+    if (METRIC_MENU.length && METRIC_MENU[0].name === 'Popular') return;
+    const all = {}; METRIC_MENU.forEach(s => s.items.forEach(i => { all[i.m] = i; }));
+    const items = POPULAR.map(m => all[m]).filter(Boolean);
+    if (items.length) METRIC_MENU.unshift({name: 'Popular', items});
+  })();
   // Redfin breaks these three out by home type (US, states, large metros only)
   const HOME_TYPES = [['all', 'All home types'], ['sfr', 'Single-family'], ['th', 'Townhouse'], ['condo', 'Condo / co-op'], ['mf', '2–4 units']];
   const HOME_TYPE_BASES = new Set(['rf_median_sale_price','rf_sfr_median_sale_price','rf_th_median_sale_price','rf_condo_median_sale_price','rf_mf_median_sale_price', 'rf_homes_sold','rf_sfr_homes_sold','rf_th_homes_sold','rf_condo_homes_sold','rf_mf_homes_sold', 'rf_new_listings','rf_sfr_new_listings','rf_th_new_listings','rf_condo_new_listings','rf_mf_new_listings']);
@@ -4308,11 +4317,18 @@ document.addEventListener('change', function(e){
   const resize = () => { try { if (typeof map !== 'undefined' && map && map.resize) map.resize(); } catch (e) {} };
   setTimeout(resize, 50); setTimeout(resize, 600); window.addEventListener('resize', resize);
   // one menu: picking a metric (or YOY switch / home type) in the left menu also switches the chart
+  // remember which place the panel is showing, so a metric change redraws that place at any level
+  let shown = null;
+  ['openNationalModal', 'openNationalStateModal', 'openStateModal', 'openMetroModal', 'openModal', 'openZipModal'].forEach(name => {
+    const f = window[name]; if (typeof f !== 'function') return;
+    window[name] = function (...args) { shown = {name, args}; return f.apply(this, args); };
+  });
   function syncChart() {
     const m = (typeof mapMetric !== 'undefined') ? mapMetric : null;
-    if (!m) return;
-    const b = document.querySelector('#chart-tabs [data-cmetric="' + m + '"]');
-    if (b && !b.classList.contains('active')) b.click();
+    if (!m || !shown) return;
+    if (typeof chartMetric !== 'undefined' && chartMetric === m) return;
+    try { if (shown.name === 'openZipModal') selectedZip = shown.args[0]; } catch (e) {}
+    window[shown.name].apply(window, shown.args);
   }
   const menu = document.getElementById('metric-menu-map');
   if (menu) { menu.addEventListener('click', () => setTimeout(syncChart, 30)); menu.addEventListener('change', () => setTimeout(syncChart, 60)); }
