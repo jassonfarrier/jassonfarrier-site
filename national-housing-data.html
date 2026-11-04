@@ -54,6 +54,11 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
   #search-bar{left:0!important;right:0!important;top:0!important;transform:none!important;width:auto!important;min-width:0!important;max-width:none!important;border-radius:0!important;border-left:none!important;border-right:none!important;box-sizing:border-box!important}
   #search-bar .mode-pills{flex-wrap:wrap!important;overflow:visible!important;justify-content:center!important;row-gap:6px!important}
 }
+html.is-phone .upper-third{flex-direction:column!important;align-items:stretch!important}
+html.is-phone .upper-third-main{width:auto!important;flex-wrap:wrap!important}
+html.is-phone .upper-third-rank-section{width:auto!important;border-left:none!important;border-top:1px solid rgba(255,255,255,0.12)}
+html.is-phone .upper-third-rank{white-space:normal!important}
+html.is-phone .upper-third-rank .rk-part{display:block}
 /* market sliders (pending ratio + months of supply) */
 .mkt-sliders{font-family:Montserrat,sans-serif;background:#edf2fb;border-radius:12px;padding:12px 12px 11px;margin-bottom:12px}
 .mkt-axis{display:flex;justify-content:space-between;font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:9px}
@@ -461,17 +466,35 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 <script>
 
 // ---- Phone-only chart spacing: desktop (wider than 768px) keeps the exact original spacing ----
-function _isPhone() { return window.innerWidth <= 768; }
+// phone = narrow window, OR a small touch screen (catches iPhones showing the zoomed/desktop layout)
+function _isPhone() {
+  if (window.innerWidth <= 768) return true;
+  const s = Math.min(screen.width || 9999, screen.height || 9999);
+  return s <= 600 && !!(window.matchMedia && matchMedia('(pointer: coarse)').matches);
+}
+document.documentElement.classList.toggle('is-phone', _isPhone());
+// phone width actually available for a chart (screen-based, so a zoomed desktop layout still spaces for a phone)
+function _phoneW(w) { const s = Math.min(screen.width || 9999, screen.height || 9999); return Math.min(w || 9999, Math.max(s - 100, 150)); }
+// phone: label only the latest point plus the high and the low
+function _phoneKeyPts(rows, get) {
+  const ok = rows.filter(r => get(r) != null && !isNaN(get(r)));
+  if (!ok.length) return [];
+  const last = ok[ok.length - 1];
+  let hi = ok[0], lo = ok[0];
+  ok.forEach(r => { if (get(r) > get(hi)) hi = r; if (get(r) < get(lo)) lo = r; });
+  return [...new Set([lo, hi, last])];
+}
 // years to label: desktop = every other year (or all, when deskAll); phone = spaced to fit, always ending on the latest year
 function _yearsToLabel(years, w, px, deskAll) {
   if (!_isPhone()) return deskAll ? years : years.filter((_, i) => i % 2 === 0);
+  w = _phoneW(w);
   const n = years.length, step = Math.max(2, Math.ceil(n * px / Math.max(w || 0, 1)));
   return years.filter((_, i) => (n - 1 - i) % step === 0);
 }
 // time-axis year step: desktop 2, phone spaced to fit
 function _mobYearStep(x) {
   if (!_isPhone()) return 2;
-  const d = x.domain(), r = x.range(), span = (d[1] - d[0]) / 31557600000, w = Math.abs(r[1] - r[0]);
+  const d = x.domain(), r = x.range(), span = (d[1] - d[0]) / 31557600000, w = _phoneW(Math.abs(r[1] - r[0]));
   return Math.max(2, Math.ceil(span * 34 / Math.max(w, 1)));
 }
 // band/point year axes: desktop shows every year (null = d3 default); phone spaced to fit
@@ -1128,7 +1151,7 @@ function renderRankBadge(mode, id, metric) {
       const {rank: sRank, total: sTotal} = computeRank(stateVals, metric, targetVal);
       html += ` · ${sRank}<sup>${_ordSuffix(sRank)}</sup> of ${sTotal} in ${targetStateId}`;
     }
-    el.innerHTML = html + ` · ${label}`;
+    el.innerHTML = _isPhone() ? (html + ' · ' + label).split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html + ` · ${label}`;
   } else if (mode === 'zip') {
     // Permits aren't tracked at zip level — skip.
     if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { hide(); return; }
@@ -1154,7 +1177,7 @@ function renderRankBadge(mode, id, metric) {
       const natPct = Math.max(1, Math.round((zd.national_rank / zd.national_total) * 100));
       html += ` · Top ${natPct}% of ${zd.national_total.toLocaleString()} nationally`;
     }
-    el.innerHTML = html + ` · ${label}`;
+    el.innerHTML = _isPhone() ? (html + ' · ' + label).split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html + ` · ${label}`;
   } else if (mode === 'metro') {
     if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { hide(); return; }
     const vals = [], stateVals = [];
@@ -1185,7 +1208,7 @@ function renderRankBadge(mode, id, metric) {
       const {rank: sRank, total: sTotal} = computeRank(stateVals, metric, targetVal);
       html += ` · ${sRank}<sup>${_ordSuffix(sRank)}</sup> of ${sTotal} in ${targetStateId}`;
     }
-    el.innerHTML = html + ` · ${label}`;
+    el.innerHTML = _isPhone() ? (html + ' · ' + label).split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html + ` · ${label}`;
   } else {
     hide();
   }
@@ -1673,7 +1696,7 @@ function drawLineChart(county, cmetric) {
   const latestMonth = history[history.length-1].date.split('-')[1];
   const allYears = [...new Set(history.map(r=>r.date.slice(0,4)))].sort();
   const labelYears = new Set(_yearsToLabel(allYears, iw, 44).concat([allYears[allYears.length-1]]));
-  const annualPts = history.filter((r,i) => {
+  const annualPts = _isPhone() ? _phoneKeyPts(history, r => r[cmetric]) : history.filter((r,i) => {
     if (i === history.length-1) return true;
     const [yr, mo] = r.date.split('-');
     return labelYears.has(yr) && mo === latestMonth;
@@ -3092,7 +3115,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip, keepSlider) {
     .style('cursor','pointer');
 
   // Value labels on labeled years
-  g.selectAll('.alc-lbl').data(rows.filter(r=>labelSet.has(r.date.slice(0,4)))).join('text')
+  g.selectAll('.alc-lbl').data(_isPhone() ? _phoneKeyPts(rows, r => r[cmetric]) : rows.filter(r=>labelSet.has(r.date.slice(0,4)))).join('text')
     .attr('class','alc-lbl')
     .attr('x', r=>x(r.date.slice(0,4)))
     .attr('y', r=>y(r[cmetric])-15)
