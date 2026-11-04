@@ -44,6 +44,28 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 .yoy-btn .mn{font-size:10px;color:rgba(26,26,46,0.65)}
 .yoy-btn.active{background:#dce8f7;border-color:#0D1E42}
 .yoy-btn.active .mn{color:#0D1E42;font-weight:700}
+/* metric menu (shared by map sidebar and chart sidebar) */
+.yoy-switch{display:flex;background:#e9edf3;border-radius:8px;padding:3px;margin:2px 0 8px;gap:3px}
+.yoy-opt{flex:1;border:none;background:transparent;border-radius:6px;padding:7px 4px;font-family:Montserrat,sans-serif;font-size:10px;font-weight:600;color:rgba(13,30,66,0.55);cursor:pointer;transition:all .15s}
+.yoy-opt.on{background:#fff;color:#0D1E42;box-shadow:0 1px 3px rgba(0,0,0,0.12)}
+.menu-sec{margin-bottom:2px}
+.menu-sec-head{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;cursor:pointer;padding:10px 3px 5px;font-family:Montserrat,sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.45)}
+.menu-sec-head:hover{color:#0D1E42}
+.menu-chev{width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg);margin-right:4px;transition:transform .15s}
+.menu-sec.collapsed .menu-chev{transform:rotate(-45deg)}
+.menu-sec-body{display:flex;flex-direction:column;gap:4px}
+.menu-sec.collapsed .menu-sec-body{display:none}
+.metric-btn.yoy-ver{display:none}
+.show-yoy .metric-btn.yoy-ver{display:block}
+.show-yoy .metric-btn.has-yoy{display:none}
+.show-yoy .metric-btn.no-yoy-ver{opacity:0.45}
+.metric-btn.no-data{opacity:0.4}
+.metric-btn.no-data .md::after{content:' · no data at this level'}
+/* chart sidebar rows look exactly like the map sidebar rows */
+#chart-tabs .metric-btn.chart-tab{background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:6px;padding:10px 12px;font-weight:400;color:inherit;position:relative}
+#chart-tabs .metric-btn.chart-tab:hover{background:#edf2fb;border-color:rgba(26,82,150,0.3)}
+#chart-tabs .metric-btn.chart-tab.active{background:#dce8f7;border-color:#0D1E42}
+#chart-tabs .md{display:inline}
 .sidebar hr{border:none;border-top:1px solid rgba(0,0,0,0.07);margin:5px 0}
 .src{font-size:8px;color:rgba(0,0,0,0.28);line-height:1.7;padding:0 3px;margin-top:auto;padding-top:12px}
 .hint{font-size:9px;color:rgba(26,82,150,0.6);padding:8px 10px;background:rgba(26,82,150,0.05);border-radius:5px;line-height:1.5;margin-top:4px}
@@ -266,72 +288,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 </div>
 
 <div id="mobile-metric-bar">
-  <select id="metric-select-mobile">
-    <option value="zhvi">SFH Home Value</option>
-    <option value="median_list_price">Median List Price</option>
-    <option value="rf_median_sale_price">Median Sale Price (Redfin)</option>
-    <option value="rf_median_sale_price_yoy">Median Sale Price YOY % (Redfin)</option>
-    <option value="zhvi_yoy">SFH Home Value YOY %</option>
-    <option value="zhvi_condo">Condo Home Value</option>
-    <option value="zhvi_condo_yoy">Condo Home Value YOY %</option>
-    <option value="zori">Rent</option>
-    <option value="zori_yoy">Rent YOY %</option>
-    <option value="active_listings">Active Listings</option>
-    <option value="new_listings">New Listings</option>
-    <option value="active_listings_yoy">Active Listings YOY %</option>
-    <option value="rf_inventory">Inventory (Redfin)</option>
-    <option value="rf_inventory_yoy">Inventory YOY % (Redfin)</option>
-    <option value="rf_months_supply">Months of Supply (Redfin)</option>
-    <option value="rf_months_supply_yoy">Months of Supply YOY % (Redfin)</option>
-    <option value="new_listings_yoy">New Listings YOY %</option>
-    <option value="rf_new_listings">New Listings (Redfin)</option>
-    <option value="rf_new_listings_yoy">New Listings YOY % (Redfin)</option>
-    <option value="pending_listings">Pending Sales</option>
-    <option value="pending_listings_yoy">Pending Sales YOY %</option>
-    <option value="rf_homes_sold">Homes Sold (Redfin)</option>
-    <option value="rf_homes_sold_yoy">Homes Sold YOY % (Redfin)</option>
-    <option value="pending_ratio">Pending Ratio</option>
-    <option value="pending_ratio_yoy">Pending Ratio YOY %</option>
-    <option value="days_on_market">Days on Market</option>
-    <option value="days_on_market_yoy">Days on Market YOY %</option>
-    <option value="price_reduced_pct">Price Cut %</option>
-    <option value="price_reduced_pct_yoy">Price Cut % YOY</option>
-    <option value="rf_price_drop_pct">Price Drop % (Redfin)</option>
-    <option value="rf_price_drop_pct_yoy">Price Drop % YOY (Redfin)</option>
-    <option value="est_payment_20">Est. Payment (20% Down)</option>
-    <option value="relisted_pct">Relisted %</option>
-    <option value="cash_pct">All-Cash Sales %</option>
-    <option value="down_payment_pct">Median Down Payment %</option>
-    <option value="fha_pct">FHA Loan %</option>
-    <option value="va_pct">VA Loan %</option>
-    <option value="investor_purchases">Investor Purchases</option>
-    <option value="investor_market_share">Investor Market Share %</option>
-    <option value="luxury_median_sale_price">Luxury Median Sale Price</option>
-    <option value="luxury_median_sale_price_yoy">Luxury Median Sale Price YOY %</option>
-    <option value="luxury_median_dom">Luxury Days on Market</option>
-    <option value="luxury_median_dom_yoy">Luxury Days on Market YOY %</option>
-    <option value="luxury_active_listings">Luxury Active Listings</option>
-    <option value="luxury_active_listings_yoy">Luxury Active Listings YOY %</option>
-    <option value="luxury_pending_sales">Luxury Pending Sales</option>
-    <option value="luxury_pending_sales_yoy">Luxury Pending Sales YOY %</option>
-    <option value="median_property_tax">Property Tax</option>
-    <option value="median_property_tax_yoy">Property Tax YOY %</option>
-    <option value="property_tax_rate">Tax Rate</option>
-    <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
-    <option value="sf_permits_per_1k">SF Permits / 1K</option>
-    <option value="mf_permits_per_1k">MF Permits / 1K</option>
-    <option value="total_permits_per_1k">Total Permits / 1K</option>
-    <option value="new_construction_price">New Construction Median Price</option>
-    <option value="new_construction_sqft">New Construction $/SqFt</option>
-    <option value="population">Population</option>
-    <option value="pop_change_pct">Population Change %</option>
-    <option value="net_migration">Net Migration</option>
-    <option value="intl_migration">International Migration</option>
-    <option value="domestic_migration">Domestic Migration</option>
-    <option value="moved_from_other_state">Moved From Another State</option>
-    <option value="moved_from_abroad">Moved From Abroad</option>
-    <option value="foreign_born_pct">Foreign-Born %</option>
-  </select>
+  <select id="metric-select-mobile"></select>
 </div>
 <div class="main">
   <div class="sidebar">
@@ -340,94 +297,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
       <div id="pending-ratio-badge-placeholder"></div>
     </div>
     <div class="sidebar-scroll">
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Prices</div>
-    <button class="metric-btn active" data-metric="zhvi"><span class="mn">SFH Home Value</span><span class="md">Zillow ZHVI single-family</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="median_list_price"><span class="mn">Median List Price</span><span class="md">Realtor.com asking price</span><a class="metric-help" href="/ohio-housing-data-methodology#median-list-price" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="rf_median_sale_price"><span class="mn">Median Sale Price (Redfin)</span><span class="md">Redfin · price homes actually sold for</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="rf_median_sale_price_yoy"><span class="mn">Median Sale Price YOY %</span><span class="md">Year-over-year change · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="zhvi_yoy"><span class="mn">SFH Home Value YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="zhvi_condo"><span class="mn">Condo Home Value</span><span class="md">Zillow ZHVI condo/co-op</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="zhvi_condo_yoy"><span class="mn">Condo Home Value YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#zhvi-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="zori"><span class="mn">Rent</span><span class="md">Zillow ZORI typical monthly rent</span></button>
-    <button class="metric-btn yoy-btn" data-metric="zori_yoy"><span class="mn">Rent YOY %</span><span class="md">Year-over-year change</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Supply</div>
-    <button class="metric-btn" data-metric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="mls_active_listings"><span class="mn">Active Listings (Central Ohio MLS)</span><span class="md">Homes for sale, Central Ohio MLS</span><a class="metric-help" href="/ohio-housing-data-methodology#mls-active-listings" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="new_listings"><span class="mn">New Listings</span><span class="md">New listings this month</span></button>
-    <button class="metric-btn yoy-btn" data-metric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#active-listings-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="rf_inventory"><span class="mn">Inventory (Redfin)</span><span class="md">Redfin · homes for sale at month end</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="rf_inventory_yoy"><span class="mn">Inventory YOY %</span><span class="md">Year-over-year change · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="rf_months_supply"><span class="mn">Months of Supply (Redfin)</span><span class="md">Redfin · months to sell all inventory</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="rf_months_supply_yoy"><span class="mn">Months of Supply YOY %</span><span class="md">Year-over-year change · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="new_listings_yoy"><span class="mn">New Listings YOY %</span><span class="md">Year-over-year change</span></button>
-    <button class="metric-btn" data-metric="rf_new_listings"><span class="mn">New Listings (Redfin)</span><span class="md">Redfin · homes newly listed in the month</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="rf_new_listings_yoy"><span class="mn">New Listings YOY %</span><span class="md">Year-over-year change · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Single-family permits per 1,000 residents</span></button>
-    <button class="metric-btn" data-metric="mf_permits_per_1k"><span class="mn">MF Permits / 1K</span><span class="md">Multifamily permits per 1,000 residents</span></button>
-    <button class="metric-btn" data-metric="total_permits_per_1k"><span class="mn">Total Permits / 1K</span><span class="md">All permits per 1,000 residents</span></button>
-    <button class="metric-btn" data-metric="delisted_pct"><span class="mn">Delisted %</span><span class="md">% of listings pulled off market · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#delisted-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="relisted_pct"><span class="mn">Relisted %</span><span class="md">% of delisted homes put back up · Redfin</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Demand</div>
-    <button class="metric-btn" data-metric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-sales" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-sales-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="rf_homes_sold"><span class="mn">Homes Sold (Redfin)</span><span class="md">Redfin · closed sales in the month</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="rf_homes_sold_yoy"><span class="mn">Homes Sold YOY %</span><span class="md">Year-over-year change · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="pending_ratio"><span class="mn">Pending Ratio</span><span class="md">Pending ÷ active listings</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-ratio" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="pending_ratio_yoy"><span class="mn">Pending Ratio YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#pending-ratio-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span><a class="metric-help" href="/ohio-housing-data-methodology#days-on-market" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#days-on-market-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span><a class="metric-help" href="/ohio-housing-data-methodology#price-cut" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#price-cut-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="rf_price_drop_pct"><span class="mn">Price Drop % (Redfin)</span><span class="md">Redfin · % of listings with a price drop</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="rf_price_drop_pct_yoy"><span class="mn">Price Drop % YOY</span><span class="md">Year-over-year change · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#redfin-market-data" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">% of pending sales cancelled · Redfin</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#cancellation-rate-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Affordability</div>
-    <button class="metric-btn" data-metric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">P&amp;I + tax + insurance · illustration only</span><a class="metric-help" href="/ohio-housing-data-methodology#est-payment" target="_blank" onclick="event.stopPropagation()">?</a></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Financing</div>
-    <button class="metric-btn" data-metric="cash_pct"><span class="mn">All-Cash Sales %</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-    <button class="metric-btn" data-metric="down_payment_pct"><span class="mn">Median Down Payment %</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-    <button class="metric-btn" data-metric="fha_pct"><span class="mn">FHA Loan %</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-    <button class="metric-btn" data-metric="va_pct"><span class="mn">VA Loan %</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Investor Activity</div>
-    <button class="metric-btn" data-metric="investor_purchases"><span class="mn">Investor Purchases</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-    <button class="metric-btn" data-metric="investor_market_share"><span class="mn">Investor Market Share %</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Luxury Market</div>
-    <button class="metric-btn" data-metric="luxury_median_sale_price"><span class="mn">Luxury Median Sale Price</span><span class="md">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span></button>
-    <button class="metric-btn yoy-btn" data-metric="luxury_median_sale_price_yoy"><span class="mn">Luxury Median Sale Price YOY %</span><span class="md">Year-over-year change</span></button>
-    <button class="metric-btn" data-metric="luxury_median_dom"><span class="mn">Luxury Days on Market</span><span class="md">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span></button>
-    <button class="metric-btn yoy-btn" data-metric="luxury_median_dom_yoy"><span class="mn">Luxury Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
-    <button class="metric-btn" data-metric="luxury_active_listings"><span class="mn">Luxury Active Listings</span><span class="md">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span></button>
-    <button class="metric-btn yoy-btn" data-metric="luxury_active_listings_yoy"><span class="mn">Luxury Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
-    <button class="metric-btn" data-metric="luxury_pending_sales"><span class="mn">Luxury Pending Sales</span><span class="md">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span></button>
-    <button class="metric-btn yoy-btn" data-metric="luxury_pending_sales_yoy"><span class="mn">Luxury Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Taxes</div>
-    <button class="metric-btn" data-metric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#property-tax-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-rate" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn yoy-btn" data-metric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-rate-yoy" target="_blank" onclick="event.stopPropagation()">?</a></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">New Construction</div>
-    <button class="metric-btn" data-metric="new_construction_price"><span class="mn">New Construction Median Price</span><span class="md">MLS closed sales, trailing 12mo · county/zip only</span><a class="metric-help" href="/ohio-housing-data-methodology#new-construction" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="new_construction_sqft"><span class="mn">New Construction $/SqFt</span><span class="md">MLS closed sales, trailing 12mo · county/zip only</span><a class="metric-help" href="/ohio-housing-data-methodology#new-construction" target="_blank" onclick="event.stopPropagation()">?</a></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Distress</div>
-    <button class="metric-btn" data-metric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">Tax delinquent properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">Tax delinquent as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#tax-delinquent-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="pre_fc"><span class="mn">Pre-Foreclosure</span><span class="md">Properties in pre-foreclosure</span><a class="metric-help" href="/ohio-housing-data-methodology#pre-foreclosure" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="pre_fc_pct"><span class="mn">Pre-Foreclosure %</span><span class="md">Pre-foreclosure as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#pre-foreclosure-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="upside_down"><span class="mn">Underwater</span><span class="md">Properties with negative equity</span><a class="metric-help" href="/ohio-housing-data-methodology#underwater" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="upside_down_pct"><span class="mn">Underwater %</span><span class="md">Underwater as % of total properties</span><a class="metric-help" href="/ohio-housing-data-methodology#underwater-pct" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="mortgage_30_60_pct"><span class="mn">Mortgages 30–60 Days Late %</span><span class="md">Share of Ohio mortgages 30 or 60 days past due · statewide only</span><a class="metric-help" href="/ohio-housing-data-methodology#mortgage-distress" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="mortgage_90_180_pct"><span class="mn">Mortgages 90–180 Days Late %</span><span class="md">Share of Ohio mortgages 90 to 180 days past due · statewide only</span><a class="metric-help" href="/ohio-housing-data-methodology#mortgage-distress" target="_blank" onclick="event.stopPropagation()">?</a></button>
-    <button class="metric-btn" data-metric="mortgage_fc_bk_pct"><span class="mn">Mortgage Foreclosure %</span><span class="md">Foreclosure, bankruptcy or deed-in-lieu · statewide only</span><a class="metric-help" href="/ohio-housing-data-methodology#mortgage-distress" target="_blank" onclick="event.stopPropagation()">?</a></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:10px 3px 4px;font-family:Montserrat,sans-serif">Population</div>
-    <button class="metric-btn" data-metric="population"><span class="mn">Population</span><span class="md">Total residents</span></button>
-    <button class="metric-btn" data-metric="pop_change_pct"><span class="mn">Population Change %</span><span class="md">Change from the prior year</span></button>
-    <button class="metric-btn" data-metric="net_migration"><span class="mn">Net Migration</span><span class="md">People moving in minus out</span></button>
-    <button class="metric-btn" data-metric="intl_migration"><span class="mn">International Migration</span><span class="md">Net immigration from abroad</span></button>
-    <button class="metric-btn" data-metric="domestic_migration"><span class="mn">Domestic Migration</span><span class="md">Net moves from other US counties</span></button>
-    <button class="metric-btn" data-metric="moved_from_other_state"><span class="mn">Moved From Another State</span><span class="md">Residents who moved in from another state (ZIP)</span></button>
-    <button class="metric-btn" data-metric="moved_from_abroad"><span class="mn">Moved From Abroad</span><span class="md">Residents who moved in from abroad (ZIP)</span></button>
-    <button class="metric-btn" data-metric="foreign_born_pct"><span class="mn">Foreign-Born %</span><span class="md">Share of residents born outside the US (ZIP)</span></button>
+    <div id="metric-menu-map" class="metric-menu"></div>
     <hr>
     <div style="padding:6px 3px 0;"><label style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;color:rgba(0,0,0,0.45);cursor:pointer;font-family:Montserrat,sans-serif"><input type="checkbox" id="dc-toggle" style="cursor:pointer;accent-color:#0d1e42"> Data Centers</label></div>
 
@@ -493,84 +363,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
     <div class="modal-body">
       <div class="modal-left">
         <div class="chart-label">Chart Type</div>
-        <select id="chart-metric-select-mobile" style="display:none;width:100%;margin-bottom:8px;padding:9px 14px;font-family:Montserrat,sans-serif;font-size:13px;font-weight:600;color:#0d1e42;background:#fff;border:1.5px solid #0d1e42;border-radius:8px;-webkit-appearance:none;appearance:none">
-          <option value="zhvi">SFH Home Value</option>
-          <option value="median_list_price">Median List Price</option>
-    <option value="rf_median_sale_price">Median Sale Price (Redfin)</option>
-    <option value="rf_median_sale_price_yoy">Median Sale Price YOY % (Redfin)</option>
-          <option value="zhvi_yoy">SFH Home Value YOY %</option>
-          <option value="zhvi_condo">Condo Home Value</option>
-          <option value="zhvi_condo_yoy">Condo Home Value YOY %</option>
-          <option value="zori">Rent</option>
-          <option value="zori_yoy">Rent YOY %</option>
-          <option value="active_listings">Active Listings</option>
-          <option value="new_listings">New Listings</option>
-          <option value="active_listings_yoy">Active Listings YOY %</option>
-    <option value="rf_inventory">Inventory (Redfin)</option>
-    <option value="rf_inventory_yoy">Inventory YOY % (Redfin)</option>
-    <option value="rf_months_supply">Months of Supply (Redfin)</option>
-    <option value="rf_months_supply_yoy">Months of Supply YOY % (Redfin)</option>
-          <option value="new_listings_yoy">New Listings YOY %</option>
-    <option value="rf_new_listings">New Listings (Redfin)</option>
-    <option value="rf_new_listings_yoy">New Listings YOY % (Redfin)</option>
-          <option value="pending_listings">Pending Sales</option>
-          <option value="pending_listings_yoy">Pending Sales YOY %</option>
-    <option value="rf_homes_sold">Homes Sold (Redfin)</option>
-    <option value="rf_homes_sold_yoy">Homes Sold YOY % (Redfin)</option>
-          <option value="pending_ratio">Pending Ratio</option>
-          <option value="pending_ratio_yoy">Pending Ratio YOY %</option>
-          <option value="days_on_market">Days on Market</option>
-          <option value="days_on_market_yoy">Days on Market YOY %</option>
-          <option value="price_reduced_pct">Price Cut %</option>
-          <option value="price_reduced_pct_yoy">Price Cut % YOY</option>
-    <option value="rf_price_drop_pct">Price Drop % (Redfin)</option>
-    <option value="rf_price_drop_pct_yoy">Price Drop % YOY (Redfin)</option>
-          <option value="cancellation_pct">Cancellation Rate %</option>
-          <option value="cancellation_pct_yoy">Cancellation Rate YOY %</option>
-          <option value="est_payment_20">Est. Payment (20% Down)</option>
-          <option value="relisted_pct">Relisted %</option>
-          <option value="cash_pct">All-Cash Sales %</option>
-          <option value="down_payment_pct">Median Down Payment %</option>
-          <option value="fha_pct">FHA Loan %</option>
-          <option value="va_pct">VA Loan %</option>
-          <option value="investor_purchases">Investor Purchases</option>
-          <option value="investor_market_share">Investor Market Share %</option>
-          <option value="luxury_median_sale_price">Luxury Median Sale Price</option>
-          <option value="luxury_median_sale_price_yoy">Luxury Median Sale Price YOY %</option>
-          <option value="luxury_median_dom">Luxury Days on Market</option>
-          <option value="luxury_median_dom_yoy">Luxury Days on Market YOY %</option>
-          <option value="luxury_active_listings">Luxury Active Listings</option>
-          <option value="luxury_active_listings_yoy">Luxury Active Listings YOY %</option>
-          <option value="luxury_pending_sales">Luxury Pending Sales</option>
-          <option value="luxury_pending_sales_yoy">Luxury Pending Sales YOY %</option>
-          <option value="median_property_tax">Property Tax</option>
-          <option value="median_property_tax_yoy">Property Tax YOY %</option>
-          <option value="property_tax_rate">Tax Rate</option>
-          <option value="property_tax_rate_yoy">Tax Rate YOY %</option>
-          <option value="sf_permits_per_1k">SF Permits / 1K</option>
-          <option value="mf_permits_per_1k">MF Permits / 1K</option>
-          <option value="total_permits_per_1k">Total Permits / 1K</option>
-    <option value="new_construction_price">New Construction Median Price</option>
-    <option value="new_construction_sqft">New Construction $/SqFt</option>
-          <option value="delisted_pct">Delisted %</option>
-          <option value="tax_delinquent">Tax Delinquent</option>
-          <option value="tax_del_pct">Tax Delinquent %</option>
-          <option value="pre_fc">Pre-Foreclosure</option>
-          <option value="pre_fc_pct">Pre-Foreclosure %</option>
-          <option value="upside_down">Underwater</option>
-          <option value="upside_down_pct">Underwater %</option>
-          <option value="mortgage_30_60_pct">Mortgages 30–60 Days Late %</option>
-          <option value="mortgage_90_180_pct">Mortgages 90–180 Days Late %</option>
-          <option value="mortgage_fc_bk_pct">Mortgage Foreclosure %</option>
-          <option value="population">Population</option>
-          <option value="pop_change_pct">Population Change %</option>
-          <option value="net_migration">Net Migration</option>
-          <option value="intl_migration">International Migration</option>
-          <option value="domestic_migration">Domestic Migration</option>
-          <option value="moved_from_other_state">Moved From Another State</option>
-          <option value="moved_from_abroad">Moved From Abroad</option>
-          <option value="foreign_born_pct">Foreign-Born %</option>
-        </select>
+        <select id="chart-metric-select-mobile" style="display:none;width:100%;margin-bottom:8px;padding:9px 14px;font-family:Montserrat,sans-serif;font-size:13px;font-weight:600;color:#0d1e42;background:#fff;border:1.5px solid #0d1e42;border-radius:8px;-webkit-appearance:none;appearance:none"></select>
         <div class="modal-left-sticky"><div id="pending-ratio-badge" style="display:none;font-family:Montserrat,sans-serif;background:#edf2fb;border-radius:12px;padding:16px 12px 16px;margin-bottom:12px;">
           <svg viewBox="5 5 190 118" style="width:100%;display:block;margin:0 auto 8px;">
             <defs>
@@ -597,90 +390,7 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
           </div>
         </div></div><!-- end modal-left-sticky -->
         <div class="modal-left-scroll"><div class="chart-tabs" id="chart-tabs">
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Prices</div>
-          <button class="metric-btn chart-tab active" data-cmetric="zhvi"><span class="mn">SFH Home Value</span><span class="md">Zillow ZHVI single-family</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="median_list_price"><span class="mn">Median List Price</span><span class="md">Realtor.com asking price</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="rf_median_sale_price"><span class="mn">Median Sale Price (Redfin)</span><span class="md">Redfin · Jan 2012–present</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="rf_median_sale_price_yoy"><span class="mn">Median Sale Price YOY %</span><span class="md">Year-over-year change · Redfin</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_yoy"><span class="mn">SFH Home Value YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="zhvi_condo"><span class="mn">Condo Home Value</span><span class="md">Zillow ZHVI condo/co-op</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="zhvi_condo_yoy"><span class="mn">Condo Home Value YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="zori"><span class="mn">Rent</span><span class="md">Zillow ZORI typical monthly rent</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="zori_yoy"><span class="mn">Rent YOY %</span><span class="md">Year-over-year change</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Supply</div>
-          <button class="metric-btn chart-tab" data-cmetric="active_listings"><span class="mn">Active Listings</span><span class="md">Homes currently for sale</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="new_listings"><span class="mn">New Listings</span><span class="md">New listings this month</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="active_listings_yoy"><span class="mn">Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="rf_inventory"><span class="mn">Inventory (Redfin)</span><span class="md">Redfin · Jan 2012–present</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="rf_inventory_yoy"><span class="mn">Inventory YOY %</span><span class="md">Year-over-year change · Redfin</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="rf_months_supply"><span class="mn">Months of Supply (Redfin)</span><span class="md">Redfin · Jan 2012–present</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="rf_months_supply_yoy"><span class="mn">Months of Supply YOY %</span><span class="md">Year-over-year change · Redfin</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="new_listings_yoy"><span class="mn">New Listings YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="rf_new_listings"><span class="mn">New Listings (Redfin)</span><span class="md">Redfin · Jan 2012–present</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="rf_new_listings_yoy"><span class="mn">New Listings YOY %</span><span class="md">Year-over-year change · Redfin</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="sf_permits_per_1k"><span class="mn">SF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 1990–2025</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="mf_permits_per_1k"><span class="mn">MF Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 1990–2025</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="total_permits_per_1k"><span class="mn">Total Permits / 1K</span><span class="md">Census BPS · per 1,000 residents · 1990–2025</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Demand</div>
-          <button class="metric-btn chart-tab" data-cmetric="pending_listings"><span class="mn">Pending Sales</span><span class="md">Homes under contract</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="pending_listings_yoy"><span class="mn">Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="rf_homes_sold"><span class="mn">Homes Sold (Redfin)</span><span class="md">Redfin · Jan 2012–present</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="rf_homes_sold_yoy"><span class="mn">Homes Sold YOY %</span><span class="md">Year-over-year change · Redfin</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="pending_ratio"><span class="mn">Pending Ratio</span><span class="md">Pending ÷ active listings · Realtor.com · 2016–present</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="pending_ratio_yoy"><span class="mn">Pending Ratio YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="days_on_market"><span class="mn">Days on Market</span><span class="md">Median days to go pending</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="days_on_market_yoy"><span class="mn">Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="price_reduced_pct"><span class="mn">Price Cut %</span><span class="md">% of listings with a cut</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="price_reduced_pct_yoy"><span class="mn">Price Cut % YOY</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="rf_price_drop_pct"><span class="mn">Price Drop % (Redfin)</span><span class="md">Redfin · Jan 2012–present</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="rf_price_drop_pct_yoy"><span class="mn">Price Drop % YOY</span><span class="md">Year-over-year change · Redfin</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Affordability</div>
-          <button class="metric-btn chart-tab" data-cmetric="est_payment_20"><span class="mn">Est. Payment (20% Down)</span><span class="md">Historical · illustration only</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Financing</div>
-          <button class="metric-btn chart-tab" data-cmetric="cash_pct"><span class="mn">All-Cash Sales %</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="down_payment_pct"><span class="mn">Median Down Payment %</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="fha_pct"><span class="mn">FHA Loan %</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="va_pct"><span class="mn">VA Loan %</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Investor Activity</div>
-          <button class="metric-btn chart-tab" data-cmetric="investor_purchases"><span class="mn">Investor Purchases</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="investor_market_share"><span class="mn">Investor Market Share %</span><span class="md">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Luxury Market</div>
-          <button class="metric-btn chart-tab" data-cmetric="luxury_median_sale_price"><span class="mn">Luxury Median Sale Price</span><span class="md">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="luxury_median_sale_price_yoy"><span class="mn">Luxury Median Sale Price YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="luxury_median_dom"><span class="mn">Luxury Days on Market</span><span class="md">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="luxury_median_dom_yoy"><span class="mn">Luxury Days on Market YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="luxury_active_listings"><span class="mn">Luxury Active Listings</span><span class="md">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="luxury_active_listings_yoy"><span class="mn">Luxury Active Listings YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="luxury_pending_sales"><span class="mn">Luxury Pending Sales</span><span class="md">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="luxury_pending_sales_yoy"><span class="mn">Luxury Pending Sales YOY %</span><span class="md">Year-over-year change</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Taxes</div>
-          <button class="metric-btn chart-tab" data-cmetric="median_property_tax"><span class="mn">Property Tax</span><span class="md">Median annual tax (Census ACS)</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="median_property_tax_yoy"><span class="mn">Property Tax YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="property_tax_rate"><span class="mn">Tax Rate</span><span class="md">Effective rate % of home value</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="property_tax_rate_yoy"><span class="mn">Tax Rate YOY %</span><span class="md">Year-over-year change</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Distress</div>
-          <button class="metric-btn chart-tab" data-cmetric="tax_delinquent"><span class="mn">Tax Delinquent</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="tax_del_pct"><span class="mn">Tax Delinquent %</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="pre_fc"><span class="mn">Pre-Foreclosure</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="pre_fc_pct"><span class="mn">Pre-Foreclosure %</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="upside_down"><span class="mn">Underwater</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="upside_down_pct"><span class="mn">Underwater %</span><span class="md">PropStream</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="mortgage_30_60_pct"><span class="mn">Mortgages 30–60 Days Late %</span><span class="md">FHFA NMDB · statewide only</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="mortgage_90_180_pct"><span class="mn">Mortgages 90–180 Days Late %</span><span class="md">FHFA NMDB · statewide only</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="mortgage_fc_bk_pct"><span class="mn">Mortgage Foreclosure %</span><span class="md">FHFA NMDB · statewide only</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="cancellation_pct"><span class="mn">Cancellation Rate %</span><span class="md">Redfin · Apr 2015–Jul 2026</span></button>
-          <button class="metric-btn yoy-btn chart-tab" data-cmetric="cancellation_pct_yoy"><span class="mn">Cancellation Rate YOY %</span><span class="md">Year-over-year change</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="delisted_pct"><span class="mn">Delisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="relisted_pct"><span class="mn">Relisted %</span><span class="md">Redfin · Jan 2012–Jul 2026</span></button>
-<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(0,0,0,0.35);padding:8px 3px 3px;font-family:Montserrat,sans-serif">Population</div>
-          <button class="metric-btn chart-tab" data-cmetric="population"><span class="mn">Population</span><span class="md">Census · state/county/metro since 2000, ZIP 2021+</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="pop_change_pct"><span class="mn">Population Change %</span><span class="md">Census · since 2001</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="net_migration"><span class="mn">Net Migration</span><span class="md">Census · since 2011</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="intl_migration"><span class="mn">International Migration</span><span class="md">Census · since 2011</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="domestic_migration"><span class="mn">Domestic Migration</span><span class="md">Census · since 2011</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="moved_from_other_state"><span class="mn">Moved From Another State</span><span class="md">Census ACS · ZIP only · 2021+</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="moved_from_abroad"><span class="mn">Moved From Abroad</span><span class="md">Census ACS · ZIP only · 2021+</span></button>
-          <button class="metric-btn chart-tab" data-cmetric="foreign_born_pct"><span class="mn">Foreign-Born %</span><span class="md">Census ACS · ZIP only · 2021+</span></button>
+          
 
         </div></div><!-- end modal-left-scroll -->
       </div>
@@ -717,6 +427,178 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 </div><!-- /modal-overlay -->
 
 <script>
+const METRIC_MENU = [{"name": "Prices", "items": [{"m": "zhvi", "html": "<span class=\"mn\">SFH Home Value</span><span class=\"md\">Zillow ZHVI single-family</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#zhvi\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "zhvi_yoy", "html": "<span class=\"mn\">SFH Home Value YOY %</span><span class=\"md\">Year-over-year change</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#zhvi-yoy\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "zhvi_condo", "html": "<span class=\"mn\">Condo Home Value</span><span class=\"md\">Zillow ZHVI condo/co-op</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#zhvi\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "zhvi_condo_yoy", "html": "<span class=\"mn\">Condo Home Value YOY %</span><span class=\"md\">Year-over-year change</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#zhvi-yoy\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "median_list_price", "html": "<span class=\"mn\">Median List Price</span><span class=\"md\">Realtor.com asking price</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#median-list-price\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "rf_median_sale_price", "html": "<span class=\"mn\">Median Sale Price (Redfin)</span><span class=\"md\">Redfin · price homes actually sold for</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "rf_median_sale_price_yoy", "html": "<span class=\"mn\">Median Sale Price YOY %</span><span class=\"md\">Year-over-year change · Redfin</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "zori", "html": "<span class=\"mn\">Rent</span><span class=\"md\">Zillow ZORI typical monthly rent</span>", "yoy": {"m": "zori_yoy", "html": "<span class=\"mn\">Rent YOY %</span><span class=\"md\">Year-over-year change</span>"}}]}, {"name": "Supply", "items": [{"m": "active_listings", "html": "<span class=\"mn\">Active Listings</span><span class=\"md\">Homes currently for sale</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#active-listings\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "active_listings_yoy", "html": "<span class=\"mn\">Active Listings YOY %</span><span class=\"md\">Year-over-year change</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#active-listings-yoy\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "mls_active_listings", "html": "<span class=\"mn\">Active Listings (Central Ohio MLS)</span><span class=\"md\">Homes for sale, Central Ohio MLS</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#mls-active-listings\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "rf_inventory", "html": "<span class=\"mn\">Inventory (Redfin)</span><span class=\"md\">Redfin · homes for sale at month end</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "rf_inventory_yoy", "html": "<span class=\"mn\">Inventory YOY %</span><span class=\"md\">Year-over-year change · Redfin</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "rf_months_supply", "html": "<span class=\"mn\">Months of Supply (Redfin)</span><span class=\"md\">Redfin · months to sell all inventory</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "rf_months_supply_yoy", "html": "<span class=\"mn\">Months of Supply YOY %</span><span class=\"md\">Year-over-year change · Redfin</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "new_listings", "html": "<span class=\"mn\">New Listings</span><span class=\"md\">New listings this month</span>", "yoy": {"m": "new_listings_yoy", "html": "<span class=\"mn\">New Listings YOY %</span><span class=\"md\">Year-over-year change</span>"}}, {"m": "rf_new_listings", "html": "<span class=\"mn\">New Listings (Redfin)</span><span class=\"md\">Redfin · homes newly listed in the month</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "rf_new_listings_yoy", "html": "<span class=\"mn\">New Listings YOY %</span><span class=\"md\">Year-over-year change · Redfin</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "delisted_pct", "html": "<span class=\"mn\">Delisted %</span><span class=\"md\">% of listings pulled off market · Redfin</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#delisted-pct\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "relisted_pct", "html": "<span class=\"mn\">Relisted %</span><span class=\"md\">% of delisted homes put back up · Redfin</span>"}]}, {"name": "Demand", "items": [{"m": "pending_listings", "html": "<span class=\"mn\">Pending Sales</span><span class=\"md\">Homes under contract</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#pending-sales\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "pending_listings_yoy", "html": "<span class=\"mn\">Pending Sales YOY %</span><span class=\"md\">Year-over-year change</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#pending-sales-yoy\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "rf_homes_sold", "html": "<span class=\"mn\">Homes Sold (Redfin)</span><span class=\"md\">Redfin · closed sales in the month</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "rf_homes_sold_yoy", "html": "<span class=\"mn\">Homes Sold YOY %</span><span class=\"md\">Year-over-year change · Redfin</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "pending_ratio", "html": "<span class=\"mn\">Pending Ratio</span><span class=\"md\">Pending ÷ active listings</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#pending-ratio\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "pending_ratio_yoy", "html": "<span class=\"mn\">Pending Ratio YOY %</span><span class=\"md\">Year-over-year change</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#pending-ratio-yoy\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "days_on_market", "html": "<span class=\"mn\">Days on Market</span><span class=\"md\">Median days to go pending</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#days-on-market\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "days_on_market_yoy", "html": "<span class=\"mn\">Days on Market YOY %</span><span class=\"md\">Year-over-year change</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#days-on-market-yoy\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "price_reduced_pct", "html": "<span class=\"mn\">Price Cut %</span><span class=\"md\">% of listings with a cut</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#price-cut\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "price_reduced_pct_yoy", "html": "<span class=\"mn\">Price Cut % YOY</span><span class=\"md\">Year-over-year change</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#price-cut-yoy\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "rf_price_drop_pct", "html": "<span class=\"mn\">Price Drop % (Redfin)</span><span class=\"md\">Redfin · % of listings with a price drop</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "rf_price_drop_pct_yoy", "html": "<span class=\"mn\">Price Drop % YOY</span><span class=\"md\">Year-over-year change · Redfin</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#redfin-market-data\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "cancellation_pct", "html": "<span class=\"mn\">Cancellation Rate %</span><span class=\"md\">% of pending sales cancelled · Redfin</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#cancellation-rate\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "cancellation_pct_yoy", "html": "<span class=\"mn\">Cancellation Rate YOY %</span><span class=\"md\">Year-over-year change</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#cancellation-rate-yoy\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}]}, {"name": "Affordability", "items": [{"m": "est_payment_20", "html": "<span class=\"mn\">Est. Payment (20% Down)</span><span class=\"md\">P&amp;I + tax + insurance · illustration only</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#est-payment\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}]}, {"name": "Financing", "items": [{"m": "cash_pct", "html": "<span class=\"mn\">All-Cash Sales %</span><span class=\"md\">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span>"}, {"m": "down_payment_pct", "html": "<span class=\"mn\">Median Down Payment %</span><span class=\"md\">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span>"}, {"m": "fha_pct", "html": "<span class=\"mn\">FHA Loan %</span><span class=\"md\">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span>"}, {"m": "va_pct", "html": "<span class=\"mn\">VA Loan %</span><span class=\"md\">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span>"}]}, {"name": "Investor Activity", "items": [{"m": "investor_purchases", "html": "<span class=\"mn\">Investor Purchases</span><span class=\"md\">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span>"}, {"m": "investor_market_share", "html": "<span class=\"mn\">Investor Market Share %</span><span class=\"md\">Redfin · Columbus, Cleveland &amp; Cincinnati metros only</span>"}]}, {"name": "Luxury Market", "items": [{"m": "luxury_median_sale_price", "html": "<span class=\"mn\">Luxury Median Sale Price</span><span class=\"md\">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span>", "yoy": {"m": "luxury_median_sale_price_yoy", "html": "<span class=\"mn\">Luxury Median Sale Price YOY %</span><span class=\"md\">Year-over-year change</span>"}}, {"m": "luxury_median_dom", "html": "<span class=\"mn\">Luxury Days on Market</span><span class=\"md\">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span>", "yoy": {"m": "luxury_median_dom_yoy", "html": "<span class=\"mn\">Luxury Days on Market YOY %</span><span class=\"md\">Year-over-year change</span>"}}, {"m": "luxury_active_listings", "html": "<span class=\"mn\">Luxury Active Listings</span><span class=\"md\">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span>", "yoy": {"m": "luxury_active_listings_yoy", "html": "<span class=\"mn\">Luxury Active Listings YOY %</span><span class=\"md\">Year-over-year change</span>"}}, {"m": "luxury_pending_sales", "html": "<span class=\"mn\">Luxury Pending Sales</span><span class=\"md\">Redfin · Top 5% tier · Ohio &amp; the 3 major metros</span>", "yoy": {"m": "luxury_pending_sales_yoy", "html": "<span class=\"mn\">Luxury Pending Sales YOY %</span><span class=\"md\">Year-over-year change</span>"}}]}, {"name": "Taxes", "items": [{"m": "median_property_tax", "html": "<span class=\"mn\">Property Tax</span><span class=\"md\">Median annual tax (Census ACS)</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#property-tax\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "median_property_tax_yoy", "html": "<span class=\"mn\">Property Tax YOY %</span><span class=\"md\">Year-over-year change</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#property-tax-yoy\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}, {"m": "property_tax_rate", "html": "<span class=\"mn\">Tax Rate</span><span class=\"md\">Effective rate % of home value</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#tax-rate\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>", "yoy": {"m": "property_tax_rate_yoy", "html": "<span class=\"mn\">Tax Rate YOY %</span><span class=\"md\">Year-over-year change</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#tax-rate-yoy\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}}]}, {"name": "New Construction", "items": [{"m": "new_construction_price", "html": "<span class=\"mn\">New Construction Median Price</span><span class=\"md\">MLS closed sales, trailing 12mo · county/zip only</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#new-construction\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "new_construction_sqft", "html": "<span class=\"mn\">New Construction $/SqFt</span><span class=\"md\">MLS closed sales, trailing 12mo · county/zip only</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#new-construction\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "sf_permits_per_1k", "html": "<span class=\"mn\">SF Permits / 1K</span><span class=\"md\">Single-family permits per 1,000 residents</span>"}, {"m": "mf_permits_per_1k", "html": "<span class=\"mn\">MF Permits / 1K</span><span class=\"md\">Multifamily permits per 1,000 residents</span>"}, {"m": "total_permits_per_1k", "html": "<span class=\"mn\">Total Permits / 1K</span><span class=\"md\">All permits per 1,000 residents</span>"}]}, {"name": "Distress", "items": [{"m": "tax_delinquent", "html": "<span class=\"mn\">Tax Delinquent</span><span class=\"md\">Tax delinquent properties</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#tax-delinquent\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "tax_del_pct", "html": "<span class=\"mn\">Tax Delinquent %</span><span class=\"md\">Tax delinquent as % of total properties</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#tax-delinquent-pct\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "pre_fc", "html": "<span class=\"mn\">Pre-Foreclosure</span><span class=\"md\">Properties in pre-foreclosure</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#pre-foreclosure\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "pre_fc_pct", "html": "<span class=\"mn\">Pre-Foreclosure %</span><span class=\"md\">Pre-foreclosure as % of total properties</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#pre-foreclosure-pct\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "upside_down", "html": "<span class=\"mn\">Underwater</span><span class=\"md\">Properties with negative equity</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#underwater\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "upside_down_pct", "html": "<span class=\"mn\">Underwater %</span><span class=\"md\">Underwater as % of total properties</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#underwater-pct\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "mortgage_30_60_pct", "html": "<span class=\"mn\">Mortgages 30–60 Days Late %</span><span class=\"md\">Share of Ohio mortgages 30 or 60 days past due · statewide only</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#mortgage-distress\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "mortgage_90_180_pct", "html": "<span class=\"mn\">Mortgages 90–180 Days Late %</span><span class=\"md\">Share of Ohio mortgages 90 to 180 days past due · statewide only</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#mortgage-distress\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}, {"m": "mortgage_fc_bk_pct", "html": "<span class=\"mn\">Mortgage Foreclosure %</span><span class=\"md\">Foreclosure, bankruptcy or deed-in-lieu · statewide only</span><a class=\"metric-help\" href=\"/ohio-housing-data-methodology#mortgage-distress\" target=\"_blank\" onclick=\"event.stopPropagation()\">?</a>"}]}, {"name": "Population", "items": [{"m": "population", "html": "<span class=\"mn\">Population</span><span class=\"md\">Total residents</span>"}, {"m": "pop_change_pct", "html": "<span class=\"mn\">Population Change %</span><span class=\"md\">Change from the prior year</span>"}, {"m": "net_migration", "html": "<span class=\"mn\">Net Migration</span><span class=\"md\">People moving in minus out</span>"}, {"m": "intl_migration", "html": "<span class=\"mn\">International Migration</span><span class=\"md\">Net immigration from abroad</span>"}, {"m": "domestic_migration", "html": "<span class=\"mn\">Domestic Migration</span><span class=\"md\">Net moves from other US counties</span>"}, {"m": "moved_from_other_state", "html": "<span class=\"mn\">Moved From Another State</span><span class=\"md\">Residents who moved in from another state (ZIP)</span>"}, {"m": "moved_from_abroad", "html": "<span class=\"mn\">Moved From Abroad</span><span class=\"md\">Residents who moved in from abroad (ZIP)</span>"}, {"m": "foreign_born_pct", "html": "<span class=\"mn\">Foreign-Born %</span><span class=\"md\">Share of residents born outside the US (ZIP)</span>"}]}];
+// ===== Metric menu (one list -> map sidebar, chart sidebar, both phone dropdowns) =====
+// Both menus are built from METRIC_MENU so they always show the same metrics, order and look.
+// YOY versions are not separate rows: the "Current | YOY change" switch flips every row.
+(function buildMetricMenus() {
+  const OPEN_BY_DEFAULT = new Set(['Prices', 'Supply', 'Demand']);
+  const LEVEL_NAME = {national:'national', state:'state', metro:'metro', county:'county', zip:'ZIP code'};
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function txt(html) { const d = document.createElement('div'); d.innerHTML = html; const mn = d.querySelector('.mn'); return (mn ? mn.textContent : d.textContent).trim(); }
+
+  function menuHTML(attr, extraCls) {
+    let h = '<div class="yoy-switch" role="group" aria-label="Show value or year-over-year change">' +
+            '<button type="button" class="yoy-opt on" data-yoy="0">Current</button>' +
+            '<button type="button" class="yoy-opt" data-yoy="1">YOY change</button></div>';
+    METRIC_MENU.forEach(sec => {
+      const open = OPEN_BY_DEFAULT.has(sec.name);
+      h += `<div class="menu-sec${open ? '' : ' collapsed'}" data-sec="${esc(sec.name)}">` +
+           `<button type="button" class="menu-sec-head"><span>${sec.name}</span><span class="menu-chev"></span></button><div class="menu-sec-body">`;
+      sec.items.forEach(it => {
+        h += `<button class="${extraCls}${it.yoy ? ' has-yoy' : ' no-yoy-ver'}" ${attr}="${it.m}">${it.html}</button>`;
+        if (it.yoy) h += `<button class="${extraCls} yoy-ver" ${attr}="${it.yoy.m}">${it.yoy.html}</button>`;
+      });
+      h += '</div></div>';
+    });
+    return h;
+  }
+  function optionsHTML() {
+    let h = '';
+    METRIC_MENU.forEach(sec => {
+      h += `<optgroup label="${esc(sec.name)}">`;
+      sec.items.forEach(it => {
+        h += `<option value="${it.m}">${esc(txt(it.html))}</option>`;
+        if (it.yoy) h += `<option value="${it.yoy.m}">${esc(txt(it.yoy.html))}</option>`;
+      });
+      h += '</optgroup>';
+    });
+    return h;
+  }
+
+  const mapMenu = document.getElementById('metric-menu-map');
+  const chartMenu = document.getElementById('chart-tabs');
+  mapMenu.innerHTML = menuHTML('data-metric', 'metric-btn');
+  chartMenu.innerHTML = menuHTML('data-cmetric', 'metric-btn chart-tab');
+  ['metric-select-mobile', 'chart-metric-select-mobile'].forEach(id => {
+    const s = document.getElementById(id); if (s) s.innerHTML = optionsHTML();
+  });
+  const first = mapMenu.querySelector('[data-metric="zhvi"]'); if (first) first.classList.add('active');
+  const firstC = chartMenu.querySelector('[data-cmetric="zhvi"]'); if (firstC) firstC.classList.add('active');
+
+  // --- YOY switch: each menu shows either value rows or YOY rows ---
+  function attrOf(menu) { return menu === mapMenu ? 'data-metric' : 'data-cmetric'; }
+  function setYoyView(menu, on) {
+    menu.classList.toggle('show-yoy', on);
+    menu.querySelectorAll('.yoy-opt').forEach(b => b.classList.toggle('on', (b.dataset.yoy === '1') === on));
+  }
+  function activeBtn(menu) { return menu.querySelector('.metric-btn.active'); }
+  function counterpart(menu, btn, wantYoy) {
+    const a = attrOf(menu), m = btn.getAttribute(a);
+    const base = m.endsWith('_yoy') ? m.slice(0, -4) : m;
+    const target = wantYoy ? base + '_yoy' : base;
+    return menu.querySelector(`.metric-btn[${a}="${target}"]`);
+  }
+  [mapMenu, chartMenu].forEach(menu => {
+    menu.addEventListener('click', e => {
+      const opt = e.target.closest('.yoy-opt');
+      if (opt) {
+        const wantYoy = opt.dataset.yoy === '1';
+        setYoyView(menu, wantYoy);
+        const cur = activeBtn(menu);
+        if (cur) { const t = counterpart(menu, cur, wantYoy); if (t && t !== cur) t.click(); }
+        return;
+      }
+      const head = e.target.closest('.menu-sec-head');
+      if (head) {
+        const name = head.parentElement.dataset.sec;
+        const collapse = !head.parentElement.classList.contains('collapsed');
+        // keep both menus folded the same way
+        document.querySelectorAll(`.menu-sec[data-sec="${CSS.escape(name)}"]`).forEach(s => s.classList.toggle('collapsed', collapse));
+        return;
+      }
+      // a row with no YOY version clicked while in YOY view -> show it as a value
+      const b = e.target.closest('.metric-btn.no-yoy-ver');
+      if (b && menu.classList.contains('show-yoy')) setYoyView(menu, false);
+    }, true);
+    // Keep the switch and open sections in step with whatever row is active
+    // (rows also get activated by code, e.g. the chart opening on the map's metric).
+    let last = null;
+    new MutationObserver(() => {
+      const cur = activeBtn(menu);
+      if (!cur || cur === last) return;
+      last = cur;
+      if (cur.classList.contains('yoy-ver')) setYoyView(menu, true);
+      else if (cur.classList.contains('has-yoy')) setYoyView(menu, false);
+      const sec = cur.closest('.menu-sec');
+      if (sec && sec.classList.contains('collapsed')) sec.classList.remove('collapsed');
+    }).observe(menu, {subtree: true, attributes: true, attributeFilter: ['class']});
+  });
+
+  // --- Gray out rows with no data at the level being viewed ---
+  function levelRows(mode) {
+    try {
+      if (mode === 'county') return typeof DATA !== 'undefined' ? DATA : null;
+      if (mode === 'metro') return typeof METRO_DATA !== 'undefined' ? METRO_DATA : null;
+      if (mode === 'zip') return typeof ZIP_DATA !== 'undefined' ? ZIP_DATA : null;
+      if (mode === 'national') return (typeof NATIONAL_DATA !== 'undefined' && NATIONAL_DATA) ? [NATIONAL_DATA] : null;
+      if (mode === 'state') {
+        if (typeof NATIONAL_STATES !== 'undefined' && NATIONAL_STATES && NATIONAL_STATES.length) return NATIONAL_STATES;
+        return (typeof STATE_DATA !== 'undefined' && STATE_DATA) ? [STATE_DATA] : null;
+      }
+    } catch (e) {}
+    return null;
+  }
+  // metrics computed or charted from data that isn't on the map rows
+  const EXTRA_LEVELS = {
+    est_payment_20: ['state', 'metro', 'county', 'zip'],   // needs the statewide mortgage rate, loaded on demand
+    mls_active_listings: ['state'],                         // Central Ohio MLS, statewide series
+  };
+  const cache = {};
+  function hasData(mode, metric) {
+    const rows = levelRows(mode);
+    if (rows && rows.length) {
+      const key = mode + '|' + rows.length + '|' + metric;
+      if (key in cache) return cache[key];
+      let ok = false;
+      for (let i = 0; i < rows.length && !ok; i++) {
+        try { ok = rows[i] && getMetricVal(rows[i], metric) != null; } catch (e) {}
+      }
+      // a metric whose chart builds from history may have no map value yet -- also count its YOY partner
+      if (!ok && !metric.endsWith('_yoy')) {
+        for (let i = 0; i < rows.length && !ok; i++) {
+          try { ok = rows[i] && getMetricVal(rows[i], metric + '_yoy') != null; } catch (e) {}
+        }
+      }
+      // the page's own coverage list wins when it says this level has the metric
+      // (some metrics only chart from history and have no current map value)
+      if (!ok && typeof METRIC_MODES !== 'undefined' && METRIC_MODES[metric] && METRIC_MODES[metric].includes(mode)) ok = true;
+      if (!ok && EXTRA_LEVELS[metric] && EXTRA_LEVELS[metric].includes(mode)) ok = true;
+      if (ok) cache[key] = true;   // only remember "has data" -- a level may still be loading
+      return ok;
+    }
+    const modes = (typeof METRIC_MODES !== 'undefined' && METRIC_MODES[metric]) || null;
+    return modes ? modes.includes(mode) : true;
+  }
+  window.updateMenuAvailability = function () {
+    const mode = typeof mapMode !== 'undefined' ? mapMode : 'county';
+    [mapMenu, chartMenu].forEach(menu => {
+      const a = attrOf(menu);
+      menu.querySelectorAll('.metric-btn').forEach(btn => {
+        const m = btn.getAttribute(a);
+        const ok = hasData(mode, m);
+        btn.classList.toggle('no-data', !ok);
+        btn.title = ok ? '' : 'No data at the ' + (LEVEL_NAME[mode] || mode) + ' level';
+      });
+    });
+  };
+  // re-check when the level buttons change and again as that level's data arrives
+  let _t = [];
+  function scheduleAvailability() {
+    _t.forEach(clearTimeout);
+    _t = [150, 1500, 4000, 9000].map(ms => setTimeout(() => { try { updateMenuAvailability(); } catch (e) {} }, ms));
+  }
+  document.querySelectorAll('.mode-pill').forEach(p =>
+    new MutationObserver(scheduleAvailability).observe(p, {attributes: true, attributeFilter: ['class']}));
+  scheduleAvailability();
+  // and whenever the map recolors (data finished loading)
+  const _rc = window.renderColors;
+  if (typeof _rc === 'function') {
+    window.renderColors = function () { const r = _rc.apply(this, arguments); try { updateMenuAvailability(); } catch (e) {} return r; };
+  }
+})();
+// ===== end metric menu =====
+
 mapboxgl.accessToken = 'pk.eyJ1IjoiamFzc29uZmFy'
   + 'cmllciIsImEiOiJjbWx1eTF5bDYwMmUx'
   + 'M2VuMGdhcWJ3b2ZjIn0.P30w3CmMyaDkBzumr5NyWg';
