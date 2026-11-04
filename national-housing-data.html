@@ -3759,7 +3759,8 @@ function loadNationalStatesData() {
     nationalStatesMap = {};
     NATIONAL_STATES.forEach(d => { attachYOY(d); nationalStatesMap[d.state] = d; });
     nationalStatesLoaded = true;
-    renderColors('state');
+    // the US view also needs the states (for its color scale) -- redraw whichever view is showing
+    renderColors(mapMode === 'national' ? 'national' : 'state');
   }).catch(err => console.error('National states data load error:', err));
 }
 
