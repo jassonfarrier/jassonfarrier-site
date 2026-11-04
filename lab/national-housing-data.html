@@ -5319,7 +5319,7 @@ function _mapLabel(metric, val, isYOY, isPayment) {
     ];
   }
   const TABS = [
-    {t: 'Market Direction', title: 'Market Direction', sub: "Buyer's or seller's market, from 5 market signals", fn: directionSignals,
+    {t: 'Market Status', title: 'Market Status', sub: "Buyer's or seller's market, from 5 market signals", fn: directionSignals,
      hi: 'Sellers', mid: 'Balanced', lo: 'Buyers', big: s => s > 0.2 ? ["Seller's market", 'up'] : s < -0.2 ? ["Buyer's market", 'down'] : ['Balanced market', ''],
      v: s => s > 0.15 ? ["Seller's advantage", 'up'] : s < -0.15 ? ["Buyer's advantage", 'down'] : ['Neutral', 'mid'], cmp: 'Hotter than'},
     {t: 'Investor View', title: 'Investor View', sub: 'How the numbers work for a rental purchase', fn: investorSignals,
