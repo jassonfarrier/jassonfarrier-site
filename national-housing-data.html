@@ -330,6 +330,14 @@ html.is-phone .upper-third-rank .rk-part{display:block}
 /* market sliders: Pending Ratio only (Months of Supply slider removed) */
 #mkt-mos{display:none!important}
 #mkt-pr{margin-bottom:0!important}
+/* Pending Ratio box: name + number on top, bar under it, Buyers/Sellers ends below; no source tag */
+.mkt-sliders{display:flex!important;flex-direction:column}
+#mkt-pr{order:1}
+.mkt-axis{order:2;margin:7px 0 0!important}
+#mkt-pr .src-tag{display:none!important}
+#mkt-pr .mkt-top{align-items:center!important;margin-bottom:8px!important}
+#mkt-pr .mkt-name{font-size:12px!important;letter-spacing:.3px!important;text-transform:none!important;color:#0d1e42!important;font-weight:800!important}
+#mkt-pr .mkt-val{font-size:24px!important}
 #line-chart .chart-card{transform-box:fill-box;transform-origin:center;transform:scale(.73)}
 </style>
 </head>
