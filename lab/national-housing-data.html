@@ -344,6 +344,11 @@ html.dock .cr-bar.on{display:flex}
 </style>
 
 <style id="cards-css">
+/* chart: fixed, roomy height in the panel so it never shrinks on big screens */
+html.dock .modal-body{flex:0 0 auto!important;min-height:auto!important}
+html.dock .modal-right{flex:0 0 auto!important;min-height:auto!important}
+html.dock .modal-right > *{flex-shrink:0!important}
+html.dock #line-chart{flex:0 0 auto!important;height:clamp(380px,50vh,600px)!important;min-height:0!important;width:100%!important}
 .snap{display:none;margin-top:14px;font-family:Montserrat,sans-serif}
 html.dock .snap.on{display:block}
 .snap-h{font-size:12px;font-weight:700;color:#0d1e42;margin:0 0 8px}
@@ -5131,8 +5136,8 @@ function _mapLabel(metric, val, isYOY, isPayment) {
   // same look everywhere; size follows the area (states largest, ZIPs smallest)
   const RULES = {
     'state-labels':    {min: 0,   size: ['interpolate', ['linear'], ['zoom'], 3, 13, 4.5, 16, 6, 20, 8, 26, 10, 32], field: twoLine('name')},
-    'metros-labels':   {min: 3.5, size: ['interpolate', ['linear'], ['zoom'], 3.5, 10, 5, 12, 6.5, 14, 8, 17, 10, 21], field: twoLineExpr(beforeComma('name'))},
-    'counties-labels': {min: 5.2, size: ['interpolate', ['linear'], ['zoom'], 5.2, 9, 6, 10.5, 7, 12.5, 8.5, 16, 10, 20, 12, 24], field: twoLine('county')},
+    'metros-labels':   {min: 5.6, size: ['interpolate', ['linear'], ['zoom'], 3.5, 10, 5, 12, 6.5, 14, 8, 17, 10, 21], field: twoLineExpr(beforeComma('name'))},
+    'counties-labels': {min: 6.6, size: ['interpolate', ['linear'], ['zoom'], 6.6, 11.5, 7.5, 13.5, 8.5, 16, 10, 20, 12, 24], field: twoLine('county')},
     'zips-labels':     {min: 7,   size: ['interpolate', ['linear'], ['zoom'], 7, 9, 8.5, 11, 10, 14, 12, 18], field: twoLineExpr(['to-string', ['get', 'zip']])}
   };
   let tries = 0;
@@ -5153,7 +5158,7 @@ function _mapLabel(metric, val, isYOY, isPayment) {
       } catch (e) { console.warn('label rule', id, e); }
     }
     // every county and metro label shows from about state-level zoom (wide national views keep clean spacing)
-    const FULL_AT = 6.0;
+    const FULL_AT = 6.6;
     const setOverlap = () => {
       const on = map.getZoom() >= FULL_AT;
       ['counties-labels', 'metros-labels'].forEach(id => {
