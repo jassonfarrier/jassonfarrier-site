@@ -85,6 +85,11 @@ nav{position:sticky;top:0;z-index:300;background:#fff;height:68px;flex-shrink:0;
 #chart-tabs .metric-btn.chart-tab.active{background:#dce8f7;border-color:#0D1E42}
 #chart-tabs .md{display:inline}
 #metric-menu-map .metric-btn,#chart-tabs .metric-btn.chart-tab{padding-right:28px;position:relative}
+
+.ht-pick{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-family:Montserrat,sans-serif;font-size:10px;font-weight:700;color:#0D1E42}
+.ht-pick span{white-space:nowrap}
+.ht-select{flex:1;min-width:0;padding:5px 6px;font-family:Montserrat,sans-serif;font-size:10.5px;font-weight:600;color:#0D1E42;background:#fff;border:1px solid rgba(13,30,66,0.25);border-radius:6px;cursor:pointer}
+.ht-tag{background:#0D1E42;color:#fff}
 .sidebar hr{border:none;border-top:1px solid rgba(0,0,0,0.07);margin:5px 0}
 .src{font-size:8px;color:rgba(0,0,0,0.28);line-height:1.7;padding:0 3px;margin-top:auto;padding-top:12px}
 .hint{font-size:9px;color:rgba(26,82,150,0.6);padding:8px 10px;background:rgba(26,82,150,0.05);border-radius:5px;line-height:1.5;margin-top:4px}
@@ -450,6 +455,11 @@ const METRIC_MENU = [{"name": "Prices", "items": [{"m": "zhvi", "html": "<span c
 // YOY versions are not separate rows: the "Current | YOY change" switch flips every row.
 (function buildMetricMenus() {
   const OPEN_BY_DEFAULT = new Set(['Prices', 'Supply', 'Demand']);
+  // Redfin breaks these three out by home type (US, states, large metros only)
+  const HOME_TYPES = [['all', 'All home types'], ['sfr', 'Single-family'], ['th', 'Townhouse'], ['condo', 'Condo / co-op'], ['mf', '2–4 units']];
+  const HOME_TYPE_BASES = new Set(['rf_median_sale_price','rf_sfr_median_sale_price','rf_th_median_sale_price','rf_condo_median_sale_price','rf_mf_median_sale_price', 'rf_homes_sold','rf_sfr_homes_sold','rf_th_homes_sold','rf_condo_homes_sold','rf_mf_homes_sold', 'rf_new_listings','rf_sfr_new_listings','rf_th_new_listings','rf_condo_new_listings','rf_mf_new_listings']);
+  let homeType = 'all';
+  function typedKey(base, yoy) { const k = homeType === 'all' ? base : 'rf_' + homeType + '_' + base.slice(3); return yoy ? k + '_yoy' : k; }
   const LEVEL_NAME = {national:'national', state:'state', metro:'metro', county:'county', zip:'ZIP code'};
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function txt(html) { const d = document.createElement('div'); d.innerHTML = html; const mn = d.querySelector('.mn'); return (mn ? mn.textContent : d.textContent).trim(); }
@@ -457,14 +467,16 @@ const METRIC_MENU = [{"name": "Prices", "items": [{"m": "zhvi", "html": "<span c
   function menuHTML(attr, extraCls) {
     let h = '<div class="yoy-switch" role="group" aria-label="Show value or year-over-year change">' +
             '<button type="button" class="yoy-opt on" data-yoy="0">Current</button>' +
-            '<button type="button" class="yoy-opt" data-yoy="1">YOY change</button></div>';
+            '<button type="button" class="yoy-opt" data-yoy="1">YOY change</button></div>' +
+            '<label class="ht-pick"><span>Home type</span><select class="ht-select">' +
+            HOME_TYPES.map(([v, l]) => `<option value="${v}">${l}</option>`).join('') + '</select></label>';
     METRIC_MENU.forEach(sec => {
       const open = OPEN_BY_DEFAULT.has(sec.name);
       h += `<div class="menu-sec${open ? '' : ' collapsed'}" data-sec="${esc(sec.name)}">` +
            `<button type="button" class="menu-sec-head"><span>${sec.name}</span><span class="menu-chev"></span></button><div class="menu-sec-body">`;
       sec.items.forEach(it => {
-        h += `<button class="${extraCls}${it.yoy ? ' has-yoy' : ' no-yoy-ver'}" ${attr}="${it.m}">${it.html}</button>`;
-        if (it.yoy) h += `<button class="${extraCls} yoy-ver" ${attr}="${it.yoy.m}">${it.yoy.html}</button>`;
+        h += `<button class="${extraCls}${it.yoy ? ' has-yoy' : ' no-yoy-ver'}" ${attr}="${it.m}" data-base="${it.m}">${it.html}</button>`;
+        if (it.yoy) h += `<button class="${extraCls} yoy-ver" ${attr}="${it.yoy.m}" data-base="${it.m}" data-yoy="1">${it.yoy.html}</button>`;
       });
       h += '</div></div>';
     });
@@ -541,6 +553,40 @@ const METRIC_MENU = [{"name": "Prices", "items": [{"m": "zhvi", "html": "<span c
       if (sec && sec.classList.contains('collapsed')) sec.classList.remove('collapsed');
     }).observe(menu, {subtree: true, attributes: true, attributeFilter: ['class']});
   });
+
+  // --- Home type picker: points the three Redfin rows at the chosen home type ---
+  function applyHomeType(newType) {
+    homeType = newType;
+    document.querySelectorAll('.ht-select').forEach(s => { if (s.value !== newType) s.value = newType; });
+    const label = (HOME_TYPES.find(h => h[0] === newType) || [, ''])[1];
+    [mapMenu, chartMenu].forEach(menu => {
+      const a = attrOf(menu);
+      let reclick = null;
+      menu.querySelectorAll('.metric-btn[data-base]').forEach(btn => {
+        if (!HOME_TYPE_BASES.has(btn.dataset.base)) return;
+        btn.setAttribute(a, typedKey(btn.dataset.base, btn.dataset.yoy === '1'));
+        const md = btn.querySelector('.md');
+        let tag = md && md.querySelector('.ht-tag');
+        if (newType === 'all') { if (tag) tag.remove(); }
+        else if (md) {
+          if (!tag) { tag = document.createElement('span'); tag.className = 'src-tag ht-tag'; md.querySelector('.src-tag').after(tag); }
+          tag.textContent = label;
+        }
+        if (btn.classList.contains('active')) reclick = btn;
+      });
+      if (reclick && (menu === mapMenu || (chartMenu.offsetParent))) reclick.click();
+    });
+    ['metric-select-mobile', 'chart-metric-select-mobile'].forEach(id => {
+      const s = document.getElementById(id); if (!s) return;
+      s.querySelectorAll('option').forEach(o => {
+        const raw = o.dataset.base || o.value, yoy = raw.endsWith('_yoy'), base = yoy ? raw.slice(0, -4) : raw;
+        if (!HOME_TYPE_BASES.has(base)) return;
+        o.dataset.base = raw; o.value = typedKey(base, yoy);
+      });
+    });
+    try { updateMenuAvailability(); } catch (e) {}
+  }
+  document.querySelectorAll('.ht-select').forEach(s => s.addEventListener('change', () => applyHomeType(s.value)));
 
   // --- Gray out rows with no data at the level being viewed ---
   function levelRows(mode) {
@@ -660,15 +706,39 @@ const METRICS = {
   cancellation_pct_yoy:         {label:'Cancellation Rate YOY %', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   delisted_pct:                 {label:'Delisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
   rf_median_sale_price: {label:'Median Sale Price (Redfin)', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
+  rf_sfr_median_sale_price: {label:'Median Sale Price (Redfin, Single-Family)', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
+  rf_th_median_sale_price: {label:'Median Sale Price (Redfin, Townhouse)', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
+  rf_condo_median_sale_price: {label:'Median Sale Price (Redfin, Condo)', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
+  rf_mf_median_sale_price: {label:'Median Sale Price (Redfin, 2–4 Unit)', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower', hi:'Higher'},
   rf_median_sale_price_yoy: {label:'Median Sale Price YOY % (Redfin)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_sfr_median_sale_price_yoy: {label:'Median Sale Price YOY % (Redfin, Single-Family)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_th_median_sale_price_yoy: {label:'Median Sale Price YOY % (Redfin, Townhouse)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_condo_median_sale_price_yoy: {label:'Median Sale Price YOY % (Redfin, Condo)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_mf_median_sale_price_yoy: {label:'Median Sale Price YOY % (Redfin, 2–4 Unit)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   rf_homes_sold: {label:'Homes Sold (Redfin)', fmt:v=>Math.round(v).toLocaleString(), lo:'Fewer', hi:'More'},
+  rf_sfr_homes_sold: {label:'Homes Sold (Redfin, Single-Family)', fmt:v=>Math.round(v).toLocaleString(), lo:'Fewer', hi:'More'},
+  rf_th_homes_sold: {label:'Homes Sold (Redfin, Townhouse)', fmt:v=>Math.round(v).toLocaleString(), lo:'Fewer', hi:'More'},
+  rf_condo_homes_sold: {label:'Homes Sold (Redfin, Condo)', fmt:v=>Math.round(v).toLocaleString(), lo:'Fewer', hi:'More'},
+  rf_mf_homes_sold: {label:'Homes Sold (Redfin, 2–4 Unit)', fmt:v=>Math.round(v).toLocaleString(), lo:'Fewer', hi:'More'},
   rf_homes_sold_yoy: {label:'Homes Sold YOY % (Redfin)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_sfr_homes_sold_yoy: {label:'Homes Sold YOY % (Redfin, Single-Family)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_th_homes_sold_yoy: {label:'Homes Sold YOY % (Redfin, Townhouse)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_condo_homes_sold_yoy: {label:'Homes Sold YOY % (Redfin, Condo)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_mf_homes_sold_yoy: {label:'Homes Sold YOY % (Redfin, 2–4 Unit)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   rf_inventory: {label:'Inventory (Redfin)', fmt:v=>Math.round(v).toLocaleString(), lo:'Few', hi:'Many'},
   rf_inventory_yoy: {label:'Inventory YOY % (Redfin)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   rf_months_supply: {label:'Months of Supply (Redfin)', fmt:v=>v.toFixed(1)+' mo', lo:'Seller\'s Market', hi:'Buyer\'s Market'},
   rf_months_supply_yoy: {label:'Months of Supply YOY % (Redfin)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   rf_new_listings: {label:'New Listings (Redfin)', fmt:v=>Math.round(v).toLocaleString(), lo:'Few', hi:'Many'},
+  rf_sfr_new_listings: {label:'New Listings (Redfin, Single-Family)', fmt:v=>Math.round(v).toLocaleString(), lo:'Few', hi:'Many'},
+  rf_th_new_listings: {label:'New Listings (Redfin, Townhouse)', fmt:v=>Math.round(v).toLocaleString(), lo:'Few', hi:'Many'},
+  rf_condo_new_listings: {label:'New Listings (Redfin, Condo)', fmt:v=>Math.round(v).toLocaleString(), lo:'Few', hi:'Many'},
+  rf_mf_new_listings: {label:'New Listings (Redfin, 2–4 Unit)', fmt:v=>Math.round(v).toLocaleString(), lo:'Few', hi:'Many'},
   rf_new_listings_yoy: {label:'New Listings YOY % (Redfin)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_sfr_new_listings_yoy: {label:'New Listings YOY % (Redfin, Single-Family)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_th_new_listings_yoy: {label:'New Listings YOY % (Redfin, Townhouse)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_condo_new_listings_yoy: {label:'New Listings YOY % (Redfin, Condo)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
+  rf_mf_new_listings_yoy: {label:'New Listings YOY % (Redfin, 2–4 Unit)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   rf_price_drop_pct: {label:'Price Drop % (Redfin)', fmt:v=>v.toFixed(1)+'%', lo:'Few Drops', hi:'Many Drops'},
   rf_price_drop_pct_yoy: {label:'Price Drop % YOY (Redfin)', fmt:v=>v.toFixed(1)+'%', lo:'Declining', hi:'Growing'},
   relisted_pct:                 {label:'Relisted %',             fmt:v=>v.toFixed(1)+'%',   lo:'Lower', hi:'Higher'},
@@ -692,8 +762,8 @@ const METRICS = {
   median_year_built:     {label:'Median Year Built',  fmt:v=>Math.round(v).toString(), lo:'Older', hi:'Newer'},
   pct_pre_1960:          {label:'Housing Stock by Age',fmt:v=>v.toFixed(1)+'%',         lo:'Newer Stock', hi:'Older Stock'},
 };
-const YOY_METRICS = new Set(['rf_median_sale_price_yoy','rf_homes_sold_yoy','rf_inventory_yoy','rf_months_supply_yoy','rf_new_listings_yoy','rf_price_drop_pct_yoy','zhvi_yoy','zhvi_condo_yoy','zori_yoy','active_listings_yoy','new_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','luxury_median_sale_price_yoy','luxury_median_dom_yoy','luxury_active_listings_yoy','luxury_pending_sales_yoy']);
-const YOY_BASE = {rf_median_sale_price_yoy:'rf_median_sale_price', rf_homes_sold_yoy:'rf_homes_sold', rf_inventory_yoy:'rf_inventory', rf_months_supply_yoy:'rf_months_supply', rf_new_listings_yoy:'rf_new_listings', rf_price_drop_pct_yoy:'rf_price_drop_pct', zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', zori_yoy:'zori', active_listings_yoy:'active_listings', new_listings_yoy:'new_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct', luxury_median_sale_price_yoy:'luxury_median_sale_price', luxury_median_dom_yoy:'luxury_median_dom', luxury_active_listings_yoy:'luxury_active_listings', luxury_pending_sales_yoy:'luxury_pending_sales'};
+const YOY_METRICS = new Set(['rf_median_sale_price_yoy','rf_sfr_median_sale_price_yoy','rf_th_median_sale_price_yoy','rf_condo_median_sale_price_yoy','rf_mf_median_sale_price_yoy','rf_homes_sold_yoy','rf_sfr_homes_sold_yoy','rf_th_homes_sold_yoy','rf_condo_homes_sold_yoy','rf_mf_homes_sold_yoy','rf_inventory_yoy','rf_months_supply_yoy','rf_new_listings_yoy','rf_sfr_new_listings_yoy','rf_th_new_listings_yoy','rf_condo_new_listings_yoy','rf_mf_new_listings_yoy','rf_price_drop_pct_yoy','zhvi_yoy','zhvi_condo_yoy','zori_yoy','active_listings_yoy','new_listings_yoy','pending_listings_yoy','pending_ratio_yoy','days_on_market_yoy','price_reduced_pct_yoy','median_property_tax_yoy','property_tax_rate_yoy','cancellation_pct_yoy','luxury_median_sale_price_yoy','luxury_median_dom_yoy','luxury_active_listings_yoy','luxury_pending_sales_yoy']);
+const YOY_BASE = {rf_sfr_median_sale_price_yoy:'rf_sfr_median_sale_price', rf_th_median_sale_price_yoy:'rf_th_median_sale_price', rf_condo_median_sale_price_yoy:'rf_condo_median_sale_price', rf_mf_median_sale_price_yoy:'rf_mf_median_sale_price', rf_sfr_homes_sold_yoy:'rf_sfr_homes_sold', rf_th_homes_sold_yoy:'rf_th_homes_sold', rf_condo_homes_sold_yoy:'rf_condo_homes_sold', rf_mf_homes_sold_yoy:'rf_mf_homes_sold', rf_sfr_new_listings_yoy:'rf_sfr_new_listings', rf_th_new_listings_yoy:'rf_th_new_listings', rf_condo_new_listings_yoy:'rf_condo_new_listings', rf_mf_new_listings_yoy:'rf_mf_new_listings', rf_median_sale_price_yoy:'rf_median_sale_price', rf_homes_sold_yoy:'rf_homes_sold', rf_inventory_yoy:'rf_inventory', rf_months_supply_yoy:'rf_months_supply', rf_new_listings_yoy:'rf_new_listings', rf_price_drop_pct_yoy:'rf_price_drop_pct', zhvi_yoy:'zhvi', zhvi_condo_yoy:'zhvi_condo', zori_yoy:'zori', active_listings_yoy:'active_listings', new_listings_yoy:'new_listings', pending_listings_yoy:'pending_listings', pending_ratio_yoy:'pending_ratio', days_on_market_yoy:'days_on_market', price_reduced_pct_yoy:'price_reduced_pct', median_property_tax_yoy:'median_property_tax', property_tax_rate_yoy:'property_tax_rate', cancellation_pct_yoy:'cancellation_pct', luxury_median_sale_price_yoy:'luxury_median_sale_price', luxury_median_dom_yoy:'luxury_median_dom', luxury_active_listings_yoy:'luxury_active_listings', luxury_pending_sales_yoy:'luxury_pending_sales'};
 const TAX_YOY = new Set(['median_property_tax_yoy','property_tax_rate_yoy']);
 // Metrics where the NATIONAL series alone is short (currently under a year), so the
 // Annual chart (one point per calendar year) would collapse to a single dot -- use monthly instead.
@@ -729,7 +799,7 @@ const PAYMENT_METRICS = new Set(['est_payment_20']);
 const NEW_CONSTRUCTION_METRICS = new Set(['new_construction_price','new_construction_sqft']);
 const PERMITS_METRICS = new Set(['sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k']);
 const HOUSING_STOCK_METRICS = new Set(['median_year_built','pct_pre_1960']);
-const REDFIN_METRICS = new Set(['rf_median_sale_price','rf_homes_sold','rf_inventory','rf_months_supply','rf_new_listings','rf_price_drop_pct','cancellation_pct','delisted_pct','relisted_pct','cash_pct','down_payment_pct','fha_pct','va_pct','investor_purchases','investor_market_share','luxury_median_sale_price','luxury_median_dom','luxury_active_listings','luxury_pending_sales']);
+const REDFIN_METRICS = new Set(['rf_median_sale_price','rf_sfr_median_sale_price','rf_th_median_sale_price','rf_condo_median_sale_price','rf_mf_median_sale_price','rf_homes_sold','rf_sfr_homes_sold','rf_th_homes_sold','rf_condo_homes_sold','rf_mf_homes_sold','rf_inventory','rf_months_supply','rf_new_listings','rf_sfr_new_listings','rf_th_new_listings','rf_condo_new_listings','rf_mf_new_listings','rf_price_drop_pct','cancellation_pct','delisted_pct','relisted_pct','cash_pct','down_payment_pct','fha_pct','va_pct','investor_purchases','investor_market_share','luxury_median_sale_price','luxury_median_dom','luxury_active_listings','luxury_pending_sales']);
 
 // Ohio-specific homeowners insurance rate, as a % of home value per year. Sourced from
 // NerdWallet's 2026 state-by-state average ($2,080/yr average Ohio premium on their $400,000
@@ -976,7 +1046,7 @@ function getMetricVal(d, metric) {
 // --- Rank Badge ---
 // Only metrics where relative position is a meaningful, citable fact get ranked.
 // Neutral framing throughout: "Highest"/"Lowest" describes direction, never "best"/"worst".
-const RANKABLE_METRICS = new Set(['rf_median_sale_price','rf_homes_sold','rf_inventory','rf_months_supply','rf_new_listings','rf_price_drop_pct','zhvi','zhvi_condo','zori','days_on_market','price_reduced_pct','cancellation_pct','pending_ratio','property_tax_rate','median_property_tax','sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k','median_year_built','pct_pre_1960','est_payment_20','luxury_median_sale_price']);
+const RANKABLE_METRICS = new Set(['rf_median_sale_price','rf_sfr_median_sale_price','rf_th_median_sale_price','rf_condo_median_sale_price','rf_mf_median_sale_price','rf_homes_sold','rf_sfr_homes_sold','rf_th_homes_sold','rf_condo_homes_sold','rf_mf_homes_sold','rf_inventory','rf_months_supply','rf_new_listings','rf_sfr_new_listings','rf_th_new_listings','rf_condo_new_listings','rf_mf_new_listings','rf_price_drop_pct','zhvi','zhvi_condo','zori','days_on_market','price_reduced_pct','cancellation_pct','pending_ratio','property_tax_rate','median_property_tax','sf_permits_per_1k','mf_permits_per_1k','total_permits_per_1k','median_year_built','pct_pre_1960','est_payment_20','luxury_median_sale_price']);
 
 function computeRank(list, metric, targetVal) {
   // list: array of numeric values (already non-null) for every record that has this metric.
@@ -1218,7 +1288,7 @@ function renderColors(mode) {
         const n = Number(val);
         if (metric === 'zori') {
           f.properties.__label = '$'+Math.round(n).toLocaleString();
-        } else if (metric === 'zhvi' || metric === 'zhvi_condo' || metric === 'rf_median_sale_price' || metric === 'median_list_price' || metric === 'median_property_tax') {
+        } else if (metric === 'zhvi' || metric === 'zhvi_condo' || (metric === 'rf_median_sale_price' || metric === 'rf_sfr_median_sale_price' || metric === 'rf_th_median_sale_price' || metric === 'rf_condo_median_sale_price' || metric === 'rf_mf_median_sale_price') || metric === 'median_list_price' || metric === 'median_property_tax') {
           f.properties.__label = n >= 1000000 ? '$'+(n/1000000).toFixed(1)+'M' : '$'+Math.round(n/1000)+'K';
         } else if (isYOY) {
           f.properties.__label = n.toFixed(1)+'%';
@@ -1311,7 +1381,7 @@ function renderColors(mode) {
           const n = Number(v);
           if (metric === 'zori') {
             f.properties.__label = '$'+Math.round(n).toLocaleString();
-          } else if (metric === 'zhvi' || metric === 'zhvi_condo' || metric === 'rf_median_sale_price' || metric === 'median_property_tax') {
+          } else if (metric === 'zhvi' || metric === 'zhvi_condo' || (metric === 'rf_median_sale_price' || metric === 'rf_sfr_median_sale_price' || metric === 'rf_th_median_sale_price' || metric === 'rf_condo_median_sale_price' || metric === 'rf_mf_median_sale_price') || metric === 'median_property_tax') {
             f.properties.__label = n >= 1000000 ? '$'+(n/1000000).toFixed(1)+'M' : '$'+Math.round(n/1000)+'K';
           } else if (metric === 'property_tax_rate' || metric === 'price_reduced_pct' || metric === 'rf_price_drop_pct') {
             f.properties.__label = n.toFixed(1)+'%';
@@ -1342,7 +1412,7 @@ function renderColors(mode) {
         f.properties.__label = n.toFixed(1)+'%';
       } else if (metric === 'zori') {
         f.properties.__label = '$'+Math.round(n).toLocaleString();
-      } else if (metric === 'zhvi' || metric === 'zhvi_condo' || metric === 'rf_median_sale_price' || metric === 'median_property_tax') {
+      } else if (metric === 'zhvi' || metric === 'zhvi_condo' || (metric === 'rf_median_sale_price' || metric === 'rf_sfr_median_sale_price' || metric === 'rf_th_median_sale_price' || metric === 'rf_condo_median_sale_price' || metric === 'rf_mf_median_sale_price') || metric === 'median_property_tax') {
         f.properties.__label = n >= 1000000 ? '$'+(n/1000000).toFixed(1)+'M' : '$'+Math.round(n/1000)+'K';
       } else if (metric === 'property_tax_rate' || metric === 'price_reduced_pct' || metric === 'rf_price_drop_pct') {
         f.properties.__label = n.toFixed(1)+'%';
@@ -1381,7 +1451,7 @@ function fmt$(v){return v?'$'+v.toLocaleString():'—';}
 function fmtN(v){return v!=null?v.toLocaleString():'—';}
 function fmtAxisCompact(cmetric) {
   return v => {
-    if (cmetric==='zhvi'||cmetric==='zhvi_condo'||cmetric==='rf_median_sale_price'||cmetric==='zori'||cmetric==='median_list_price'||cmetric==='median_property_tax'||cmetric==='new_construction_price') {
+    if (cmetric==='zhvi'||cmetric==='zhvi_condo'||(cmetric === 'rf_median_sale_price' || cmetric === 'rf_sfr_median_sale_price' || cmetric === 'rf_th_median_sale_price' || cmetric === 'rf_condo_median_sale_price' || cmetric === 'rf_mf_median_sale_price')||cmetric==='zori'||cmetric==='median_list_price'||cmetric==='median_property_tax'||cmetric==='new_construction_price') {
       if (Math.abs(v)>=1000) return '$'+d3.format('.2s')(v).replace('k','K').replace('G','B');
       return '$'+v;
     }
@@ -1554,7 +1624,7 @@ function drawLineChart(county, cmetric) {
   // Compact label formatter (e.g. $301K, 37 days, 24.1%)
   function fmtCompact(val) {
     if (cmetric === 'zori') return '$' + Math.round(val).toLocaleString();
-    if (cmetric === 'zhvi' || cmetric === 'zhvi_condo' || cmetric === 'rf_median_sale_price' || cmetric === 'median_property_tax') {
+    if (cmetric === 'zhvi' || cmetric === 'zhvi_condo' || (cmetric === 'rf_median_sale_price' || cmetric === 'rf_sfr_median_sale_price' || cmetric === 'rf_th_median_sale_price' || cmetric === 'rf_condo_median_sale_price' || cmetric === 'rf_mf_median_sale_price') || cmetric === 'median_property_tax') {
       if (val >= 1000000) return '$' + (val/1000000).toFixed(1) + 'M';
       if (val >= 1000) return '$' + Math.round(val/1000) + 'K';
       return '$' + Math.round(val);
@@ -2006,7 +2076,7 @@ function renderChart(county, cmetric) {
         }
       });
     }
-  } else if (cmetric === 'zhvi' || cmetric === 'zori' || cmetric === 'median_list_price' || cmetric === 'rf_median_sale_price' || cmetric === 'rf_homes_sold' || cmetric === 'rf_inventory' || cmetric === 'rf_months_supply' || cmetric === 'rf_new_listings' || cmetric === 'rf_price_drop_pct' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'new_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct' || cmetric === 'relisted_pct' || cmetric === 'cash_pct' || cmetric === 'down_payment_pct' || cmetric === 'fha_pct' || cmetric === 'va_pct' || cmetric === 'investor_purchases' || cmetric === 'investor_market_share' || cmetric === 'luxury_median_sale_price' || cmetric === 'luxury_median_dom' || cmetric === 'luxury_active_listings' || cmetric === 'luxury_pending_sales') {
+  } else if (cmetric === 'zhvi' || cmetric === 'zori' || cmetric === 'median_list_price' || (cmetric === 'rf_median_sale_price' || cmetric === 'rf_sfr_median_sale_price' || cmetric === 'rf_th_median_sale_price' || cmetric === 'rf_condo_median_sale_price' || cmetric === 'rf_mf_median_sale_price') || (cmetric === 'rf_homes_sold' || cmetric === 'rf_sfr_homes_sold' || cmetric === 'rf_th_homes_sold' || cmetric === 'rf_condo_homes_sold' || cmetric === 'rf_mf_homes_sold') || cmetric === 'rf_inventory' || cmetric === 'rf_months_supply' || (cmetric === 'rf_new_listings' || cmetric === 'rf_sfr_new_listings' || cmetric === 'rf_th_new_listings' || cmetric === 'rf_condo_new_listings' || cmetric === 'rf_mf_new_listings') || cmetric === 'rf_price_drop_pct' || cmetric === 'zhvi_condo' || cmetric === 'active_listings' || cmetric === 'new_listings' || cmetric === 'pending_listings' || cmetric === 'pending_ratio' || cmetric === 'days_on_market' || cmetric === 'price_reduced_pct' || cmetric === 'cancellation_pct' || cmetric === 'delisted_pct' || cmetric === 'relisted_pct' || cmetric === 'cash_pct' || cmetric === 'down_payment_pct' || cmetric === 'fha_pct' || cmetric === 'va_pct' || cmetric === 'investor_purchases' || cmetric === 'investor_market_share' || cmetric === 'luxury_median_sale_price' || cmetric === 'luxury_median_dom' || cmetric === 'luxury_active_listings' || cmetric === 'luxury_pending_sales') {
     drawAnnualLineChart(displayName, cmetric, d && d.history, true);
   } else {
     drawMonthlyBarChart(displayName, cmetric, d && d.history, true);
@@ -2968,7 +3038,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip, keepSlider) {
   // Compact label format
   function fmtC(val) {
     if (cmetric==='zori') return '$'+Math.round(val).toLocaleString();
-    if (cmetric==='zhvi'||cmetric==='zhvi_condo'||cmetric==='rf_median_sale_price'||cmetric==='median_property_tax'||cmetric==='new_construction_price') {
+    if (cmetric==='zhvi'||cmetric==='zhvi_condo'||(cmetric === 'rf_median_sale_price' || cmetric === 'rf_sfr_median_sale_price' || cmetric === 'rf_th_median_sale_price' || cmetric === 'rf_condo_median_sale_price' || cmetric === 'rf_mf_median_sale_price')||cmetric==='median_property_tax'||cmetric==='new_construction_price') {
       if (val>=1000000) return '$'+(val/1000000).toFixed(1)+'M';
       if (val>=1000) return '$'+Math.round(val/1000)+'K';
       return '$'+Math.round(val);
@@ -3541,7 +3611,7 @@ function loadMetroData() {
     // from full history, refreshed on data update. Without this, d.yoy_latest is empty for
     // every metro until that metro's history is lazily loaded by a click, which is exactly
     // what made YOY map coloring show nothing and caused the price/YOY state to desync.
-    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_metros_yoy?select=region_id,zhvi_yoy,zhvi_condo_yoy,zori_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy,cancellation_pct_yoy,delisted_pct_yoy,relisted_pct_yoy,cash_pct_yoy,down_payment_pct_yoy,fha_pct_yoy,va_pct_yoy,investor_purchases_yoy,investor_market_share_yoy,luxury_median_sale_price_yoy,luxury_median_dom_yoy,luxury_active_listings_yoy,luxury_pending_sales_yoy,rf_median_sale_price_yoy,rf_homes_sold_yoy,rf_inventory_yoy,rf_months_supply_yoy,rf_new_listings_yoy,rf_price_drop_pct_yoy', {
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_metros_yoy?select=region_id,zhvi_yoy,zhvi_condo_yoy,zori_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy,cancellation_pct_yoy,delisted_pct_yoy,relisted_pct_yoy,cash_pct_yoy,down_payment_pct_yoy,fha_pct_yoy,va_pct_yoy,investor_purchases_yoy,investor_market_share_yoy,luxury_median_sale_price_yoy,luxury_median_dom_yoy,luxury_active_listings_yoy,luxury_pending_sales_yoy,rf_median_sale_price_yoy,rf_homes_sold_yoy,rf_inventory_yoy,rf_months_supply_yoy,rf_new_listings_yoy,rf_price_drop_pct_yoy,rf_sfr_median_sale_price_yoy,rf_th_median_sale_price_yoy,rf_condo_median_sale_price_yoy,rf_mf_median_sale_price_yoy,rf_sfr_homes_sold_yoy,rf_th_homes_sold_yoy,rf_condo_homes_sold_yoy,rf_mf_homes_sold_yoy,rf_sfr_new_listings_yoy,rf_th_new_listings_yoy,rf_condo_new_listings_yoy,rf_mf_new_listings_yoy', {
       headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
     }).then(r=>r.json())
   ]).then(([geojson, metros, yoyRows]) => {
