@@ -4303,7 +4303,7 @@ function _mapLabel(metric, val, isYOY, isPayment) {
   const RULES = {
     'state-labels':    {min: 0,   size: ['interpolate', ['linear'], ['zoom'], 3, 13, 4.5, 16, 6, 20, 8, 26, 10, 32], field: twoLine('name')},
     'metros-labels':   {min: 5.6, size: ['interpolate', ['linear'], ['zoom'], 3.5, 10, 5, 12, 6.5, 14, 8, 17, 10, 21], field: twoLineExpr(beforeComma('name'))},
-    'counties-labels': {min: 6.6, size: ['interpolate', ['linear'], ['zoom'], 6.6, 11.5, 7.5, 13.5, 8.5, 16, 10, 20, 12, 24], field: twoLine('county')},
+    'counties-labels': {min: 6.6, size: ['interpolate', ['linear'], ['zoom'], 6.6, 12.08, 7.5, 14.18, 8.5, 16.8, 10, 21, 12, 25.2], field: twoLine('county')},  // +5% (Nov 4)
     'zips-labels':     {min: 7,   size: ['interpolate', ['linear'], ['zoom'], 7, 9, 8.5, 11, 10, 14, 12, 18], field: twoLineExpr(['to-string', ['get', 'zip']])}
   };
   let tries = 0;
