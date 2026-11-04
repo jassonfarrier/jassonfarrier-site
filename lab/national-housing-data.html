@@ -331,6 +331,17 @@ html.dock .upper-third-rank-section{width:auto!important;border-left:none!import
 html.dock .upper-third-rank{white-space:normal!important}
 html.dock .dock-sliders .mkt-sliders{margin-bottom:0}
 </style>
+
+<style id="cr-css">
+/* chart range + frequency buttons */
+html.dock #chart-slider-wrap{display:none!important}
+.cr-bar{display:none;align-items:center;justify-content:flex-end;gap:14px;margin:2px 0 4px;font-family:Montserrat,sans-serif}
+html.dock .cr-bar.on{display:flex}
+.cr-grp{display:inline-flex;background:#eef1f6;border-radius:999px;padding:3px;gap:2px}
+.cr-btn{border:none;background:transparent;color:#0d1e42;font:700 11px Montserrat,sans-serif;padding:5px 12px;border-radius:999px;cursor:pointer;letter-spacing:.3px}
+.cr-btn:hover{background:rgba(13,30,66,0.08)}
+.cr-btn.on{background:#0d1e42;color:#fff}
+</style>
 </head>
 <body>
 <div id="loading" style="background:#f7f8fa"><div class="spinner" style="border-color:rgba(26,82,150,0.15);border-top-color:#0D1E42"></div><div class="ld" style="color:rgba(26,82,150,0.6)">Loading National Data</div></div>
@@ -515,7 +526,7 @@ function _phoneKeyPts(rows, get) {
 }
 // years to label: desktop = every other year (or all, when deskAll); phone = spaced to fit, always ending on the latest year
 function _yearsToLabel(years, w, px, deskAll) {
-  if (!_isPhone()) return deskAll ? years : years.filter((_, i) => i % 2 === 0);
+  if (!_isPhone()) return (deskAll || (document.documentElement.classList.contains('dock') && years.length <= 12)) ? years : years.filter((_, i) => i % 2 === 0);
   w = _phoneW(w);
   const n = years.length, step = Math.max(1, Math.ceil(n * px / Math.max(w || 0, 1)));
   return years.filter((_, i) => (n - 1 - i) % step === 0);
@@ -4960,5 +4971,65 @@ document.addEventListener('change', function(e){
     if (document.getElementById('modal-county').textContent.trim()) return;   // a place is already showing
     try { DEFAULT(); setTimeout(() => { syncChart(); resize(); }, 900); } catch (e) { if (tries++ < 120) setTimeout(openDefault, 500); }
   })();
+})();
+</script>
+
+<script id="cr-js">
+// ===== chart range (10Y / 20Y / All) and Yearly / Monthly, desktop three-panel layout only =====
+(function () {
+  if (!document.documentElement.classList.contains('dock')) return;
+  const NAMES = {al: 'drawAnnualLineChart', mb: 'drawMonthlyBarChart', ab: 'drawAnnualBarChart'};
+  const ORIG = {};
+  for (const k in NAMES) { if (typeof window[NAMES[k]] !== 'function') return; ORIG[k] = window[NAMES[k]]; }
+  const CR = {range: 10, freq: null};        // range in years (0 = all); freq null = the metric's normal view
+  let last = null;
+  const yearOf = r => r.date ? parseInt(String(r.date).slice(0, 4), 10) : (r.year != null ? parseInt(r.year, 10) : (r.period ? parseInt(String(r.period).slice(0, 4), 10) : NaN));
+  function cut(rows) {
+    if (!CR.range || !Array.isArray(rows) || !rows.length) return rows;
+    let maxY = -Infinity; rows.forEach(r => { const y = yearOf(r); if (y > maxY) maxY = y; });
+    if (!isFinite(maxY)) return rows;
+    return rows.filter(r => { const y = yearOf(r); return isNaN(y) || y > maxY - CR.range; });
+  }
+  // toolbar above the chart
+  const svg = document.getElementById('line-chart');
+  const bar = document.createElement('div'); bar.className = 'cr-bar';
+  bar.innerHTML = '<div class="cr-grp" data-g="freq"><button class="cr-btn" data-v="yearly">Yearly</button><button class="cr-btn" data-v="monthly">Monthly</button></div>' +
+                  '<div class="cr-grp" data-g="range"><button class="cr-btn" data-v="10">10Y</button><button class="cr-btn" data-v="20">20Y</button><button class="cr-btn" data-v="0">All</button></div>';
+  svg.parentNode.insertBefore(bar, svg);
+  function paint(shownKind) {
+    bar.querySelectorAll('[data-g="range"] .cr-btn').forEach(b => b.classList.toggle('on', +b.dataset.v === CR.range));
+    const f = shownKind === 'mb' ? 'monthly' : 'yearly';
+    bar.querySelectorAll('[data-g="freq"] .cr-btn').forEach(b => b.classList.toggle('on', b.dataset.v === f));
+  }
+  function wrap(kind) {
+    return function (county, cmetric, hist, isZip, ...rest) {
+      const base = hist != null ? hist : (typeof dataMap !== 'undefined' && dataMap[county] ? dataMap[county].history : null);
+      last = {kind, county, cmetric, base, isZip};
+      let k = kind;
+      if (CR.freq === 'monthly') k = 'mb';
+      else if (CR.freq === 'yearly' && kind === 'mb') k = 'ab';
+      const out = base == null ? ORIG[k](county, cmetric, hist, isZip, ...rest) : ORIG[k](county, cmetric, cut(base), isZip, ...rest);
+      // mark the chart as one these buttons control (other chart types clear the mark)
+      if (svg.firstChild || svg.childNodes.length) { const m = document.createElementNS('http://www.w3.org/2000/svg', 'g'); m.setAttribute('class', 'cr-mark'); svg.appendChild(m); }
+      bar.classList.add('on'); paint(k);
+      return out;
+    };
+  }
+  for (const k in NAMES) window[NAMES[k]] = wrap(k);
+  // hide the buttons when a different kind of chart is showing
+  new MutationObserver(() => { if (!svg.querySelector('.cr-mark')) bar.classList.remove('on'); }).observe(svg, {childList: true});
+  function redraw() {
+    if (!last || !svg.querySelector('.cr-mark')) return;
+    window[NAMES[last.kind]](last.county, last.cmetric, last.base, last.isZip);
+  }
+  bar.addEventListener('click', e => {
+    const b = e.target.closest('.cr-btn'); if (!b) return;
+    const g = b.parentNode.dataset.g;
+    if (g === 'range') CR.range = +b.dataset.v; else CR.freq = b.dataset.v;
+    redraw();
+  });
+  // a new metric starts in its normal view (yearly line for prices, monthly bars for listings)
+  const menu = document.getElementById('metric-menu-map');
+  if (menu) menu.addEventListener('click', e => { if (e.target.closest('.metric-btn')) CR.freq = null; }, true);
 })();
 </script>
