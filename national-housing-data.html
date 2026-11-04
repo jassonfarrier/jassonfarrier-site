@@ -1174,10 +1174,10 @@ function renderRankBadge(mode, id, metric) {
     }
     const {rank, total} = computeRank(vals, metric, targetVal);
     show();
-    let html = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total} counties nationally`;
+    let html = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total.toLocaleString()} in US`;
     if (stateVals.length > 1 && targetStateId) {
       const {rank: sRank, total: sTotal} = computeRank(stateVals, metric, targetVal);
-      html += ` · ${sRank}<sup>${_ordSuffix(sRank)}</sup> of ${sTotal} in ${targetStateId}`;
+      html = `${sRank}<sup>${_ordSuffix(sRank)}</sup> of ${sTotal} in ${targetStateId} · ` + html;
     }
     el.innerHTML = _isPhone() ? html.split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html;
   } else if (mode === 'zip') {
@@ -1203,7 +1203,7 @@ function renderRankBadge(mode, id, metric) {
     const zd = zipDataMap[id];
     if (metric === 'zhvi' && zd && zd.national_rank != null && zd.national_total) {
       const natPct = Math.max(1, Math.round((zd.national_rank / zd.national_total) * 100));
-      html += ` · Top ${natPct}% of ${zd.national_total.toLocaleString()} nationally`;
+      html += ` · Top ${natPct}% of ${zd.national_total.toLocaleString()} in US`;
     }
     el.innerHTML = _isPhone() ? html.split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html;
   } else if (mode === 'metro') {
@@ -1231,10 +1231,10 @@ function renderRankBadge(mode, id, metric) {
     }
     const {rank, total} = computeRank(vals, metric, targetVal);
     show();
-    let html = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total} metros nationally`;
+    let html = `${rank}<sup>${_ordSuffix(rank)}</sup> of ${total.toLocaleString()} in US`;
     if (stateVals.length > 1 && targetStateId) {
       const {rank: sRank, total: sTotal} = computeRank(stateVals, metric, targetVal);
-      html += ` · ${sRank}<sup>${_ordSuffix(sRank)}</sup> of ${sTotal} in ${targetStateId}`;
+      html = `${sRank}<sup>${_ordSuffix(sRank)}</sup> of ${sTotal} in ${targetStateId} · ` + html;
     }
     el.innerHTML = _isPhone() ? html.split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html;
   } else {
