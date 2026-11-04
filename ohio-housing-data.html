@@ -4346,3 +4346,79 @@ function _mapLabel(metric, val, isYOY, isPayment) {
   })();
 })();
 </script>
+
+<script id="rank-words">
+// ===== rank line in plain words (local first, then US) =====
+(function () {
+  const NATIONAL = typeof nationalStatesMap !== 'undefined';
+  const PERMITS = new Set(['sf_permits_per_1k', 'mf_permits_per_1k', 'total_permits_per_1k']);
+  function words(metric) {
+    const base = String(metric).replace(/_yoy$/, '');
+    if (base === 'days_on_market' && !/_yoy$/.test(metric)) return ['Slower', 'Faster'];
+    return ['Higher', 'Lower'];
+  }
+  // share of places below / above this value -> "Higher than 85%" or "Lower than 70%"
+  function phrase(vals, target, metric) {
+    const n = vals.length; if (!n) return null;
+    let below = 0, above = 0; vals.forEach(v => { if (v < target) below++; else if (v > target) above++; });
+    const pb = Math.round(below / n * 100), pa = Math.round(above / n * 100), w = words(metric);
+    return pb >= pa ? `${w[0]} than ${pb}%` : `${w[1]} than ${pa}%`;
+  }
+  function phraseFromRank(rank, total, metric) {   // rank 1 = highest
+    const pb = Math.round((total - rank) / total * 100), pa = Math.round((rank - 1) / total * 100), w = words(metric);
+    return pb >= pa ? `${w[0]} than ${pb}%` : `${w[1]} than ${pa}%`;
+  }
+  function out(parts) {
+    const el = document.getElementById('ut-rank'), section = document.querySelector('.upper-third-rank-section');
+    if (!el) return;
+    parts = parts.filter(Boolean);
+    if (!parts.length) { el.textContent = ''; if (section) section.style.display = 'none'; return; }
+    if (section) section.style.display = 'flex';
+    const phone = typeof _isPhone === 'function' && _isPhone();
+    el.innerHTML = phone ? parts.map(p => '<span class="rk-part">' + p + '</span>').join('') : parts.join(' · ');
+  }
+  function collect(list, metric, idOf, id, stateOf) {
+    const vals = [], local = []; let target = null, st = null;
+    list.forEach(d => { const v = getMetricVal(d, metric); if (v == null || isNaN(v)) return; vals.push(Number(v)); if (idOf(d) === id) { target = Number(v); st = stateOf ? stateOf(d) : null; } });
+    if (stateOf && st) list.forEach(d => { if (stateOf(d) !== st) return; const v = getMetricVal(d, metric); if (v != null && !isNaN(v)) local.push(Number(v)); });
+    return {vals, local, target, st};
+  }
+  window.renderRankBadge = function (mode, id, metric) {
+    if (typeof RANKABLE_METRICS === 'undefined' || !RANKABLE_METRICS.has(metric)) return out([]);
+    if ((mode === 'zip' || mode === 'metro') && PERMITS.has(metric)) return out([]);
+    try {
+      if (mode === 'county') {
+        if (NATIONAL) {
+          const c = collect(DATA, metric, d => d.fips, id, d => d.state_id);
+          if (c.target == null) return out([]);
+          return out([c.local.length > 1 ? `${phrase(c.local, c.target, metric)} of ${c.st} counties` : null,
+                      `${phrase(c.vals, c.target, metric)} of US counties`]);
+        }
+        const c = collect(DATA, metric, d => d.county, id);
+        return out([c.target == null ? null : `${phrase(c.vals, c.target, metric)} of OH counties`]);
+      }
+      if (mode === 'metro') {
+        if (NATIONAL) {
+          const c = collect(METRO_DATA, metric, m => m.region_id, id, m => m.state_id);
+          if (c.target == null) return out([]);
+          return out([c.local.length > 1 ? `${phrase(c.local, c.target, metric)} of ${c.st} metros` : null,
+                      `${phrase(c.vals, c.target, metric)} of US metros`]);
+        }
+        const c = collect(METRO_DATA, metric, m => m.region_id, id);
+        return out([c.target == null ? null : `${phrase(c.vals, c.target, metric)} of OH metros`]);
+      }
+      if (mode === 'zip') {
+        const c = collect(ZIP_DATA, metric, z => z.zip, id);
+        if (c.target == null || c.vals.length < 20) return out([]);
+        const st = NATIONAL ? (typeof currentZipState !== 'undefined' && currentZipState) || '' : 'OH';
+        const parts = [`${phrase(c.vals, c.target, metric)} of ${st} ZIPs`];
+        const zd = typeof zipDataMap !== 'undefined' ? zipDataMap[id] : null;
+        if (NATIONAL && metric === 'zhvi' && zd && zd.national_rank != null && zd.national_total)
+          parts.push(`${phraseFromRank(zd.national_rank, zd.national_total, metric)} of US ZIPs`);
+        return out(parts);
+      }
+    } catch (e) { console.warn('rank', e); }
+    out([]);
+  };
+})();
+</script>
