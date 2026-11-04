@@ -2158,15 +2158,10 @@ function _onCountiesLoaded(counties, yoyRows) {
     attachYOY(d);
     const yr = yoyMap[d.fips];
     if (yr) {
-      if (yr.zhvi_yoy != null) d.yoy_latest.zhvi_yoy = Number(yr.zhvi_yoy);
-      if (yr.zhvi_condo_yoy != null) d.yoy_latest.zhvi_condo_yoy = Number(yr.zhvi_condo_yoy);
-      if (yr.zori_yoy != null) d.yoy_latest.zori_yoy = Number(yr.zori_yoy);
-      if (yr.active_listings_yoy != null) d.yoy_latest.active_listings_yoy = Number(yr.active_listings_yoy);
-      if (yr.new_listings_yoy != null) d.yoy_latest.new_listings_yoy = Number(yr.new_listings_yoy);
-      if (yr.pending_listings_yoy != null) d.yoy_latest.pending_listings_yoy = Number(yr.pending_listings_yoy);
-      if (yr.pending_ratio_yoy != null) d.yoy_latest.pending_ratio_yoy = Number(yr.pending_ratio_yoy);
-      if (yr.days_on_market_yoy != null) d.yoy_latest.days_on_market_yoy = Number(yr.days_on_market_yoy);
-      if (yr.price_reduced_pct_yoy != null) d.yoy_latest.price_reduced_pct_yoy = Number(yr.price_reduced_pct_yoy);
+      // Copy every YOY column the view returns (Zillow, Realtor.com and Redfin).
+      for (const [k, v] of Object.entries(yr)) {
+        if (k !== 'fips' && v != null) d.yoy_latest[k] = Number(v);
+      }
     }
   });
 
