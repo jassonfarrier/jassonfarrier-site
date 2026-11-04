@@ -5069,15 +5069,20 @@ function _mapLabel(metric, val, isYOY, isPayment) {
   const shortName = p => ['case',
     ['all', ['>', ['length', ['get', p]], 7], ['==', ['slice', ['get', p], ['-', ['length', ['get', p]], 7]], ' County']],
     ['slice', ['get', p], 0, ['-', ['length', ['get', p]], 7]], ['get', p]];
-  const twoLine = nameProp => ['format',
-    shortName(nameProp), {'font-scale': 0.82, 'text-color': '#4a5363'},
+  // metros: keep the part before the comma ("Columbus" not "Columbus, OH")
+  const beforeComma = p => ['case', ['>', ['index-of', ',', ['get', p]], 0],
+    ['slice', ['get', p], 0, ['index-of', ',', ['get', p]]], ['get', p]];
+  const twoLineExpr = nameExpr => ['format',
+    nameExpr, {'font-scale': 0.82, 'text-color': '#4a5363'},
     '\n', {},
     ['coalesce', ['get', '__label'], ''], {'font-scale': 1.0, 'text-color': '#0d1e42'}];
+  const twoLine = nameProp => twoLineExpr(shortName(nameProp));
+  // same look everywhere; size follows the area (states largest, ZIPs smallest)
   const RULES = {
+    'state-labels':    {min: 0,   size: ['interpolate', ['linear'], ['zoom'], 3, 13, 4.5, 16, 6, 20, 8, 26, 10, 32], field: twoLine('name')},
+    'metros-labels':   {min: 3.5, size: ['interpolate', ['linear'], ['zoom'], 3.5, 10, 5, 12, 6.5, 14, 8, 17, 10, 21], field: twoLineExpr(beforeComma('name'))},
     'counties-labels': {min: 5.2, size: ['interpolate', ['linear'], ['zoom'], 5.2, 9, 6, 10.5, 7, 12.5, 8.5, 16, 10, 20, 12, 24], field: twoLine('county')},
-    'metros-labels':   {min: 3.5, size: ['interpolate', ['linear'], ['zoom'], 3.5, 9, 5, 10.5, 6.5, 12.5, 8, 15, 10, 19], field: twoLine('name')},
-    'state-labels':    {min: 0,   size: ['interpolate', ['linear'], ['zoom'], 3, 10, 4.5, 12, 6, 15, 8, 20, 10, 26], field: twoLine('name')},
-    'zips-labels':     {min: 7,   size: ['interpolate', ['linear'], ['zoom'], 7, 9.5, 8.5, 12, 10, 15, 12, 19]}
+    'zips-labels':     {min: 7,   size: ['interpolate', ['linear'], ['zoom'], 7, 9, 8.5, 11, 10, 14, 12, 18], field: twoLineExpr(['to-string', ['get', 'zip']])}
   };
   let tries = 0;
   (function apply() {
