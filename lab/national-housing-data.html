@@ -390,6 +390,10 @@ html.dock .sumcard.on{display:block}
 .sc-v{font-size:10.5px;font-weight:800;text-align:right}.sc-v.up{color:#c0392b}.sc-v.down{color:#1d4ed8}.sc-v.mid{color:#6b7280}
 .sc-foot{font-size:9.5px;color:#9aa3b2;margin-top:8px}
 </style>
+<style id="tips-css">
+/* chart hover + click cards: about 22% smaller, shrink toward their middle so they cover less of the line */
+html.dock #line-chart .chart-card{transform-box:fill-box;transform-origin:center;transform:scale(.78)}
+</style>
 </head>
 <body>
 <div id="loading" style="background:#f7f8fa"><div class="spinner" style="border-color:rgba(26,82,150,0.15);border-top-color:#0D1E42"></div><div class="ld" style="color:rgba(26,82,150,0.6)">Loading National Data</div></div>
@@ -1843,7 +1847,7 @@ function drawLineChart(county, cmetric) {
   const bisect = d3.bisector(r=>parseDate(r.date)).left;
   const hoverLine = g.append('line').attr('y1',0).attr('y2',ih).attr('stroke','rgba(26,82,150,0.25)').attr('stroke-width',1).attr('stroke-dasharray','4,3').style('opacity',0);
   const hoverDot = g.append('circle').attr('r',6).attr('fill','#1a3a5c').attr('stroke','#fff').attr('stroke-width',2.5).style('opacity',0);
-  const hoverCard = g.append('g').style('opacity',0);
+  const hoverCard = g.append('g').attr('class','chart-card').style('opacity',0);
   const hoverRect = hoverCard.append('rect').attr('rx',12).attr('fill','#fff').attr('stroke','rgba(26,82,150,0.12)').attr('stroke-width',1.5).style('filter','drop-shadow(0 8px 28px rgba(0,0,0,0.3))');
   const hoverDateTxt = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888').attr('letter-spacing','0.06em');
   const hoverValTxt = hoverCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
@@ -2932,7 +2936,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
 
   // Persistent click tooltip
   let clickedDate = null;
-  const clickCard = g.append('g').style('opacity',0);
+  const clickCard = g.append('g').attr('class','chart-card').style('opacity',0);
   _dismissClickCard = () => { clickCard.style('opacity',0); clickedDate = null; if(bars){bars.attr('fill', d=>barColor(d)).attr('fill-opacity',1.0).attr('stroke','#fff').attr('stroke-width',0.8);} };
 
   // ── RECORD HIGH CALLOUT ─────────────────────────────────────────────
@@ -3070,7 +3074,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const hoverLine = g.append('line').attr('y1',0).attr('y2',ih)
     .attr('stroke','rgba(26,82,150,0.3)').attr('stroke-width',1)
     .attr('stroke-dasharray','4,3').style('opacity',0);
-  const hoverCard = g.append('g').style('opacity',0);
+  const hoverCard = g.append('g').attr('class','chart-card').style('opacity',0);
   const hoverRect = hoverCard.append('rect').attr('rx',12).attr('fill','#fff').attr('stroke','rgba(26,82,150,0.12)').attr('stroke-width',1.5)
     .attr('stroke','rgba(26,82,150,0.18)').attr('stroke-width',1.5)
     .style('filter','drop-shadow(0 6px 18px rgba(0,0,0,0.22))');
@@ -3252,7 +3256,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip, keepSlider) {
   lsvg.on('click', function() { _dismissClickCard(); });
 
   // Click card (pinned — dark)
-  const alcClickCard = g.append('g').style('opacity',0);
+  const alcClickCard = g.append('g').attr('class','chart-card').style('opacity',0);
   const alcClickRect = alcClickCard.append('rect').attr('rx',11).attr('fill','rgba(13,30,66,0.95)')
     .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1.5)
     .style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.55))');
@@ -3264,7 +3268,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip, keepSlider) {
   // Hover — full-area mousemove finds nearest dot (no tiny target to hit)
   const hoverDot = g.append('circle').attr('r',7).attr('fill','#1a5296').attr('stroke','#fff').attr('stroke-width',2.5)
     .style('opacity',0).style('pointer-events','none');
-  const hoverCard = g.append('g').style('opacity',0).style('pointer-events','none');
+  const hoverCard = g.append('g').attr('class','chart-card').style('opacity',0).style('pointer-events','none');
   const hoverRect = hoverCard.append('rect').attr('rx',11).attr('fill','#fff')
     .attr('stroke','rgba(26,82,150,0.18)').attr('stroke-width',1.5)
     .style('filter','drop-shadow(0 8px 28px rgba(0,0,0,0.3))');
@@ -3414,7 +3418,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
   _dismissClickCard = () => { annClickCard.style('opacity',0); annClickedYear = null; g.selectAll('.bar').attr('stroke','#fff').attr('stroke-width',1.5); };
 
   // Click card (pinned — dark)
-  const annClickCard = g.append('g').style('opacity',0);
+  const annClickCard = g.append('g').attr('class','chart-card').style('opacity',0);
   const annClickRect = annClickCard.append('rect').attr('rx',12).attr('fill','rgba(13,30,66,0.95)')
     .attr('stroke','rgba(255,255,255,0.15)').attr('stroke-width',1.5)
     .style('filter','drop-shadow(0 6px 20px rgba(0,0,0,0.55))');
@@ -3424,7 +3428,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
   const annClickHint = annClickCard.append('text').attr('font-size','11px').attr('font-family','Montserrat').attr('font-weight','600').attr('fill','rgba(255,255,255,0.45)').text('HOVER ANOTHER BAR TO COMPARE');
 
   // Hover card
-  const annHoverCard = g.append('g').style('opacity',0).style('pointer-events','none');
+  const annHoverCard = g.append('g').attr('class','chart-card').style('opacity',0).style('pointer-events','none');
   const annHoverRect = annHoverCard.append('rect').attr('rx',12).attr('fill','#fff')
     .attr('stroke','rgba(26,82,150,0.18)').attr('stroke-width',1.5)
     .style('filter','drop-shadow(0 6px 18px rgba(0,0,0,0.22))');
