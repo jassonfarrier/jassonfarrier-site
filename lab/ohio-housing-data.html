@@ -536,15 +536,15 @@ const METRIC_MENU = [{"name": "Prices", "items": [{"m": "zhvi", "html": "<span c
 // Both menus are built from METRIC_MENU so they always show the same metrics, order and look.
 // YOY versions are not separate rows: the "Current | YOY change" switch flips every row.
 (function buildMetricMenus() {
-  const OPEN_BY_DEFAULT = new Set(['Popular']);
+  const OPEN_BY_DEFAULT = new Set(['Key Numbers']);
   // Popular: the key metrics up top; they also stay in their normal groups below
   (function addPopular() {
     const POPULAR = ['zhvi', 'active_listings', 'pending_ratio', 'delisted_pct', 'days_on_market',
                      'rf_months_supply', 'rf_median_sale_price', 'price_reduced_pct'];
-    if (METRIC_MENU.length && METRIC_MENU[0].name === 'Popular') return;
+    if (METRIC_MENU.length && METRIC_MENU[0].name === 'Key Numbers') return;
     const all = {}; METRIC_MENU.forEach(s => s.items.forEach(i => { all[i.m] = i; }));
     const items = POPULAR.map(m => all[m]).filter(Boolean);
-    if (items.length) METRIC_MENU.unshift({name: 'Popular', items});
+    if (items.length) METRIC_MENU.unshift({name: 'Key Numbers', items});
   })();
   // Redfin breaks these three out by home type (US, states, large metros only)
   const HOME_TYPES = [['all', 'All home types'], ['sfr', 'Single-family'], ['th', 'Townhouse'], ['condo', 'Condo / co-op'], ['mf', '2–4 units']];
@@ -4443,7 +4443,7 @@ function _mapLabel(metric, val, isYOY, isPayment) {
       const r = RULES[id];
       try {
         map.setLayerZoomRange(id, r.min, 24);
-        map.setLayoutProperty(id, 'text-size', r.size);
+        map.setLayoutProperty(id, 'text-size', r.size.map((v, i) => (i > 2 && i % 2 === 0) ? +(v * 1.06).toFixed(2) : v));
         if (r.field) map.setLayoutProperty(id, 'text-field', r.field);
         map.setLayoutProperty(id, 'text-padding', 1);
         map.setLayoutProperty(id, 'text-max-width', 8);
@@ -4451,6 +4451,16 @@ function _mapLabel(metric, val, isYOY, isPayment) {
         map.setPaintProperty(id, 'text-halo-width', 1.6);
       } catch (e) { console.warn('label rule', id, e); }
     }
+    // every county and metro label shows from about state-level zoom (wide national views keep clean spacing)
+    const FULL_AT = 6.0;
+    const setOverlap = () => {
+      const on = map.getZoom() >= FULL_AT;
+      ['counties-labels', 'metros-labels'].forEach(id => {
+        if (!map.getLayer(id)) return;
+        try { map.setLayoutProperty(id, 'text-allow-overlap', on); map.setLayoutProperty(id, 'text-ignore-placement', on); } catch (e) {}
+      });
+    };
+    setOverlap(); map.on('zoomend', setOverlap);
     // metros need their values filled in once
     try { if (typeof mapMode !== 'undefined' && mapMode === 'metro') renderColors('metro'); } catch (e) {}
   })();
