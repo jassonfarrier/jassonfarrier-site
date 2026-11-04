@@ -1,6 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script id="fetch-retry">
+// Retry data requests that fail on a busy moment (server error / timeout) instead of showing an empty map
+(function () {
+  var f = window.fetch.bind(window);
+  window.fetch = async function (input, init) {
+    var url = typeof input === 'string' ? input : ((input && input.url) || '');
+    var method = (init && init.method) || 'GET';
+    if (url.indexOf('supabase.co/rest/v1/') < 0 || method !== 'GET') return f(input, init);
+    var last;
+    for (var i = 0; i < 4; i++) {
+      try {
+        var r = await f(input, init);
+        if (r.ok || (r.status < 500 && r.status !== 429)) return r;
+        last = r;
+      } catch (e) { last = e; }
+      await new Promise(function (res) { setTimeout(res, 700 * (i + 1)); });
+    }
+    if (last instanceof Response) return last;
+    throw last;
+  };
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>National Housing Market Data by State, Metro, County & ZIP | Jasson Farrier</title>
@@ -1157,7 +1179,7 @@ function renderRankBadge(mode, id, metric) {
       const {rank: sRank, total: sTotal} = computeRank(stateVals, metric, targetVal);
       html += ` · ${sRank}<sup>${_ordSuffix(sRank)}</sup> of ${sTotal} in ${targetStateId}`;
     }
-    el.innerHTML = _isPhone() ? (html + ' · ' + label).split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html + ` · ${label}`;
+    el.innerHTML = _isPhone() ? html.split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html;
   } else if (mode === 'zip') {
     // Permits aren't tracked at zip level — skip.
     if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { hide(); return; }
@@ -1183,7 +1205,7 @@ function renderRankBadge(mode, id, metric) {
       const natPct = Math.max(1, Math.round((zd.national_rank / zd.national_total) * 100));
       html += ` · Top ${natPct}% of ${zd.national_total.toLocaleString()} nationally`;
     }
-    el.innerHTML = _isPhone() ? (html + ' · ' + label).split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html + ` · ${label}`;
+    el.innerHTML = _isPhone() ? html.split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html;
   } else if (mode === 'metro') {
     if (metric === 'sf_permits_per_1k' || metric === 'mf_permits_per_1k' || metric === 'total_permits_per_1k') { hide(); return; }
     const vals = [], stateVals = [];
@@ -1214,7 +1236,7 @@ function renderRankBadge(mode, id, metric) {
       const {rank: sRank, total: sTotal} = computeRank(stateVals, metric, targetVal);
       html += ` · ${sRank}<sup>${_ordSuffix(sRank)}</sup> of ${sTotal} in ${targetStateId}`;
     }
-    el.innerHTML = _isPhone() ? (html + ' · ' + label).split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html + ` · ${label}`;
+    el.innerHTML = _isPhone() ? html.split(' · ').map(p => '<span class="rk-part">' + p + '</span>').join('') : html;
   } else {
     hide();
   }
