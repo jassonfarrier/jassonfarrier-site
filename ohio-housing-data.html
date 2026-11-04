@@ -338,6 +338,19 @@ html.is-phone .upper-third-rank .rk-part{display:block}
 #mkt-pr .mkt-val{font-size:24px!important}
 #line-chart .chart-card{transform-box:fill-box;transform-origin:center;transform:scale(.73)}
 </style>
+
+<script id="tax-helpers">
+// each place's own property tax history -> chart rows / {year: rate} (same data Ohio counties & ZIPs use)
+function _taxRows(d) { return ((d && d.prop_tax_history) || []).map(r => ({...r, date: r.year + '-06'})); }
+function _taxByYear(d) { const t = {}; ((d && d.prop_tax_history) || []).forEach(r => { if (r.property_tax_rate != null) t[r.year] = r.property_tax_rate; }); return Object.keys(t).length ? t : null; }
+function _drawPayment(name, cm, d) {
+  if (!nationalRatesLoaded) { loadNationalRates(); const w = setInterval(() => { if (nationalRatesLoaded) { clearInterval(w); _drawPayment(name, cm, d); } }, 200); return; }
+  if (typeof STATE_DATA !== 'undefined' && !STATE_DATA && typeof loadStateData === 'function') { loadStateData(); const w2 = setInterval(() => { if (STATE_DATA) { clearInterval(w2); _drawPayment(name, cm, d); } }, 200); return; }
+  const zhviByYear = {};
+  ((d && d.history) || []).forEach(r => { if (r.zhvi == null || !r.date) return; const [yr, mo] = r.date.split('-'); if (!zhviByYear[yr] || mo === '07') zhviByYear[yr] = r.zhvi; });
+  drawAnnualBarChart(name, cm, buildPaymentHist(zhviByYear, _taxByYear(d), 0.20, cm), true);
+}
+</script>
 </head>
 <body>
 <div id="loading" style="background:#f7f8fa"><div class="spinner" style="border-color:rgba(26,82,150,0.15);border-top-color:#0D1E42"></div><div class="ld" style="color:rgba(26,82,150,0.6)">Loading Ohio Data</div></div>
@@ -1715,7 +1728,7 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
         } else if (YOY_METRICS.has(cm)) {
           drawMonthlyBarChart(d.metro, cm, getYOYRows(d, cm), true);
         } else if (cm === 'median_property_tax' || cm === 'property_tax_rate') {
-          drawAnnualBarChart(d.metro, cm, [], true);
+          drawAnnualBarChart(d.metro, cm, _taxRows(d), true);
         } else if (PAYMENT_METRICS.has(cm)) {
           if (!nationalRatesLoaded) {
             loadNationalRates();
@@ -1729,7 +1742,7 @@ document.querySelectorAll('.chart-tab').forEach(tab => {
               if (!zhviByYear[yr] || mo === '07') zhviByYear[yr] = r.zhvi;
             });
             // Metros have no property tax data source — payment is P&I + insurance only
-            const paymentHist = buildPaymentHist(zhviByYear, null, downPct, cm);
+            const paymentHist = buildPaymentHist(zhviByYear, _taxByYear(d), downPct, cm);
             drawAnnualBarChart(d.metro, cm, paymentHist, true);
           }
         } else if (cm === 'pending_ratio') {
@@ -3434,7 +3447,7 @@ function openMetroModal(rid) {
   if (!d) return;
   if (!d.history) {
     const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
-    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_metros?select=region_id,history&region_id=eq.'+rid, {
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_metros?select=region_id,history,prop_tax_history&region_id=eq.'+rid, {
       headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
     }).then(r=>r.json()).then(rows => {
       // NOTE: do NOT call attachYOY() here — it recomputes yoy_latest client-side from
@@ -3442,7 +3455,7 @@ function openMetroModal(rid) {
       // yoy_latest is already correct: it comes precomputed from the ohio_metros.yoy_latest
       // column when metros first load and must not be overwritten.
       if (rows[0]) {
-        d.history = rows[0].history;
+        d.history = rows[0].history; if (rows[0].prop_tax_history) d.prop_tax_history = rows[0].prop_tax_history;
         d.yoy_history = {};
         for (const [yoyKey, base] of Object.entries(YOY_BASE)) {
           if (TAX_YOY.has(yoyKey)) {
@@ -3490,7 +3503,9 @@ function openMetroModal(rid) {
     } else if (YOY_METRICS.has(mapMetric)) {
       drawMonthlyBarChart(d.metro, mapMetric, getYOYRows(d, mapMetric), true);
     } else if (mapMetric === 'median_property_tax' || mapMetric === 'property_tax_rate') {
-      drawAnnualBarChart(d.metro, mapMetric, [], true);
+      drawAnnualBarChart(d.metro, mapMetric, _taxRows(d), true);
+    } else if (PAYMENT_METRICS.has(mapMetric)) {
+      _drawPayment(d.metro, mapMetric, d);
     } else if (mapMetric === 'pending_ratio') {
       drawAnnualLineChart(d.metro, mapMetric, d.history, true);
     } else {
@@ -3659,7 +3674,7 @@ function renderStateChart(name, cmetric, d) {
   if (YOY_METRICS.has(cmetric)) {
     drawMonthlyBarChart(name, cmetric, getYOYRows(d, cmetric), true);
   } else if (cmetric === 'median_property_tax' || cmetric === 'property_tax_rate') {
-    drawAnnualBarChart(name, cmetric, [], true);
+    drawAnnualBarChart(name, cmetric, _taxRows(d), true);
   } else if (PAYMENT_METRICS.has(cmetric)) {
     if (!nationalRatesLoaded) {
       loadNationalRates();
@@ -3836,7 +3851,7 @@ function openZipModal(zip) {
   setPendingRatioBadge(l.pending_ratio, l.rf_months_supply);
 
   // Chart tabs
-  const defaultMetric = mapMetric==='median_property_tax'||mapMetric==='property_tax_rate' ? 'zhvi' : mapMetric;
+  const defaultMetric = mapMetric;
   renderRankBadge('zip', zip, defaultMetric);
   document.querySelectorAll('.chart-tab[data-cmetric]').forEach(t=>t.classList.remove('active'));
   const at = document.querySelector(`.chart-tab[data-cmetric="${defaultMetric}"]`);
@@ -4389,8 +4404,16 @@ function _mapLabel(metric, val, isYOY, isPayment) {
     if (stateOf && st) list.forEach(d => { if (stateOf(d) !== st) return; const v = getMetricVal(d, metric); if (v != null && !isNaN(v)) local.push(Number(v)); });
     return {vals, local, target, st};
   }
+  let _payWait = 0;
   window.renderRankBadge = function (mode, id, metric) {
     if (!metric) return out([]);
+    // Est. Payment needs the current mortgage rate first; fill the rank in once it has loaded
+    if (typeof PAYMENT_METRICS !== 'undefined' && PAYMENT_METRICS.has(metric) && typeof STATE_DATA !== 'undefined' && !STATE_DATA) {
+      if (typeof loadStateData === 'function') loadStateData();
+      if (_payWait++ < 40) setTimeout(() => window.renderRankBadge(mode, id, metric), 400);
+      return out([]);
+    }
+    _payWait = 0;
     if ((mode === 'zip' || mode === 'metro') && PERMITS.has(metric)) return out([]);
     try {
       if (mode === 'county') {
