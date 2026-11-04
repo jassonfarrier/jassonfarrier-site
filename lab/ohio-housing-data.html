@@ -302,6 +302,33 @@ html.is-phone .upper-third-rank .rk-part{display:block}
   "license": "https://jassonfarrier.com/privacy"
 }
 </script>
+
+<style id="dock-css">
+/* ===== three-panel desktop layout (menu | chart | map) ===== */
+html.dock .map-wrap{position:relative;flex:1;min-width:0;height:100%}
+html.dock .map-wrap #map{position:absolute;inset:0;width:100%;height:100%}
+html.dock #legend{left:12px!important}
+html.dock #search-bar{left:12px!important;right:12px!important;transform:none!important;width:auto!important;min-width:0!important;max-width:none!important;flex-wrap:wrap;row-gap:4px}
+html.dock #search-bar #search-input{min-width:120px!important}
+html.dock #search-bar .mode-pills{flex-wrap:wrap}
+html.dock #national-stat-overlay{left:0!important}
+html.dock #modal-overlay{position:relative!important;inset:auto!important;display:flex!important;align-items:stretch!important;justify-content:stretch!important;
+  background:#fff!important;backdrop-filter:none!important;z-index:5!important;width:clamp(520px,44vw,860px);flex-shrink:0;height:100%;
+  border-right:1px solid rgba(0,0,0,0.09);box-shadow:4px 0 18px rgba(0,0,0,0.05)}
+html.dock #modal-wrapper{width:100%!important;height:100%;align-items:stretch}
+html.dock #modal{width:100%!important;height:100%!important;border:none!important;border-radius:0!important;box-shadow:none!important;padding:14px 22px 14px!important;overflow-y:auto!important}
+html.dock .modal-left{display:none!important}
+html.dock .close-btn{display:none!important}
+html.dock .modal-body{flex-direction:column}
+html.dock .modal-right{flex:1;min-height:0;display:flex;flex-direction:column}
+html.dock #line-chart{min-height:340px}
+html.dock .dock-sliders{margin-top:14px}
+html.dock .upper-third{flex-direction:column!important;align-items:stretch!important}
+html.dock .upper-third-main{width:auto!important;flex-wrap:wrap!important}
+html.dock .upper-third-rank-section{width:auto!important;border-left:none!important;border-top:1px solid rgba(255,255,255,0.12)}
+html.dock .upper-third-rank{white-space:normal!important}
+html.dock .dock-sliders .mkt-sliders{margin-bottom:0}
+</style>
 </head>
 <body>
 <div id="loading" style="background:#f7f8fa"><div class="spinner" style="border-color:rgba(26,82,150,0.15);border-top-color:#0D1E42"></div><div class="ld" style="color:rgba(26,82,150,0.6)">Loading Ohio Data</div></div>
@@ -4246,3 +4273,47 @@ document.addEventListener('change', function(e){
 
 </script>
 <div style="position:fixed;bottom:10px;left:10px;z-index:99999;background:#e11d48;color:#fff;font:700 11px Montserrat,sans-serif;padding:5px 9px;border-radius:6px;letter-spacing:.5px">TEST VERSION · not live</div>
+<script>window.__DOCK_DEFAULT = () => openStateModal();</script>
+
+<script id="dock-js">
+// ===== three-panel desktop layout: the chart sits between the menu and the map instead of a popup =====
+(function () {
+  if (typeof _isPhone === 'function' && _isPhone()) return;          // phones keep the current layout
+  const root = document.documentElement;
+  root.classList.add('dock');
+  const main = document.querySelector('.main'), mapEl = document.getElementById('map'), ov = document.getElementById('modal-overlay');
+  if (!main || !mapEl || !ov) { root.classList.remove('dock'); return; }
+  // map area keeps its own search bar, legend and overlays
+  const wrap = document.createElement('div'); wrap.className = 'map-wrap';
+  main.insertBefore(wrap, mapEl); wrap.appendChild(mapEl);
+  ['national-stat-overlay', 'table-view', 'search-bar', 'zip-picker-banner', 'legend'].forEach(id => { const el = document.getElementById(id); if (el) wrap.appendChild(el); });
+  // chart panel goes between the menu and the map
+  main.insertBefore(ov, wrap);
+  // market sliders move under the chart
+  const sl = document.getElementById('pending-ratio-badge'), right = ov.querySelector('.modal-right');
+  if (sl && right) { const box = document.createElement('div'); box.className = 'dock-sliders'; box.appendChild(sl); right.appendChild(box); }
+  // the panel never closes: clicks on its background must not dismiss it
+  ov.addEventListener('click', e => { if (e.target === ov) e.stopImmediatePropagation(); }, true);
+  const resize = () => { try { if (typeof map !== 'undefined' && map && map.resize) map.resize(); } catch (e) {} };
+  setTimeout(resize, 50); setTimeout(resize, 600); window.addEventListener('resize', resize);
+  // one menu: picking a metric (or YOY switch / home type) in the left menu also switches the chart
+  function syncChart() {
+    const m = (typeof mapMetric !== 'undefined') ? mapMetric : null;
+    if (!m) return;
+    const b = document.querySelector('#chart-tabs [data-cmetric="' + m + '"]');
+    if (b && !b.classList.contains('active')) b.click();
+  }
+  const menu = document.getElementById('metric-menu-map');
+  if (menu) { menu.addEventListener('click', () => setTimeout(syncChart, 30)); menu.addEventListener('change', () => setTimeout(syncChart, 60)); }
+  // open on a default place so the panel is never blank
+  const DEFAULT = window.__DOCK_DEFAULT;
+  let tries = 0;
+  (function openDefault() {
+    const loading = document.getElementById('loading');
+    const busy = loading && getComputedStyle(loading).display !== 'none' && getComputedStyle(loading).opacity !== '0';
+    if (busy && tries++ < 120) { setTimeout(openDefault, 250); return; }
+    if (document.getElementById('modal-county').textContent.trim()) return;   // a place is already showing
+    try { DEFAULT(); setTimeout(() => { syncChart(); resize(); }, 900); } catch (e) { if (tries++ < 120) setTimeout(openDefault, 500); }
+  })();
+})();
+</script>
