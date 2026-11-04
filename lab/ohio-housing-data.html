@@ -4684,6 +4684,8 @@ function _mapLabel(metric, val, isYOY, isPayment) {
      hi: 'Strong', mid: 'Average', lo: 'Slow', big: s => s > 0.2 ? ['Strong growth', 'up'] : s < -0.2 ? ['Slow growth', 'down'] : ['Average growth', ''],
      v: s => s > 0.15 ? ['Above average', 'up'] : s < -0.15 ? ['Below average', 'down'] : ['Average', 'mid'], cmp: 'Stronger than'}
   ];
+  // Investor View and Long-Term Growth are parked on the to-do list for now: only Market Direction shows
+  TABS.length = 1;
   function score(sigs) { const ok = sigs.filter(x => x.s != null); return ok.length ? ok.reduce((a, x) => a + x.s, 0) / ok.length : null; }
   function bestMonths(d) {
     const h = hist(d); if (!h.length) return null;
@@ -4717,7 +4719,7 @@ function _mapLabel(metric, val, isYOY, isPayment) {
     card.innerHTML =
       `<div class="sc-head"><div class="sc-logo">JASSON<br>FARRIER<span>KIGER REALTY</span></div><div><div class="sc-place">${nm}</div>` +
       `<div class="sc-title">${T.title} <em>· ${when}</em></div><div class="sc-sub">${T.sub}</div></div></div>` +
-      `<div class="sc-tabs">${TABS.map((x, i) => `<button class="sc-tab${i === tab ? ' on' : ''}" data-i="${i}">${x.t}</button>`).join('')}</div>` +
+      (TABS.length > 1 ? `<div class="sc-tabs">${TABS.map((x, i) => `<button class="sc-tab${i === tab ? ' on' : ''}" data-i="${i}">${x.t}</button>`).join('')}</div>` : '<div style="height:14px"></div>') +
       `<div class="sc-main"><div class="sc-gauge">${s == null ? '' : `<span class="dot" style="top:${(1 - s) / 2 * 100}%"></span>`}</div>` +
       `<div class="sc-glbl"><span>${T.hi}</span><span>${T.mid}</span><span>${T.lo}</span></div>` +
       `<div class="sc-verdict"><div class="sc-big ${big[1]}">${big[0]}</div>` +
