@@ -5003,15 +5003,21 @@ function _mapLabel(metric, val, isYOY, isPayment) {
     return ['Higher', 'Lower'];
   }
   // share of places below / above this value -> "Higher than 85%" or "Lower than 70%"
-  function phrase(vals, target, metric) {
-    const n = vals.length; if (!n) return null;
-    let below = 0, above = 0; vals.forEach(v => { if (v < target) below++; else if (v > target) above++; });
-    const pb = Math.round(below / n * 100), pa = Math.round(above / n * 100), w = words(metric);
-    return pb >= pa ? `${w[0]} than ${pb}%` : `${w[1]} than ${pa}%`;
+  // shares of places below / above this value
+  function shares(vals, target) {
+    const n = vals.length; let below = 0, above = 0;
+    vals.forEach(v => { if (v < target) below++; else if (v > target) above++; });
+    return {pb: Math.round(below / n * 100), pa: Math.round(above / n * 100)};
   }
-  function phraseFromRank(rank, total, metric) {   // rank 1 = highest
-    const pb = Math.round((total - rank) / total * 100), pa = Math.round((rank - 1) / total * 100), w = words(metric);
-    return pb >= pa ? `${w[0]} than ${pb}%` : `${w[1]} than ${pa}%`;
+  function sharesFromRank(rank, total) {   // rank 1 = highest
+    return {pb: Math.round((total - rank) / total * 100), pa: Math.round((rank - 1) / total * 100)};
+  }
+  // every part uses the same word; the direction is picked by the widest comparison (US when shown)
+  function sentence(parts, metric) {
+    parts = parts.filter(p => p && p.s);
+    if (!parts.length) return [];
+    const ref = parts[parts.length - 1].s, w = words(metric), up = ref.pb >= ref.pa;
+    return parts.map(p => `${up ? w[0] : w[1]} than ${up ? p.s.pb : p.s.pa}% of ${p.of}`);
   }
   function out(parts) {
     const el = document.getElementById('ut-rank'), section = document.querySelector('.upper-third-rank-section');
@@ -5029,38 +5035,38 @@ function _mapLabel(metric, val, isYOY, isPayment) {
     return {vals, local, target, st};
   }
   window.renderRankBadge = function (mode, id, metric) {
-    if (typeof RANKABLE_METRICS === 'undefined' || !RANKABLE_METRICS.has(metric)) return out([]);
+    if (!metric) return out([]);
     if ((mode === 'zip' || mode === 'metro') && PERMITS.has(metric)) return out([]);
     try {
       if (mode === 'county') {
         if (NATIONAL) {
           const c = collect(DATA, metric, d => d.fips, id, d => d.state_id);
           if (c.target == null) return out([]);
-          return out([c.local.length > 1 ? `${phrase(c.local, c.target, metric)} of ${c.st} counties` : null,
-                      `${phrase(c.vals, c.target, metric)} of US counties`]);
+          return out(sentence([c.local.length > 1 ? {s: shares(c.local, c.target), of: `${c.st} counties`} : null,
+                               {s: shares(c.vals, c.target), of: 'US counties'}], metric));
         }
         const c = collect(DATA, metric, d => d.county, id);
-        return out([c.target == null ? null : `${phrase(c.vals, c.target, metric)} of OH counties`]);
+        return out(c.target == null || c.vals.length < 2 ? [] : sentence([{s: shares(c.vals, c.target), of: 'OH counties'}], metric));
       }
       if (mode === 'metro') {
         if (NATIONAL) {
           const c = collect(METRO_DATA, metric, m => m.region_id, id, m => m.state_id);
           if (c.target == null) return out([]);
-          return out([c.local.length > 1 ? `${phrase(c.local, c.target, metric)} of ${c.st} metros` : null,
-                      `${phrase(c.vals, c.target, metric)} of US metros`]);
+          return out(sentence([c.local.length > 1 ? {s: shares(c.local, c.target), of: `${c.st} metros`} : null,
+                               {s: shares(c.vals, c.target), of: 'US metros'}], metric));
         }
         const c = collect(METRO_DATA, metric, m => m.region_id, id);
-        return out([c.target == null ? null : `${phrase(c.vals, c.target, metric)} of OH metros`]);
+        return out(c.target == null || c.vals.length < 2 ? [] : sentence([{s: shares(c.vals, c.target), of: 'OH metros'}], metric));
       }
       if (mode === 'zip') {
         const c = collect(ZIP_DATA, metric, z => z.zip, id);
         if (c.target == null || c.vals.length < 20) return out([]);
         const st = NATIONAL ? (typeof currentZipState !== 'undefined' && currentZipState) || '' : 'OH';
-        const parts = [`${phrase(c.vals, c.target, metric)} of ${st} ZIPs`];
+        const parts = [{s: shares(c.vals, c.target), of: `${st} ZIPs`}];
         const zd = typeof zipDataMap !== 'undefined' ? zipDataMap[id] : null;
         if (NATIONAL && metric === 'zhvi' && zd && zd.national_rank != null && zd.national_total)
-          parts.push(`${phraseFromRank(zd.national_rank, zd.national_total, metric)} of US ZIPs`);
-        return out(parts);
+          parts.push({s: sharesFromRank(zd.national_rank, zd.national_total), of: 'US ZIPs'});
+        return out(sentence(parts, metric));
       }
     } catch (e) { console.warn('rank', e); }
     out([]);
