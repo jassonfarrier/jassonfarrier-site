@@ -342,6 +342,49 @@ html.dock .cr-bar.on{display:flex}
 .cr-btn:hover{background:rgba(13,30,66,0.08)}
 .cr-btn.on{background:#0d1e42;color:#fff}
 </style>
+
+<style id="cards-css">
+.snap{display:none;margin-top:14px;font-family:Montserrat,sans-serif}
+html.dock .snap.on{display:block}
+.snap-h{font-size:12px;font-weight:700;color:#0d1e42;margin:0 0 8px}
+.snap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.snap-box{border:1px solid #e3e7ee;border-radius:8px;padding:9px 11px 10px;background:#fff;min-width:0}
+.snap-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
+.snap-lbl{font-size:10px;color:#6b7280;font-weight:600;line-height:1.3;text-transform:none!important;letter-spacing:0!important}
+.snap-i{flex-shrink:0;width:13px;height:13px;border-radius:50%;border:1px solid #9aa3b2;color:#6b7280;font:700 8px/11px Montserrat,sans-serif;text-align:center;cursor:help}
+.snap-val{font-size:17px;font-weight:800;color:#0d1e42;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snap-val.up{color:#c0392b}.snap-val.down{color:#15803d}.snap-val.na{color:#9aa3b2;font-size:14px}
+.sumcard{display:none;margin-top:14px;border:1px solid #e3e7ee;border-radius:12px;padding:16px 18px 14px;background:#fff;font-family:Montserrat,sans-serif}
+html.dock .sumcard.on{display:block}
+.sc-head{display:flex;align-items:center;gap:16px}
+.sc-logo{font-weight:900;font-size:13px;line-height:1.05;color:#0d1e42;letter-spacing:.5px;flex-shrink:0;border-right:1px solid #e3e7ee;padding-right:14px}
+.sc-logo span{display:block;font-size:8px;font-weight:700;letter-spacing:2px;color:#6b7280;margin-top:3px}
+.sc-place{font-size:12px;font-weight:800;color:#c0392b}
+.sc-title{font-size:17px;font-weight:800;color:#0d1e42;margin-top:1px}.sc-title em{font-style:normal;color:#6b7280;font-weight:700}
+.sc-sub{font-size:10.5px;color:#6b7280;margin-top:2px}
+.sc-tabs{display:flex;background:#eef1f6;border-radius:8px;padding:3px;margin:14px 0 12px}
+.sc-tab{flex:1;border:none;background:transparent;font:700 10.5px Montserrat,sans-serif;color:#4a5363;padding:7px 4px;border-radius:6px;cursor:pointer}
+.sc-tab.on{background:#fff;color:#0d1e42;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.sc-main{display:flex;gap:16px;align-items:stretch}
+.sc-gauge{position:relative;width:16px;border-radius:8px;flex-shrink:0;height:150px;background:linear-gradient(#c0392b,#e8e3e3 50%,#1d4ed8)}
+.sc-gauge .dot{position:absolute;left:50%;width:14px;height:14px;border-radius:50%;background:#0d1e42;border:2px solid #fff;transform:translate(-50%,-50%);box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.sc-glbl{display:flex;flex-direction:column;justify-content:space-between;height:150px;font-size:10px;font-weight:700;color:#4a5363;flex-shrink:0}
+.sc-verdict{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.sc-big{font-size:26px;font-weight:900;color:#0d1e42}.sc-big.up{color:#c0392b}.sc-big.down{color:#1d4ed8}
+.sc-when{font-size:11px;color:#6b7280;margin-top:4px}
+.sc-pct{display:inline-block;margin-top:8px;font-size:11px;font-weight:700;color:#0d1e42;background:#eef1f6;border-radius:999px;padding:4px 10px}
+.sc-months{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 6px}
+.sc-mon{border-radius:8px;padding:8px 10px;text-align:center}
+.sc-mon.buy{background:#e8f0fe}.sc-mon.sell{background:#fdecea}
+.sc-mon b{display:block;font-size:9.5px;color:#4a5363;font-weight:700;letter-spacing:.3px}
+.sc-mon span{display:block;font-size:15px;font-weight:900;color:#0d1e42;letter-spacing:1px;margin-top:2px}
+.sc-sig{display:grid;grid-template-columns:150px 1fr 120px;align-items:center;gap:12px;padding:9px 0;border-top:1px solid #f0f2f6}
+.sc-sig-n{font-size:11.5px;font-weight:700;color:#0d1e42}.sc-sig-n small{display:block;font-size:10px;color:#6b7280;font-weight:600;margin-top:1px}
+.sc-track{position:relative;height:6px;border-radius:3px;background:linear-gradient(90deg,#1d4ed8,#e8e3e3 50%,#c0392b)}
+.sc-track .dot{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:#0d1e42;border:2px solid #fff;transform:translate(-50%,-50%);box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sc-v{font-size:10.5px;font-weight:800;text-align:right}.sc-v.up{color:#c0392b}.sc-v.down{color:#1d4ed8}.sc-v.mid{color:#6b7280}
+.sc-foot{font-size:9.5px;color:#9aa3b2;margin-top:8px}
+</style>
 </head>
 <body>
 <div id="loading" style="background:#f7f8fa"><div class="spinner" style="border-color:rgba(26,82,150,0.15);border-top-color:#0D1E42"></div><div class="ld" style="color:rgba(26,82,150,0.6)">Loading National Data</div></div>
@@ -5114,5 +5157,213 @@ function _mapLabel(metric, val, isYOY, isPayment) {
     // metros need their values filled in once
     try { if (typeof mapMode !== 'undefined' && mapMode === 'metro') renderColors('metro'); } catch (e) {}
   })();
+})();
+</script>
+
+<script id="cards-js">
+// ===== 'Market snapshot' boxes + summary card under the chart (desktop panel) =====
+(function () {
+  if (!document.documentElement.classList.contains('dock')) return;
+  const right = document.querySelector('#modal-overlay .modal-right'); if (!right) return;
+  const snap = document.createElement('div'); snap.className = 'snap';
+  const card = document.createElement('div'); card.className = 'sumcard';
+  const sliders = right.querySelector('.dock-sliders');
+  right.insertBefore(snap, sliders || null); right.insertBefore(card, sliders || null);
+
+  // ---- which place is showing ----
+  let shown = null;
+  ['openNationalModal', 'openNationalStateModal', 'openStateModal', 'openMetroModal', 'openModal', 'openZipModal'].forEach(name => {
+    const f = window[name]; if (typeof f !== 'function') return;
+    window[name] = function (...args) { shown = {name, args}; schedule(); return f.apply(this, args); };
+  });
+  function place() {
+    if (!shown) return null;
+    const a = shown.args[0];
+    try {
+      switch (shown.name) {
+        case 'openNationalModal': return {d: NATIONAL_DATA, level: 'national', peers: null, unit: ''};
+        case 'openNationalStateModal': return {d: nationalStatesMap[a], level: 'state', peers: Object.values(nationalStatesMap), unit: 'states'};
+        case 'openStateModal': return {d: STATE_DATA, level: 'state', peers: null, unit: ''};
+        case 'openMetroModal': return {d: metroDataMap[a], level: 'metro', peers: Object.values(metroDataMap), unit: 'metros'};
+        case 'openModal': return {d: dataMap[a], level: 'county', peers: Object.values(dataMap), unit: 'counties'};
+        case 'openZipModal': return {d: zipDataMap[a], level: 'zip', peers: Object.values(zipDataMap), unit: 'ZIP codes'};
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  // ---- data helpers (history + latest) ----
+  const num = v => (v == null || v === '' || isNaN(Number(v))) ? null : Number(v);
+  function hist(d) { return (d && Array.isArray(d.history)) ? d.history : []; }
+  function lastOf(d, f) { const h = hist(d); for (let i = h.length - 1; i >= 0; i--) if (num(h[i][f]) != null) return {v: num(h[i][f]), date: h[i].date}; const l = d && d.latest; return l && num(l[f]) != null ? {v: num(l[f]), date: l.date} : null; }
+  function valAt(d, f, date) { const e = hist(d).find(r => r.date === date); return e ? num(e[f]) : null; }
+  function shiftY(date, n) { return (parseInt(date.slice(0, 4), 10) - n) + date.slice(4); }
+  function yoy(d, f) {
+    try { const v = getMetricVal(d, f + '_yoy'); if (v != null && !isNaN(v)) return Number(v); } catch (e) {}
+    const L = lastOf(d, f); if (!L || !L.date) return null; const p = valAt(d, f, shiftY(L.date, 1));
+    return (p ? (L.v / p - 1) * 100 : null);
+  }
+  function growth(d, f, n) { const L = lastOf(d, f); if (!L || !L.date) return null; const p = valAt(d, f, shiftY(L.date, n)); return p ? (L.v / p - 1) * 100 : null; }
+  function cur(d, f) { try { const v = getMetricVal(d, f); if (v != null && !isNaN(v)) return Number(v); } catch (e) {} const L = lastOf(d, f); return L ? L.v : null; }
+  const clamp = x => Math.max(-1, Math.min(1, x));
+  const pct = v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
+  function fmt(m, v) {
+    if (v == null) return null;
+    if (/_yoy$/.test(m) || m === '__g5' || m === '__g10') return pct(v);
+    try { if (METRICS[m] && METRICS[m].fmt) return METRICS[m].fmt(v); } catch (e) {}
+    return v.toLocaleString();
+  }
+
+  // ---- menu info (names, descriptions) ----
+  const INFO = {};
+  try { METRIC_MENU.forEach(s => s.items.forEach(it => {
+    const t = document.createElement('div'); t.innerHTML = it.html;
+    const mn = t.querySelector('.mn'), md = t.querySelector('.md'); const src = md && md.querySelector('.src-tag');
+    const srcTxt = src ? src.textContent : (it.src || ''); if (src) src.remove();
+    INFO[it.m] = {name: mn ? mn.textContent.trim() : it.m, desc: md ? md.textContent.trim() : '', src: srcTxt};
+    if (it.yoy) INFO[it.yoy.m] = {name: (mn ? mn.textContent.trim() : it.m) + ' YOY', desc: 'Change from the same month last year', src: srcTxt};
+  })); } catch (e) {}
+  INFO.__g5 = {name: '5-Year Home Value Growth', desc: 'Change in SFH home value over the last 5 years', src: 'Zillow'};
+
+  // ---- Market snapshot ----
+  const KEY = ['zhvi', 'zhvi_yoy', 'active_listings', 'rf_months_supply', '__g5', 'pending_ratio'];
+  const SELLER_UP = new Set(['zhvi', 'zhvi_yoy', '__g5', 'pending_ratio', 'zhvi_condo', 'median_list_price', 'rf_median_sale_price']);
+  const BUYER_UP = new Set(['active_listings', 'rf_months_supply', 'rf_inventory', 'days_on_market', 'price_reduced_pct']);
+  function groupNow() {
+    const b = document.querySelector('#metric-menu-map .metric-btn.active');
+    const sec = b && b.closest('.menu-sec'); return sec ? sec.dataset.sec : 'Key Numbers';
+  }
+  function renderSnap(P) {
+    const g = groupNow();
+    let ms = KEY;
+    if (g !== 'Key Numbers') { const s = METRIC_MENU.find(x => x.name === g); ms = s ? s.items.map(i => i.m).slice(0, 6) : KEY; }
+    const d = P.d;
+    const boxes = ms.map(m => {
+      const v = m === '__g5' ? growth(d, 'zhvi', 5) : (/_yoy$/.test(m) ? yoy(d, m.slice(0, -4)) : cur(d, m));
+      const i = INFO[m] || {name: (METRICS[m] && METRICS[m].label) || m, desc: '', src: ''};
+      let cls = v == null ? 'na' : '';
+      if (v != null && (/_yoy$/.test(m) || m === '__g5')) cls = v > 0.05 ? 'up' : (v < -0.05 ? 'down' : '');
+      else if (v != null && SELLER_UP.has(m)) cls = 'up'; else if (v != null && BUYER_UP.has(m)) cls = 'down';
+      const tip = (i.desc ? i.desc + '. ' : '') + (i.src ? 'Source: ' + i.src : '');
+      return `<div class="snap-box"><div class="snap-top"><span class="snap-lbl">${i.name}</span><span class="snap-i" title="${tip.replace(/"/g, '&quot;')}">i</span></div>` +
+             `<div class="snap-val ${cls}">${v == null ? 'No data' : fmt(m, v)}</div></div>`;
+    }).join('');
+    snap.innerHTML = `<div class="snap-h">Market snapshot for ${g}</div><div class="snap-grid">${boxes}</div>`;
+    snap.classList.add('on');
+  }
+
+  // ---- summary card ----
+  let tab = 0;
+  const MON = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+  function rateChange() {
+    try {
+      if (typeof NATIONAL_RATES === 'undefined' || !NATIONAL_RATES) { if (typeof loadNationalRates === 'function') loadNationalRates(); return null; }
+      const nowRate = (typeof STATE_DATA !== 'undefined' && STATE_DATA && STATE_DATA.latest && num(STATE_DATA.latest.current_mortgage_rate) != null) ? num(STATE_DATA.latest.current_mortgage_rate) : null;
+      const y = new Date().getFullYear(); const prev = NATIONAL_RATES[y - 1] && NATIONAL_RATES[y - 1].rate;
+      const now = nowRate != null ? nowRate : (NATIONAL_RATES[y] && NATIONAL_RATES[y].rate);
+      return (now != null && prev != null) ? {now, prev, ch: now - prev} : null;
+    } catch (e) { return null; }
+  }
+  function directionSignals(d) {
+    const ap = yoy(d, 'zhvi'), dm = yoy(d, 'days_on_market'), iv = yoy(d, 'active_listings'), pc = yoy(d, 'price_reduced_pct'), rc = rateChange();
+    return [
+      {n: 'Recent Appreciation', note: ap == null ? null : 'Home values ' + pct(ap) + ' vs last year', s: ap == null ? null : clamp(ap / 6)},
+      {n: 'Days on Market', note: dm == null ? null : 'Days on market ' + pct(dm) + ' vs last year', s: dm == null ? null : clamp(-dm / 25)},
+      {n: 'Mortgage Rates', note: rc == null ? null : 'Rates ' + rc.now.toFixed(2) + '% vs ' + rc.prev.toFixed(2) + '% a year ago', s: rc == null ? null : clamp(-rc.ch / 1)},
+      {n: 'Inventory', note: iv == null ? null : 'Active listings ' + pct(iv) + ' vs last year', s: iv == null ? null : clamp(-iv / 25)},
+      {n: 'Price Cuts', note: pc == null ? null : 'Share of price cuts ' + pct(pc) + ' vs last year', s: pc == null ? null : clamp(-pc / 25)}
+    ];
+  }
+  function investorSignals(d) {
+    const z = cur(d, 'zhvi'), r = cur(d, 'zori'), rg = yoy(d, 'zori');
+    const y = (z && r) ? r * 12 / z * 100 : null, ptr = (z && r) ? z / (r * 12) : null;
+    return [
+      {n: 'Rent Yield', note: y == null ? null : 'Yearly rent is ' + y.toFixed(1) + '% of home value', s: y == null ? null : clamp((y - 7) / 3)},
+      {n: 'Rent Growth', note: rg == null ? null : 'Rent ' + pct(rg) + ' vs last year', s: rg == null ? null : clamp((rg - 3) / 5)},
+      {n: 'Price-to-Rent', note: ptr == null ? null : 'Home value = ' + ptr.toFixed(1) + ' years of rent', s: ptr == null ? null : clamp((15 - ptr) / 7)},
+      {n: 'Months of Supply', note: cur(d, 'rf_months_supply') == null ? null : cur(d, 'rf_months_supply').toFixed(1) + ' months of homes for sale', s: cur(d, 'rf_months_supply') == null ? null : clamp((cur(d, 'rf_months_supply') - 4) / 3)},
+      {n: 'Price Cuts', note: cur(d, 'price_reduced_pct') == null ? null : cur(d, 'price_reduced_pct').toFixed(1) + '% of listings cut their price', s: cur(d, 'price_reduced_pct') == null ? null : clamp((cur(d, 'price_reduced_pct') - 18) / 12)}
+    ];
+  }
+  function growthSignals(d) {
+    const g10 = growth(d, 'zhvi', 10), g5 = growth(d, 'zhvi', 5);
+    const a10 = g10 == null ? null : (Math.pow(1 + g10 / 100, 0.1) - 1) * 100, a5 = g5 == null ? null : (Math.pow(1 + g5 / 100, 0.2) - 1) * 100;
+    const pop = cur(d, 'pop_change_pct'), pm = cur(d, 'total_permits_per_1k'), rg = yoy(d, 'zori');
+    return [
+      {n: '10-Year Appreciation', note: g10 == null ? null : pct(g10) + ' total (' + a10.toFixed(1) + '% a year)', s: a10 == null ? null : clamp((a10 - 4) / 4)},
+      {n: '5-Year Appreciation', note: g5 == null ? null : pct(g5) + ' total (' + a5.toFixed(1) + '% a year)', s: a5 == null ? null : clamp((a5 - 4) / 4)},
+      {n: 'Population Growth', note: pop == null ? null : 'Population ' + pct(pop) + ' last year', s: pop == null ? null : clamp((pop - 0.3) / 1)},
+      {n: 'New Construction', note: pm == null ? null : pm.toFixed(1) + ' permits per 1,000 people', s: pm == null ? null : clamp((pm - 3) / 4)},
+      {n: 'Rent Growth', note: rg == null ? null : 'Rent ' + pct(rg) + ' vs last year', s: rg == null ? null : clamp((rg - 3) / 5)}
+    ];
+  }
+  const TABS = [
+    {t: 'Market Direction', title: 'Market Direction', sub: "Buyer's or seller's market, from 5 market signals", fn: directionSignals,
+     hi: 'Sellers', mid: 'Balanced', lo: 'Buyers', big: s => s > 0.2 ? ["Seller's market", 'up'] : s < -0.2 ? ["Buyer's market", 'down'] : ['Balanced market', ''],
+     v: s => s > 0.15 ? ["Seller's advantage", 'up'] : s < -0.15 ? ["Buyer's advantage", 'down'] : ['Neutral', 'mid'], cmp: 'Hotter than'},
+    {t: 'Investor View', title: 'Investor View', sub: 'How the numbers work for a rental purchase', fn: investorSignals,
+     hi: 'Strong', mid: 'Average', lo: 'Weak', big: s => s > 0.2 ? ['Strong for investors', 'up'] : s < -0.2 ? ['Weak for investors', 'down'] : ['Average for investors', ''],
+     v: s => s > 0.15 ? ['Favors investors', 'up'] : s < -0.15 ? ['Weak for investors', 'down'] : ['Average', 'mid'], cmp: 'Better than'},
+    {t: 'Long-Term Growth', title: 'Long-Term Growth', sub: 'How this area has grown over 5 to 10 years', fn: growthSignals,
+     hi: 'Strong', mid: 'Average', lo: 'Slow', big: s => s > 0.2 ? ['Strong growth', 'up'] : s < -0.2 ? ['Slow growth', 'down'] : ['Average growth', ''],
+     v: s => s > 0.15 ? ['Above average', 'up'] : s < -0.15 ? ['Below average', 'down'] : ['Average', 'mid'], cmp: 'Stronger than'}
+  ];
+  function score(sigs) { const ok = sigs.filter(x => x.s != null); return ok.length ? ok.reduce((a, x) => a + x.s, 0) / ok.length : null; }
+  function bestMonths(d) {
+    const h = hist(d); if (!h.length) return null;
+    const lastY = parseInt((h[h.length - 1].date || '0').slice(0, 4), 10);
+    for (const f of ['days_on_market', 'active_listings']) {
+      const by = {}, yrAvg = {};
+      h.forEach(r => { const v = num(r[f]); if (v == null || !r.date) return; const y = +r.date.slice(0, 4); if (y < lastY - 5) return; (yrAvg[y] = yrAvg[y] || []).push(v); });
+      h.forEach(r => { const v = num(r[f]); if (v == null || !r.date) return; const y = +r.date.slice(0, 4); if (!yrAvg[y] || yrAvg[y].length < 10) return;
+        const avg = yrAvg[y].reduce((a, b) => a + b, 0) / yrAvg[y].length; const m = +r.date.slice(5, 7) - 1; (by[m] = by[m] || []).push(v / avg); });
+      const ms = Object.keys(by); if (ms.length < 12) continue;
+      const mean = m => by[m].reduce((a, b) => a + b, 0) / by[m].length;
+      ms.sort((a, b) => mean(a) - mean(b));
+      // buy when homes sit longest / most for sale; sell when they move fastest / fewest for sale
+      return {buy: MON[ms[ms.length - 1]], sell: MON[ms[0]], basis: f === 'days_on_market' ? 'days on market' : 'listings'};
+    }
+    return null;
+  }
+  function renderCard(P) {
+    const d = P.d, T = TABS[tab], sigs = T.fn(d), s = score(sigs);
+    const nm = (document.getElementById('ut-county') || {}).textContent || '';
+    const L = lastOf(d, 'zhvi') || lastOf(d, 'active_listings');
+    const when = L && L.date ? MON[+L.date.slice(5, 7) - 1].charAt(0) + MON[+L.date.slice(5, 7) - 1].slice(1, 3).toLowerCase() + ' ' + L.date.slice(0, 4) : '';
+    let peerTxt = '';
+    if (s != null && P.peers && P.peers.length > 5) {
+      const ps = P.peers.map(p => { try { return score(T.fn(p)); } catch (e) { return null; } }).filter(x => x != null);
+      if (ps.length > 5 && ps.length >= P.peers.length * 0.5) { const below = ps.filter(x => x < s).length; peerTxt = `${T.cmp} ${Math.round(below / ps.length * 100)}% of ${P.unit}`; }
+    }
+    const bm = tab === 0 ? bestMonths(d) : null;
+    const big = s == null ? ['Not enough data', ''] : T.big(s);
+    const on = sigs.filter(x => x.s != null), favor = on.filter(x => x.s > 0.15).length;
+    card.innerHTML =
+      `<div class="sc-head"><div class="sc-logo">JASSON<br>FARRIER<span>KIGER REALTY</span></div><div><div class="sc-place">${nm}</div>` +
+      `<div class="sc-title">${T.title} <em>· ${when}</em></div><div class="sc-sub">${T.sub}</div></div></div>` +
+      `<div class="sc-tabs">${TABS.map((x, i) => `<button class="sc-tab${i === tab ? ' on' : ''}" data-i="${i}">${x.t}</button>`).join('')}</div>` +
+      `<div class="sc-main"><div class="sc-gauge">${s == null ? '' : `<span class="dot" style="top:${(1 - s) / 2 * 100}%"></span>`}</div>` +
+      `<div class="sc-glbl"><span>${T.hi}</span><span>${T.mid}</span><span>${T.lo}</span></div>` +
+      `<div class="sc-verdict"><div class="sc-big ${big[1]}">${big[0]}</div>` +
+      (s == null ? '' : `<div class="sc-when">${favor} of ${on.length} signals point ${tab === 0 ? 'toward sellers' : 'up'}</div>`) +
+      (peerTxt ? `<div class="sc-pct">${peerTxt}</div>` : '') + `</div></div>` +
+      (bm ? `<div class="sc-months"><div class="sc-mon buy"><b>Best month to buy</b><span>${bm.buy}</span></div><div class="sc-mon sell"><b>Best month to sell</b><span>${bm.sell}</span></div></div>` : '<div style="height:10px"></div>') +
+      sigs.map(x => {
+        const v = x.s == null ? ['No data', 'mid'] : T.v(x.s);
+        return `<div class="sc-sig"><div class="sc-sig-n">${x.n}<small>${x.note || 'Not available here'}</small></div>` +
+               `<div class="sc-track">${x.s == null ? '' : `<span class="dot" style="left:${(x.s + 1) / 2 * 100}%"></span>`}</div><div class="sc-v ${v[1]}">${v[0]}</div></div>`;
+      }).join('') +
+      (bm ? `<div class="sc-foot">Best months use the last 5 years of ${bm.basis}: buy when homes sit longest, sell when they move fastest.</div>` : '');
+    card.classList.add('on');
+  }
+  card.addEventListener('click', e => { const b = e.target.closest('.sc-tab'); if (!b) return; tab = +b.dataset.i; const P = place(); if (P && P.d) renderCard(P); });
+
+  // ---- refresh whenever the place, metric or chart changes ----
+  let t = null;
+  function render() { const P = place(); if (!P || !P.d) { snap.classList.remove('on'); card.classList.remove('on'); return; } try { renderSnap(P); } catch (e) { console.warn('snap', e); } try { renderCard(P); } catch (e) { console.warn('card', e); } }
+  function schedule() { clearTimeout(t); t = setTimeout(render, 250); }
+  const watch = new MutationObserver(schedule);
+  ['ut-county', 'ut-metric'].forEach(id => { const el = document.getElementById(id); if (el) watch.observe(el, {childList: true, characterData: true, subtree: true}); });
+  const svg = document.getElementById('line-chart'); if (svg) watch.observe(svg, {childList: true});
 })();
 </script>
