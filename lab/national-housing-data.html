@@ -3081,7 +3081,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
   const hoverDateTxt = hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
   const hoverValTxt  = hoverCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
   const hoverLabelTxt= hoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
-  const hoverDeltaTxt= hoverCard.append('text').attr('font-size','15px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#1a5296').style('opacity',0);
+  const hoverDeltaTxt= hoverCard.append('text').attr('font-size','19px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#1a5296').style('opacity',0);
 
   const cardW=240, cardH=125;
   lsvg.on('mousemove', function(event) {
@@ -3275,7 +3275,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip, keepSlider) {
   const hoverYear = hoverCard.append('text').attr('font-size','13px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
   const hoverVal  = hoverCard.append('text').attr('font-size','32px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
   const hoverLbl  = hoverCard.append('text').attr('font-size','13px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
-  const hoverDelta= hoverCard.append('text').attr('font-size','13px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#1a5296').style('opacity',0);
+  const hoverDelta= hoverCard.append('text').attr('font-size','19px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#1a5296').style('opacity',0);
   const cardW = 223, cardH = 116;
 
   // Transparent overlay catches all mouse events across full chart area
@@ -3435,7 +3435,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
   const annHoverYear = annHoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#888');
   const annHoverVal  = annHoverCard.append('text').attr('font-size','34px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#0d1e42');
   const annHoverLbl  = annHoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','700').attr('fill','#444');
-  const annHoverDelta= annHoverCard.append('text').attr('font-size','14px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#1a5296').style('opacity',0);
+  const annHoverDelta= annHoverCard.append('text').attr('font-size','19px').attr('font-family','Montserrat').attr('font-weight','800').attr('fill','#1a5296').style('opacity',0);
   const annCardW = 240;
 
   // Dismiss click card on SVG background click
