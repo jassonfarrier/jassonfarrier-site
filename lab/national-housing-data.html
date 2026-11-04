@@ -598,6 +598,11 @@ const METRIC_MENU = [{"name": "Prices", "items": [{"m": "zhvi", "html": "<span c
     if (METRIC_MENU.length && METRIC_MENU[0].name === 'Key Numbers') return;
     const all = {}; METRIC_MENU.forEach(s => s.items.forEach(i => { all[i.m] = i; }));
     const items = POPULAR.map(m => all[m]).filter(Boolean);
+    const OV = {m: 'overvalued_pct', src: 'Census',
+      html: '<span class="mn">Overvalued %</span><span class="md"><span class="src-tag">Census</span>Home value vs income, compared with normal</span>'};
+    const prices = METRIC_MENU.find(s => s.name === 'Prices');
+    if (prices && !prices.items.some(i => i.m === 'overvalued_pct')) prices.items.push(OV);
+    items.push(OV);
     if (items.length) METRIC_MENU.unshift({name: 'Key Numbers', items});
   })();
   // Redfin breaks these three out by home type (US, states, large metros only)
@@ -812,6 +817,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiamFzc29uZmFy'
   + 'M2VuMGdhcWJ3b2ZjIn0.P30w3CmMyaDkBzumr5NyWg';
 
 const METRICS = {
+  overvalued_pct: {label:'Overvalued %', fmt:v=>(v>=0?'+':'')+Number(v).toFixed(1)+'%', lo:'Undervalued', hi:'Overvalued'},
   zhvi:             {label:'SFH Home Value',      fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower',    hi:'Higher'},
   median_list_price:{label:'Median List Price', fmt:v=>'$'+Math.round(v).toLocaleString(), lo:'Lower',    hi:'Higher'},
   zhvi_yoy:         {label:'SFH Home Value YOY %',fmt:v=>v.toFixed(1)+'%',                   lo:'Declining',hi:'Growing'},
@@ -1368,7 +1374,7 @@ function renderColors(mode) {
   // YOY: PALETTE_NORM (red=negative/down, blue=positive/up)
   // Inverse metrics: higher value = worse = red (but not a "danger" signal specifically)
   const isYOY = YOY_METRICS.has(metric);
-  const isInverse = !isYOY && (metric === 'days_on_market' ||
+  const isInverse = !isYOY && (metric === 'overvalued_pct' || metric === 'days_on_market' ||
                     metric === 'median_property_tax' || metric === 'property_tax_rate');
   const isDistress = DISTRESS_METRICS.has(metric);
   const isPayment = PAYMENT_METRICS.has(metric);
@@ -2750,7 +2756,7 @@ function paletteForMetric(metric) {
   const isYOY = YOY_METRICS.has(metric);
   if (!isYOY && DANGER_METRICS.has(metric)) return PALETTE_DANGER;
   const isInv = !isYOY && (
-    metric === 'days_on_market' ||
+    metric === 'overvalued_pct' || metric === 'days_on_market' ||
     metric === 'median_property_tax' || metric === 'property_tax_rate'
   );
   return (DISTRESS_METRICS.has(metric) || isInv) ? PALETTE_INV : PALETTE_NORM;
@@ -5063,11 +5069,13 @@ document.addEventListener('change', function(e){
   }
   function wrap(kind) {
     return function (county, cmetric, hist, isZip, ...rest) {
-      const base = hist != null ? hist : (typeof dataMap !== 'undefined' && dataMap[county] ? dataMap[county].history : null);
+      let base = hist != null ? hist : (typeof dataMap !== 'undefined' && dataMap[county] ? dataMap[county].history : null);
+      if (cmetric === 'overvalued_pct') base = window.__ovRows || [];
       last = {kind, county, cmetric, base, isZip};
       let k = kind;
       if (CR.freq === 'monthly') k = 'mb';
       else if (CR.freq === 'yearly' && kind === 'mb') k = 'ab';
+      if (cmetric === 'overvalued_pct') k = 'al';   // yearly series only
       const out = base == null ? ORIG[k](county, cmetric, hist, isZip, ...rest) : ORIG[k](county, cmetric, cut(base), isZip, ...rest);
       // mark the chart as one these buttons control (other chart types clear the mark)
       if (svg.firstChild || svg.childNodes.length) { const m = document.createElementNS('http://www.w3.org/2000/svg', 'g'); m.setAttribute('class', 'cr-mark'); svg.appendChild(m); }
@@ -5210,7 +5218,7 @@ function _mapLabel(metric, val, isYOY, isPayment) {
   const pct = v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%';
   function fmt(m, v) {
     if (v == null) return null;
-    if (/_yoy$/.test(m) || m === '__g5' || m === '__g10') return pct(v);
+    if (/_yoy$/.test(m) || m === '__g5' || m === '__g10' || m === 'overvalued_pct') return pct(v);
     try { if (METRICS[m] && METRICS[m].fmt) return METRICS[m].fmt(v); } catch (e) {}
     return v.toLocaleString();
   }
@@ -5227,8 +5235,8 @@ function _mapLabel(metric, val, isYOY, isPayment) {
   INFO.__g5 = {name: '5-Year Home Value Growth', desc: 'Change in SFH home value over the last 5 years', src: 'Zillow'};
 
   // ---- Market snapshot ----
-  const KEY = ['zhvi', 'zhvi_yoy', 'active_listings', 'rf_months_supply', '__g5', 'pending_ratio'];
-  const SELLER_UP = new Set(['zhvi', 'zhvi_yoy', '__g5', 'pending_ratio', 'zhvi_condo', 'median_list_price', 'rf_median_sale_price']);
+  const KEY = ['zhvi', 'zhvi_yoy', 'active_listings', 'rf_months_supply', '__g5', 'overvalued_pct'];
+  const SELLER_UP = new Set(['overvalued_pct', 'zhvi', 'zhvi_yoy', '__g5', 'pending_ratio', 'zhvi_condo', 'median_list_price', 'rf_median_sale_price']);
   const BUYER_UP = new Set(['active_listings', 'rf_months_supply', 'rf_inventory', 'days_on_market', 'price_reduced_pct']);
   function groupNow() {
     const b = document.querySelector('#metric-menu-map .metric-btn.active');
@@ -5243,7 +5251,7 @@ function _mapLabel(metric, val, isYOY, isPayment) {
       const v = m === '__g5' ? growth(d, 'zhvi', 5) : (/_yoy$/.test(m) ? yoy(d, m.slice(0, -4)) : cur(d, m));
       const i = INFO[m] || {name: (METRICS[m] && METRICS[m].label) || m, desc: '', src: ''};
       let cls = v == null ? 'na' : '';
-      if (v != null && (/_yoy$/.test(m) || m === '__g5')) cls = v > 0.05 ? 'up' : (v < -0.05 ? 'down' : '');
+      if (v != null && (/_yoy$/.test(m) || m === '__g5' || m === 'overvalued_pct')) cls = v > 0.05 ? 'up' : (v < -0.05 ? 'down' : '');
       else if (v != null && SELLER_UP.has(m)) cls = 'up'; else if (v != null && BUYER_UP.has(m)) cls = 'down';
       const tip = (i.desc ? i.desc + '. ' : '') + (i.src ? 'Source: ' + i.src : '');
       return `<div class="snap-box"><div class="snap-top"><span class="snap-lbl">${i.name}</span><span class="snap-i" title="${tip.replace(/"/g, '&quot;')}">i</span></div>` +
@@ -5369,5 +5377,57 @@ function _mapLabel(metric, val, isYOY, isPayment) {
   const watch = new MutationObserver(schedule);
   ['ut-county', 'ut-metric'].forEach(id => { const el = document.getElementById(id); if (el) watch.observe(el, {childList: true, characterData: true, subtree: true}); });
   const svg = document.getElementById('line-chart'); if (svg) watch.observe(svg, {childList: true});
+})();
+</script>
+
+<script id="ov-js">
+// ===== Overvalued %: per-place yearly series for the chart =====
+(function () {
+  try { RANKABLE_METRICS.add('overvalued_pct'); } catch (e) {}
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
+  const BASE = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/';
+  const NATIONAL_PAGE = typeof nationalStatesMap !== 'undefined' && typeof openNationalModal === 'function';
+  window.__ovRows = [];
+  const cache = {};
+  function target(name, args) {
+    const a = args[0];
+    try {
+      switch (name) {
+        case 'openNationalModal': return {t: 'us_national', q: 'id=eq.1', d: NATIONAL_DATA};
+        case 'openNationalStateModal': return {t: 'us_states', q: 'state=eq.' + encodeURIComponent(a), d: nationalStatesMap[a]};
+        case 'openStateModal': return {t: 'ohio_state', q: '', d: STATE_DATA};
+        case 'openMetroModal': return {t: NATIONAL_PAGE ? 'us_metros' : 'ohio_metros', q: 'region_id=eq.' + encodeURIComponent(a), d: metroDataMap[a]};
+        case 'openModal': { const d = dataMap[a]; const f = (d && d.fips) || a; return {t: NATIONAL_PAGE ? 'us_counties' : 'ohio_counties', q: 'fips=eq.' + encodeURIComponent(f), d}; }
+        case 'openZipModal': return {t: NATIONAL_PAGE ? 'us_zips' : 'ohio_zips', q: 'zip=eq.' + encodeURIComponent(a), d: zipDataMap[a]};
+      }
+    } catch (e) {}
+    return null;
+  }
+  function rowsFor(series, d) {
+    const L = d && d.latest; const cur = L && L.overvalued_pct != null ? Number(L.overvalued_pct) : null;
+    const date = (L && L.date) || '';
+    const mo = date.slice(5, 7) || '12';
+    const rows = (series || []).map(r => ({date: r.year + '-' + mo, overvalued_pct: Number(r.overvalued_pct)}));
+    if (cur != null && date) { const i = rows.findIndex(r => r.date === date); if (i >= 0) rows[i].overvalued_pct = cur; else rows.push({date, overvalued_pct: cur}); }
+    return rows;
+  }
+  function redrawIfShowing() {
+    if (typeof chartMetric === 'undefined' || chartMetric !== 'overvalued_pct') return;
+    const b = document.querySelector('#chart-tabs [data-cmetric="overvalued_pct"]'); if (b) { b.classList.remove('active'); b.click(); }
+  }
+  function load(name, args) {
+    const T = target(name, args); window.__ovRows = []; if (!T) return;
+    const key = T.t + '|' + T.q;
+    if (cache[key]) { window.__ovRows = rowsFor(cache[key], T.d); return; }
+    fetch(BASE + T.t + '?select=overvalued_history' + (T.q ? '&' + T.q : '') + '&limit=1', {headers: {apikey: ANON, Authorization: 'Bearer ' + ANON}})
+      .then(r => r.json()).then(rows => {
+        cache[key] = (rows && rows[0] && rows[0].overvalued_history) || [];
+        window.__ovRows = rowsFor(cache[key], T.d); redrawIfShowing();
+      }).catch(() => {});
+  }
+  ['openNationalModal', 'openNationalStateModal', 'openStateModal', 'openMetroModal', 'openModal', 'openZipModal'].forEach(name => {
+    const f = window[name]; if (typeof f !== 'function') return;
+    window[name] = function (...args) { load(name, args); return f.apply(this, args); };
+  });
 })();
 </script>
