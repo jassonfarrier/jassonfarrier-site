@@ -4519,6 +4519,7 @@ function _mapLabel(metric, val, isYOY, isPayment) {
 // ===== 'Market snapshot' boxes + summary card under the chart (desktop panel) =====
 (function () {
   if (!document.documentElement.classList.contains('dock')) return;
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5tZXJxd2pmcm5tenFnZHBncnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzOTIwNjcsImV4cCI6MjA5NTk2ODA2N30.aNUfPbiTdURkO6gbDBo7BGyJ1m_AH6vKh8eoEkZjZNI';
   const right = document.querySelector('#modal-overlay .modal-right'); if (!right) return;
   const snap = document.createElement('div'); snap.className = 'snap';
   const card = document.createElement('div'); card.className = 'sumcard';
@@ -4610,13 +4611,16 @@ function _mapLabel(metric, val, isYOY, isPayment) {
   // ---- summary card ----
   let tab = 0;
   const MON = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+  let LIVE_RATE = null;
+  fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_state?select=latest', {headers: {apikey: ANON, Authorization: 'Bearer ' + ANON}})
+    .then(r => r.json()).then(rows => { const v = rows && rows[0] && rows[0].latest && num(rows[0].latest.current_mortgage_rate); if (v != null) { LIVE_RATE = v; schedule(); } }).catch(() => {});
   function rateChange() {
     try {
       if (typeof NATIONAL_RATES === 'undefined' || !NATIONAL_RATES) { if (typeof loadNationalRates === 'function') loadNationalRates(); return null; }
-      const nowRate = (typeof STATE_DATA !== 'undefined' && STATE_DATA && STATE_DATA.latest && num(STATE_DATA.latest.current_mortgage_rate) != null) ? num(STATE_DATA.latest.current_mortgage_rate) : null;
+      // this week's 30-year rate (Freddie Mac via FRED, refreshed every Friday) vs last July's average
       const y = new Date().getFullYear(); const prev = NATIONAL_RATES[y - 1] && NATIONAL_RATES[y - 1].rate;
-      const now = nowRate != null ? nowRate : (NATIONAL_RATES[y] && NATIONAL_RATES[y].rate);
-      return (now != null && prev != null) ? {now, prev, ch: now - prev} : null;
+      const now = LIVE_RATE != null ? LIVE_RATE : (NATIONAL_RATES[y] && NATIONAL_RATES[y].rate);
+      return (now != null && prev != null) ? {now, prev, ch: now - prev, py: y - 1} : null;
     } catch (e) { return null; }
   }
   function directionSignals(d) {
@@ -4624,7 +4628,7 @@ function _mapLabel(metric, val, isYOY, isPayment) {
     return [
       {n: 'Recent Appreciation', note: ap == null ? null : 'Home values ' + pct(ap) + ' vs last year', s: ap == null ? null : clamp(ap / 6)},
       {n: 'Days on Market', note: dm == null ? null : 'Days on market ' + pct(dm) + ' vs last year', s: dm == null ? null : clamp(-dm / 25)},
-      {n: 'Mortgage Rates', note: rc == null ? null : 'Rates ' + rc.now.toFixed(2) + '% vs ' + rc.prev.toFixed(2) + '% a year ago', s: rc == null ? null : clamp(-rc.ch / 1)},
+      {n: 'Mortgage Rates', note: rc == null ? null : '30-yr rate ' + rc.now.toFixed(2) + '% now vs ' + rc.prev.toFixed(2) + '% in July ' + rc.py, s: rc == null ? null : clamp(-rc.ch / 1)},
       {n: 'Inventory', note: iv == null ? null : 'Active listings ' + pct(iv) + ' vs last year', s: iv == null ? null : clamp(-iv / 25)},
       {n: 'Price Cuts', note: pc == null ? null : 'Share of price cuts ' + pct(pc) + ' vs last year', s: pc == null ? null : clamp(-pc / 25)}
     ];
