@@ -1360,6 +1360,7 @@ function renderColors(mode) {
           ? (d ? getMetricVal(d, metric) : null)
           : (f.properties[metric] != null ? Number(f.properties[metric]) : null);
       f.properties.__color = isYOY ? yoyQuantileColor(vals, val != null ? Number(val) : null, metric) : colorFromStops(stops, val != null ? Number(val) : null);
+      f.properties.__label = (typeof _mapLabel === 'function') ? _mapLabel(metric, val, isYOY, isPayment) : '';
     });
     map.getSource('ohio-metros').setData(metroGeoJSON);
     map.setPaintProperty('metros-fill', 'fill-color', ['coalesce', ['get', '__color'], '#ccc']);
@@ -4250,10 +4251,68 @@ document.addEventListener('change', function(e){
 
 </script>
 
-
-
-
-
-
-
-
+<script id="labels-js">
+// ===== map labels: name + value from a wider zoom, small when zoomed out (same rules on both pages) =====
+function _mapLabel(metric, val, isYOY, isPayment) {
+  if (val == null || isNaN(Number(val))) return '';
+  const n = Number(val);
+  if (isYOY) return n.toFixed(1) + '%';
+  if (/^(zhvi|zhvi_condo|median_list_price|rf_(sfr_|th_|condo_|mf_)?median_sale_price|new_construction_price)$/.test(metric))
+    return n >= 1000000 ? '$' + (n / 1000000).toFixed(1) + 'M' : '$' + Math.round(n / 1000) + 'K';
+  if (isPayment) return '$' + (n / 1000).toFixed(1) + 'K';
+  if (metric === 'property_tax_rate' || metric === 'price_reduced_pct' || metric === 'rf_price_drop_pct') return n.toFixed(1) + '%';
+  try { return METRICS[metric] ? METRICS[metric].fmt(n) : String(n); } catch (e) { return String(n); }
+}
+(function () {
+  // place name small and gray, value bold and navy
+  // drop a trailing " County" so labels stay short ("Licking" not "Licking County")
+  const shortName = p => ['case',
+    ['all', ['>', ['length', ['get', p]], 7], ['==', ['slice', ['get', p], ['-', ['length', ['get', p]], 7]], ' County']],
+    ['slice', ['get', p], 0, ['-', ['length', ['get', p]], 7]], ['get', p]];
+  // metros: keep the part before the comma ("Columbus" not "Columbus, OH")
+  const beforeComma = p => ['case', ['>', ['index-of', ',', ['get', p]], 0],
+    ['slice', ['get', p], 0, ['index-of', ',', ['get', p]]], ['get', p]];
+  const twoLineExpr = nameExpr => ['format',
+    nameExpr, {'font-scale': 0.82, 'text-color': '#4a5363'},
+    '\n', {},
+    ['coalesce', ['get', '__label'], ''], {'font-scale': 1.0, 'text-color': '#0d1e42'}];
+  const twoLine = nameProp => twoLineExpr(shortName(nameProp));
+  // same look everywhere; size follows the area (states largest, ZIPs smallest)
+  const RULES = {
+    'state-labels':    {min: 0,   size: ['interpolate', ['linear'], ['zoom'], 3, 13, 4.5, 16, 6, 20, 8, 26, 10, 32], field: twoLine('name')},
+    'metros-labels':   {min: 5.6, size: ['interpolate', ['linear'], ['zoom'], 3.5, 10, 5, 12, 6.5, 14, 8, 17, 10, 21], field: twoLineExpr(beforeComma('name'))},
+    'counties-labels': {min: 6.6, size: ['interpolate', ['linear'], ['zoom'], 6.6, 11.5, 7.5, 13.5, 8.5, 16, 10, 20, 12, 24], field: twoLine('county')},
+    'zips-labels':     {min: 7,   size: ['interpolate', ['linear'], ['zoom'], 7, 9, 8.5, 11, 10, 14, 12, 18], field: twoLineExpr(['to-string', ['get', 'zip']])}
+  };
+  let tries = 0;
+  (function apply() {
+    const ok = typeof map !== 'undefined' && map && map.getLayer && map.getLayer('counties-labels');
+    if (!ok) { if (tries++ < 240) setTimeout(apply, 250); return; }
+    for (const id in RULES) {
+      if (!map.getLayer(id)) continue;
+      const r = RULES[id];
+      try {
+        map.setLayerZoomRange(id, r.min, 24);
+        map.setLayoutProperty(id, 'text-size', r.size.map((v, i) => (i > 2 && i % 2 === 0) ? +(v * 1.06).toFixed(2) : v));
+        if (r.field) map.setLayoutProperty(id, 'text-field', r.field);
+        map.setLayoutProperty(id, 'text-padding', 1);
+        map.setLayoutProperty(id, 'text-max-width', 8);
+        map.setPaintProperty(id, 'text-halo-color', 'rgba(255,255,255,0.92)');
+        map.setPaintProperty(id, 'text-halo-width', 1.6);
+      } catch (e) { console.warn('label rule', id, e); }
+    }
+    // every county and metro label shows from about state-level zoom (wide national views keep clean spacing)
+    const FULL_AT = 6.6;
+    const setOverlap = () => {
+      const on = map.getZoom() >= FULL_AT;
+      ['counties-labels', 'metros-labels'].forEach(id => {
+        if (!map.getLayer(id)) return;
+        try { map.setLayoutProperty(id, 'text-allow-overlap', on); map.setLayoutProperty(id, 'text-ignore-placement', on); } catch (e) {}
+      });
+    };
+    setOverlap(); map.on('zoomend', setOverlap);
+    // metros need their values filled in once
+    try { if (typeof mapMode !== 'undefined' && mapMode === 'metro') renderColors('metro'); } catch (e) {}
+  })();
+})();
+</script>
