@@ -356,7 +356,7 @@ html.dock .snap.on{display:block}
 .snap-lbl{font-size:10px;color:#6b7280;font-weight:600;line-height:1.3;text-transform:none!important;letter-spacing:0!important}
 .snap-i{flex-shrink:0;width:13px;height:13px;border-radius:50%;border:1px solid #9aa3b2;color:#6b7280;font:700 8px/11px Montserrat,sans-serif;text-align:center;cursor:help}
 .snap-val{font-size:17px;font-weight:800;color:#0d1e42;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.snap-val.up{color:#c0392b}.snap-val.down{color:#15803d}.snap-val.na{color:#9aa3b2;font-size:14px}
+.snap-val.neg{color:#c0392b}.snap-val.blue{color:#1d4ed8}.snap-val.na{color:#9aa3b2;font-size:14px}
 .sumcard{display:none;margin-top:14px;border:1px solid #e3e7ee;border-radius:12px;padding:16px 18px 14px;background:#fff;font-family:Montserrat,sans-serif}
 html.dock .sumcard.on{display:block}
 .sc-head{display:flex;align-items:center;gap:16px}
@@ -4615,8 +4615,9 @@ function _mapLabel(metric, val, isYOY, isPayment) {
       const v = m === '__g5' ? growth(d, 'zhvi', 5) : (/_yoy$/.test(m) ? yoy(d, m.slice(0, -4)) : cur(d, m));
       const i = INFO[m] || {name: (METRICS[m] && METRICS[m].label) || m, desc: '', src: ''};
       let cls = v == null ? 'na' : '';
-      if (v != null && (/_yoy$/.test(m) || m === '__g5' || m === 'overvalued_pct')) cls = v > 0.05 ? 'up' : (v < -0.05 ? 'down' : '');
-      else if (v != null && SELLER_UP.has(m)) cls = 'up'; else if (v != null && BUYER_UP.has(m)) cls = 'down';
+      // numbers are navy; negative changes red; Overvalued % red when overvalued, blue when undervalued
+      if (v != null && m === 'overvalued_pct') cls = v > 0 ? 'neg' : (v < 0 ? 'blue' : '');
+      else if (v != null && (/_yoy$/.test(m) || m === '__g5' || m === '__g10') && v < 0) cls = 'neg';
       const tip = (i.desc ? i.desc + '. ' : '') + (i.src ? 'Source: ' + i.src : '');
       return `<div class="snap-box"><div class="snap-top"><span class="snap-lbl">${i.name}</span><span class="snap-i" title="${tip.replace(/"/g, '&quot;')}">i</span></div>` +
              `<div class="snap-val ${cls}">${v == null ? 'No data' : fmt(m, v)}</div></div>`;
