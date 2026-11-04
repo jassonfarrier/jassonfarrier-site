@@ -350,6 +350,7 @@ function _drawPayment(name, cm, d) {
   ((d && d.history) || []).forEach(r => { if (r.zhvi == null || !r.date) return; const [yr, mo] = r.date.split('-'); if (!zhviByYear[yr] || mo === '07') zhviByYear[yr] = r.zhvi; });
   drawAnnualBarChart(name, cm, buildPaymentHist(zhviByYear, _taxByYear(d), 0.20, cm), true);
 }
+function _payShort(v) { if (v == null || isNaN(v)) return ''; v = Number(v); return v < 1000 ? '$' + Math.round(v) : '$' + (v / 1000).toFixed(1) + 'K'; }
 </script>
 </head>
 <body>
@@ -1955,7 +1956,7 @@ function renderChart(county, cmetric) {
         .attr('text-anchor','middle').attr('font-size','13px').attr('font-weight','900')
         .attr('font-family','Montserrat').attr('fill','#1a1a2e')
         .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','3px').style('stroke-linejoin','round')
-        .text(r=>METRICS[cmetric].fmt(r.val));
+        .text(r=>PAYMENT_METRICS.has(cmetric) ? _payShort(r.val) : METRICS[cmetric].fmt(r.val));
     };
     if (d.distress_history) {
       doRenderDistress(d.distress_history);
@@ -3079,7 +3080,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip, _sliderFilter)
     .attr('text-anchor','middle').attr('font-size','10px').attr('font-weight','900')
     .attr('font-family','Montserrat').attr('fill','#1a1a2e')
     .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','2px').style('stroke-linejoin','round')
-    .text(r=>METRICS[cmetric].fmt(r.val));
+    .text(r=>PAYMENT_METRICS.has(cmetric) ? _payShort(r.val) : METRICS[cmetric].fmt(r.val));
 
   // Trend line toggle — annual bar chart (payment, tax YOY, etc.)
   wireTrendLineButton(g, rows, (r) => r.val, (r) => x(r.year) + x.bandwidth()/2, y, iw);
@@ -3746,7 +3747,7 @@ function renderStateChart(name, cmetric, d) {
       .attr('text-anchor','middle').attr('font-size','13px').attr('font-weight','900')
       .attr('font-family','Montserrat').attr('fill','#1a1a2e')
       .style('paint-order','stroke').style('stroke','#fff').style('stroke-width','3px').style('stroke-linejoin','round')
-      .text(r=>METRICS[cmetric].fmt(r.val));
+      .text(r=>PAYMENT_METRICS.has(cmetric) ? _payShort(r.val) : METRICS[cmetric].fmt(r.val));
   } else if (MLS_METRICS.has(cmetric)) {
     // Identical rendering path to active_listings below — drawAnnualLineChart — just fed
     // a reshaped history array so it's pixel-for-pixel the same chart, same tooltips, same
