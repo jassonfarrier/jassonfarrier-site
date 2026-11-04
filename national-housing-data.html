@@ -479,6 +479,7 @@ function _phoneW(w) { const s = Math.min(screen.width || 9999, screen.height || 
 function _phoneKeyPts(rows, get) {
   const ok = rows.filter(r => get(r) != null && !isNaN(get(r)));
   if (!ok.length) return [];
+  if (ok.length <= 7) return ok;
   const last = ok[ok.length - 1];
   let hi = ok[0], lo = ok[0];
   ok.forEach(r => { if (get(r) > get(hi)) hi = r; if (get(r) < get(lo)) lo = r; });
@@ -488,14 +489,14 @@ function _phoneKeyPts(rows, get) {
 function _yearsToLabel(years, w, px, deskAll) {
   if (!_isPhone()) return deskAll ? years : years.filter((_, i) => i % 2 === 0);
   w = _phoneW(w);
-  const n = years.length, step = Math.max(2, Math.ceil(n * px / Math.max(w || 0, 1)));
+  const n = years.length, step = Math.max(1, Math.ceil(n * px / Math.max(w || 0, 1)));
   return years.filter((_, i) => (n - 1 - i) % step === 0);
 }
 // time-axis year step: desktop 2, phone spaced to fit
 function _mobYearStep(x) {
   if (!_isPhone()) return 2;
   const d = x.domain(), r = x.range(), span = (d[1] - d[0]) / 31557600000, w = _phoneW(Math.abs(r[1] - r[0]));
-  return Math.max(2, Math.ceil(span * 34 / Math.max(w, 1)));
+  return Math.max(1, Math.ceil(span * 34 / Math.max(w, 1)));
 }
 // band/point year axes: desktop shows every year (null = d3 default); phone spaced to fit
 function _phoneTicks(x) {
@@ -1647,7 +1648,9 @@ function drawLineChart(county, cmetric) {
   document.getElementById('chart-label').textContent = METRICS[cmetric].label + ' — ' + county + _suffix + (_startYr ? ` (${_startYr}–${_endYr})` : '');
   const _utm1 = document.getElementById('ut-metric'); if (_utm1) _utm1.textContent = METRICS[cmetric].label;
   
-  const history = d.history.filter(r => r[cmetric] != null);
+  const _histAll = d.history.filter(r => r[cmetric] != null);
+  // phone: last 5 years only
+  const history = (_isPhone() && _histAll.length) ? (() => { const L = _histAll[_histAll.length-1].date; const cut = (parseInt(L.slice(0,4)) - 5) + L.slice(4); return _histAll.filter(r => r.date >= cut); })() : _histAll;
   const lsvg = d3.select('#line-chart');
   lsvg.selectAll('*').remove();
   const W = lsvg.node().getBoundingClientRect().width || 760;
@@ -1696,7 +1699,7 @@ function drawLineChart(county, cmetric) {
   const latestMonth = history[history.length-1].date.split('-')[1];
   const allYears = [...new Set(history.map(r=>r.date.slice(0,4)))].sort();
   const labelYears = new Set(_yearsToLabel(allYears, iw, 44).concat([allYears[allYears.length-1]]));
-  const annualPts = _isPhone() ? _phoneKeyPts(history, r => r[cmetric]) : history.filter((r,i) => {
+  const annualPts = _isPhone() ? _phoneKeyPts(history.filter(r => r.date.split('-')[1] === latestMonth), r => r[cmetric]) : history.filter((r,i) => {
     if (i === history.length-1) return true;
     const [yr, mo] = r.date.split('-');
     return labelYears.has(yr) && mo === latestMonth;
@@ -2676,11 +2679,12 @@ function _initChartSlider(allRows) {
 
   sStart.min = sEnd.min = minYr;
   sStart.max = sEnd.max = maxYr;
-  sStart.value = minYr;
+  const _openYr = _isPhone() ? Math.max(minYr, maxYr - 5) : minYr;
+  sStart.value = _openYr;
   sEnd.value = maxYr;
-  chartSliderStartYr = minYr;
+  chartSliderStartYr = _openYr;
   chartSliderEndYr = maxYr;
-  lStart.textContent = minYr;
+  lStart.textContent = _openYr;
   lEnd.textContent = maxYr;
 
   function updateTrack() {
@@ -3043,7 +3047,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip, keepSlider) {
     const [yr, mo] = r.date.split('-');
     if (mo === anchorMonth) byYear[yr] = r;
   });
-  const rows = Object.keys(byYear).sort().map(yr => byYear[yr]);
+  const rows = Object.keys(byYear).sort().map(yr => byYear[yr]).slice(_isPhone() ? -6 : 0);
   if (!rows.length) return;
 
   const suffix = isZip ? '' : ' County';
