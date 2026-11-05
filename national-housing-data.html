@@ -4849,30 +4849,6 @@ document.addEventListener('click', e => {
 
     const hits = [];
 
-    // ZIP digits search every state (same list as the map search); picking a ZIP in
-    // another state loads that state first -- no Change State click needed.
-    if (mapMode === 'zip' && /^\d/.test(q)) {
-      const typed = q;
-      loadNationalZipIndex().then(() => {
-        if (inp.value.trim().toLowerCase() !== typed) return;
-        res.innerHTML = '';
-        const m = nationalZipIndex.filter(d => d.zip.startsWith(typed)).slice(0, 10);
-        if (!m.length) { res.style.display = 'none'; return; }
-        m.forEach(d => {
-          const li = document.createElement('li');
-          li.textContent = d.zip + (d.city ? ' — ' + d.city + ', ' + d.state_id : '');
-          li.addEventListener('mousedown', e => {
-            e.preventDefault(); inp.value = ''; res.style.display = 'none';
-            const go = () => { openZipModal(d.zip, d.state_id); updateMapSelection('zip', d.zip); };
-            if (d.state_id && currentZipState !== d.state_id) loadZipDataForState(d.state_id).then(go); else go();
-          });
-          res.appendChild(li);
-        });
-        res.style.display = 'block';
-      });
-      return;
-    }
-
     if (mapMode === 'zip') {
       ZIP_DATA.filter(d => {
         const zip = (d.zip||'').toLowerCase();
