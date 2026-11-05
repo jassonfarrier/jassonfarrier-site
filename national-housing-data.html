@@ -1573,6 +1573,7 @@ function sourceForMetric(m) {
   const base = YOY_BASE[m] || m;
   if (base==='zhvi'||base==='zhvi_condo'||base==='zori') return '<a href="https://www.zillow.com/research/data/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Zillow</a>';
   if (base==='median_property_tax'||base==='property_tax_rate') return '<a href="https://data.census.gov/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census ACS</a>';
+  if (HOUSING_STOCK_METRICS.has(base)) return '<a href="https://data.census.gov/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census ACS</a>';
   if (base==='sf_permits_per_1k'||base==='mf_permits_per_1k'||base==='total_permits_per_1k') return '<a href="https://www.census.gov/construction/bps/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">Census BPS</a>';
   if (base==='fc_starts'||base==='mortgage_dq_rate') return '<a href="https://www.ice.com/mortgage-technology/mortgage-monitor" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">ICE McDash</a>';
   if (DISTRESS_METRICS.has(base)) return '<a href="https://www.propstream.com/" target="_blank" rel="noopener" style="color:#c0392b;text-decoration:none">PropStream</a>';
@@ -2095,6 +2096,8 @@ function renderChart(county, cmetric) {
     }
   } else if (cmetric === 'median_year_built' || cmetric === 'pct_pre_1960') {
       const val = getMetricVal(d, cmetric);
+      const utm = document.getElementById('ut-metric'); if (utm) utm.textContent = METRICS[cmetric].label;
+      document.getElementById('chart-label').textContent = METRICS[cmetric].label;
       const svg = d3.select('#line-chart'); svg.selectAll('*').remove();
       document.getElementById('chart-slider-wrap').style.display = 'none';
       const w = svg.node().parentElement.clientWidth || 700;
