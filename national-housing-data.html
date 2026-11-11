@@ -3852,6 +3852,18 @@ function buildAggregatedStateDistressHistory() {
   })).sort((a,b) => a.month < b.month ? -1 : 1);
 }
 
+// Ohio is the only state with every county pulled from PropStream, so it is the only
+// state that gets distress numbers in the State view (sum of its 88 counties).
+function _attachOhioStateDistress() {
+  const oh = NATIONAL_STATES.find(s => s.state_id === 'OH');
+  if (!oh) return;
+  const apply = () => { oh.distress_history = buildAggregatedStateDistressHistory(); };
+  if (DATA.length) { apply(); return; }
+  const wait = setInterval(() => {
+    if (DATA.length) { clearInterval(wait); apply(); if (mapMode === 'state') renderColors('state'); }
+  }, 300);
+}
+
 function _applyAggregatedStateDistress() {
   if (!STATE_DATA || !DATA.length) return;
   STATE_DATA.distress_history = buildAggregatedStateDistressHistory();
@@ -3870,6 +3882,7 @@ function loadNationalStatesData() {
     NATIONAL_STATES = rows || [];
     nationalStatesMap = {};
     NATIONAL_STATES.forEach(d => { attachYOY(d); nationalStatesMap[d.state] = d; });
+    _attachOhioStateDistress();
     nationalStatesLoaded = true;
     // the US view also needs the states (for its color scale) -- redraw whichever view is showing
     renderColors(mapMode === 'national' ? 'national' : 'state');
