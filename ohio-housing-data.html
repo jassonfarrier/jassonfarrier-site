@@ -2190,7 +2190,7 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
         const _cColor = _cRaw != null && _cRaw < 0 ? '#c0392b' : '#111';
         if (map.getLayer('dc-circles') && map.queryRenderedFeatures(e.point,{layers:['dc-circles']}).length) return;
         popup.setLngLat(e.lngLat).setHTML(`
-          <div class="tt-county">${name} County</div>
+          <div class="tt-county">${name} County, OH</div>
           <div class="tt-val" style="color:${_cColor}">${fmtVal}</div>
           <div class="tt-label">${METRICS[mapMetric].label}</div>
         `).addTo(map);
@@ -2355,7 +2355,7 @@ fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/ohio_counties?select=fip
         const zd = zipDataMap[zipHoveredId];
         const zVal = zd ? getMetricVal(zd, mapMetric) : null;
         const zFmt = zVal != null ? METRICS[mapMetric].fmt(zVal) : 'N/A';
-        const zCity = zd && zd.city ? zd.city : '';
+        const zCity = zd && zd.city ? zd.city + ', ' + (zd.state_id || 'OH') : '';
         const _zColor = zVal != null && zVal < 0 ? '#c0392b' : '#111';
         if (map.getLayer('dc-circles') && map.queryRenderedFeatures(e.point,{layers:['dc-circles']}).length) return;
         popup.setLngLat(e.lngLat).setHTML(`
@@ -3994,7 +3994,7 @@ function showZipResults(raw) {
     const li = document.createElement('li');
     const d = zipDataMap[z];
     const val = d && d.latest && d.latest[mapMetric] != null ? METRICS[mapMetric].fmt(Number(d.latest[mapMetric])) : '';
-    li.innerHTML = `<div>${z}${d&&d.city?' — '+d.city+', OH':''}</div><div class="sr-sub">${d&&d.county?d.county+' County':''}${val?' · '+METRICS[mapMetric].label+': '+val:''}</div>`;
+    li.innerHTML = `<div>${z}${d&&d.city?' — '+d.city+', OH':''}</div><div class="sr-sub">${d&&d.county?(/ County$/.test(d.county)?d.county:d.county+' County'):''}${val?' · '+METRICS[mapMetric].label+': '+val:''}</div>`;
     li.addEventListener('click', () => selectZip(z));
     searchResults.appendChild(li);
   });
@@ -4050,7 +4050,7 @@ function doSearch(q) {
     const li = document.createElement('li');
     const d = dataMap[name];
     const val = d && d.latest && d.latest[mapMetric] != null ? METRICS[mapMetric].fmt(Number(d.latest[mapMetric])) : '';
-    li.innerHTML = `<div>${name} County</div><div class="sr-sub">${METRICS[mapMetric].label}${val?' — '+val:''}</div>`;
+    li.innerHTML = `<div>${name} County, OH</div><div class="sr-sub">${METRICS[mapMetric].label}${val?' — '+val:''}</div>`;
     li.addEventListener('click', () => selectCounty(name));
     searchResults.appendChild(li);
   });
