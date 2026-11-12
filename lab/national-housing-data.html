@@ -3623,7 +3623,7 @@ function getTableRows() {
     return DATA.map(d => _tableRowFromD(d, d.county + ', ' + d.state_id, d.fips));
   }
   if (mapMode === 'zip') {
-    return ZIP_DATA.map(d => _tableRowFromD(d, d.zip + (d.city ? ' — ' + d.city : ''), d.zip));
+    return ZIP_DATA.map(d => _tableRowFromD(d, d.zip + (d.city ? ' — ' + d.city + ', ' + (d.state_id || 'OH') : ''), d.zip));
   }
   return [];
 }
@@ -4435,7 +4435,7 @@ function openZipModal(zip, fallbackState) {
   }
   const l = d.latest || {};
   document.getElementById('modal-county').textContent = zip;
-  const _utc4 = document.getElementById('ut-county'); if (_utc4) _utc4.textContent = zip + (d.city ? ' · ' + d.city : '');
+  const _utc4 = document.getElementById('ut-county'); if (_utc4) _utc4.textContent = zip + (d.city ? ' · ' + d.city + ', ' + (d.state_id || 'OH') : '');
   document.getElementById('modal-sub').textContent = (d.city || '') + (d.city && d.state_id ? ', ' + d.state_id : (d.state_id || ''));
   const _chips = [];
   if (d.county) _chips.push('County: ' + d.county);
@@ -4735,7 +4735,7 @@ function selectZip(zip, stateId) {
   if (mapMode !== 'zip') setMode('zip');
   const finishSelect = () => {
     const d = zipDataMap[zip];
-    searchInput.value = zip + (d && d.city ? ' — ' + d.city : '');
+    searchInput.value = zip + (d && d.city ? ' — ' + d.city + ', ' + (d.state_id || 'OH') : '');
     if (selectedZip) { try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:false})}catch(e){} }
     selectedZip = zip;
     try{map.setFeatureState({source:'ohio-zips',id:selectedZip},{selected:true})}catch(e){}
@@ -4929,7 +4929,7 @@ document.addEventListener('click', e => {
         const city = (d.city||'').toLowerCase();
         return zip.startsWith(q) || city.includes(q);
       }).slice(0,10).forEach(d => {
-        hits.push({label: d.zip + (d.city ? ' — '+d.city : ''), action: ()=>{ openZipModal(d.zip); updateMapSelection('zip', d.zip); inp.value=''; res.style.display='none'; }});
+        hits.push({label: d.zip + (d.city ? ' — '+d.city+', '+(d.state_id || 'OH') : ''), action: ()=>{ openZipModal(d.zip); updateMapSelection('zip', d.zip); inp.value=''; res.style.display='none'; }});
       });
     } else if (mapMode === 'county') {
       Object.keys(FIPS_NAME).filter(fips => FIPS_NAME[fips].toLowerCase().includes(q))
