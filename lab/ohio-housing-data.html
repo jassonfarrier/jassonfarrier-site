@@ -1401,7 +1401,8 @@ function renderColors(mode) {
       try { map.setPaintProperty('counties-fill', 'fill-color', ['coalesce', ['get', '__color'], '#ccc']); } catch(e) {}
     } else {
       // Non-YOY: use Mapbox interpolate expression on GeoJSON property
-      const flatStops = stops.flatMap(([v, c]) => [v, c]);
+      // Mapbox needs strictly rising stop values; drop repeats (many places can share a value, e.g. 0)
+      const flatStops = stops.filter((s, i, a) => i === 0 || s[0] > a[i-1][0]).flatMap(([v, c]) => [v, c]);
       try {
         map.setPaintProperty('counties-fill', 'fill-color', [
           'interpolate', ['linear'],
