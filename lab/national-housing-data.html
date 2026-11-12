@@ -2737,7 +2737,7 @@ function _onCountiesLoaded(counties, yoyRows) {
         const zd = zipDataMap[zipHoveredId];
         const zVal = zd ? getMetricVal(zd, mapMetric) : null;
         const zFmt = zVal != null ? METRICS[mapMetric].fmt(zVal) : 'N/A';
-        const zCity = zd && zd.city ? zd.city : '';
+        const zCity = zd && zd.city ? zd.city + ', ' + (zd.state_id || 'OH') : '';
         const _zColor = zVal != null && zVal < 0 ? '#c0392b' : '#111';
         if (map.getLayer('dc-circles') && map.queryRenderedFeatures(e.point,{layers:['dc-circles']}).length) return;
         popup.setLngLat(e.lngLat).setHTML(`
