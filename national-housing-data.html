@@ -4278,7 +4278,7 @@ function loadZipDataForState(abbr) {
   }
   return Promise.all([
     fetch('/zips/'+abbr+'.geojson').then(r=>r.json()),
-    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,county,metro,latest&state_id=eq.'+abbr),
+    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips?select=zip,city,state_id,county,metro,latest&state_id=eq.'+abbr),
     // us_zips_yoy: same materialized-view pattern as us_counties_yoy/us_metros_yoy --
     // computed server-side from full history, refreshed on data update. Now covers the
     // Realtor.com fields too (active_listings, pending_listings, pending_ratio,
