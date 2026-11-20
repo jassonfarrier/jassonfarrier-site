@@ -1071,6 +1071,23 @@ function computeYOYHistoryAnnual(history, baseMetric) {
 }
 
 // Hover tooltip: amount of change behind a YOY % (e.g. +$12,400, +3 days, +1.2 pts)
+function chartChgAmt(metric, cur, prev) {
+  const M = METRICS[metric];
+  if (!M || YOY_METRICS.has(metric) || cur == null || prev == null) return '';
+  const n = Number(cur) - Number(prev);
+  if (isNaN(n)) return '';
+  const a = Math.abs(n), sign = n > 0 ? '+' : n < 0 ? '−' : '';
+  let t;
+  if (/days_on_market|_dom$/.test(metric)) { const r = Math.round(a); t = r + (r === 1 ? ' day' : ' days'); }
+  else { t = String(M.fmt(a)); if (t.endsWith('%')) t = t.slice(0, -1) + ' pts'; }
+  return sign + t;
+}
+function _setDeltaLines(sel, text, amt) {
+  const x = sel.attr('x');
+  sel.text(null);
+  sel.append('tspan').text(text);
+  if (amt) sel.append('tspan').attr('x', x).attr('dy', '1.3em').text(amt);
+}
 function ttChg(d, metric, color) {
   if (!YOY_METRICS.has(metric) || !d || !d.yoy_chg || getMetricVal(d, metric) == null) return '';
   const base = YOY_BASE[metric], M = METRICS[base];
@@ -3117,7 +3134,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
     const cx = x(parseDate(r.date));
     const cy = y(r[cmetric]);
     // Compute delta from pinned bar
-    let deltaText = null;
+    let deltaText = null, deltaAmt = '';
     if (clickedDate && clickedDate !== r.date) {
       const pinnedRow = rows.find(p => p.date === clickedDate);
       if (pinnedRow && pinnedRow[cmetric] != null && r[cmetric] != null && pinnedRow[cmetric] !== 0) {
@@ -3127,10 +3144,11 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
         } else {
           const pct = ((r[cmetric] - pinnedRow[cmetric]) / Math.abs(pinnedRow[cmetric])) * 100;
           deltaText = (pct >= 0 ? '▲ ' : '▼ ') + Math.abs(pct).toFixed(1) + '% from ' + fmtMonthDate(clickedDate);
+          deltaAmt = chartChgAmt(cmetric, r[cmetric], pinnedRow[cmetric]);
         }
       }
     }
-    const curCardH = deltaText ? 175 : 145;
+    const curCardH = (deltaText ? 175 : 145) + (deltaAmt ? 24 : 0);
     const cardX = cx + cardW + 10 > iw ? cx - cardW - 10 : cx + 10;
     const cardY = Math.max(0, Math.min(cy - 10, ih - curCardH));
     hoverLine.attr('x1',cx).attr('x2',cx).style('opacity',1);
@@ -3140,7 +3158,7 @@ function drawMonthlyBarChart(county, cmetric, histOverride, isZip, _sliderFilter
     hoverLabelTxt.attr('x',cardX+18).attr('y',cardY+115).text(METRICS[cmetric].label.toUpperCase());
     if (deltaText) {
       const isNegDelta = deltaText.startsWith('▼') || deltaText.startsWith('-');
-      hoverDeltaTxt.attr('x',cardX+18).attr('y',cardY+148).text(deltaText)
+      hoverDeltaTxt.attr('x',cardX+18).attr('y',cardY+148).call(_setDeltaLines, deltaText, deltaAmt)
         .attr('fill', isNegDelta ? '#c0392b' : '#1a5296')
         .style('opacity',1);
     } else {
@@ -3336,15 +3354,16 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip, keepSlider) {
       const yr = nearest.date.slice(0,4);
       const cx = x(yr), cy = y(nearest[cmetric]);
       // Compute delta from pinned year
-      let deltaText = null;
+      let deltaText = null, deltaAmt = '';
       if (alcClickedYear && alcClickedYear !== yr) {
         const pinnedRow = rows.find(r => r.date.slice(0,4) === alcClickedYear);
         if (pinnedRow && pinnedRow[cmetric] != null && nearest[cmetric] != null && pinnedRow[cmetric] !== 0) {
           const pct = ((nearest[cmetric] - pinnedRow[cmetric]) / Math.abs(pinnedRow[cmetric])) * 100;
           deltaText = (pct >= 0 ? '▲ ' : '▼ ') + Math.abs(pct).toFixed(1) + '% from ' + alcClickedYear;
+          deltaAmt = chartChgAmt(cmetric, nearest[cmetric], pinnedRow[cmetric]);
         }
       }
-      const curCardH = deltaText ? 153 : cardH;
+      const curCardH = deltaText ? 153 + (deltaAmt ? 24 : 0) : cardH;
       const cardX = cx + cardW + 9 > iw ? cx - cardW - 9 : cx + 9;
       const cardY = Math.max(0, Math.min(cy - 9, ih - curCardH));
       hoverRect.attr('x',cardX).attr('y',cardY).attr('width',cardW).attr('height',curCardH);
@@ -3353,7 +3372,7 @@ function drawAnnualLineChart(county, cmetric, histOverride, isZip, keepSlider) {
       hoverLbl.attr('x',cardX+17).attr('y',cardY+104).text(METRICS[cmetric].label.toUpperCase());
       if (deltaText) {
         const isNeg = deltaText.startsWith('▼');
-        hoverDelta.attr('x',cardX+17).attr('y',cardY+138).text(deltaText)
+        hoverDelta.attr('x',cardX+17).attr('y',cardY+138).call(_setDeltaLines, deltaText, deltaAmt)
           .attr('fill', isNeg ? '#c0392b' : '#1a5296').style('opacity',1);
       } else {
         hoverDelta.style('opacity',0);
@@ -3492,7 +3511,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
       const bx = parseFloat(d3.select(this).attr('x'));
       const by = parseFloat(d3.select(this).attr('y'));
       const cx = bx + x.bandwidth() / 2;
-      let deltaText = null;
+      let deltaText = null, deltaAmt = '';
       if (annClickedYear && annClickedYear !== r.year) {
         const pinnedRow = rows.find(p => p.year === annClickedYear);
         if (pinnedRow && pinnedRow.val != null && r.val != null && pinnedRow.val !== 0) {
@@ -3502,10 +3521,11 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
           } else {
             const pct = ((r.val - pinnedRow.val) / Math.abs(pinnedRow.val)) * 100;
             deltaText = (pct >= 0 ? '▲ ' : '▼ ') + Math.abs(pct).toFixed(1) + '% from ' + annClickedYear;
+            deltaAmt = chartChgAmt(cmetric, r.val, pinnedRow.val);
           }
         }
       }
-      const curCardH = deltaText ? 165 : 125;
+      const curCardH = (deltaText ? 165 : 125) + (deltaAmt ? 24 : 0);
       const cardX = cx + annCardW + 10 > iw ? cx - annCardW - 10 : cx + 10;
       const cardY = Math.max(0, Math.min(by - 10, ih - curCardH));
       annHoverRect.attr('x',cardX).attr('y',cardY).attr('width',annCardW).attr('height',curCardH);
@@ -3514,7 +3534,7 @@ function drawAnnualBarChart(county, cmetric, histOverride, isZip) {
       annHoverLbl.attr('x',cardX+18).attr('y',cardY+112).text(METRICS[cmetric].label.toUpperCase());
       if (deltaText) {
         const isNeg = deltaText.startsWith('▼') || deltaText.startsWith('-');
-        annHoverDelta.attr('x',cardX+18).attr('y',cardY+148).text(deltaText)
+        annHoverDelta.attr('x',cardX+18).attr('y',cardY+148).call(_setDeltaLines, deltaText, deltaAmt)
           .attr('fill', isNeg ? '#c0392b' : '#1a5296').style('opacity',1);
       } else {
         annHoverDelta.style('opacity',0);
