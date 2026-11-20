@@ -126,6 +126,8 @@ html.is-phone .upper-third-rank .rk-part{display:block}
 .mapboxgl-popup-tip{border-top-color:rgba(0,0,0,0.15)!important;border-bottom-color:rgba(0,0,0,0.15)!important}
 .tt-county{font-size:14px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#555;margin-bottom:10px;white-space:nowrap}
 .tt-val{font-size:38px;font-weight:800;color:#111;line-height:1.1;letter-spacing:-0.5px;text-align:left;display:block;white-space:nowrap}
+.tt-chg{font-size:19px;font-weight:700;line-height:1.2;margin-top:6px;white-space:nowrap}
+.tt-chg span{font-size:13px;font-weight:500;color:#777;margin-left:4px}
 .tt-label{font-size:14px;font-weight:500;color:#777;margin-top:10px;white-space:nowrap}
 .mapboxgl-popup-close-button{display:none!important}
 
@@ -1050,7 +1052,7 @@ function computeYOYHistory(history, baseMetric) {
     const prior = byDate[priorDate];
     if (!prior || prior[baseMetric] == null || prior[baseMetric] === 0) return;
     const pct = (r[baseMetric] - prior[baseMetric]) / Math.abs(prior[baseMetric]) * 100;
-    result.push({date: r.date, value: parseFloat(pct.toFixed(2))});
+    result.push({date: r.date, value: parseFloat(pct.toFixed(2)), diff: r[baseMetric] - prior[baseMetric]});
   });
   return result;
 }
@@ -1063,25 +1065,41 @@ function computeYOYHistoryAnnual(history, baseMetric) {
     const curr = history[i], prev = history[i-1];
     if (curr[baseMetric] == null || prev[baseMetric] == null || prev[baseMetric] === 0) continue;
     const pct = (curr[baseMetric] - prev[baseMetric]) / Math.abs(prev[baseMetric]) * 100;
-    result.push({year: curr.year, value: parseFloat(pct.toFixed(2))});
+    result.push({year: curr.year, value: parseFloat(pct.toFixed(2)), diff: curr[baseMetric] - prev[baseMetric]});
   }
   return result;
+}
+
+// Hover tooltip: amount of change behind a YOY % (e.g. +$12,400, +3 days, +1.2 pts)
+function ttChg(d, metric, color) {
+  if (!YOY_METRICS.has(metric) || !d || !d.yoy_chg || getMetricVal(d, metric) == null) return '';
+  const base = YOY_BASE[metric], M = METRICS[base];
+  const n = Number(d.yoy_chg[base]);
+  if (!M || d.yoy_chg[base] == null || isNaN(n)) return '';
+  const a = Math.abs(n), sign = n > 0 ? '+' : n < 0 ? '−' : '';
+  let t;
+  if (/days_on_market|_dom$/.test(base)) { const r = Math.round(a); t = r + (r === 1 ? ' day' : ' days'); }
+  else { t = M.fmt(a); if (t.endsWith('%')) t = t.slice(0, -1) + ' pts'; }
+  return `<div class="tt-chg" style="color:${color}">${sign}${t}<span>vs. last year</span></div>`;
 }
 
 function attachYOY(d) {
   // Attach .yoy_latest and .yoy_history to a data record
   d.yoy_latest = {};
   d.yoy_history = {};
+  d.yoy_chg = {};
   for (const [yoyKey, base] of Object.entries(YOY_BASE)) {
     if (TAX_YOY.has(yoyKey)) {
       // Annual property tax — use prop_tax_history
       const hist = computeYOYHistoryAnnual(d.prop_tax_history || [], base);
       d.yoy_history[yoyKey] = hist;
       d.yoy_latest[yoyKey] = hist.length ? hist[hist.length-1].value : null;
+      if (hist.length) d.yoy_chg[base] = hist[hist.length-1].diff;
     } else {
       const hist = computeYOYHistory(d.history || [], base);
       d.yoy_history[yoyKey] = hist;
       d.yoy_latest[yoyKey] = hist.length ? hist[hist.length-1].value : null;
+      if (hist.length) d.yoy_chg[base] = hist[hist.length-1].diff;
     }
   }
 }
@@ -2276,7 +2294,7 @@ document.querySelectorAll('.metric-btn[data-metric]').forEach(btn => {
   // payload small (~730KB total vs ~14MB with history). History gets added back in a later
   // pass, fetched lazily per-county on click, once this base layer is confirmed working.
   const _base = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties?select=fips,county,state,state_id,latest,distress_history&order=county';
-  const _yoyBase = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties_yoy?select=fips,zhvi_yoy,zhvi_condo_yoy,zori_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy,rf_median_sale_price_yoy,rf_homes_sold_yoy,rf_inventory_yoy,rf_months_supply_yoy,rf_new_listings_yoy,rf_price_drop_pct_yoy&order=fips';
+  const _yoyBase = 'https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_counties_yoy?select=fips,yoy_chg,zhvi_yoy,zhvi_condo_yoy,zori_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy,rf_median_sale_price_yoy,rf_homes_sold_yoy,rf_inventory_yoy,rf_months_supply_yoy,rf_new_listings_yoy,rf_price_drop_pct_yoy&order=fips';
   const _pageSize = 1000;
   const _pageCount = 4; // 4 * 1000 = 4000, safely covers all 3,073 counties with room to grow
   Promise.all([
@@ -2348,7 +2366,8 @@ function _onCountiesLoaded(counties, yoyRows) {
     if (yr) {
       // Copy every YOY column the view returns (Zillow, Realtor.com and Redfin).
       for (const [k, v] of Object.entries(yr)) {
-        if (k !== 'fips' && v != null) d.yoy_latest[k] = Number(v);
+        if (k === 'yoy_chg') { if (v) d.yoy_chg = Object.assign(d.yoy_chg || {}, v); continue; }
+          if (k !== 'fips' && v != null) d.yoy_latest[k] = Number(v);
       }
     }
   });
@@ -2489,7 +2508,7 @@ function _onCountiesLoaded(counties, yoyRows) {
 
 
       // Hover tooltip
-      popup = new mapboxgl.Popup({closeButton:false, closeOnClick:false, offset:12, maxWidth:'220px'});
+      popup = new mapboxgl.Popup({closeButton:false, closeOnClick:false, offset:12, maxWidth:'280px'});
       let hoveredId = null;
 
       map.on('mousemove','counties-fill', e => {
@@ -2512,7 +2531,7 @@ function _onCountiesLoaded(counties, yoyRows) {
         if (map.getLayer('dc-circles') && map.queryRenderedFeatures(e.point,{layers:['dc-circles']}).length) return;
         popup.setLngLat(e.lngLat).setHTML(`
           <div class="tt-county">${cd ? cd.county+', '+cd.state_id : ''}</div>
-          <div class="tt-val" style="color:${_cColor}">${fmtVal}</div>
+          <div class="tt-val" style="color:${_cColor}">${fmtVal}</div>${ttChg(cd, mapMetric, _cColor)}
           <div class="tt-label">${METRICS[mapMetric].label}</div>
         `).addTo(map);
       });
@@ -2573,7 +2592,7 @@ function _onCountiesLoaded(counties, yoyRows) {
         if (map.getLayer('dc-circles') && map.queryRenderedFeatures(e.point,{layers:['dc-circles']}).length) return;
         popup.setLngLat(e.lngLat).setHTML(`
           <div class="tt-county">${mName}</div>
-          <div class="tt-val" style="color:${_mColor}">${mFmt}</div>
+          <div class="tt-val" style="color:${_mColor}">${mFmt}</div>${ttChg(md, mapMetric, _mColor)}
           <div class="tt-label">${METRICS[mapMetric].label}</div>
         `).addTo(map);
       });
@@ -2648,7 +2667,7 @@ function _onCountiesLoaded(counties, yoyRows) {
         const _sColor = sVal != null && sVal < 0 ? '#c0392b' : '#111';
         popup.setLngLat(e.lngLat).setHTML(`
           <div class="tt-county">${sName}</div>
-          <div class="tt-val" style="color:${_sColor}">${sFmt}</div>
+          <div class="tt-val" style="color:${_sColor}">${sFmt}</div>${ttChg(sd, mapMetric, _sColor)}
           <div class="tt-label">${METRICS[mapMetric].label}</div>
         `).addTo(map);
       });
@@ -2742,7 +2761,7 @@ function _onCountiesLoaded(counties, yoyRows) {
         if (map.getLayer('dc-circles') && map.queryRenderedFeatures(e.point,{layers:['dc-circles']}).length) return;
         popup.setLngLat(e.lngLat).setHTML(`
           <div class="tt-county">${zipHoveredId}${zCity ? ' · '+zCity : ''}</div>
-          <div class="tt-val" style="color:${_zColor}">${zFmt}</div>
+          <div class="tt-val" style="color:${_zColor}">${zFmt}</div>${ttChg(zd, mapMetric, _zColor)}
           <div class="tt-label">${METRICS[mapMetric].label}</div>
         `).addTo(map);
       });
@@ -3784,7 +3803,7 @@ function loadMetroData() {
     // from full history, refreshed on data update. Without this, d.yoy_latest is empty for
     // every metro until that metro's history is lazily loaded by a click, which is exactly
     // what made YOY map coloring show nothing and caused the price/YOY state to desync.
-    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_metros_yoy?select=region_id,zhvi_yoy,zhvi_condo_yoy,zori_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy,cancellation_pct_yoy,delisted_pct_yoy,relisted_pct_yoy,cash_pct_yoy,down_payment_pct_yoy,fha_pct_yoy,va_pct_yoy,investor_purchases_yoy,investor_market_share_yoy,luxury_median_sale_price_yoy,luxury_median_dom_yoy,luxury_active_listings_yoy,luxury_pending_sales_yoy,rf_median_sale_price_yoy,rf_homes_sold_yoy,rf_inventory_yoy,rf_months_supply_yoy,rf_new_listings_yoy,rf_price_drop_pct_yoy,rf_sfr_median_sale_price_yoy,rf_th_median_sale_price_yoy,rf_condo_median_sale_price_yoy,rf_mf_median_sale_price_yoy,rf_sfr_homes_sold_yoy,rf_th_homes_sold_yoy,rf_condo_homes_sold_yoy,rf_mf_homes_sold_yoy,rf_sfr_new_listings_yoy,rf_th_new_listings_yoy,rf_condo_new_listings_yoy,rf_mf_new_listings_yoy', {
+    fetch('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_metros_yoy?select=region_id,yoy_chg,zhvi_yoy,zhvi_condo_yoy,zori_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy,cancellation_pct_yoy,delisted_pct_yoy,relisted_pct_yoy,cash_pct_yoy,down_payment_pct_yoy,fha_pct_yoy,va_pct_yoy,investor_purchases_yoy,investor_market_share_yoy,luxury_median_sale_price_yoy,luxury_median_dom_yoy,luxury_active_listings_yoy,luxury_pending_sales_yoy,rf_median_sale_price_yoy,rf_homes_sold_yoy,rf_inventory_yoy,rf_months_supply_yoy,rf_new_listings_yoy,rf_price_drop_pct_yoy,rf_sfr_median_sale_price_yoy,rf_th_median_sale_price_yoy,rf_condo_median_sale_price_yoy,rf_mf_median_sale_price_yoy,rf_sfr_homes_sold_yoy,rf_th_homes_sold_yoy,rf_condo_homes_sold_yoy,rf_mf_homes_sold_yoy,rf_sfr_new_listings_yoy,rf_th_new_listings_yoy,rf_condo_new_listings_yoy,rf_mf_new_listings_yoy', {
       headers: {'apikey': ANON_KEY, 'Authorization': 'Bearer ' + ANON_KEY}
     }).then(r=>r.json())
   ]).then(([geojson, metros, yoyRows]) => {
@@ -3796,6 +3815,7 @@ function loadMetroData() {
       const yr = yoyByRid[d.region_id];
       if (yr) {
         for (const [k, v] of Object.entries(yr)) {
+          if (k === 'yoy_chg') { if (v) d.yoy_chg = Object.assign(d.yoy_chg || {}, v); continue; }
           if (k !== 'region_id' && v != null) d.yoy_latest[k] = Number(v);
         }
       }
@@ -4337,7 +4357,7 @@ function loadZipDataForState(abbr) {
     // computed server-side from full history, refreshed on data update. Now covers the
     // Realtor.com fields too (active_listings, pending_listings, pending_ratio,
     // days_on_market, price_reduced_pct), not just zhvi.
-    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,zhvi_yoy,zori_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy,cancellation_pct_yoy,rf_median_sale_price_yoy,rf_homes_sold_yoy,rf_inventory_yoy,rf_months_supply_yoy,rf_new_listings_yoy,rf_price_drop_pct_yoy&state_id=eq.'+abbr),
+    fetchAllPages('https://nmerqwjfrnmzqgdpgrys.supabase.co/rest/v1/us_zips_yoy?select=zip,yoy_chg,zhvi_yoy,zori_yoy,active_listings_yoy,new_listings_yoy,pending_listings_yoy,pending_ratio_yoy,days_on_market_yoy,price_reduced_pct_yoy,cancellation_pct_yoy,rf_median_sale_price_yoy,rf_homes_sold_yoy,rf_inventory_yoy,rf_months_supply_yoy,rf_new_listings_yoy,rf_price_drop_pct_yoy&state_id=eq.'+abbr),
     // us_zips_national_rank: precomputed RANK() OVER (ORDER BY zhvi DESC) across all 26,268
     // priced ZIPs -- lets the rank badge show a national percentile alongside the in-state
     // one (computed client-side from ZIP_DATA below) without loading all 26k ZIPs client-side.
@@ -4353,6 +4373,7 @@ function loadZipDataForState(abbr) {
       const fresh = yoyByZip[d.zip];
       if (fresh) {
         for (const [k, v] of Object.entries(fresh)) {
+          if (k === 'yoy_chg') { if (v) d.yoy_chg = Object.assign(d.yoy_chg || {}, v); continue; }
           if (k !== 'zip' && v != null) d.yoy_latest[k] = Number(v);
         }
       }
